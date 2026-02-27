@@ -1,5 +1,8 @@
 # Project 4H Campaign Dashboard
 
+**Live:** https://pumpcans.com  
+**Operating model:** See [`SOP-WORKFLOW.md`](./SOP-WORKFLOW.md) — dashboard is the view layer; Bob is the engine.
+
 Project 4H — Saw.City Campaign Command built with Next.js App Router.
 
 ## Local Development
