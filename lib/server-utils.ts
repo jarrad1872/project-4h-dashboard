@@ -8,6 +8,7 @@ import type {
   BudgetData,
   BudgetRow,
   CampaignConfig,
+  AdTemplate,
   CampaignStatusData,
   ChannelMetrics,
   LaunchChecklistItem,
@@ -89,6 +90,13 @@ function normalizeStatusHistory(input: any): { status: Ad["status"]; at: string;
   return [];
 }
 
+export function statusToWorkflowStage(status: Ad["status"]): Ad["workflow_stage"] {
+  if (status === "approved") return "approved";
+  if (status === "paused") return "uploaded";
+  if (status === "rejected") return "concept";
+  return "copy-ready";
+}
+
 export function normalizeAd(input: any): Ad {
   const headline = (input.headline ?? null) as string | null;
   const createdAt = (input.created_at ?? input.createdAt ?? isoNow()) as string;
@@ -102,6 +110,7 @@ export function normalizeAd(input: any): Ad {
   const utmCampaign = (input.utm_campaign ?? input.utmCampaign ?? "") as string;
   const utmContent = (input.utm_content ?? input.utmContent ?? "") as string;
   const utmTerm = (input.utm_term ?? input.utmTerm ?? "") as string;
+  const workflowStage = (input.workflow_stage ?? input.workflowStage ?? statusToWorkflowStage(input.status)) as Ad["workflow_stage"];
 
   return {
     id: String(input.id),
@@ -118,6 +127,7 @@ export function normalizeAd(input: any): Ad {
     utm_content: utmContent,
     utm_term: utmTerm,
     status: input.status,
+    workflow_stage: workflowStage,
     created_at: createdAt,
     updated_at: updatedAt,
 
@@ -131,6 +141,7 @@ export function normalizeAd(input: any): Ad {
     utmTerm,
     createdAt,
     updatedAt,
+    workflowStage,
     statusHistory: normalizeStatusHistory(input),
   };
 }
@@ -151,6 +162,7 @@ export function adToDb(ad: Partial<Ad>) {
     utm_content: ad.utm_content ?? ad.utmContent,
     utm_term: ad.utm_term ?? ad.utmTerm,
     status: ad.status,
+    workflow_stage: ad.workflow_stage ?? ad.workflowStage,
     created_at: ad.created_at ?? ad.createdAt,
     updated_at: ad.updated_at ?? ad.updatedAt,
   };
@@ -172,9 +184,35 @@ export function adToLegacyJson(ad: Ad) {
     utmContent: ad.utmContent,
     utmTerm: ad.utmTerm,
     status: ad.status,
+    workflowStage: ad.workflowStage,
     createdAt: ad.createdAt,
     updatedAt: ad.updatedAt,
     statusHistory: ad.statusHistory ?? [],
+  };
+}
+
+export function normalizeTemplate(input: any): AdTemplate {
+  const primaryText = (input.primary_text ?? input.primaryText ?? "") as string;
+  const landingPath = (input.landing_path ?? input.landingPath ?? "") as string;
+  const utmCampaign = (input.utm_campaign ?? input.utmCampaign ?? "") as string;
+  const createdAt = String(input.created_at ?? input.createdAt ?? isoNow());
+
+  return {
+    id: String(input.id),
+    name: String(input.name ?? "Untitled template"),
+    platform: input.platform,
+    format: (input.format ?? null) as string | null,
+    primary_text: primaryText || null,
+    headline: (input.headline ?? null) as string | null,
+    cta: (input.cta ?? null) as string | null,
+    landing_path: landingPath || null,
+    utm_campaign: utmCampaign || null,
+    created_at: createdAt,
+
+    primaryText,
+    landingPath,
+    utmCampaign,
+    createdAt,
   };
 }
 

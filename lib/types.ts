@@ -1,6 +1,7 @@
 export type AdStatus = "approved" | "pending" | "paused" | "rejected";
 export type AdPlatform = "linkedin" | "youtube" | "facebook" | "instagram";
 export type CampaignStatus = "pre-launch" | "live" | "paused" | "ended";
+export type WorkflowStage = "concept" | "copy-ready" | "approved" | "creative-brief" | "uploaded" | "live";
 
 export interface Ad {
   id: string;
@@ -17,6 +18,7 @@ export interface Ad {
   utm_content: string;
   utm_term: string;
   status: AdStatus;
+  workflow_stage: WorkflowStage;
   created_at: string;
   updated_at: string;
 
@@ -31,7 +33,27 @@ export interface Ad {
   utmTerm: string;
   createdAt: string;
   updatedAt?: string;
+  workflowStage: WorkflowStage;
   statusHistory?: StatusHistoryItem[];
+}
+
+export interface AdTemplate {
+  id: string;
+  name: string;
+  platform: AdPlatform;
+  format: string | null;
+  primary_text: string | null;
+  headline: string | null;
+  cta: string | null;
+  landing_path: string | null;
+  utm_campaign: string | null;
+  created_at: string;
+
+  // Compatibility fields for existing UI/request payloads.
+  primaryText: string;
+  landingPath: string;
+  utmCampaign: string;
+  createdAt: string;
 }
 
 export interface WeeklyMetric {

@@ -1,13 +1,52 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
-import { adToDb, adToLegacyJson, hasSupabase, logActivity, normalizeAd, readFallback } from "@/lib/server-utils";
-import type { Ad, AdStatus } from "@/lib/types";
+import {
+  adToDb,
+  adToLegacyJson,
+  hasSupabase,
+  logActivity,
+  normalizeAd,
+  readFallback,
+  statusToWorkflowStage,
+} from "@/lib/server-utils";
+import type { Ad, AdStatus, WorkflowStage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export function OPTIONS() {
   return optionsResponse();
+}
+
+function readWorkflowOverrides() {
+  return readFallback<Record<string, WorkflowStage>>(DataFiles.workflowStages, {});
+}
+
+function writeWorkflowOverride(id: string, workflowStage: WorkflowStage) {
+  const current = readWorkflowOverrides();
+  current[id] = workflowStage;
+  writeJsonFile(DataFiles.workflowStages, current);
+}
+
+function applyWorkflowOverrides(rows: unknown[]) {
+  const overrides = readWorkflowOverrides();
+  return rows.map((row) => {
+    const item = row as { id: string; workflow_stage?: WorkflowStage };
+    return normalizeAd({
+      ...item,
+      workflow_stage: overrides[item.id] ?? item.workflow_stage,
+    });
+  });
+}
+
+function isWorkflowStageColumnMissing(error: { code?: string; message?: string } | null | undefined) {
+  return Boolean(
+    error &&
+      (error.code === "42703" ||
+        error.code === "PGRST204" ||
+        error.message?.includes("workflow_stage") ||
+        error.message?.includes("schema cache")),
+  );
 }
 
 export async function GET(request: Request) {
@@ -17,7 +56,7 @@ export async function GET(request: Request) {
     const status = searchParams.get("status");
 
     if (!hasSupabase()) {
-      const fallbackAds = readFallback<any[]>(DataFiles.ads, []).map(normalizeAd);
+      const fallbackAds = applyWorkflowOverrides(readFallback<any[]>(DataFiles.ads, []));
       const filtered = fallbackAds.filter((ad) => {
         const platformMatch = !platform || platform === "all" || ad.platform === platform;
         const statusMatch = !status || status === "all" || ad.status === status;
@@ -42,7 +81,7 @@ export async function GET(request: Request) {
       return errorJson("Failed to load ads", 500, error.message);
     }
 
-    return okJson((data ?? []).map(normalizeAd));
+    return okJson(applyWorkflowOverrides(data ?? []));
   } catch (error) {
     return errorJson("Failed to load ads", 500, String(error));
   }
@@ -63,6 +102,7 @@ export async function POST(request: Request) {
     const id = payload.id ?? `${platform}-${Date.now()}`;
     const now = isoNow();
     const status = (payload.status ?? "pending") as AdStatus;
+    const workflowStage = payload.workflow_stage ?? payload.workflowStage ?? statusToWorkflowStage(status);
 
     const ad: Ad = normalizeAd({
       id,
@@ -79,6 +119,7 @@ export async function POST(request: Request) {
       utm_content: payload.utm_content ?? payload.utmContent ?? "custom",
       utm_term: payload.utm_term ?? payload.utmTerm ?? "owners_1-10",
       status,
+      workflow_stage: workflowStage,
       created_at: payload.created_at ?? payload.createdAt ?? now,
       updated_at: now,
       statusHistory: [{ status, at: now, note: "Created from dashboard" }],
@@ -103,7 +144,17 @@ export async function POST(request: Request) {
       return okJson(ad, 201);
     }
 
-    const { error } = await supabaseAdmin.from("ads").insert(adToDb(ad));
+    let { error } = await supabaseAdmin.from("ads").insert(adToDb(ad));
+    if (isWorkflowStageColumnMissing(error)) {
+      const dbPayload = adToDb(ad);
+      delete (dbPayload as Record<string, unknown>).workflow_stage;
+      const retried = await supabaseAdmin.from("ads").insert(dbPayload);
+      error = retried.error;
+      if (!error) {
+        writeWorkflowOverride(ad.id, ad.workflow_stage);
+      }
+    }
+
     if (error) {
       if (error.code === "23505") {
         return errorJson(`Ad with id ${ad.id} already exists`, 409);

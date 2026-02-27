@@ -1,7 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const rootDataDir = path.join(process.cwd(), "data");
+const nestedDataDir = path.join(process.cwd(), "projects", "project-4h-dashboard", "data");
+const DATA_DIR = fs.existsSync(rootDataDir) ? rootDataDir : nestedDataDir;
 
 export function readJsonFile<T>(fileName: string): T {
   const filePath = path.join(DATA_DIR, fileName);
@@ -27,4 +29,6 @@ export const DataFiles = {
   campaignStatus: "campaign-status.json",
   approvalQueue: "approval-queue.json",
   activity: "activity-log.json",
+  templates: "templates.json",
+  workflowStages: "workflow-stages.json",
 } as const;
