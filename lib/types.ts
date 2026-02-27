@@ -1,31 +1,131 @@
-export type Platform = "linkedin" | "youtube" | "facebook" | "instagram" | "meta" | "tracking" | "all";
 export type AdStatus = "approved" | "pending" | "paused" | "rejected";
-export type CampaignLifecycle = "pre-launch" | "live" | "paused" | "ended";
-export type ChannelRunStatus = "ready" | "live" | "paused";
-
-export interface StatusHistoryItem {
-  status: AdStatus;
-  at: string;
-  note?: string;
-}
+export type AdPlatform = "linkedin" | "youtube" | "facebook" | "instagram";
+export type CampaignStatus = "pre-launch" | "live" | "paused" | "ended";
 
 export interface Ad {
   id: string;
-  platform: Exclude<Platform, "meta" | "tracking" | "all">;
-  campaignGroup: string;
+  platform: AdPlatform;
+  campaign_group: string;
   format: string;
-  primaryText: string;
-  headline: string;
+  primary_text: string;
+  headline: string | null;
   cta: string;
+  landing_path: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_content: string;
+  utm_term: string;
+  status: AdStatus;
+  created_at: string;
+  updated_at: string;
+
+  // Compatibility fields for existing UI/request payloads.
+  campaignGroup: string;
+  primaryText: string;
   landingPath: string;
   utmSource: string;
   utmMedium: string;
   utmCampaign: string;
   utmContent: string;
   utmTerm: string;
-  status: AdStatus;
   createdAt: string;
+  updatedAt?: string;
   statusHistory?: StatusHistoryItem[];
+}
+
+export interface WeeklyMetric {
+  id: string;
+  week_start: string;
+  platform: AdPlatform;
+  spend: number;
+  impressions: number;
+  clicks: number;
+  signups: number;
+  activations: number;
+  paid: number;
+}
+
+export interface LifecycleMessage {
+  id: string;
+  asset_id: string;
+  channel: "email" | "sms";
+  timing: string;
+  subject: string | null;
+  message: string;
+  goal: string;
+  status: "active" | "paused";
+  updated_at: string;
+
+  // Compatibility field for existing UI.
+  updatedAt?: string;
+}
+
+export interface LaunchChecklistItem {
+  id: string;
+  label: string;
+  platform: string;
+  checked: boolean;
+  updated_at: string | null;
+
+  // Compatibility field for existing UI.
+  updatedAt?: string | null;
+}
+
+export interface BudgetRow {
+  platform: AdPlatform;
+  allocated: number;
+  spent: number;
+  updated_at: string;
+}
+
+export interface CampaignConfig {
+  id: number;
+  status: CampaignStatus;
+  start_date: string | null;
+  linkedin_status: string;
+  youtube_status: string;
+  facebook_status: string;
+  instagram_status: string;
+  total_budget: number;
+  updated_at: string;
+}
+
+export interface ApprovalItem {
+  id: string;
+  type: string;
+  title: string;
+  content: string;
+  platform: string | null;
+  status: "pending" | "approved" | "rejected" | "revise";
+  note: string | null;
+  updated_at: string;
+
+  // Compatibility field for existing UI.
+  updatedAt?: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  entity_type: string;
+  entity_id: string;
+  action: string;
+  old_value: any;
+  new_value: any;
+  note: string | null;
+  created_at: string;
+}
+
+// ─── Compatibility Types used by existing UI components ───────────────────────
+
+export type Platform = AdPlatform | "meta" | "tracking" | "all";
+export type CampaignLifecycle = CampaignStatus;
+export type ChannelRunStatus = "ready" | "live" | "paused" | "ended";
+
+export interface StatusHistoryItem {
+  status: AdStatus;
+  at: string;
+  note?: string;
 }
 
 export interface ChannelMetrics {
@@ -50,38 +150,13 @@ export interface MetricsData {
   weeks: MetricsWeek[];
 }
 
-export interface LifecycleMessage {
-  id: string;
-  asset_id: string;
-  channel: "email" | "sms";
-  timing: "day0" | "day1" | "day3" | string;
-  subject: string;
-  message: string;
-  goal: string;
-  status: "active" | "paused" | string;
-  updatedAt?: string;
-}
-
-export interface LaunchChecklistItem {
-  id: string;
-  label: string;
-  checked: boolean;
-  platform: Platform;
-  updatedAt?: string | null;
-}
-
-export interface BudgetChannel {
-  allocated: number;
-  spent: number;
-}
-
 export interface BudgetData {
   totalBudget: number;
   channels: {
-    linkedin: BudgetChannel;
-    youtube: BudgetChannel;
-    facebook: BudgetChannel;
-    instagram: BudgetChannel;
+    linkedin: { allocated: number; spent: number };
+    youtube: { allocated: number; spent: number };
+    facebook: { allocated: number; spent: number };
+    instagram: { allocated: number; spent: number };
   };
   updatedAt?: string;
 }
@@ -93,13 +168,5 @@ export interface CampaignStatusData {
   youtubeStatus: ChannelRunStatus;
   facebookStatus: ChannelRunStatus;
   instagramStatus: ChannelRunStatus;
-  updatedAt?: string;
-}
-
-export interface ApprovalItem {
-  id: string;
-  type: "retargeting_ad" | "lp_block" | "lifecycle_message" | "asset";
-  content: string;
-  status: "pending" | "approved" | "revise" | "rejected";
   updatedAt?: string;
 }

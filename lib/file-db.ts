@@ -26,4 +26,5 @@ export const DataFiles = {
   budget: "budget.json",
   campaignStatus: "campaign-status.json",
   approvalQueue: "approval-queue.json",
+  activity: "activity-log.json",
 } as const;
