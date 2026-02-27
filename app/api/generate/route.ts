@@ -1,24 +1,15 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 type Variation = { headline: string; primaryText: string };
 
-const MODEL_CANDIDATES = [
-  "claude-opus-4-6",
-  "claude-sonnet-4-6",
-  "claude-opus-4-1-20250805",
-  "claude-sonnet-4-5-20250929",
-];
-
 const PROJECT_CONTEXT = `You are writing paid ad copy for Project 4H (Saw.City).
-Audience: owner-operators and 1-10 person trade teams.
-Offer: self-serve onboarding, no demo call required.
+Audience: owner-operators and 1-10 person trade teams (concrete cutters, excavators, contractors).
+Offer: field service management software, self-serve onboarding, no demo call required.
 Price: $149/mo.
-Voice: direct, practical, field-first.
-Avoid hype and fluffy claims.
-Output concise conversion-oriented copy.`;
+Voice: direct, practical, field-first. No hype or fluffy claims.
+Output concise, conversion-oriented copy.`;
 
 function stripCodeFences(input: string): string {
   return input.replace(/```json\s*/gi, "").replace(/```/g, "").trim();
@@ -38,17 +29,16 @@ function normalizeVariations(value: unknown): Variation[] {
 }
 
 function buildFallbackVariations(platform: string, prompt: string, tone: string, count: number): Variation[] {
-  const audience = "1-10 person trade teams";
   const headlines = [
     `Stop Missing Jobs While You're on Site`,
-    `Self-Serve Dispatch for ${audience}`,
-    `${platform[0].toUpperCase() + platform.slice(1)} Leads to Booked Work Faster`,
-    `Go Live Today — No Demo Call Needed`,
+    `Self-Serve Dispatch — No Demo Call`,
+    `Run Your Crew From Your Phone`,
+    `$149/mo. No Contracts. No Demo.`,
+    `Built for Trades. Ready in Minutes.`,
   ];
-
   return Array.from({ length: count }).map((_, idx) => ({
     headline: headlines[idx % headlines.length],
-    primaryText: `${tone} angle: ${prompt}. Saw.City is built for ${audience}. Set up in minutes, skip the demo call, and run your workflow for $149/mo.`,
+    primaryText: `${tone} angle on "${prompt}" — Saw.City is built for 1-10 person trade teams. Set up in minutes, skip the sales call. $149/mo.`,
   }));
 }
 
@@ -74,7 +64,7 @@ export async function POST(request: Request) {
       return errorJson("platform and prompt are required", 400);
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return okJson({
         variations: buildFallbackVariations(platform, prompt, tone, count),
@@ -82,46 +72,59 @@ export async function POST(request: Request) {
       });
     }
 
-    const anthropic = new Anthropic({ apiKey });
+    const userPrompt = `Platform: ${platform}\nTone: ${tone}\nDirection: ${prompt}\n\nGenerate ${count} ad copy variations for Saw.City.\nReturn ONLY strict JSON with this shape:\n{\n  "variations": [\n    { "headline": "...", "primaryText": "..." }\n  ]\n}`;
 
-    const userPrompt = `Platform: ${platform}\nTone: ${tone}\nDirection: ${prompt}\n\nGenerate ${count} variations.\nReturn strict JSON only with this shape:\n{\n  \"variations\": [\n    { \"headline\": \"...\", \"primaryText\": \"...\" }\n  ]\n}`;
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        max_tokens: 1200,
+        temperature: 0.7,
+        messages: [
+          { role: "system", content: PROJECT_CONTEXT },
+          { role: "user", content: userPrompt },
+        ],
+      }),
+    });
 
-    let lastError = "Unknown Anthropic error";
-
-    for (const model of MODEL_CANDIDATES) {
-      try {
-        const response = await anthropic.messages.create({
-          model,
-          max_tokens: 1200,
-          system: PROJECT_CONTEXT,
-          temperature: 0.7,
-          messages: [{ role: "user", content: userPrompt }],
-        });
-
-        const text = response.content
-          .filter((item) => item.type === "text")
-          .map((item) => item.text)
-          .join("\n")
-          .trim();
-
-        const parsed = JSON.parse(stripCodeFences(text));
-        const variations = normalizeVariations(parsed?.variations);
-
-        if (!variations.length) {
-          return errorJson("AI response did not contain usable variations", 502, text);
-        }
-
-        return okJson({ variations });
-      } catch (error) {
-        lastError = String(error);
-      }
+    if (!response.ok) {
+      const errText = await response.text();
+      return okJson({
+        variations: buildFallbackVariations(platform, prompt, tone, count),
+        source: "fallback",
+        warning: errText,
+      });
     }
 
-    return okJson({
-      variations: buildFallbackVariations(platform, prompt, tone, count),
-      source: "fallback",
-      warning: lastError,
-    });
+    const data = await response.json() as {
+      choices: Array<{ message: { content: string } }>;
+    };
+
+    const text = data.choices?.[0]?.message?.content?.trim() ?? "";
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripCodeFences(text));
+    } catch {
+      return okJson({
+        variations: buildFallbackVariations(platform, prompt, tone, count),
+        source: "fallback",
+        warning: "JSON parse failed: " + text.slice(0, 200),
+      });
+    }
+
+    const variations = normalizeVariations((parsed as { variations?: unknown })?.variations);
+    if (!variations.length) {
+      return okJson({
+        variations: buildFallbackVariations(platform, prompt, tone, count),
+        source: "fallback",
+      });
+    }
+
+    return okJson({ variations, source: "openai" });
   } catch (error) {
     return errorJson("Failed to generate ad copy", 500, String(error));
   }
