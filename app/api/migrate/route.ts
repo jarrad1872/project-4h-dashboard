@@ -1,0 +1,68 @@
+/**
+ * One-time migration endpoint — POST /api/migrate
+ * Applies schema changes that can't run via supabase-js (DDL).
+ * Requires MIGRATE_SECRET header for security.
+ */
+import { okJson, errorJson, optionsResponse } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
+
+const MIGRATION_SQL = `
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+ALTER TABLE ads ADD COLUMN IF NOT EXISTS workflow_stage TEXT NOT NULL DEFAULT 'concept';
+
+UPDATE ads
+SET workflow_stage = CASE
+  WHEN status = 'approved' THEN 'approved'
+  WHEN status = 'paused'   THEN 'uploaded'
+  WHEN status = 'rejected' THEN 'concept'
+  ELSE 'copy-ready'
+END
+WHERE workflow_stage = 'concept';
+
+CREATE TABLE IF NOT EXISTS ad_templates (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  platform TEXT NOT NULL,
+  format TEXT,
+  primary_text TEXT,
+  headline TEXT,
+  cta TEXT,
+  landing_path TEXT,
+  utm_campaign TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS ad_templates_created_at_idx ON ad_templates(created_at DESC);
+`;
+
+export function OPTIONS() {
+  return optionsResponse();
+}
+
+export async function POST(request: Request) {
+  const secret = request.headers.get("x-migrate-secret");
+  if (secret !== process.env.MIGRATE_SECRET && process.env.MIGRATE_SECRET) {
+    return errorJson("Unauthorized", 401);
+  }
+
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    return errorJson("DATABASE_URL not configured", 500);
+  }
+
+  try {
+    // Dynamic import of pg (only available server-side)
+    const { Client } = await import("pg");
+    const client = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
+
+    await client.connect();
+    await client.query(MIGRATION_SQL);
+    await client.end();
+
+    return okJson({ ok: true, message: "Migration 003 applied" });
+  } catch (error) {
+    return errorJson("Migration failed", 500, String(error));
+  }
+}
