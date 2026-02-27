@@ -1,0 +1,114 @@
+[
+  {
+    "id": "LI-RT-01",
+    "type": "retargeting_ad",
+    "content": "Approval item for LI-RT-01 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:00:00Z"
+  },
+  {
+    "id": "LI-RT-02",
+    "type": "retargeting_ad",
+    "content": "Approval item for LI-RT-02 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:01:00Z"
+  },
+  {
+    "id": "META-RT-01",
+    "type": "retargeting_ad",
+    "content": "Approval item for META-RT-01 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:02:00Z"
+  },
+  {
+    "id": "META-RT-02",
+    "type": "retargeting_ad",
+    "content": "Approval item for META-RT-02 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:03:00Z"
+  },
+  {
+    "id": "YT-RT-01",
+    "type": "retargeting_ad",
+    "content": "Approval item for YT-RT-01 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:04:00Z"
+  },
+  {
+    "id": "YT-RT-02",
+    "type": "retargeting_ad",
+    "content": "Approval item for YT-RT-02 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:05:00Z"
+  },
+  {
+    "id": "LPB-01",
+    "type": "lp_block",
+    "content": "Approval item for LPB-01 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:06:00Z"
+  },
+  {
+    "id": "LPB-02",
+    "type": "lp_block",
+    "content": "Approval item for LPB-02 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:07:00Z"
+  },
+  {
+    "id": "LPB-03",
+    "type": "lp_block",
+    "content": "Approval item for LPB-03 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:08:00Z"
+  },
+  {
+    "id": "LPB-04",
+    "type": "lp_block",
+    "content": "Approval item for LPB-04 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:09:00Z"
+  },
+  {
+    "id": "ONB-EMAIL-01",
+    "type": "lifecycle_message",
+    "content": "Approval item for ONB-EMAIL-01 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:10:00Z"
+  },
+  {
+    "id": "ONB-EMAIL-02",
+    "type": "lifecycle_message",
+    "content": "Approval item for ONB-EMAIL-02 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:11:00Z"
+  },
+  {
+    "id": "ONB-EMAIL-03",
+    "type": "lifecycle_message",
+    "content": "Approval item for ONB-EMAIL-03 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:12:00Z"
+  },
+  {
+    "id": "ONB-SMS-01",
+    "type": "lifecycle_message",
+    "content": "Approval item for ONB-SMS-01 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:13:00Z"
+  },
+  {
+    "id": "ONB-SMS-02",
+    "type": "lifecycle_message",
+    "content": "Approval item for ONB-SMS-02 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:14:00Z"
+  },
+  {
+    "id": "ONB-SMS-03",
+    "type": "lifecycle_message",
+    "content": "Approval item for ONB-SMS-03 from APPROVAL-BATCH-002-CUSTOMER-FACING.md",
+    "status": "pending",
+    "updatedAt": "2026-02-27T08:15:00Z"
+  }
+]

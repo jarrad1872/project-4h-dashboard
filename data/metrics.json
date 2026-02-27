@@ -1,0 +1,40 @@
+{
+  "weeks": [
+    {
+      "weekStart": "2026-03-02",
+      "linkedin": {
+        "spend": 0,
+        "impressions": 0,
+        "clicks": 0,
+        "signups": 0,
+        "activations": 0,
+        "paid": 0
+      },
+      "youtube": {
+        "spend": 0,
+        "impressions": 0,
+        "clicks": 0,
+        "signups": 0,
+        "activations": 0,
+        "paid": 0
+      },
+      "facebook": {
+        "spend": 0,
+        "impressions": 0,
+        "clicks": 0,
+        "signups": 0,
+        "activations": 0,
+        "paid": 0
+      },
+      "instagram": {
+        "spend": 0,
+        "impressions": 0,
+        "clicks": 0,
+        "signups": 0,
+        "activations": 0,
+        "paid": 0
+      },
+      "updatedAt": "2026-03-02T00:00:00Z"
+    }
+  ]
+}

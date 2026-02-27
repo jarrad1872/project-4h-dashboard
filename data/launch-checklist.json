@@ -1,0 +1,72 @@
+[
+  {
+    "id": "LG-05",
+    "label": "LinkedIn Insight Tag firing on saw.city/li",
+    "checked": false,
+    "platform": "linkedin",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-06",
+    "label": "Meta Pixel firing on saw.city/fb and saw.city/ig",
+    "checked": false,
+    "platform": "meta",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-07",
+    "label": "Google Tag firing on saw.city/yt",
+    "checked": false,
+    "platform": "youtube",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-08",
+    "label": "All UTM params confirmed passing through to GA/analytics endpoint",
+    "checked": false,
+    "platform": "tracking",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-09",
+    "label": "021_marketing_events.sql migration applied in Supabase",
+    "checked": false,
+    "platform": "tracking",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-10",
+    "label": "lp_view / signup_start / checkout_complete events confirmed in analytics table",
+    "checked": false,
+    "platform": "tracking",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-11",
+    "label": "All 27 ad creatives (images/videos) uploaded to asset libraries",
+    "checked": false,
+    "platform": "all",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-12",
+    "label": "All 4 landing pages live (saw.city/li, /yt, /fb, /ig)",
+    "checked": false,
+    "platform": "meta",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-13",
+    "label": "Kill/scale thresholds documented and team briefed (ref OPERATING-PACK-v1.md)",
+    "checked": false,
+    "platform": "all",
+    "updatedAt": null
+  },
+  {
+    "id": "LG-14",
+    "label": "$20k budget confirmed in ad account billing",
+    "checked": false,
+    "platform": "all",
+    "updatedAt": null
+  }
+]

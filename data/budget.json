@@ -1,0 +1,22 @@
+{
+  "totalBudget": 20000,
+  "channels": {
+    "linkedin": {
+      "allocated": 5000,
+      "spent": 0
+    },
+    "youtube": {
+      "allocated": 5000,
+      "spent": 0
+    },
+    "facebook": {
+      "allocated": 5000,
+      "spent": 0
+    },
+    "instagram": {
+      "allocated": 5000,
+      "spent": 0
+    }
+  },
+  "updatedAt": "2026-02-27T00:00:00Z"
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "ONB-EMAIL-01",
+    "asset_id": "ONB-EMAIL-01",
+    "channel": "email",
+    "timing": "day0",
+    "subject": "You\u2019re in \u2014 let\u2019s get your call flow live today",
+    "message": "Hey {{first_name}},\\n\\nWelcome to Saw.City. You can go from signup to live call handling in a few steps:\\n1) Confirm your number setup\\n2) Set your greeting\\n3) Configure routing\\n4) Run a quick test call\\n\\nNo demo call needed\u2014just finish setup and go live.\\n\\nComplete setup: {{onboarding_link}}",
+    "goal": "activate_first_call",
+    "status": "active",
+    "updatedAt": "2026-02-27T00:00:00Z"
+  },
+  {
+    "id": "ONB-EMAIL-02",
+    "asset_id": "ONB-EMAIL-02",
+    "channel": "email",
+    "timing": "day1",
+    "subject": "You\u2019re one step from first handled call",
+    "message": "Hey {{first_name}},\\n\\nYou\u2019re close. Finish your setup and start capturing the calls that usually slip through.\\n\\nIf you complete your test call today, your flow is live.\\n\\nFinish setup now: {{onboarding_link}}",
+    "goal": "reduce_setup_dropoff",
+    "status": "active",
+    "updatedAt": "2026-02-27T00:00:00Z"
+  },
+  {
+    "id": "ONB-EMAIL-03",
+    "asset_id": "ONB-EMAIL-03",
+    "channel": "email",
+    "timing": "day3",
+    "subject": "Ready to stop the missed-call leak?",
+    "message": "Hey {{first_name}},\\n\\nOperators who complete setup early usually see impact fastest: faster response and fewer dropped opportunities.\\n\\nKeep it simple\u2014complete setup and run your first live call today.\\n\\nGo live: {{onboarding_link}}",
+    "goal": "activation_push",
+    "status": "active",
+    "updatedAt": "2026-02-27T00:00:00Z"
+  },
+  {
+    "id": "ONB-SMS-01",
+    "asset_id": "ONB-SMS-01",
+    "channel": "sms",
+    "timing": "day0",
+    "subject": "",
+    "message": "Welcome to Saw.City. You\u2019re a few steps from go-live. No demo needed\u2014finish setup here: {{short_link}}",
+    "goal": "activate_first_call",
+    "status": "active",
+    "updatedAt": "2026-02-27T00:00:00Z"
+  },
+  {
+    "id": "ONB-SMS-02",
+    "asset_id": "ONB-SMS-02",
+    "channel": "sms",
+    "timing": "day1",
+    "subject": "",
+    "message": "Quick nudge: you\u2019re close to first handled call. Finish setup now and stop missed-call leakage: {{short_link}}",
+    "goal": "reduce_setup_dropoff",
+    "status": "active",
+    "updatedAt": "2026-02-27T00:00:00Z"
+  },
+  {
+    "id": "ONB-SMS-03",
+    "asset_id": "ONB-SMS-03",
+    "channel": "sms",
+    "timing": "day3",
+    "subject": "",
+    "message": "Last nudge for now: complete your Saw.City setup today to start capturing jobs already calling you: {{short_link}}",
+    "goal": "activation_push",
+    "status": "active",
+    "updatedAt": "2026-02-27T00:00:00Z"
+  }
+]

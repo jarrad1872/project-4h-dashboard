@@ -1,0 +1,200 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { PlatformChip, StatusChip } from "@/components/chips";
+import { Button, Card, GhostButton } from "@/components/ui";
+import type { Ad, AdStatus } from "@/lib/types";
+
+const platformFilters = ["all", "linkedin", "youtube", "facebook", "instagram", "retargeting"] as const;
+const statusFilters = ["all", "approved", "pending", "paused", "rejected"] as const;
+
+const emptyAd: Partial<Ad> = {
+  platform: "linkedin",
+  campaignGroup: "4h_custom",
+  format: "static1x1",
+  primaryText: "",
+  headline: "",
+  cta: "Start now",
+  landingPath: "/li",
+  utmSource: "linkedin",
+  utmMedium: "paid-social",
+  utmCampaign: "4h_2026-03_custom",
+  utmContent: "custom",
+  utmTerm: "owners_1-10",
+  status: "pending",
+};
+
+export default function AdsPage() {
+  const [ads, setAds] = useState<Ad[]>([]);
+  const [platform, setPlatform] = useState<(typeof platformFilters)[number]>("all");
+  const [status, setStatus] = useState<(typeof statusFilters)[number]>("all");
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState<Partial<Ad>>(emptyAd);
+
+  async function loadAds() {
+    const res = await fetch("/api/ads", { cache: "no-store" });
+    const data = (await res.json()) as Ad[];
+    setAds(data);
+  }
+
+  useEffect(() => {
+    void loadAds();
+  }, []);
+
+  const filtered = useMemo(() => {
+    return ads.filter((ad) => {
+      const platformMatch =
+        platform === "all"
+          ? true
+          : platform === "retargeting"
+            ? ad.campaignGroup.toLowerCase().includes("retarget")
+            : ad.platform === platform;
+      const statusMatch = status === "all" ? true : ad.status === status;
+      return platformMatch && statusMatch;
+    });
+  }, [ads, platform, status]);
+
+  async function pauseAd(id: string) {
+    await fetch(`/api/ads/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "paused" satisfies AdStatus }),
+    });
+    void loadAds();
+  }
+
+  async function createAd() {
+    await fetch("/api/ads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    setShowModal(false);
+    setForm(emptyAd);
+    void loadAds();
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <h1 className="text-2xl font-bold">Ad Library</h1>
+        <Button onClick={() => setShowModal(true)}>+ New Ad</Button>
+      </div>
+
+      <Card className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {platformFilters.map((value) => (
+            <GhostButton
+              key={value}
+              className={platform === value ? "bg-slate-700" : ""}
+              onClick={() => setPlatform(value)}
+            >
+              {value[0].toUpperCase() + value.slice(1)}
+            </GhostButton>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {statusFilters.map((value) => (
+            <GhostButton key={value} className={status === value ? "bg-slate-700" : ""} onClick={() => setStatus(value)}>
+              {value[0].toUpperCase() + value.slice(1)}
+            </GhostButton>
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {filtered.map((ad) => {
+          const utmUrl = `https://saw.city${ad.landingPath}?utm_source=${ad.utmSource}&utm_medium=${ad.utmMedium}&utm_campaign=${ad.utmCampaign}&utm_content=${ad.utmContent}&utm_term=${ad.utmTerm}`;
+
+          return (
+            <Card key={ad.id}>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <PlatformChip platform={ad.platform} />
+                <span className="rounded bg-slate-700 px-2 py-1 text-xs">{ad.format}</span>
+              </div>
+              <p className="mb-2 font-semibold">{ad.headline || "(No headline)"}</p>
+              <p className="line-clamp-3 text-sm text-slate-300">{ad.primaryText}</p>
+              <p className="mt-2 text-xs text-slate-400">CTA: {ad.cta}</p>
+              <p className="mb-3 text-xs text-slate-400">UTM: {ad.utmCampaign}</p>
+              <StatusChip status={ad.status} className="mb-3" />
+              <div className="flex flex-wrap gap-2">
+                <Link className="rounded-md border border-slate-600 px-3 py-2 text-sm hover:bg-slate-700" href={`/ads/${ad.id}`}>
+                  Edit
+                </Link>
+                <GhostButton onClick={() => pauseAd(ad.id)}>Pause</GhostButton>
+                <GhostButton
+                  onClick={() => {
+                    navigator.clipboard.writeText(utmUrl).catch(() => null);
+                  }}
+                >
+                  Copy UTM
+                </GhostButton>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-2xl rounded-lg border border-slate-700 bg-slate-900 p-4">
+            <h2 className="mb-3 text-lg font-bold">New Ad</h2>
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="text-sm">
+                Platform
+                <select
+                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
+                  value={form.platform}
+                  onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value as Ad["platform"] }))}
+                >
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                </select>
+              </label>
+              <label className="text-sm">
+                Headline
+                <input
+                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
+                  value={form.headline}
+                  onChange={(e) => setForm((f) => ({ ...f, headline: e.target.value }))}
+                />
+              </label>
+              <label className="text-sm md:col-span-2">
+                Primary text
+                <textarea
+                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
+                  rows={4}
+                  value={form.primaryText}
+                  onChange={(e) => setForm((f) => ({ ...f, primaryText: e.target.value }))}
+                />
+              </label>
+              <label className="text-sm">
+                CTA
+                <input
+                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
+                  value={form.cta}
+                  onChange={(e) => setForm((f) => ({ ...f, cta: e.target.value }))}
+                />
+              </label>
+              <label className="text-sm">
+                Landing path
+                <input
+                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
+                  value={form.landingPath}
+                  onChange={(e) => setForm((f) => ({ ...f, landingPath: e.target.value }))}
+                />
+              </label>
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <GhostButton onClick={() => setShowModal(false)}>Cancel</GhostButton>
+              <Button onClick={createAd}>Create</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
