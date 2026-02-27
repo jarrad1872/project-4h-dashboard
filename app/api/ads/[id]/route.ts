@@ -8,10 +8,11 @@ export function OPTIONS() {
   return optionsResponse();
 }
 
-export function GET(_: Request, context: { params: { id: string } }) {
+export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await context.params;
     const ads = readJsonFile<Ad[]>(DataFiles.ads);
-    const ad = ads.find((item) => item.id === context.params.id);
+    const ad = ads.find((item) => item.id === id);
     if (!ad) {
       return errorJson("Ad not found", 404);
     }
@@ -22,11 +23,12 @@ export function GET(_: Request, context: { params: { id: string } }) {
   }
 }
 
-export async function PATCH(request: Request, context: { params: { id: string } }) {
+export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await context.params;
     const payload = (await request.json()) as Partial<Ad>;
     const ads = readJsonFile<Ad[]>(DataFiles.ads);
-    const index = ads.findIndex((item) => item.id === context.params.id);
+    const index = ads.findIndex((item) => item.id === id);
 
     if (index < 0) {
       return errorJson("Ad not found", 404);
