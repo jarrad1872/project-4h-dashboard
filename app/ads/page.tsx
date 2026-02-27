@@ -158,7 +158,7 @@ export default function AdsPage() {
                 Headline
                 <input
                   className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  value={form.headline}
+                  value={form.headline ?? ""}
                   onChange={(e) => setForm((f) => ({ ...f, headline: e.target.value }))}
                 />
               </label>

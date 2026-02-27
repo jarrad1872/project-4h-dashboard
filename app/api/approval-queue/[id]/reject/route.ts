@@ -2,7 +2,6 @@ import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { hasSupabase, logActivity, normalizeApprovalItem, readFallback } from "@/lib/server-utils";
-import type { ApprovalItem } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -10,39 +9,14 @@ export function OPTIONS() {
   return optionsResponse();
 }
 
-export async function GET() {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    if (!hasSupabase()) {
-      const queue = readFallback<any[]>(DataFiles.approvalQueue, []).map(normalizeApprovalItem);
-      return okJson(queue);
-    }
-
-    const { data, error } = await supabaseAdmin
-      .from("approval_queue")
-      .select("*")
-      .order("updated_at", { ascending: false });
-
-    if (error) {
-      return errorJson("Failed to load approval queue", 500, error.message);
-    }
-
-    return okJson((data ?? []).map(normalizeApprovalItem));
-  } catch (error) {
-    return errorJson("Failed to load approval queue", 500, String(error));
-  }
-}
-
-export async function PATCH(request: Request) {
-  try {
-    const payload = (await request.json()) as { id?: string; status?: ApprovalItem["status"]; note?: string | null };
-
-    if (!payload.id || !payload.status) {
-      return errorJson("id and status are required", 400);
-    }
+    const { id } = await context.params;
+    const payload = (await request.json().catch(() => ({}))) as { note?: string };
 
     if (!hasSupabase()) {
       const queue = readFallback<any[]>(DataFiles.approvalQueue, []).map(normalizeApprovalItem);
-      const index = queue.findIndex((item) => item.id === payload.id);
+      const index = queue.findIndex((item) => item.id === id);
       if (index < 0) {
         return errorJson("Approval item not found", 404);
       }
@@ -51,8 +25,8 @@ export async function PATCH(request: Request) {
       const now = isoNow();
       const next = {
         ...previous,
-        status: payload.status,
-        note: payload.note ?? previous.note ?? null,
+        status: "rejected" as const,
+        note: payload.note ?? null,
         updated_at: now,
         updatedAt: now,
       };
@@ -62,8 +36,8 @@ export async function PATCH(request: Request) {
 
       await logActivity({
         entity_type: "approval",
-        entity_id: payload.id,
-        action: payload.status,
+        entity_id: id,
+        action: "rejected",
         old_value: previous,
         new_value: next,
         note: payload.note ?? null,
@@ -75,7 +49,7 @@ export async function PATCH(request: Request) {
     const { data: existing, error: existingError } = await supabaseAdmin
       .from("approval_queue")
       .select("*")
-      .eq("id", payload.id)
+      .eq("id", id)
       .maybeSingle();
 
     if (existingError) {
@@ -88,19 +62,19 @@ export async function PATCH(request: Request) {
 
     const { data, error } = await supabaseAdmin
       .from("approval_queue")
-      .update({ status: payload.status, note: payload.note ?? existing.note ?? null, updated_at: isoNow() })
-      .eq("id", payload.id)
+      .update({ status: "rejected", note: payload.note ?? null, updated_at: isoNow() })
+      .eq("id", id)
       .select("*")
       .single();
 
     if (error) {
-      return errorJson("Failed to update approval item", 500, error.message);
+      return errorJson("Failed to reject item", 500, error.message);
     }
 
     await logActivity({
       entity_type: "approval",
-      entity_id: payload.id,
-      action: payload.status,
+      entity_id: id,
+      action: "rejected",
       old_value: existing,
       new_value: data,
       note: payload.note ?? null,
@@ -108,6 +82,6 @@ export async function PATCH(request: Request) {
 
     return okJson(normalizeApprovalItem(data));
   } catch (error) {
-    return errorJson("Failed to update approval item", 500, String(error));
+    return errorJson("Failed to reject item", 500, String(error));
   }
 }

@@ -106,7 +106,7 @@ export default function LaunchPage() {
                     <input type="checkbox" checked={item.checked} onChange={() => toggle(item.id, item.checked)} />
                     {item.label}
                   </label>
-                  <PlatformChip platform={item.platform} />
+                  <PlatformChip platform={item.platform as "linkedin" | "youtube" | "facebook" | "instagram" | "meta" | "tracking" | "all"} />
                 </div>
               ))}
               {rows.length === 0 && <p className="text-sm text-slate-500">No items in this group.</p>}
