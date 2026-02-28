@@ -11,6 +11,7 @@ const navItems = [
   { href: "/gtm", label: "GTM Board" },
   { href: "/ads", label: "Ads" },
   { href: "/workflow", label: "Workflow" },
+  { href: "/creatives", label: "Creatives" },
   { href: "/templates", label: "Templates" },
   { href: "/generate", label: "AI Studio" },
   { href: "/approval", label: "Approval" },
