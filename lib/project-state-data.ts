@@ -87,7 +87,7 @@ export function getProjectState() {
         { label: 'Upload-ready CSVs', status: 'done', note: 'CAMPAIGN-UPLOAD-SHEET-v2.csv — 27 rows, all platforms' },
         { label: 'Platform Setup Guides', status: 'done', note: 'LinkedIn, Meta, YouTube step-by-step upload guides ready' },
         { label: 'Ad approval queue', status: 'in-progress', note: '81 trade-specific copy variants pending review at pumpcans.com/approval' },
-        { label: 'Conversion tracking (4H DB)', status: 'pending', note: 'Run 021_marketing_events.sql in 4H Supabase SQL editor (30 sec)' },
+        { label: 'Conversion tracking (4H DB)', status: 'done', note: 'marketing_events table live in 4H Supabase — UTM attribution ready' },
         { label: 'Ad account + pixel setup', status: 'pending', note: 'LinkedIn Campaign Manager, Meta Ads, Google/YouTube Ads — Jarrad initiates' },
         { label: 'A2P SMS approval', status: 'blocked', note: 'Lifecycle SMS blocked until TCR campaign approved (~2-3 weeks)' },
       ],
@@ -104,10 +104,10 @@ export function getProjectState() {
       },
       {
         priority: 2,
-        label: 'Apply conversion tracking migration',
-        effort: '2 min',
+        label: 'Add image_url column to ads table',
+        effort: '30 sec',
         owner: 'Jarrad',
-        detail: 'Run 021_marketing_events.sql in 4H Supabase SQL editor to enable UTM attribution tracking.',
+        detail: 'Run: ALTER TABLE ads ADD COLUMN IF NOT EXISTS image_url TEXT; — in 4H Supabase SQL editor. Unlocks creative thumbnails on /ads.',
         link: 'https://supabase.com/dashboard/project/vzawlfitqnjhypnkguas/editor',
       },
       {
