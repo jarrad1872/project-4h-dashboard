@@ -4,7 +4,7 @@
 export function getProjectState() {
   return {
     lastUpdated: '2026-02-28',
-    version: '2.8.0',
+    version: '2.9.0',
 
     product: {
       name: 'Saw.City LITE',
@@ -48,33 +48,40 @@ export function getProjectState() {
       channels: ['LinkedIn', 'YouTube', 'Facebook', 'Instagram'],
       status: 'pre-launch',
       dashboard: 'https://pumpcans.com',
+      // Campaign Phase 1 trades (ads already built for these 4)
       tier1_trades: [
-        { domain: 'saw.city', slug: 'concrete-cutting', appName: 'Saw.City', trade: 'Concrete Cutting' },
-        { domain: 'rinse.city', slug: 'pressure-washing', appName: 'Rinse.City', trade: 'Pressure Washing' },
+        { domain: 'pipe.city', slug: 'plumbing', appName: 'Pipe.City', trade: 'Plumbing' },
         { domain: 'mow.city', slug: 'lawn-care', appName: 'Mow.City', trade: 'Lawn Care' },
-        { domain: 'rooter.city', slug: 'drain-cleaning', appName: 'Rooter.City', trade: 'Drain Cleaning' },
+        { domain: 'coat.city', slug: 'painting', appName: 'Coat.City', trade: 'Painting' },
+        { domain: 'duct.city', slug: 'hvac', appName: 'Duct.City', trade: 'HVAC' },
+        { domain: 'pest.city', slug: 'pest-control', appName: 'Pest.City', trade: 'Pest Control' },
       ],
+      // TAM-ranked tiers (source: Feb 2026 trade research). Tier = opportunity rank, not campaign phase.
+      // Campaign Phase 1 ads were built for: saw / rinse / mow / rooter (brand familiarity; not TAM-driven)
       all_trades: [
-        { domain: 'saw.city', slug: 'concrete-cutting', appName: 'Saw.City', tier: 1 },
-        { domain: 'rinse.city', slug: 'pressure-washing', appName: 'Rinse.City', tier: 1 },
-        { domain: 'mow.city', slug: 'lawn-care', appName: 'Mow.City', tier: 1 },
-        { domain: 'rooter.city', slug: 'drain-cleaning', appName: 'Rooter.City', tier: 1 },
-        { domain: 'lockout.city', slug: 'locksmith', appName: 'Lockout.City', tier: 2 },
-        { domain: 'pest.city', slug: 'pest-control', appName: 'Pest.City', tier: 2 },
-        { domain: 'duct.city', slug: 'hvac', appName: 'Duct.City', tier: 2 },
-        { domain: 'detail.city', slug: 'auto-detailing', appName: 'Detail.City', tier: 2 },
-        { domain: 'plow.city', slug: 'snow-removal', appName: 'Plow.City', tier: 3 },
-        { domain: 'prune.city', slug: 'tree-service', appName: 'Prune.City', tier: 3 },
-        { domain: 'chimney.city', slug: 'chimney-sweep', appName: 'Chimney.City', tier: 3 },
-        { domain: 'haul.city', slug: 'hauling', appName: 'Haul.City', tier: 3 },
-        { domain: 'grade.city', slug: 'grading', appName: 'Grade.City', tier: 3 },
-        { domain: 'coat.city', slug: 'painting', appName: 'Coat.City', tier: 3 },
-        { domain: 'brake.city', slug: 'auto-repair', appName: 'Brake.City', tier: 3 },
-        { domain: 'wrench.city', slug: 'mechanic', appName: 'Wrench.City', tier: 3 },
-        { domain: 'polish.city', slug: 'floor-polishing', appName: 'Polish.City', tier: 3 },
-        { domain: 'pave.city', slug: 'paving', appName: 'Pave.City', tier: 3 },
-        { domain: 'wreck.city', slug: 'demolition', appName: 'Wreck.City', tier: 3 },
-        { domain: 'pipe.city', slug: 'plumbing', appName: 'Pipe.City', tier: 3 },
+        // TIER 1 — Massive TAM + high operator count + strong product fit
+        { domain: 'pipe.city',     slug: 'plumbing',         appName: 'Pipe.City',    tier: 1, tam: '$191B', businesses: '130K', note: 'Emergency 24/7, huge solo operator base' },
+        { domain: 'mow.city',      slug: 'lawn-care',        appName: 'Mow.City',     tier: 1, tam: '$60B',  businesses: '500K+', note: '55% solo operators, largest addressable pool' },
+        { domain: 'coat.city',     slug: 'painting',         appName: 'Coat.City',    tier: 1, tam: '$28B',  businesses: '220K', note: 'Highest operator count of any trade' },
+        { domain: 'duct.city',     slug: 'hvac',             appName: 'Duct.City',    tier: 1, tam: '$30B',  businesses: '105K', note: 'Emergency demand, high job value' },
+        { domain: 'pest.city',     slug: 'pest-control',     appName: 'Pest.City',    tier: 1, tam: '$26B',  businesses: '33K',  note: 'Recurring revenue model, scheduled visits' },
+        // TIER 2 — Large TAM or high urgency fit
+        { domain: 'prune.city',    slug: 'tree-service',     appName: 'Prune.City',   tier: 2, tam: '$39.5B', businesses: '50K+', note: 'Storm emergency + seasonal surge' },
+        { domain: 'brake.city',    slug: 'auto-repair',      appName: 'Brake.City',   tier: 2, tam: '$90B',  businesses: '302K', note: 'Massive market; shop vs solo dynamics to test' },
+        { domain: 'pave.city',     slug: 'paving',           appName: 'Pave.City',    tier: 2, tam: '$19B',  businesses: '30K+', note: 'Fragmented small operators, project-based' },
+        { domain: 'plow.city',     slug: 'snow-removal',     appName: 'Plow.City',    tier: 2, tam: '$21B',  businesses: '106K', note: '80% sole proprietors; seasonal caveat' },
+        { domain: 'lockout.city',  slug: 'locksmith',        appName: 'Lockout.City', tier: 2, tam: '$3B',   businesses: '25K',  note: 'Small market but highest urgency — missed call = job gone' },
+        { domain: 'rooter.city',   slug: 'drain-cleaning',   appName: 'Rooter.City',  tier: 2, tam: '$8.1B', businesses: '7.7K', note: 'Emergency pull, high value jobs' },
+        { domain: 'haul.city',     slug: 'hauling',          appName: 'Haul.City',    tier: 2, tam: '$6B',   businesses: '20K+', note: 'Junk removal segment; 30-40% missed call rate' },
+        { domain: 'wreck.city',    slug: 'demolition',       appName: 'Wreck.City',   tier: 2, tam: '$22.7B', businesses: '45K+', note: 'Towing = 45K+ operators, high emergency demand' },
+        // TIER 3 — Niche, small market, or buyer mismatch
+        { domain: 'grade.city',    slug: 'grading',          appName: 'Grade.City',   tier: 3, tam: '$203B', businesses: '235K', note: 'Giant market BUT mostly commercial/large operators — buyer mismatch' },
+        { domain: 'chimney.city',  slug: 'chimney-sweep',    appName: 'Chimney.City', tier: 3, tam: '$170M', businesses: '8.2K', note: 'Small US market' },
+        { domain: 'saw.city',      slug: 'concrete-cutting', appName: 'Saw.City',     tier: 3, tam: '$2.5B', businesses: '2K',   note: 'Jarrad\'s home trade but smallest US market (~2K operators)' },
+        { domain: 'rinse.city',    slug: 'pressure-washing', appName: 'Rinse.City',   tier: 3, tam: '$1.8B', businesses: '12K',  note: 'Small market, highly seasonal' },
+        { domain: 'detail.city',   slug: 'auto-detailing',   appName: 'Detail.City',  tier: 3, tam: '$1.7B', businesses: '16.5K', note: 'Small US market, mobile detailers growing' },
+        { domain: 'polish.city',   slug: 'floor-polishing',  appName: 'Polish.City',  tier: 3, tam: '$4B',   businesses: '20K',  note: 'Specialist niche, B2B-heavy' },
+        { domain: 'wrench.city',   slug: 'mechanic',         appName: 'Wrench.City',  tier: 3, tam: 'sub-$90B', businesses: '620K mechanics', note: 'Individual mechanic focus; different buyer than shop owner' },
       ],
 
       readiness: [
@@ -104,14 +111,6 @@ export function getProjectState() {
       },
       {
         priority: 2,
-        label: 'Add image_url column to ads table',
-        effort: '30 sec',
-        owner: 'Jarrad',
-        detail: 'Run: ALTER TABLE ads ADD COLUMN IF NOT EXISTS image_url TEXT; — in 4H Supabase SQL editor. Unlocks creative thumbnails on /ads.',
-        link: 'https://supabase.com/dashboard/project/vzawlfitqnjhypnkguas/editor',
-      },
-      {
-        priority: 3,
         label: 'Set up ad accounts + pixels',
         effort: '2–3 hrs',
         owner: 'Jarrad + Bob',
@@ -119,7 +118,7 @@ export function getProjectState() {
         link: null,
       },
       {
-        priority: 4,
+        priority: 3,
         label: 'Upload creatives + launch campaigns',
         effort: '1–2 hrs',
         owner: 'Bob',
@@ -127,7 +126,7 @@ export function getProjectState() {
         link: 'https://pumpcans.com/creatives',
       },
       {
-        priority: 5,
+        priority: 4,
         label: 'A2P 10DLC approval',
         effort: 'Waiting',
         owner: 'TCR (auto)',

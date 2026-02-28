@@ -99,7 +99,7 @@ export default function GTMPage() {
             </p>
           </div>
           <div className="ml-auto hidden sm:block">
-            <p className="text-right text-xs text-slate-400">Tier 1 Trades</p>
+            <p className="text-right text-xs text-slate-400">Top TAM Trades</p>
             {(state.campaign as any).tier1_trades?.map((t: { domain: string; appName: string; trade: string }) => (
               <p key={t.domain} className="text-right text-sm font-medium text-green-300">{t.appName}</p>
             ))}
@@ -234,8 +234,8 @@ export default function GTMPage() {
       <section className="rounded-xl border border-slate-700 bg-slate-800/60 p-6">
         <h2 className="mb-1 text-lg font-semibold text-white">Trade Domain Registry</h2>
         <p className="mb-4 text-xs text-slate-400">
-          Authoritative source: <code className="text-slate-300">trades/*.json → brand.domain</code> in sawcity-lite codebase.
-          Never guess domain mappings — use this table.
+          Tiers ranked by US TAM + operator count + product fit (Feb 2026 research). Campaign Phase 1 ads were built for saw/rinse/mow/rooter.{" "}
+          <span className="text-yellow-400">Tier 1 by data = pipe/mow/coat/duct/pest.</span>
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -244,11 +244,13 @@ export default function GTMPage() {
                 <th className="pb-2 pr-4">Tier</th>
                 <th className="pb-2 pr-4">Domain</th>
                 <th className="pb-2 pr-4">App Name</th>
-                <th className="pb-2">Code Slug</th>
+                <th className="pb-2 pr-4">US TAM</th>
+                <th className="pb-2 pr-4">Businesses</th>
+                <th className="pb-2 hidden lg:table-cell">Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/50">
-              {(state.campaign as any).all_trades?.map((t: { domain: string; slug: string; appName: string; tier: number }) => (
+              {(state.campaign as any).all_trades?.map((t: { domain: string; slug: string; appName: string; tier: number; tam?: string; businesses?: string; note?: string }) => (
                 <tr key={t.domain} className={t.tier === 1 ? "bg-green-500/5" : ""}>
                   <td className="py-1.5 pr-4">
                     <span className={`rounded px-1.5 py-0.5 text-xs font-bold ${
@@ -264,7 +266,9 @@ export default function GTMPage() {
                     </a>
                   </td>
                   <td className="py-1.5 pr-4 text-white">{t.appName}</td>
-                  <td className="py-1.5 font-mono text-xs text-slate-400">{t.slug}</td>
+                  <td className="py-1.5 pr-4 font-mono text-xs text-green-400">{t.tam ?? '—'}</td>
+                  <td className="py-1.5 pr-4 text-xs text-slate-300">{t.businesses ?? '—'}</td>
+                  <td className="py-1.5 hidden lg:table-cell text-xs text-slate-500 max-w-xs truncate">{t.note ?? ''}</td>
                 </tr>
               ))}
             </tbody>
