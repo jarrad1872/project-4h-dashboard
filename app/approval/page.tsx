@@ -117,7 +117,11 @@ export default function ApprovalPage() {
 
   const trades = useMemo(() => {
     const seen = new Set(pending.map(tradeFromAd));
-    return ["all", ...Array.from(seen).sort()];
+    return ["all", ...Array.from(seen).sort((a, b) => {
+      const ta = TRADE_MAP[a]?.tier ?? 99;
+      const tb = TRADE_MAP[b]?.tier ?? 99;
+      return ta !== tb ? ta - tb : a.localeCompare(b);
+    })];
   }, [pending]);
 
   const filtered = useMemo(() => {
@@ -200,7 +204,11 @@ export default function ApprovalPage() {
         </Card>
       )}
 
-      {!loading && Object.entries(byTrade).map(([trade, ads]) => {
+      {!loading && Object.entries(byTrade).sort(([a],[b]) => {
+        const ta = TRADE_MAP[a]?.tier ?? 99;
+        const tb = TRADE_MAP[b]?.tier ?? 99;
+        return ta !== tb ? ta - tb : a.localeCompare(b);
+      }).map(([trade, ads]) => {
         const info = TRADE_MAP[trade] ?? TRADE_MAP.saw;
         const stats = tradeStats[trade] ?? { approved: 0, rejected: 0 };
         const isBulkLoading = bulkLoading[trade] ?? false;
@@ -210,6 +218,9 @@ export default function ApprovalPage() {
               {/* Trade label + per-trade stats */}
               <div className="flex flex-wrap items-center gap-3">
                 <h2 className={`text-lg font-semibold ${info.color}`}>{info.label}</h2>
+                {info.tier === 1 && (
+                  <span className="rounded bg-yellow-500/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-yellow-400">Tier 1</span>
+                )}
                 <span className="text-sm text-slate-400">
                   {stats.approved} approved · {ads.length} pending · {stats.rejected} rejected
                 </span>
