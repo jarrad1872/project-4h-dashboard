@@ -5,35 +5,6 @@
 
 ---
 
-## 🔴 ACTIVE
-
-### TASK-001: Tier 1 Campaign Pivot
-**Status:** IN PROGRESS  
-**Owner:** Bob (sub-agent)  
-**Priority:** P0
-
-The campaign is pivoting from saw/rinse/mow/rooter to TAM-ranked Tier 1 trades: **pipe, mow, coat, duct, pest**.
-
-**Definition of Done:**
-- [ ] 27 ad variants generated for pipe.city (6 LinkedIn, 7 YouTube, 4 Facebook, 4 Instagram, 6 retargeting)
-- [ ] 27 ad variants generated for coat.city
-- [ ] 27 ad variants generated for duct.city
-- [ ] 27 ad variants generated for pest.city
-- [ ] mow.city already has 27 variants — review existing vs. regenerating
-- [ ] All variants uploaded to Supabase `ads` table with status `pending`
-- [ ] Creative briefs seeded into `ad_templates` table
-- [ ] All appear in `/approval` page for Jarrad review
-
-**Next Action:** Generate pipe.city ad variants (27 ads × 4 platforms)
-
-**Trade Context:**
-- pipe.city → Plumbing → $191B US market, 130K businesses, emergency calls 24/7
-- coat.city → Painting → $28B US market, 220K businesses (largest operator count)
-- duct.city → HVAC → $30B US market, 105K businesses, emergency demand
-- pest.city → Pest Control → $26B US market, 33K businesses, recurring revenue
-
----
-
 ## 🟡 PENDING JARRAD ACTION
 
 ### TASK-002: Approve Trade Ad Variants
@@ -41,9 +12,8 @@ The campaign is pivoting from saw/rinse/mow/rooter to TAM-ranked Tier 1 trades: 
 **Effort:** ~10 min  
 **Link:** https://pumpcans.com/approval
 
-78 trade ad variants (Rinse/Mow/Rooter) sitting in the approval queue. These are the original Phase 1 trade variants — still valid for those trades even after the pivot. Use "Approve All" per trade group.
-
----
+189 trade ad variants sitting in the approval queue, now sorted Tier 1 first with yellow badges.
+Use "Approve All" per trade group. Tier 1 trades (pipe/mow/coat/duct/pest + electricians/roofrepair/disaster) are at the top.
 
 ### TASK-003: Ad Account Setup
 **Status:** WAITING ON JARRAD  
@@ -56,52 +26,102 @@ Create accounts for:
 
 Bob walks through each setup guide. Required before any campaign launches.
 
+### TASK-010: Approve Trade Assets
+**Status:** WAITING ON JARRAD  
+**Effort:** ~15 min  
+**Link:** https://pumpcans.com/assets
+
+46 hero + OG images staged for approval (23 trades × 2 image types).  
+20 live trades: sourced from Drive originals ✅  
+3 Tier 1 upcoming (electricians/roofrepair/disaster): generated via Gemini Nano Banana Pro ✅  
+Approve/reject per slot on the /assets page.
+
 ---
 
-## 🟢 DONE
+## 🔴 ACTIVE
 
-- [x] Core strategy + operating pack v1
-- [x] 27 Saw.City branded ads approved (6 LI, 7 YT, 4 FB, 4 IG, 6 retargeting)
-- [x] 81 trade variants uploaded (RINSE×27, MOW×27, ROOTER×27) — pending approval
-- [x] Supabase schema live (ads, ad_templates, marketing_events, lifecycle, checklist)
-- [x] 16 ad creatives generated (Tier 1 Phase 1) — in Supabase Storage
-- [x] `/approval` page rebuilt — reads ads table, Approve/Hold/Reject, Bulk Approve All per trade
-- [x] `/creatives` page live — shows all 16 creative thumbnails
-- [x] `/gtm` page live — 2,000-user mission banner, product state, trade registry, action board
-- [x] Trade registry expanded to 72 domains (20 live + 45 upcoming + 5 forwarding + 3 platform)
-- [x] Trade tier re-ranking — TAM-based, Tier 1 = pipe/mow/coat/duct/pest
-- [x] `image_url` column added to ads table, 108 ads linked to creatives
-- [x] Vercel auto-deploy fixed — GitHub webhook reconnected
-- [x] `workflow_stage` patched: 78 concept + 27 approved + 3 uploaded
-- [x] Pause toggle working on /ads page
-- [x] marketing_events table live in 4H Supabase DB
-- [x] AGENTS.md, TASKS.md, README.md created
-- [x] `003_dashboard_v2.sql` migration applied
+### TASK-011: Generate Hero + OG for Remaining Upcoming Trades
+**Status:** READY TO RUN  
+**Owner:** Bob  
+**Priority:** P1
+
+23 trades have assets. Remaining upcoming trades with no hero/OG yet (generate when Jarrad gives the go):
+
+**Tier 2 upcoming:**
+- excavation.city (grading/earthwork, $90B, strategic — Kippen's trade)
+- remodels.city (remodeling, $500B+)
+- siding.city ($15B)
+- poolservice.city
+- housecleaning.city
+- carpetcleaning.city
+- mold.city
+- septic.city
+- rolloff.city
+- hydrovac.city
+- locating.city
+
+**Tier 3 upcoming:**
+- fireprotection.city, taxprep.city, bookkeeper.city, refrigeration.city, windshield.city
+- bodyshop.city, metalworks.city, groom.city, nail.city, stamped.city, trowel.city
+- plank.city, finish.city, grout.city, directional.city, alignment.city, inspection.city
+- pane.city, lawfirm.city, bartender.city, cater.city, portrait.city, privatechef.city
+- tattoo.city, shrink.city, sentry.city, hitch.city, drywall.city, insulation.city, gc.city
+
+**Next Action:** Jarrad confirms priority order → Bob batch-generates and uploads
+
+---
+
+## 🟢 DONE (cumulative)
+
+### Infrastructure
+- [x] Full Next.js dashboard live at pumpcans.com (GitHub: jarrad1872/project-4h-dashboard)
+- [x] Vercel auto-deploy via GitHub webhook (reconnected, verified)
+- [x] Supabase schema: ads, ad_templates, marketing_events, lifecycle, checklist, trade_assets
+- [x] All 13 pages return 200 and pass visual audit
+- [x] `005_trade_assets.sql` migration applied by Jarrad
+
+### Ad Content
+- [x] 27 Saw.City branded ads approved (4 platforms + retargeting)
+- [x] 81 trade variants: RINSE×27, MOW×27, ROOTER×27 — pending approval
+- [x] 108 ads linked to image_url in Supabase Storage
+- [x] Tier 1 ad variants generated: pipe×27, coat×27, duct×27, pest×27, mow×27
+- [x] Tier 1 upcoming ad copy: electricians×27, roofrepair×27, disaster×27 (placeholder images)
+- [x] `workflow_stage` patched: concept for all pending, approved for approved
+
+### Approval UI
+- [x] /approval page rebuilt — reads ads table, Approve/Hold/Reject, Bulk Approve All per trade
+- [x] Approval sorted by tier (Tier 1 first) with yellow TIER 1 badges
+- [x] TRADE_MAP expanded: coat, duct, pest, electricians, roofrepair, disaster all properly labelled
+
+### Creative Assets
+- [x] 16 ad creatives (Phase 1) in Supabase Storage
+- [x] /creatives page live
+- [x] /assets page live — hero + OG staging per trade, approve/reject workflow
+- [x] 20 live trade heroes uploaded to Supabase Storage (trade-heros/)
+- [x] 20 live trade OG images uploaded to Supabase Storage (trade-ogs/)
+- [x] 3 Tier 1 upcoming heroes generated + uploaded (electrical, roofing, disaster-restoration)
+- [x] 3 Tier 1 upcoming OG images generated + uploaded
+- [x] 46 trade_assets rows live with image_url, status: pending
+
+### GTM Board
+- [x] /gtm page: 2,000-user mission banner, TAM-ranked trade registry, action board
+- [x] Trade registry: 72 total domains (20 live + 44 upcoming + 5 forwarding + 3 platform)
+- [x] excavation.city demoted to Tier 2, $90B TAM (was inflated $200B Tier 1)
+- [x] Status column with color-coded badges (LIVE/UPCOMING/→forward/PLATFORM)
+
+### Drive Asset Sources (locked)
+- Hero originals: https://drive.google.com/drive/folders/1WjD0Ytf611A_5KLjUBecDS_VssM-12i0
+- OG originals: https://drive.google.com/drive/folders/1HwGepsNQZt_QXrs8_2NLQmVPI5hjbFLD
+- Local path: projects/sawcity-lite/docs/project-4h/creative-assets/{hero-originals,og-originals}/
 
 ---
 
 ## 🔵 BACKLOG
 
-### TASK-004: Phase 2 Creative Generation
-Generate ad creatives (images) for the new Tier 1 trades using Nano Banana Pro (Gemini):
-- pipe.city creative (4 platform sizes)
-- coat.city creative (4 platform sizes)
-- duct.city creative (4 platform sizes)
-- pest.city creative (4 platform sizes)
-
-### TASK-005: Phase 2 Upcoming Trades (crimp/eave/excavation/disaster)
-Once these trades are live in the sawcity-lite app, generate full 27-ad campaigns for each.
-- crimp.city → Electrical ($220B)
-- eave.city → Roofing ($56B)
-- excavation.city → Excavation ($200B)
-- disaster.city → Disaster Restoration ($210B)
-
-### TASK-006: Fix Vercel Auto-Deploy (low priority)
-GitHub webhook was reconnected but monitor for reliability. Fallback: `bash deploy.sh`.
-
 ### TASK-007: A2P 10DLC Approval
-Waiting on TCR. Registered 2026-02-22. ETA: 2-3 weeks. SMS lifecycle unblocked after approval.
-Campaign ID: `QE2c6890da8086d771620e9b13fadeba0b`
+Waiting on TCR. Registered 2026-02-22. ETA: 2–3 weeks.  
+Campaign ID: `QE2c6890da8086d771620e9b13fadeba0b`  
+SMS lifecycle sequences unblocked after approval.
 
 ### TASK-008: Upload-Ready Campaign Packages
 Once ad accounts are live and ads approved, package each trade's ads with:
@@ -110,30 +130,30 @@ Once ad accounts are live and ads approved, package each trade's ads with:
 - Upload CSV per platform
 - Budget allocation per trade per platform
 
-### TASK-009: Domain Forwarding Setup
-Configure DNS forwarding for duplicate/variant domains:
+### TASK-009: Domain Forwarding Setup (GoDaddy)
 - mechanic.city → wrench.city
 - demolition.city → wreck.city
 - bucket.city → excavation.city
 - esthetics.city → esthetician.city
 - answered.city → receptionist.city
 
+### TASK-012: trade_assets Cleanup
+- Remove duplicate `mechanic` slug rows in trade_assets (artifact from early run)
+- Fix storage folder name typo `trade-heros` → `trade-heroes` (low priority, URLs work)
+
 ---
 
-## Campaign Budget Allocation (Current)
+## Campaign Budget
 
 | Platform | Budget | Status |
 |----------|--------|--------|
 | LinkedIn | $5,000 | Pending account |
-| YouTube | $5,000 | Pending account |
+| YouTube  | $5,000 | Pending account |
 | Facebook | $5,000 | Pending account |
-| Instagram | $5,000 | Pending account |
-| **Total** | **$20,000** | Pre-launch |
+| Instagram| $5,000 | Pending account |
+| **Total**| **$20,000** | Pre-launch |
 
-### Kill/Scale Thresholds (from Operating Pack v1)
-- **Kill:** CPL > $40 after $500 spend on a platform
-- **Scale:** CPL < $20 AND 5+ sign-ups → double budget
-- **Pause creative:** CTR < 0.3% after 1,000 impressions
+**Kill/Scale thresholds:** CPL > $40 → kill | CPL < $20 + 5 sign-ups → double | CTR < 0.3% after 1K impressions → pause creative
 
 ---
 
@@ -144,8 +164,7 @@ Configure DNS forwarding for duplicate/variant domains:
 | Dashboard | https://pumpcans.com |
 | GTM Board | https://pumpcans.com/gtm |
 | Approval Queue | https://pumpcans.com/approval |
+| Trade Assets | https://pumpcans.com/assets |
 | Creatives | https://pumpcans.com/creatives |
-| Workflow | https://pumpcans.com/workflow |
 | Supabase DB | https://supabase.com/dashboard/project/vzawlfitqnjhypnkguas |
-| Saw.City LITE (prod) | https://sawcity-lite.vercel.app |
 | GitHub | https://github.com/jarrad1872/project-4h-dashboard |
