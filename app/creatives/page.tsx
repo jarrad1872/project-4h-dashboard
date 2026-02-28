@@ -45,7 +45,7 @@ const PLATFORM_ICONS: Record<string, string> = {
 };
 
 function parseCreative(raw: Record<string, unknown>): Creative {
-  const c = raw as Creative;
+  const c = raw as unknown as Creative;
   try {
     c.meta = JSON.parse(c.utm_campaign) as CreativeMeta;
   } catch {
@@ -205,8 +205,8 @@ export default function CreativesPage() {
   useEffect(() => {
     fetch("/api/templates", { cache: "no-store" })
       .then(r => r.json())
-      .then((data: Record<string, unknown>[]) => {
-        setCreatives(data.map(parseCreative));
+      .then((data: unknown[]) => {
+        setCreatives(data.map(d => parseCreative(d as Record<string, unknown>)));
         setLoading(false);
       })
       .catch(() => setLoading(false));
