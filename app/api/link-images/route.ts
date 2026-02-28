@@ -6,6 +6,7 @@
  */
 import { okJson, errorJson, optionsResponse } from "@/lib/api";
 import { supabaseAdmin } from "@/lib/supabase";
+import { tradeFromAd } from "@/lib/trade-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -75,15 +76,15 @@ export async function POST() {
       } catch {
         continue;
       }
-      const imageUrl: string | undefined = meta.image_url;
+      const imageUrl: string | undefined = meta.imageUrl ?? meta.image_url;
       if (!imageUrl) continue;
 
-      const brand = (t.name as string).split("-")[0]; // "saw", "rinse", "mow", "rooter"
-      const platform: string = t.platform;
+      const trade: string = meta.trade ?? (t.name as string).split("-")[0];
+      const platform: string = meta.platform ?? (t.name as string).split("-")[1] ?? "";
 
-      if (brand === "saw") {
-        platformImageMap[platform] = imageUrl;
-      }
+      // Map each trade+platform combo to its image
+      const key = `${trade}::${platform}`;
+      platformImageMap[key] = imageUrl;
     }
 
     // 3. Fetch all ads without image_url
