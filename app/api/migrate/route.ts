@@ -78,10 +78,19 @@ export async function POST(request: Request) {
     return errorJson("Unauthorized", 401);
   }
 
-  const dbUrl = buildConnectionString();
+  // Accept optional db_url in request body (overrides env config)
+  let bodyDbUrl: string | undefined;
+  try {
+    const body = await request.json();
+    if (body?.db_url) bodyDbUrl = body.db_url;
+  } catch {
+    // no body is fine
+  }
+
+  const dbUrl = bodyDbUrl || buildConnectionString();
   if (!dbUrl) {
     return errorJson(
-      "No database connection configured. Set DATABASE_URL or SUPABASE_PROJECT_REF + SUPABASE_DB_PASSWORD.",
+      "No database connection configured. Set DATABASE_URL, SUPABASE_PROJECT_REF + SUPABASE_DB_PASSWORD, or pass db_url in request body.",
       500
     );
   }
