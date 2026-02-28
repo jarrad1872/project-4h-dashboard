@@ -27,6 +27,17 @@ function AdCard({
         <span className="text-xs text-slate-500">Workflow: {ad.workflowStage ?? ad.workflow_stage}</span>
       </div>
 
+      {ad.image_url && (
+        <div className="mb-3 overflow-hidden rounded border border-slate-700">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={ad.image_url}
+            alt={ad.headline ?? "Ad creative"}
+            className="w-full object-cover max-h-48"
+          />
+        </div>
+      )}
+
       {ad.headline && (
         <p className="mb-2 text-base font-semibold text-white">{ad.headline}</p>
       )}
