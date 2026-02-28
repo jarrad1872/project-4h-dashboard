@@ -12,6 +12,7 @@ const navItems = [
   { href: "/ads", label: "Ads" },
   { href: "/workflow", label: "Workflow" },
   { href: "/creatives", label: "Creatives" },
+  { href: "/assets", label: "Trade Assets" },
   { href: "/templates", label: "Templates" },
   { href: "/generate", label: "AI Studio" },
   { href: "/approval", label: "Approval" },
