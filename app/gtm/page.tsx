@@ -235,6 +235,48 @@ export default async function GTMPage() {
         </div>
       </section>
 
+      {/* Trade Domain Registry */}
+      <section className="rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <h2 className="mb-1 text-lg font-semibold text-white">Trade Domain Registry</h2>
+        <p className="mb-4 text-xs text-slate-400">
+          Authoritative source: <code className="text-slate-300">trades/*.json → brand.domain</code> in sawcity-lite codebase.
+          Never guess domain mappings — use this table.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-700 text-left text-xs uppercase tracking-wide text-slate-400">
+                <th className="pb-2 pr-4">Tier</th>
+                <th className="pb-2 pr-4">Domain</th>
+                <th className="pb-2 pr-4">App Name</th>
+                <th className="pb-2">Code Slug</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700/50">
+              {(state.campaign as any).all_trades?.map((t: { domain: string; slug: string; appName: string; tier: number }) => (
+                <tr key={t.domain} className={t.tier === 1 ? "bg-green-500/5" : ""}>
+                  <td className="py-1.5 pr-4">
+                    <span className={`rounded px-1.5 py-0.5 text-xs font-bold ${
+                      t.tier === 1 ? "bg-green-500/20 text-green-400" :
+                      t.tier === 2 ? "bg-yellow-500/20 text-yellow-400" :
+                      "bg-slate-600/40 text-slate-400"
+                    }`}>T{t.tier}</span>
+                  </td>
+                  <td className="py-1.5 pr-4">
+                    <a href={`https://${t.domain}`} target="_blank" rel="noopener noreferrer"
+                       className="font-medium text-blue-400 hover:text-blue-300">
+                      {t.domain}
+                    </a>
+                  </td>
+                  <td className="py-1.5 pr-4 text-white">{t.appName}</td>
+                  <td className="py-1.5 font-mono text-xs text-slate-400">{t.slug}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       {/* Key Links */}
       <section className="rounded-xl border border-slate-700 bg-slate-800/60 p-6">
         <h2 className="mb-4 text-lg font-semibold text-white">Key Links</h2>
