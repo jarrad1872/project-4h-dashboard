@@ -138,7 +138,7 @@ function CreativeCard({ c }: { c: Creative }) {
         {/* Ad Copy */}
         <div>
           <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Ad Copy</p>
-          <CopyBlock text={c.primaryText || c.primary_text || ""} />
+          <CopyBlock text={c.primaryText || ""} />
         </div>
 
         {/* Metadata */}
@@ -170,7 +170,7 @@ function CreativeCard({ c }: { c: Creative }) {
         {/* Full Prompt (collapsible) */}
         {c.utm_campaign && (
           <PromptBlock prompt={
-            `--- GENERATION BRIEF ---\nTrade:     ${c.headline}\nPlatform:  ${c.platform} (${dimensions})\nModel:     ${model}\nHero URL:  ${heroUrl}\nLanding:   ${c.meta?.landing_url ?? "—"}\nGenerated: ${generatedAt}\n\n--- AD COPY ---\n${c.primaryText || (c as unknown as Record<string,string>).primary_text || ""}`.trimEnd()
+            `--- GENERATION BRIEF ---\nTrade:     ${c.headline}\nPlatform:  ${c.platform} (${dimensions})\nModel:     ${model}\nHero URL:  ${heroUrl}\nLanding:   ${c.meta?.landing_url ?? "—"}\nGenerated: ${generatedAt}\n\n--- AD COPY ---\n${c.primaryText || ""}`.trimEnd()
           } />
         )}
 
