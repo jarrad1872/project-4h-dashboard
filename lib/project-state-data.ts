@@ -70,7 +70,7 @@ export function getProjectState() {
         { domain: 'roofrepair.city',  slug: 'roofing',       appName: 'Roofrepair.City',  tier: 1, tam: '$56B',  businesses: '100K+', note: 'Primary roofing domain. Storm emergency, insurance jobs, high value. roof.city was $10K+ premium', status: 'upcoming' },
         { domain: 'crimp.city',    slug: 'electrical-alt',   appName: 'Crimp.City',   tier: 1, tam: 'see electricians.city', businesses: '', note: 'Forwards to Electricians.City', status: 'forward', forwardsTo: 'electricians.city' },
         { domain: 'eave.city',     slug: 'roofing-alt',      appName: 'Eave.City',    tier: 1, tam: 'see roofrepair.city', businesses: '', note: 'Forwards to Roofrepair.City', status: 'forward', forwardsTo: 'roofrepair.city' },
-        { domain: 'excavation.city', slug: 'excavation',     appName: 'Excavation.City', tier: 1, tam: '$200B', businesses: '235K', note: "Kippen's own trade. Site prep, utility trenching, earthwork", status: 'upcoming' },
+        { domain: 'excavation.city', slug: 'excavation',     appName: 'Excavation.City', tier: 2, tam: '$90B', businesses: '235K', note: "Strategic priority (Kippen's trade). Site prep, utility trenching, earthwork", status: 'upcoming' },
         { domain: 'disaster.city', slug: 'disaster-restoration', appName: 'Disaster.City', tier: 1, tam: '$210B', businesses: '30K+', note: 'Fire/flood/storm restoration. Insurance-driven, 24/7 emergency', status: 'upcoming' },
         // TIER 2 — Large TAM or high urgency fit (LIVE)
         { domain: 'prune.city',    slug: 'tree-service',     appName: 'Prune.City',   tier: 2, tam: '$39.5B', businesses: '50K+', note: 'Storm emergency + seasonal surge', status: 'live' },
