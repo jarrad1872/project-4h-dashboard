@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import { getProjectState } from "@/lib/project-state-data";
 
 interface ReadinessItem {
   label: string;
@@ -42,13 +43,7 @@ interface ProjectState {
   keyLinks: KeyLink[];
 }
 
-async function getProjectState(): Promise<ProjectState> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/project-state`, { cache: "no-store" });
-  return res.json();
-}
+
 
 const STATUS_CONFIG = {
   done: { label: "Done", color: "bg-green-500/20 text-green-400 border border-green-500/30" },
@@ -77,8 +72,8 @@ const PRIORITY_COLORS = [
   "border-slate-600 bg-slate-700/40",
 ];
 
-export default async function GTMPage() {
-  const state = await getProjectState();
+export default function GTMPage() {
+  const state = getProjectState();
 
   const doneCount = (items: ReadinessItem[]) => items.filter((i) => i.status === "done").length;
 
