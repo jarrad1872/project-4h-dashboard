@@ -144,7 +144,7 @@ export function getProjectState() {
       { label: 'Saw.City LITE (prod)', url: 'https://sawcity-lite.vercel.app' },
       { label: 'Supabase DB (4H)', url: 'https://supabase.com/dashboard/project/vzawlfitqnjhypnkguas' },
     ],
-  } as const;
+  };
 }
 
 export type ProjectState = ReturnType<typeof getProjectState>;
