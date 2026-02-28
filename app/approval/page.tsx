@@ -80,6 +80,7 @@ export default function ApprovalPage() {
   const [pending, setPending] = useState<Ad[]>([]);
   const [reviewed, setReviewed] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bulkLoading, setBulkLoading] = useState<Record<string, boolean>>({});
   const [tradeFilter, setTradeFilter] = useState<TradeFilter>("all");
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("all");
 
@@ -109,6 +110,19 @@ export default function ApprovalPage() {
     void load();
   }
 
+  async function bulkDecide(trade: string, ads: Ad[], status: AdStatus) {
+    setBulkLoading((prev) => ({ ...prev, [trade]: true }));
+    for (const ad of ads) {
+      await fetch(`/api/ads/${ad.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+    }
+    setBulkLoading((prev) => ({ ...prev, [trade]: false }));
+    void load();
+  }
+
   const trades = useMemo(() => {
     const seen = new Set(pending.map(tradeFromAd));
     return ["all", ...Array.from(seen).sort()];
@@ -122,7 +136,7 @@ export default function ApprovalPage() {
     });
   }, [pending, tradeFilter, platformFilter]);
 
-  // Group by trade for display
+  // Group pending ads by trade for display
   const byTrade = useMemo(() => {
     const groups: Record<string, Ad[]> = {};
     for (const ad of filtered) {
@@ -132,6 +146,18 @@ export default function ApprovalPage() {
     }
     return groups;
   }, [filtered]);
+
+  // Per-trade approved/rejected counts (from reviewed ads)
+  const tradeStats = useMemo(() => {
+    const stats: Record<string, { approved: number; rejected: number }> = {};
+    for (const ad of reviewed) {
+      const t = tradeFromAd(ad);
+      if (!stats[t]) stats[t] = { approved: 0, rejected: 0 };
+      if (ad.status === "approved") stats[t].approved++;
+      else if (ad.status === "rejected") stats[t].rejected++;
+    }
+    return stats;
+  }, [reviewed]);
 
   return (
     <div className="space-y-6">
@@ -184,14 +210,37 @@ export default function ApprovalPage() {
 
       {!loading && Object.entries(byTrade).map(([trade, ads]) => {
         const info = TRADE_MAP[trade] ?? TRADE_MAP.saw;
+        const stats = tradeStats[trade] ?? { approved: 0, rejected: 0 };
+        const isBulkLoading = bulkLoading[trade] ?? false;
         return (
           <Card key={trade}>
-            <div className="mb-4 flex items-center gap-3">
-              <h2 className={`text-lg font-semibold ${info.color}`}>{info.label}</h2>
-              <span className="rounded bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
-                {ads.length} pending
-              </span>
+            <div className="mb-4 space-y-3">
+              {/* Trade label + per-trade stats */}
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className={`text-lg font-semibold ${info.color}`}>{info.label}</h2>
+                <span className="text-sm text-slate-400">
+                  {stats.approved} approved · {ads.length} pending · {stats.rejected} rejected
+                </span>
+              </div>
+
+              {/* Bulk action buttons */}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  disabled={isBulkLoading || ads.length === 0}
+                  onClick={() => void bulkDecide(trade, ads, "approved")}
+                >
+                  {isBulkLoading ? "Processing…" : `Approve All ${info.label}`}
+                </Button>
+                <GhostButton
+                  className="border-red-500 text-red-400 hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={isBulkLoading || ads.length === 0}
+                  onClick={() => void bulkDecide(trade, ads, "rejected")}
+                >
+                  {isBulkLoading ? "Processing…" : `Reject All ${info.label}`}
+                </GhostButton>
+              </div>
             </div>
+
             <div className="space-y-4">
               {ads.map((ad) => (
                 <AdCard key={ad.id} ad={ad} onDecision={decide} />

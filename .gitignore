@@ -5,3 +5,4 @@ node_modules/
 .git-repo/
 .vercel
 *.tsbuildinfo
+deploy.sh
