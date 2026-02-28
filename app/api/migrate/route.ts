@@ -57,15 +57,33 @@ export function OPTIONS() {
   return optionsResponse();
 }
 
+function buildConnectionString(): string | null {
+  // Prefer explicit DATABASE_URL
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+
+  // Fall back to Supabase credentials (direct DB connection)
+  const ref = process.env.SUPABASE_PROJECT_REF;
+  const pass = process.env.SUPABASE_DB_PASSWORD;
+  if (ref && pass) {
+    // Try direct connection URL (works from Vercel/server environments)
+    return `postgresql://postgres:${encodeURIComponent(pass)}@db.${ref}.supabase.co:5432/postgres`;
+  }
+
+  return null;
+}
+
 export async function POST(request: Request) {
   const secret = request.headers.get("x-migrate-secret");
   if (secret !== process.env.MIGRATE_SECRET && process.env.MIGRATE_SECRET) {
     return errorJson("Unauthorized", 401);
   }
 
-  const dbUrl = process.env.DATABASE_URL;
+  const dbUrl = buildConnectionString();
   if (!dbUrl) {
-    return errorJson("DATABASE_URL not configured", 500);
+    return errorJson(
+      "No database connection configured. Set DATABASE_URL or SUPABASE_PROJECT_REF + SUPABASE_DB_PASSWORD.",
+      500
+    );
   }
 
   try {
