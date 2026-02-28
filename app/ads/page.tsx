@@ -56,6 +56,9 @@ export default function AdsPage() {
     void loadTemplates();
   }, []);
 
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 30;
+
   const filtered = useMemo(() => {
     return ads.filter((ad) => {
       const platformMatch =
@@ -68,6 +71,13 @@ export default function AdsPage() {
       return platformMatch && statusMatch;
     });
   }, [ads, platform, status]);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  useEffect(() => {
+    setPage(0);
+  }, [platform, status]);
 
   async function togglePause(id: string, currentStatus: AdStatus) {
     const next: AdStatus = currentStatus === "paused" ? "pending" : "paused";
@@ -148,8 +158,17 @@ export default function AdsPage() {
         </div>
       </Card>
 
+      <div className="flex items-center justify-between text-sm text-slate-400">
+        <span>{filtered.length} ads</span>
+        <div className="flex items-center gap-2">
+          <GhostButton disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>← Prev</GhostButton>
+          <span>Page {page + 1} / {totalPages || 1}</span>
+          <GhostButton disabled={page >= totalPages - 1} onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}>Next →</GhostButton>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {filtered.map((ad) => {
+        {paginated.map((ad) => {
           const utmUrl = `https://saw.city${ad.landingPath}?utm_source=${ad.utmSource}&utm_medium=${ad.utmMedium}&utm_campaign=${ad.utmCampaign}&utm_content=${ad.utmContent}&utm_term=${ad.utmTerm}`;
 
           return (
@@ -161,6 +180,7 @@ export default function AdsPage() {
                   alt={ad.headline ?? "Ad creative"}
                   className="mb-3 w-full rounded object-cover"
                   style={{ maxHeight: 180 }}
+                  loading="lazy"
                 />
               )}
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -195,6 +215,14 @@ export default function AdsPage() {
           );
         })}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-2 text-sm text-slate-400">
+          <GhostButton disabled={page === 0} onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo(0,0); }}>← Prev</GhostButton>
+          <span>Page {page + 1} / {totalPages}</span>
+          <GhostButton disabled={page >= totalPages - 1} onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo(0,0); }}>Next →</GhostButton>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
