@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { PlatformChip, StatusChip } from "@/components/chips";
+import { tradeBadge } from "@/lib/trade-utils";
 import { AIGeneratePanel } from "@/components/ai-generate-panel";
 import { Button, Card, GhostButton } from "@/components/ui";
 import type { Ad, AdStatus, AdTemplate, WorkflowStage } from "@/lib/types";
@@ -162,9 +163,12 @@ export default function AdsPage() {
                   style={{ maxHeight: 180 }}
                 />
               )}
-              <div className="mb-3 flex items-center justify-between gap-2">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
                 <PlatformChip platform={ad.platform} />
-                <span className="rounded bg-slate-700 px-2 py-1 text-xs">{ad.format}</span>
+                {(() => { const t = tradeBadge(ad); return (
+                  <span className={`rounded px-2 py-0.5 text-xs font-semibold ${t.bg} ${t.color}`}>{t.domain}</span>
+                ); })()}
+                <span className="ml-auto rounded bg-slate-700 px-2 py-1 text-xs">{ad.format}</span>
               </div>
               <p className="mb-2 font-semibold">{ad.headline || "(No headline)"}</p>
               <p className="line-clamp-3 text-sm text-slate-300">{ad.primaryText}</p>

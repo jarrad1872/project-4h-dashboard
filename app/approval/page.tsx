@@ -4,26 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import type { Ad, AdStatus } from "@/lib/types";
-
-const TRADE_MAP: Record<string, { label: string; color: string; domain: string }> = {
-  rinse: { label: "Rinse.City", color: "text-blue-400", domain: "rinse.city" },
-  mow:   { label: "Mow.City",   color: "text-green-400", domain: "mow.city" },
-  rooter:{ label: "Rooter.City",color: "text-purple-400", domain: "rooter.city" },
-  saw:   { label: "Saw.City",   color: "text-orange-400", domain: "saw.city" },
-};
-
-function tradeFromAd(ad: Ad): string {
-  const utm = (ad.utm_campaign ?? ad.utmCampaign ?? "").toLowerCase();
-  for (const key of Object.keys(TRADE_MAP)) {
-    if (utm.includes(`_${key}_`) || utm.endsWith(`_${key}`)) return key;
-  }
-  // fallback: check landing path or utm_content
-  const lp = (ad.landing_path ?? ad.landingPath ?? "").toLowerCase();
-  for (const key of Object.keys(TRADE_MAP)) {
-    if (lp.includes(key)) return key;
-  }
-  return "saw";
-}
+import { TRADE_MAP, tradeFromAd } from "@/lib/trade-utils";
 
 function AdCard({
   ad,

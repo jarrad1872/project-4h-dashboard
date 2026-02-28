@@ -35,6 +35,22 @@ CREATE TABLE IF NOT EXISTS ad_templates (
 );
 
 CREATE INDEX IF NOT EXISTS ad_templates_created_at_idx ON ad_templates(created_at DESC);
+
+-- Migration 004: link ad creatives to ads via image_url
+ALTER TABLE ads ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+-- Populate image_url by matching ad_templates to ads by platform
+-- Uses "saw" brand templates (concrete cutting = Saw.City product)
+UPDATE ads a
+SET image_url = (
+  SELECT (t.utm_campaign::jsonb)->>'image_url'
+  FROM ad_templates t
+  WHERE t.platform = a.platform
+    AND t.name LIKE 'saw-%'
+    AND (t.utm_campaign::jsonb)->>'image_url' IS NOT NULL
+  LIMIT 1
+)
+WHERE a.image_url IS NULL;
 `;
 
 export function OPTIONS() {
@@ -61,7 +77,7 @@ export async function POST(request: Request) {
     await client.query(MIGRATION_SQL);
     await client.end();
 
-    return okJson({ ok: true, message: "Migration 003 applied" });
+    return okJson({ ok: true, message: "Migration 004 applied (includes image_url column + linking)" });
   } catch (error) {
     return errorJson("Migration failed", 500, String(error));
   }
