@@ -25,6 +25,11 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 4. **Verify before reporting done.** If you push code, confirm Vercel deployed. If you update DB, confirm the row exists. Show evidence.
 5. **Never move money or modify billing** in any system.
 
+### TRADE_MAP Hard Rule
+**Every new trade added to the campaign MUST have its prefix added to `lib/trade-utils.ts → TRADE_MAP` in the same commit.**
+Missing entries silently fall back to `saw.city` badge on every page — this is a user-visible bug.
+Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
+
 ### Ad Copy Hard Rules
 - **Price is ALWAYS $79/mo** — never $99, $149, $199, or any other amount.
 - **14-day free trial, no credit card required** — include this in ALL future ad copy. It's a key conversion hook and must appear in some form in every ad (primary text, headline, or CTA).
@@ -68,7 +73,7 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 |------|---------|
 | `lib/project-state-data.ts` | Single source of truth for GTM board data — edit this to update all dashboard state |
 | `lib/types.ts` | TypeScript types for Ad, AdStatus, etc. |
-| `lib/trade-utils.ts` | TRADE_MAP and tradeFromAd() helper |
+| `lib/trade-utils.ts` | TRADE_MAP (65 prefixes) and tradeFromAd() helper — **keep in sync with all trades** |
 | `lib/server-utils.ts` | normalizeAd(), adToDb() — DB↔API field mapping |
 | `app/gtm/page.tsx` | GTM Action Board — mission, product readiness, trade registry, actions |
 | `app/approval/page.tsx` | Approval queue — reads ads table, Approve/Hold/Reject per ad |

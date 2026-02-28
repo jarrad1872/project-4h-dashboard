@@ -164,6 +164,9 @@ Priority order: electrical → roofing → disaster-restoration → Tier 2 trade
 - [x] Drive asset originals: 20 live trade hero + OG sourced + uploaded to Storage
 - [x] Tier 1 upcoming (electrical/roofing/disaster): Nano Banana Pro heroes approved by Jarrad
 - [x] TRADE_MAP expanded with all Tier 1-3 trades + tier field
+- [x] **TRADE_MAP complete — all 65 trade prefixes registered** (commit `820719f`, Feb 28 2026)
+  - All prefixes: alignment, appraisals, bartender, bodyshop, bookkeeper, brake, carpetcleaning, cater, chimney, coat, detail, directional, disaster, drywall, duct, electricians, esthetician, excavation, finish, fireprotection, grade, groom, grout, haul, hitch, housecleaning, hydrovac, inspection, insulation, lawfirm, locating, lockout, metalworks, mold, mow, nail, pane, pave, pest, pipe, plank, plow, polish, poolservice, portrait, privatechef, prune, refrigeration, remodels, renewables, rinse, rolloff, roofrepair, rooter, saw, sentry, septic, shrink, siding, stamped, taxprep, trowel, wreck, wrench
+  - `tradeFromAd()` upgraded: checks utm_campaign + campaign_group, handles last-segment and second-to-last-segment patterns — no more saw.city fallback for unrecognized trades
 
 ---
 

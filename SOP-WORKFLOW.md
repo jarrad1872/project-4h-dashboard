@@ -139,6 +139,36 @@ Upcoming trades have NO landing pages → cannot build real isometric creatives 
 
 ---
 
+## TRADE_MAP — Maintenance Rule
+
+**File:** `lib/trade-utils.ts` → `TRADE_MAP`
+
+The TRADE_MAP is the single source of truth for trade badge rendering on `/ads`, `/approval`, and any page that calls `tradeBadge()`. If a trade prefix is missing, **all ads for that trade show `saw.city` as the badge — a silent, confusing bug.**
+
+### Hard Rule: Keep TRADE_MAP in sync with every new trade added
+Whenever a new trade is added to the campaign (new ads inserted, new `.city` domain registered), the corresponding prefix **must** be added to TRADE_MAP in the same commit. No exceptions.
+
+### Current state (2026-02-28, commit `820719f`): **65 trade prefixes registered**
+```
+alignment, appraisals, bartender, bodyshop, bookkeeper, brake, carpetcleaning,
+cater, chimney, coat, detail, directional, disaster, drywall, duct, electricians,
+esthetician, excavation, finish, fireprotection, grade, groom, grout, haul, hitch,
+housecleaning, hydrovac, inspection, insulation, lawfirm, locating, lockout,
+metalworks, mold, mow, nail, pane, pave, pest, pipe, plank, plow, polish,
+poolservice, portrait, privatechef, prune, refrigeration, remodels, renewables,
+rinse, rolloff, roofrepair, rooter, saw, sentry, septic, shrink, siding, stamped,
+taxprep, trowel, wreck, wrench
+```
+
+### How `tradeFromAd()` works (as of Feb 28):
+1. Checks `utm_campaign` and `campaign_group` fields
+2. For each: looks for `_key_` in the middle OR `_key` at the end
+3. Fallback: checks last segment after `_`, then second-to-last (handles `nb2_2026-03_trowel_d2`)
+4. Final fallback: checks `landing_path`
+5. Returns `"saw"` only if genuinely no match found
+
+---
+
 ## ANTI-SLOP AUDIT GATE
 
 **Rule:** Run `scripts/audit-ads.mjs` before reporting ANY generation batch as done.  
