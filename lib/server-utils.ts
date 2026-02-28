@@ -142,6 +142,8 @@ export function normalizeAd(input: any): Ad {
     createdAt,
     updatedAt,
     workflowStage,
+    imageUrl: (input.image_url ?? input.imageUrl ?? null) as string | null,
+    image_url: (input.image_url ?? input.imageUrl ?? null) as string | null,
     statusHistory: normalizeStatusHistory(input),
   };
 }
@@ -163,6 +165,7 @@ export function adToDb(ad: Partial<Ad>) {
     utm_term: ad.utm_term ?? ad.utmTerm,
     status: ad.status,
     workflow_stage: ad.workflow_stage ?? ad.workflowStage,
+    image_url: ad.image_url ?? ad.imageUrl ?? null,
     created_at: ad.created_at ?? ad.createdAt,
     updated_at: ad.updated_at ?? ad.updatedAt,
   };

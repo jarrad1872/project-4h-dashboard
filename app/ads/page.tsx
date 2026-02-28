@@ -68,11 +68,12 @@ export default function AdsPage() {
     });
   }, [ads, platform, status]);
 
-  async function pauseAd(id: string) {
+  async function togglePause(id: string, currentStatus: AdStatus) {
+    const next: AdStatus = currentStatus === "paused" ? "pending" : "paused";
     await fetch(`/api/ads/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "paused" satisfies AdStatus }),
+      body: JSON.stringify({ status: next }),
     });
     void loadAds();
   }
@@ -152,6 +153,15 @@ export default function AdsPage() {
 
           return (
             <Card key={ad.id}>
+              {(ad.imageUrl ?? ad.image_url) && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={ad.imageUrl ?? ad.image_url ?? ""}
+                  alt={ad.headline ?? "Ad creative"}
+                  className="mb-3 w-full rounded object-cover"
+                  style={{ maxHeight: 180 }}
+                />
+              )}
               <div className="mb-3 flex items-center justify-between gap-2">
                 <PlatformChip platform={ad.platform} />
                 <span className="rounded bg-slate-700 px-2 py-1 text-xs">{ad.format}</span>
@@ -166,7 +176,9 @@ export default function AdsPage() {
                 <Link className="rounded-md border border-slate-600 px-3 py-2 text-sm hover:bg-slate-700" href={`/ads/${ad.id}`}>
                   Edit
                 </Link>
-                <GhostButton onClick={() => pauseAd(ad.id)}>Pause</GhostButton>
+                <GhostButton onClick={() => togglePause(ad.id, ad.status)}>
+                  {ad.status === "paused" ? "Unpause" : "Pause"}
+                </GhostButton>
                 <GhostButton
                   onClick={() => {
                     navigator.clipboard.writeText(utmUrl).catch(() => null);

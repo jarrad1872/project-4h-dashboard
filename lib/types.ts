@@ -34,6 +34,8 @@ export interface Ad {
   createdAt: string;
   updatedAt?: string;
   workflowStage: WorkflowStage;
+  imageUrl?: string | null;
+  image_url?: string | null;
   statusHistory?: StatusHistoryItem[];
 }
 
