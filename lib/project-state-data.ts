@@ -66,8 +66,10 @@ export function getProjectState() {
         { domain: 'duct.city',     slug: 'hvac',             appName: 'Duct.City',    tier: 1, tam: '$30B',  businesses: '105K', note: 'Emergency demand, high job value', status: 'live' },
         { domain: 'pest.city',     slug: 'pest-control',     appName: 'Pest.City',    tier: 1, tam: '$26B',  businesses: '33K',  note: 'Recurring revenue model, scheduled visits', status: 'live' },
         // TIER 1 — Upcoming
-        { domain: 'crimp.city',    slug: 'electrical',       appName: 'Crimp.City',   tier: 1, tam: '$220B', businesses: '100K+', note: 'Emergency calls, owner-operators — Tier 1 by TAM alongside pipe+duct', status: 'upcoming' },
-        { domain: 'eave.city',     slug: 'roofing',          appName: 'Eave.City',    tier: 1, tam: '$56B',  businesses: '100K+', note: 'Best available — roof.city is $10K+ premium. Storm emergency, high job value', status: 'upcoming' },
+        { domain: 'electricians.city', slug: 'electrical',    appName: 'Electricians.City', tier: 1, tam: '$220B', businesses: '100K+', note: 'Primary electrical domain. Emergency calls, owner-operators, Tier 1 alongside pipe+duct', status: 'upcoming' },
+        { domain: 'roofrepair.city',  slug: 'roofing',       appName: 'Roofrepair.City',  tier: 1, tam: '$56B',  businesses: '100K+', note: 'Primary roofing domain. Storm emergency, insurance jobs, high value. roof.city was $10K+ premium', status: 'upcoming' },
+        { domain: 'crimp.city',    slug: 'electrical-alt',   appName: 'Crimp.City',   tier: 1, tam: 'see electricians.city', businesses: '', note: 'Forwards to Electricians.City', status: 'forward', forwardsTo: 'electricians.city' },
+        { domain: 'eave.city',     slug: 'roofing-alt',      appName: 'Eave.City',    tier: 1, tam: 'see roofrepair.city', businesses: '', note: 'Forwards to Roofrepair.City', status: 'forward', forwardsTo: 'roofrepair.city' },
         { domain: 'excavation.city', slug: 'excavation',     appName: 'Excavation.City', tier: 1, tam: '$200B', businesses: '235K', note: "Kippen's own trade. Site prep, utility trenching, earthwork", status: 'upcoming' },
         { domain: 'disaster.city', slug: 'disaster-restoration', appName: 'Disaster.City', tier: 1, tam: '$210B', businesses: '30K+', note: 'Fire/flood/storm restoration. Insurance-driven, 24/7 emergency', status: 'upcoming' },
         // TIER 2 — Large TAM or high urgency fit (LIVE)
