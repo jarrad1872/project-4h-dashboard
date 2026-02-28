@@ -100,8 +100,8 @@ export default function GTMPage() {
           </div>
           <div className="ml-auto hidden sm:block">
             <p className="text-right text-xs text-slate-400">Tier 1 Trades</p>
-            {(state.campaign as any).tier1_trades?.map((t: string) => (
-              <p key={t} className="text-right text-sm font-medium text-green-300">{t}</p>
+            {(state.campaign as any).tier1_trades?.map((t: { domain: string; appName: string; trade: string }) => (
+              <p key={t.domain} className="text-right text-sm font-medium text-green-300">{t.appName}</p>
             ))}
           </div>
         </div>
