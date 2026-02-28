@@ -87,15 +87,15 @@ export async function POST() {
       platformImageMap[key] = imageUrl;
     }
 
-    // 3. Fetch all ads without image_url
+    // 3. Fetch all ads
     const { data: ads, error: aErr } = await supabaseAdmin
       .from("ads")
-      .select("id,platform,image_url");
+      .select("id,platform,utm_campaign,image_url");
 
     if (aErr) {
       if (aErr.code === "42703") {
         return errorJson(
-          "image_url column does not exist. Run POST /api/migrate first.",
+          "image_url column does not exist. Run ALTER TABLE ads ADD COLUMN IF NOT EXISTS image_url TEXT; in Supabase SQL editor first.",
           500
         );
       }
@@ -106,14 +106,21 @@ export async function POST() {
     let skipped = 0;
     let alreadySet = 0;
 
-    // 4. Link each ad to its matching template image
+    // 4. Link each ad to its matching template image by trade+platform
     for (const ad of ads ?? []) {
       if (ad.image_url) {
         alreadySet++;
         continue;
       }
 
-      const imageUrl = platformImageMap[ad.platform as string];
+      const trade = tradeFromAd(ad as Parameters<typeof tradeFromAd>[0]);
+      const platform = (ad.platform as string) ?? "";
+
+      // Try trade+platform match first, then platform-only fallback
+      const key = `${trade}::${platform}`;
+      const fallbackKey = `saw::${platform}`;
+      const imageUrl = platformImageMap[key] ?? platformImageMap[fallbackKey];
+
       if (!imageUrl) {
         skipped++;
         continue;
@@ -138,7 +145,6 @@ export async function POST() {
       matched,
       skipped,
       total: ads?.length ?? 0,
-      platformMap: platformImageMap,
     });
   } catch (err) {
     return errorJson("Unexpected error", 500, String(err));
