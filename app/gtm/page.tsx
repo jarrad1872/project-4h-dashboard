@@ -131,7 +131,7 @@ export default function GTMPage() {
             { label: "Trade Domains", value: state.product.metrics.trade_domains },
             { label: "Price", value: `$${state.product.metrics.monthly_price}/mo` },
             { label: "Gross Margin", value: state.product.metrics.gross_margin_pct },
-            { label: "Readiness", value: `${doneCount(state.product.readiness)}/${state.product.readiness.length}` },
+            { label: "Readiness", value: `${doneCount(state.product.readiness as ReadinessItem[])}/${state.product.readiness.length}` },
           ].map((m) => (
             <div key={m.label} className="rounded-lg border border-slate-700 bg-slate-800 p-3 text-center">
               <div className="text-lg font-bold text-white">{m.value}</div>
@@ -142,10 +142,10 @@ export default function GTMPage() {
 
         {/* Product readiness */}
         <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
-          Product Readiness ({doneCount(state.product.readiness)}/{state.product.readiness.length})
+          Product Readiness ({doneCount(state.product.readiness as ReadinessItem[])}/{state.product.readiness.length})
         </h3>
         <div className="space-y-1.5">
-          {state.product.readiness.map((item) => (
+          {(state.product.readiness as ReadinessItem[]).map((item) => (
             <div key={item.label} className="flex items-start gap-3 rounded-lg bg-slate-700/30 px-3 py-2">
               <StatusPill status={item.status} />
               <div className="min-w-0 flex-1">
@@ -178,10 +178,10 @@ export default function GTMPage() {
         </div>
 
         <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
-          Campaign Readiness ({doneCount(state.campaign.readiness)}/{state.campaign.readiness.length})
+          Campaign Readiness ({doneCount(state.campaign.readiness as ReadinessItem[])}/{state.campaign.readiness.length})
         </h3>
         <div className="space-y-1.5">
-          {state.campaign.readiness.map((item) => (
+          {(state.campaign.readiness as ReadinessItem[]).map((item) => (
             <div key={item.label} className="flex items-start gap-3 rounded-lg bg-slate-700/30 px-3 py-2">
               <StatusPill status={item.status} />
               <div className="min-w-0 flex-1">
