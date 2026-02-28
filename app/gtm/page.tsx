@@ -93,6 +93,25 @@ export default async function GTMPage() {
         </p>
       </div>
 
+      {/* Mission Banner */}
+      <div className="rounded-xl border-2 border-green-500 bg-green-500/10 px-6 py-5">
+        <div className="flex flex-wrap items-center gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-green-400">The Mission</p>
+            <p className="mt-1 text-4xl font-black text-white">2,000 Users</p>
+            <p className="mt-1 text-sm text-green-300">
+              Saw.City LITE · 20 trades · 4 channels · $20K budget · No demo, self-serve
+            </p>
+          </div>
+          <div className="ml-auto hidden sm:block">
+            <p className="text-right text-xs text-slate-400">Tier 1 Trades</p>
+            {(state.campaign as any).tier1_trades?.map((t: string) => (
+              <p key={t} className="text-right text-sm font-medium text-green-300">{t}</p>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Product State Summary */}
       <section className="rounded-xl border border-slate-700 bg-slate-800/60 p-6">
         <div className="mb-4 flex items-start justify-between gap-4">
@@ -154,6 +173,9 @@ export default async function GTMPage() {
               ${state.campaign.budget_total.toLocaleString()} ·{" "}
               {state.campaign.channels.join(", ")}
             </p>
+            {(state.campaign as any).mission && (
+              <p className="mt-2 text-xs font-semibold text-green-400">{(state.campaign as any).mission}</p>
+            )}
           </div>
           <span className="shrink-0 rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-yellow-400 border border-yellow-500/30">
             Pre-Launch

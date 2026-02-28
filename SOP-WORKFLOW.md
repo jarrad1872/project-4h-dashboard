@@ -4,6 +4,11 @@
 **Dashboard:** https://pumpcans.com  
 **Campaign docs:** `projects/sawcity-lite/docs/project-4h/`
 
+> **⚠️ THE MISSION: 2,000 USERS ON SAW.CITY LITE.**
+> Not 1,000. Not "customers." 2,000 users. This number never changes without Jarrad explicitly saying so.
+> **Saw.City LITE = 20 trades, one app.** Campaign is NOT exclusive to saw.city/concrete cutting.
+> Tier 1 targets: `rinse.city`, `mow.city`, `rooter.city`, `saw.city`. A/B test, swap, scale.
+
 ---
 
 ## Core Principle

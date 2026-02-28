@@ -41,10 +41,13 @@ export async function GET() {
 
     campaign: {
       name: 'Project 4H',
+      mission: '2,000 USERS — this is the number. Not 1,000. Not "customers." 2,000 users on Saw.City LITE.',
+      target_users: 2000,
       budget_total: 20000,
       channels: ['LinkedIn', 'YouTube', 'Facebook', 'Instagram'],
       status: 'pre-launch',
       dashboard: 'https://pumpcans.com',
+      tier1_trades: ['saw.city (concrete cutting)', 'rinse.city (pressure washing)', 'mow.city (lawn care)', 'rooter.city (plumbing)'],
 
       readiness: [
         { label: 'Strategy + Operating Pack', status: 'done', note: 'Kill/scale thresholds, UTM schema, weekly cadence defined' },
