@@ -2,7 +2,7 @@
 
 **Live:** https://pumpcans.com  
 **GitHub:** `jarrad1872/project-4h-dashboard`  
-**Stack:** Next.js 15 · TypeScript · Tailwind · Supabase · Vercel
+**Stack:** Next.js 15 · TypeScript · Tailwind · Supabase · Vercel · Gemini NB2 (image gen)
 
 ---
 
@@ -10,7 +10,12 @@
 
 > **2,000 users on Saw.City LITE. Not 1,000. Not "customers." 2,000 users.**
 
-Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook, Instagram) targeting owner-operators across **20+ trade communities** — each marketed independently under its own `.city` domain. $20,000 total budget. No demos. Fully self-serve.
+Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook, Instagram) targeting owner-operators across **65 trade communities** — each marketed independently under its own `.city` domain. $20,000 total budget. No demos. Fully self-serve.
+
+**Current state (as of 2026-02-28):**
+- 195 NB2 images generated (65 trades × Hero A + Hero B + OG) — pending Jarrad approval
+- 1,040 NB2 ad variants generated (65 trades × 2 directions × 8 ads) — pending approval
+- 20 trades live in Saw.City LITE app; 45 upcoming (need landing pages before ads launch)
 
 ---
 
@@ -32,17 +37,21 @@ Nothing goes external (ad accounts, live campaigns) without Jarrad's explicit ap
 
 Each `.city` domain is a **separate trade community** — not "Saw.City" marketed generically to everyone. We market `rinse.city` to pressure washers, `pipe.city` to plumbers, etc.
 
-### Tier 1 Campaign Trades (TAM-Ranked)
+### Tier 1 Campaign Trades (TAM-Ranked, launch priority)
 
 | Domain | Trade | US TAM | Businesses |
 |--------|-------|--------|------------|
 | `pipe.city` | Plumbing | $191B | 130K |
 | `mow.city` | Lawn Care | $60B | 500K+ |
-| `coat.city` | Painting | $28B | 220K |
 | `duct.city` | HVAC | $30B | 105K |
+| `coat.city` | Painting | $28B | 220K |
 | `pest.city` | Pest Control | $26B | 33K |
+| `electricians.city` | Electrical | $202B | 75K |
+| `roofrepair.city` | Roofing | $56B | 100K |
+| `disaster.city` | Disaster Restoration | $210B | 30K |
 
-**Total trade domain portfolio: 72 domains** (20 live in app, 45+ upcoming). See GTM board for full registry.
+**Total: 65 trades across 3 tiers.** Full domain portfolio: 72 domains (incl. forwarding aliases).  
+See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 
 ---
 
@@ -55,6 +64,7 @@ Each `.city` domain is a **separate trade community** — not "Saw.City" markete
 | Ads | `/ads` | All ads with status, images, pause/unpause |
 | Approval | `/approval` | Approve/Hold/Reject pending ads — Bulk Approve All per trade |
 | Creatives | `/creatives` | Generated ad creative thumbnails |
+| Assets | `/assets` | NB2 hero + OG image staging, approve/reject per trade |
 | Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences |
 | Scorecard | `/scorecard` | Weekly performance metrics |
@@ -143,6 +153,16 @@ utm_source={platform}&utm_medium=paid-social&utm_campaign=4h_2026-03_{theme}&utm
 - Phase 1 Saw.City branded: `LI-01`, `YT-02`, etc.
 - Trade variants: `LI-R1` (Rinse), `FB-M3` (Mow), `YT-RO2` (Rooter)
 - Tier 1 pivot trades: `LI-P1` (Pipe), `LI-C1` (Coat), `LI-D1` (Duct), `LI-PE1` (Pest)
+- **NB2 format (current):** `NB2-D{1|2}-{LI|FB|IG|YT}-{CODE}{AW|RT}`
+  - D1 = pain/urgency direction; D2 = aspiration/social proof direction
+  - Campaign group: `nb2_d{1|2}_{platform}_{prefix}`
+
+### Image Assets (NB2 Standard)
+All images via Gemini 3.1 Flash Image (`gemini-3.1-flash-image-preview` = Nano Banana 2):
+- **Hero A** (`hero_a`): `ad-creatives/trade-heros/nb2/{slug}-hero-a.jpg` — zoomed-in scene, for ads
+- **Hero B** (`hero_b`): `ad-creatives/trade-heros/nb2/{slug}-hero-b.jpg` — wide top-down, for landing pages
+- **OG** (`og_nb2`): `ad-creatives/trade-ogs/nb2/{slug}-og.jpg` — link preview banner
+- Tracked in `trade_assets` table (status: pending → approved → rejected)
 
 ### Kill/Scale Rules
 - **Kill:** CPL > $40 after $500 spend on a platform
@@ -172,4 +192,4 @@ See **[SOP-WORKFLOW.md](./SOP-WORKFLOW.md)** for the campaign operating SOP.
 
 ---
 
-*Last updated: 2026-02-28 | v3.0.0*
+*Last updated: 2026-02-28 post-NB2 | v4.0.0*

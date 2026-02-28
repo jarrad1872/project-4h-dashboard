@@ -1,7 +1,7 @@
 # TASKS.md — Project 4H Active Work
 
-**Updated:** 2026-02-28  
-**Mission:** 2,000 users on Saw.City LITE across 20+ trades via 4-channel paid acquisition ($20K budget)
+**Updated:** 2026-02-28 (post-NB2 generation run)  
+**Mission:** 2,000 users on Saw.City LITE across 65+ trades via 4-channel paid acquisition ($20K budget)
 
 ---
 
@@ -9,11 +9,16 @@
 
 ### TASK-002: Approve Trade Ad Variants
 **Status:** WAITING ON JARRAD  
-**Effort:** ~10 min  
+**Effort:** ~15 min  
 **Link:** https://pumpcans.com/approval
 
-189 trade ad variants sitting in the approval queue, now sorted Tier 1 first with yellow badges.
-Use "Approve All" per trade group. Tier 1 trades (pipe/mow/coat/duct/pest + electricians/roofrepair/disaster) are at the top.
+1,040 NB2 ad variants (65 trades × 2 directions × 8 ads) sitting in approval queue.
+Sorted Tier 1 first with yellow badges. Use "Approve All" per trade group.
+- **Direction 1 (D1):** Pain/urgency — missed call = lost job
+- **Direction 2 (D2):** Aspiration/social proof — contractors using X.city are booking more
+
+> ⚠️ Note: These ads do NOT yet include "14-day free trial, no credit card required" messaging.
+> Jarrad's call: approve as-is and patch later, or request a v2 pass first.
 
 ### TASK-003: Ad Account Setup
 **Status:** WAITING ON JARRAD  
@@ -28,95 +33,60 @@ Bob walks through each setup guide. Required before any campaign launches.
 
 ### TASK-010: Approve Trade Assets
 **Status:** WAITING ON JARRAD  
-**Effort:** ~15 min  
+**Effort:** ~20 min  
 **Link:** https://pumpcans.com/assets
 
-46 hero + OG images staged for approval (23 trades × 2 image types).  
-20 live trades: sourced from Drive originals ✅  
-3 Tier 1 upcoming (electricians/roofrepair/disaster): generated via Gemini Nano Banana Pro ✅  
-Approve/reject per slot on the /assets page.
+**195 NB2 images staged for approval** across all 65 trades:
+- Hero A (zoomed-in, ad use): `trade-heros/nb2/{slug}-hero-a.jpg`
+- Hero B (wide top-down, landing page backdrop): `trade-heros/nb2/{slug}-hero-b.jpg`
+- OG (link preview banner): `trade-ogs/nb2/{slug}-og.jpg`
+
+All status: `pending`. Approve per slot on /assets page.
 
 ---
 
 ## 🔴 ACTIVE
 
-### TASK-011: Generate Hero + OG for Remaining Upcoming Trades
+### TASK-013: Add 14-Day Free Trial to Ad Copy
 **Status:** READY TO RUN  
 **Owner:** Bob  
 **Priority:** P1
 
-23 trades have assets. Remaining upcoming trades with no hero/OG yet (generate when Jarrad gives the go):
+All 1,040 NB2 ads are missing "14-day free trial, no credit card required" — the key conversion hook.  
+**Options:**
+- A) Patch existing ads: update CTAs/primary_text to include trial messaging
+- B) Generate v2 pass with trial messaging baked in from the start
 
-**Tier 2 upcoming:**
-- excavation.city (grading/earthwork, $90B, strategic — Kippen's trade)
-- remodels.city (remodeling, $500B+)
-- siding.city ($15B)
-- poolservice.city
-- housecleaning.city
-- carpetcleaning.city
-- mold.city
-- septic.city
-- rolloff.city
-- hydrovac.city
-- locating.city
+**Next Action:** Jarrad chooses A or B → Bob executes
 
-**Tier 3 upcoming:**
-- fireprotection.city, taxprep.city, bookkeeper.city, refrigeration.city, windshield.city
-- bodyshop.city, metalworks.city, groom.city, nail.city, stamped.city, trowel.city
-- plank.city, finish.city, grout.city, directional.city, alignment.city, inspection.city
-- pane.city, lawfirm.city, bartender.city, cater.city, portrait.city, privatechef.city
-- tattoo.city, shrink.city, sentry.city, hitch.city, drywall.city, insulation.city, gc.city
+### TASK-014: Influencer Outreach — Start Top 3 Creators
+**Status:** RESEARCH DONE, OUTREACH PENDING  
+**Owner:** Jarrad (initiates), Bob (drafts messages)  
+**Doc:** `docs/influencer-outreach.md`
 
-**Next Action:** Jarrad confirms priority order → Bob batch-generates and uploads
+Top 3 to cold-outreach immediately:
+1. **Mike Andes** — lawn care, operator-focused audience
+2. **Brian's Lawn Maintenance** — ~247K subs, pure contractor content
+3. **AC Service Tech LLC** — HVAC, ~162K subs, pure technician audience
 
----
+Deal: $10/mo per referral × up to 24 months ($240 max) + co-branded landing page (e.g. mow.city/ryanknorr)
 
-## 🟢 DONE (cumulative)
-
-### Infrastructure
-- [x] Full Next.js dashboard live at pumpcans.com (GitHub: jarrad1872/project-4h-dashboard)
-- [x] Vercel auto-deploy via GitHub webhook (reconnected, verified)
-- [x] Supabase schema: ads, ad_templates, marketing_events, lifecycle, checklist, trade_assets
-- [x] All 13 pages return 200 and pass visual audit
-- [x] `005_trade_assets.sql` migration applied by Jarrad
-
-### Ad Content
-- [x] 27 Saw.City branded ads approved (4 platforms + retargeting)
-- [x] 81 trade variants: RINSE×27, MOW×27, ROOTER×27 — pending approval
-- [x] 108 ads linked to image_url in Supabase Storage
-- [x] Tier 1 ad variants generated: pipe×27, coat×27, duct×27, pest×27, mow×27
-- [x] Tier 1 upcoming ad copy: electricians×27, roofrepair×27, disaster×27 (placeholder images)
-- [x] `workflow_stage` patched: concept for all pending, approved for approved
-
-### Approval UI
-- [x] /approval page rebuilt — reads ads table, Approve/Hold/Reject, Bulk Approve All per trade
-- [x] Approval sorted by tier (Tier 1 first) with yellow TIER 1 badges
-- [x] TRADE_MAP expanded: coat, duct, pest, electricians, roofrepair, disaster all properly labelled
-
-### Creative Assets
-- [x] 16 ad creatives (Phase 1) in Supabase Storage
-- [x] /creatives page live
-- [x] /assets page live — hero + OG staging per trade, approve/reject workflow
-- [x] 20 live trade heroes uploaded to Supabase Storage (trade-heros/)
-- [x] 20 live trade OG images uploaded to Supabase Storage (trade-ogs/)
-- [x] 3 Tier 1 upcoming heroes generated + uploaded (electrical, roofing, disaster-restoration)
-- [x] 3 Tier 1 upcoming OG images generated + uploaded
-- [x] 46 trade_assets rows live with image_url, status: pending
-
-### GTM Board
-- [x] /gtm page: 2,000-user mission banner, TAM-ranked trade registry, action board
-- [x] Trade registry: 72 total domains (20 live + 44 upcoming + 5 forwarding + 3 platform)
-- [x] excavation.city demoted to Tier 2, $90B TAM (was inflated $200B Tier 1)
-- [x] Status column with color-coded badges (LIVE/UPCOMING/→forward/PLATFORM)
-
-### Drive Asset Sources (locked)
-- Hero originals: https://drive.google.com/drive/folders/1WjD0Ytf611A_5KLjUBecDS_VssM-12i0
-- OG originals: https://drive.google.com/drive/folders/1HwGepsNQZt_QXrs8_2NLQmVPI5hjbFLD
-- Local path: projects/sawcity-lite/docs/project-4h/creative-assets/{hero-originals,og-originals}/
+**Bob's recommended additions:**
+- Add flat $15 signup bonus on top of recurring (closes deals faster)
+- Start with only 2-3 trades, not all 8 simultaneously
+- Consider uncapped lifetime deal for top 3 as a closer
 
 ---
 
 ## 🔵 BACKLOG
+
+### TASK-004: Domain Forwarding Setup (GoDaddy)
+Configure forwarding at GoDaddy for duplicate/variant domains:
+- `mechanic.city` → `wrench.city`
+- `demolition.city` → `wreck.city`
+- `bucket.city` → `excavation.city`
+- `esthetics.city` → `esthetician.city`
+- `answered.city` → `receptionist.city`
 
 ### TASK-007: A2P 10DLC Approval
 Waiting on TCR. Registered 2026-02-22. ETA: 2–3 weeks.  
@@ -130,16 +100,70 @@ Once ad accounts are live and ads approved, package each trade's ads with:
 - Upload CSV per platform
 - Budget allocation per trade per platform
 
-### TASK-009: Domain Forwarding Setup (GoDaddy)
-- mechanic.city → wrench.city
-- demolition.city → wreck.city
-- bucket.city → excavation.city
-- esthetics.city → esthetician.city
-- answered.city → receptionist.city
+### TASK-015: Landing Pages for Upcoming Trades
+Before upcoming-trade ads can go live, landing pages must exist:
+1. Build landing page in sawcity-lite for the trade (Frank/dev)
+2. Screenshot → feed to Nano Banana 2 for updated isometric creative
+3. Replace placeholder hero with production hero
+4. Campaign launch
 
-### TASK-012: trade_assets Cleanup
+Priority order: electrical → roofing → disaster-restoration → Tier 2 trades
+
+### TASK-012: trade_assets Cleanup (Low Priority)
 - Remove duplicate `mechanic` slug rows in trade_assets (artifact from early run)
-- Fix storage folder name typo `trade-heros` → `trade-heroes` (low priority, URLs work)
+- Storage folder name `trade-heros` (typo — `trade-heroes` would be correct), but URLs work, low priority
+
+---
+
+## 🟢 DONE (cumulative)
+
+### Infrastructure
+- [x] Full Next.js dashboard live at pumpcans.com (GitHub: jarrad1872/project-4h-dashboard)
+- [x] Vercel auto-deploy via GitHub webhook (reconnected, verified)
+- [x] Supabase schema: ads, ad_templates, marketing_events, lifecycle, checklist, trade_assets
+- [x] All 13 pages return 200 and pass visual audit
+- [x] `005_trade_assets.sql` migration applied
+- [x] trade_assets check constraint expanded (hero_a, hero_b, og_nb2 now allowed)
+- [x] /ads page paginated (30/page) + lazy loading — fixes browser choke on large dataset
+- [x] Ad copy hard rules documented in AGENTS.md
+
+### NB2 Image Generation — All 65 Trades ✅
+- [x] Image Agent A: 60/60 images for 20 live trades (hero_a + hero_b + og_nb2)
+- [x] Image Agent B: 66/66 images for 22 upcoming Tier 1+2 trades
+- [x] Image Agent C: 69/69 images for 23 Tier 3 trades
+- [x] **195 total NB2 images** in Supabase Storage, 195 trade_assets rows registered
+- [x] Model: `gemini-3.1-flash-image-preview` (Nano Banana 2)
+- [x] Storage paths: `trade-heros/nb2/` (hero_a/b) and `trade-ogs/nb2/` (og_nb2)
+- [x] trade_assets asset_types: `hero_a`, `hero_b`, `og_nb2` for all 65 trades
+
+### NB2 Ad Copy Generation — All 65 Trades ✅
+- [x] 1,040 NB2 ads inserted: 65 trades × 2 directions × 8 ads
+- [x] D1 (pain/urgency): missed call = lost job, trade-specific moment of unavailability
+- [x] D2 (aspiration/social proof): transformation, before/after, "contractors using X.city are booking more"
+- [x] Trade-authentic vocabulary (no mechanical substitution — audited)
+- [x] $79/mo throughout, correct landing_path, image_url → hero_a URL
+- [x] Campaign group format: `nb2_d{1|2}_{platform}_{prefix}`
+- [x] Anti-slop audit script at `scripts/audit-ads.mjs` — must pass 🟢 before any batch is done
+
+### Influencer Outreach Research ✅
+- [x] `docs/influencer-outreach.md` — 386 lines, 40+ channels researched, 8 Tier 1 trades covered
+- [x] Outreach email template (peer-to-peer tone, not corporate)
+- [x] Deal structure one-pager
+- [x] Priority hit list: top 10 creators ranked by contractor audience × reach × conversion
+
+### Earlier Milestones
+- [x] 27 Saw.City branded seed ads (4 platforms + retargeting)
+- [x] 81 trade variants: RINSE×27, MOW×27, ROOTER×27
+- [x] Core strategy doc, operating pack, approval ledgers, lifecycle messaging
+- [x] /approval page: Approve/Hold/Reject, Bulk Approve, tier-sorted, per-trade stats
+- [x] /assets page: hero + OG staging, approve/reject per slot
+- [x] /gtm page: 2,000-user mission, TAM-ranked trade registry, action board
+- [x] /ads page: full library view + pagination
+- [x] excavation.city demoted to Tier 2 ($90B, not $200B — corrected bias)
+- [x] 72-domain trade registry in project-state-data.ts
+- [x] Drive asset originals: 20 live trade hero + OG sourced + uploaded to Storage
+- [x] Tier 1 upcoming (electrical/roofing/disaster): Nano Banana Pro heroes approved by Jarrad
+- [x] TRADE_MAP expanded with all Tier 1-3 trades + tier field
 
 ---
 
@@ -165,6 +189,9 @@ Once ad accounts are live and ads approved, package each trade's ads with:
 | GTM Board | https://pumpcans.com/gtm |
 | Approval Queue | https://pumpcans.com/approval |
 | Trade Assets | https://pumpcans.com/assets |
+| Ad Library | https://pumpcans.com/ads |
 | Creatives | https://pumpcans.com/creatives |
+| Influencer Research | `docs/influencer-outreach.md` |
 | Supabase DB | https://supabase.com/dashboard/project/vzawlfitqnjhypnkguas |
 | GitHub | https://github.com/jarrad1872/project-4h-dashboard |
+| Audit Script | `scripts/audit-ads.mjs` |
