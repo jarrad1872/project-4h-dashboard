@@ -237,6 +237,41 @@ export default function GTMPage() {
           Tiers ranked by US TAM + operator count + product fit (Feb 2026 research). Campaign Phase 1 ads were built for saw/rinse/mow/rooter.{" "}
           <span className="text-yellow-400">Tier 1 by data = pipe/mow/coat/duct/pest.</span>
         </p>
+
+        {/* Legend / Summary */}
+        {(() => {
+          const trades: Array<{ status?: string }> = (state.campaign as any).all_trades ?? [];
+          const liveCount = trades.filter((t) => t.status === 'live').length;
+          const upcomingCount = trades.filter((t) => t.status === 'upcoming').length;
+          const forwardCount = trades.filter((t) => t.status === 'forward').length;
+          const platformCount = trades.filter((t) => t.status === 'platform').length;
+          return (
+            <div className="mb-4 flex flex-wrap gap-3 rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-sm">
+              <span className="font-semibold text-slate-300">{trades.length} Total Domains</span>
+              <span className="text-slate-600">|</span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2 w-2 rounded-full bg-green-500"></span>
+                <span className="text-green-400 font-medium">{liveCount} Live</span>
+              </span>
+              <span className="text-slate-600">|</span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+                <span className="text-blue-400 font-medium">{upcomingCount} Upcoming</span>
+              </span>
+              <span className="text-slate-600">|</span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2 w-2 rounded-full bg-slate-400"></span>
+                <span className="text-slate-300 font-medium">{forwardCount} Forwarding</span>
+              </span>
+              <span className="text-slate-600">|</span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2 w-2 rounded-full bg-purple-500"></span>
+                <span className="text-purple-400 font-medium">{platformCount} Platform</span>
+              </span>
+            </div>
+          );
+        })()}
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -246,18 +281,23 @@ export default function GTMPage() {
                 <th className="pb-2 pr-4">App Name</th>
                 <th className="pb-2 pr-4">US TAM</th>
                 <th className="pb-2 pr-4">Businesses</th>
+                <th className="pb-2 pr-4">Status</th>
                 <th className="pb-2 hidden lg:table-cell">Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/50">
-              {(state.campaign as any).all_trades?.map((t: { domain: string; slug: string; appName: string; tier: number; tam?: string; businesses?: string; note?: string }) => (
-                <tr key={t.domain} className={t.tier === 1 ? "bg-green-500/5" : ""}>
+              {(state.campaign as any).all_trades?.map((t: { domain: string; slug: string; appName: string; tier: number; tam?: string; businesses?: string; note?: string; status?: string; forwardsTo?: string }) => (
+                <tr key={t.domain} className={t.tier === 1 && t.status === 'live' ? "bg-green-500/5" : ""}>
                   <td className="py-1.5 pr-4">
-                    <span className={`rounded px-1.5 py-0.5 text-xs font-bold ${
-                      t.tier === 1 ? "bg-green-500/20 text-green-400" :
-                      t.tier === 2 ? "bg-yellow-500/20 text-yellow-400" :
-                      "bg-slate-600/40 text-slate-400"
-                    }`}>T{t.tier}</span>
+                    {t.tier === 0 ? (
+                      <span className="rounded px-1.5 py-0.5 text-xs font-bold bg-purple-500/20 text-purple-400">—</span>
+                    ) : (
+                      <span className={`rounded px-1.5 py-0.5 text-xs font-bold ${
+                        t.tier === 1 ? "bg-green-500/20 text-green-400" :
+                        t.tier === 2 ? "bg-yellow-500/20 text-yellow-400" :
+                        "bg-slate-600/40 text-slate-400"
+                      }`}>T{t.tier}</span>
+                    )}
                   </td>
                   <td className="py-1.5 pr-4">
                     <a href={`https://${t.domain}`} target="_blank" rel="noopener noreferrer"
@@ -268,6 +308,20 @@ export default function GTMPage() {
                   <td className="py-1.5 pr-4 text-white">{t.appName}</td>
                   <td className="py-1.5 pr-4 font-mono text-xs text-green-400">{t.tam ?? '—'}</td>
                   <td className="py-1.5 pr-4 text-xs text-slate-300">{t.businesses ?? '—'}</td>
+                  <td className="py-1.5 pr-4">
+                    {t.status === 'live' && (
+                      <span className="rounded-full px-2 py-0.5 text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">LIVE</span>
+                    )}
+                    {t.status === 'upcoming' && (
+                      <span className="rounded-full px-2 py-0.5 text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">UPCOMING</span>
+                    )}
+                    {t.status === 'forward' && (
+                      <span className="rounded-full px-2 py-0.5 text-xs font-semibold bg-slate-600/40 text-slate-300 border border-slate-600">→ {t.forwardsTo}</span>
+                    )}
+                    {t.status === 'platform' && (
+                      <span className="rounded-full px-2 py-0.5 text-xs font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/30">PLATFORM</span>
+                    )}
+                  </td>
                   <td className="py-1.5 hidden lg:table-cell text-xs text-slate-500 max-w-xs truncate">{t.note ?? ''}</td>
                 </tr>
               ))}
