@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { PlatformChip, StatusChip } from "@/components/chips";
-import { tradeBadge } from "@/lib/trade-utils";
+import { tradeBadge, TRADE_MAP, tradeFromAd } from "@/lib/trade-utils";
 import { AIGeneratePanel } from "@/components/ai-generate-panel";
 import { Button, Card, GhostButton } from "@/components/ui";
 import type { Ad, AdStatus, AdTemplate, WorkflowStage } from "@/lib/types";
@@ -33,6 +33,8 @@ export default function AdsPage() {
   const [templates, setTemplates] = useState<AdTemplate[]>([]);
   const [platform, setPlatform] = useState<(typeof platformFilters)[number]>("all");
   const [status, setStatus] = useState<(typeof statusFilters)[number]>("all");
+  const [search, setSearch] = useState("");
+  const [tradeFilter, setTradeFilter] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [startFromTemplate, setStartFromTemplate] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
@@ -60,6 +62,7 @@ export default function AdsPage() {
   const PAGE_SIZE = 30;
 
   const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
     return ads.filter((ad) => {
       const platformMatch =
         platform === "all"
@@ -68,16 +71,24 @@ export default function AdsPage() {
             ? ad.campaignGroup.toLowerCase().includes("retarget")
             : ad.platform === platform;
       const statusMatch = status === "all" ? true : ad.status === status;
-      return platformMatch && statusMatch;
+      const tradeMatch = tradeFilter === "all" ? true : tradeFromAd(ad) === tradeFilter;
+      const searchMatch = !q
+        ? true
+        : (ad.headline ?? "").toLowerCase().includes(q) ||
+          (ad.primaryText ?? "").toLowerCase().includes(q) ||
+          (ad.campaignGroup ?? "").toLowerCase().includes(q) ||
+          (ad.landingPath ?? "").toLowerCase().includes(q) ||
+          (TRADE_MAP[tradeFromAd(ad)]?.domain ?? "").toLowerCase().includes(q);
+      return platformMatch && statusMatch && tradeMatch && searchMatch;
     });
-  }, [ads, platform, status]);
+  }, [ads, platform, status, search, tradeFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   useEffect(() => {
     setPage(0);
-  }, [platform, status]);
+  }, [platform, status, search, tradeFilter]);
 
   async function togglePause(id: string, currentStatus: AdStatus) {
     const next: AdStatus = currentStatus === "paused" ? "pending" : "paused";
@@ -155,6 +166,32 @@ export default function AdsPage() {
               {value[0].toUpperCase() + value.slice(1)}
             </GhostButton>
           ))}
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            type="text"
+            placeholder="Search headline, copy, domain…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-slate-400 focus:outline-none"
+          />
+          <select
+            value={tradeFilter}
+            onChange={(e) => setTradeFilter(e.target.value)}
+            className="rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 focus:border-slate-400 focus:outline-none"
+          >
+            <option value="all">All trades</option>
+            {Object.entries(TRADE_MAP)
+              .sort((a, b) => a[1].tier - b[1].tier || a[1].domain.localeCompare(b[1].domain))
+              .map(([key, t]) => (
+                <option key={key} value={key}>{t.domain}</option>
+              ))}
+          </select>
+          {(search || tradeFilter !== "all") && (
+            <GhostButton onClick={() => { setSearch(""); setTradeFilter("all"); }}>
+              Clear
+            </GhostButton>
+          )}
         </div>
       </Card>
 
