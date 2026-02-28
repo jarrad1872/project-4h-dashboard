@@ -25,6 +25,13 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 4. **Verify before reporting done.** If you push code, confirm Vercel deployed. If you update DB, confirm the row exists. Show evidence.
 5. **Never move money or modify billing** in any system.
 
+### Ad Copy Hard Rules
+- **Price is ALWAYS $79/mo** — never $99, $149, $199, or any other amount.
+- **14-day free trial, no credit card required** — include this in ALL future ad copy. It's a key conversion hook and must appear in some form in every ad (primary text, headline, or CTA).
+- **Trade-authentic copy only** — mechanical find-and-replace fails the anti-slop audit. Use trade-specific vocabulary.
+- **No generic brand name** — ads always use the trade-specific `.city` domain (rinse.city, mow.city, etc.), never "Saw.City" as a catch-all.
+- **UTM format:** `utm_campaign=4h_YYYY-MM_{campaign}`, `utm_source={platform}`, `utm_medium=paid-social`.
+
 ---
 
 ## Environment
