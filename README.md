@@ -82,3 +82,4 @@ All routes are under `/api` and return JSON with CORS headers.
 ### Approval Queue (supporting route)
 - `GET /api/approval`
 - `PATCH /api/approval` — approve/revise/reject by id
+# Last verified: Sat Feb 28 05:00:00 UTC 2026
