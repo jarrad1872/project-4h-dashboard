@@ -315,17 +315,13 @@ function AdsContent() {
           return (
             <Card key={ad.id}>
               {(() => {
-                const prefix = adPrefix;
-                const resolvedUrls = adResolvedUrls;
-                const activeUrl = adActiveUrl;
-                const activeVariant = adVariant;
                 const isSaving = savingCreative.has(ad.id);
                 return (
                   <>
                     {/* Main creative preview */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={activeUrl}
+                      src={adActiveUrl}
                       alt={ad.headline ?? "Ad creative"}
                       className="mb-2 w-full rounded object-cover"
                       style={{ maxHeight: 160 }}
@@ -334,8 +330,8 @@ function AdsContent() {
                     {/* 3-slot creative picker */}
                     <div className="mb-3 flex gap-1.5">
                       {([1, 2, 3] as const).map((v) => {
-                        const thumbUrl = v === 2 ? resolvedUrls.c2 : v === 3 ? resolvedUrls.c3 : resolvedUrls.c1;
-                        const isActive = activeVariant === v;
+                        const thumbUrl = v === 2 ? adResolvedUrls.c2 : v === 3 ? adResolvedUrls.c3 : adResolvedUrls.c1;
+                        const isActive = adVariant === v;
                         return (
                           <div key={v} className="relative flex-1" style={{ height: 40 }}>
                             <button
@@ -351,7 +347,7 @@ function AdsContent() {
                             {/* Pencil edit button */}
                             <button
                               title={`Edit C${v} with prompt`}
-                              onClick={(e) => { e.stopPropagation(); openEditModal(ad, v as 1|2|3, prefix); }}
+                              onClick={(e) => { e.stopPropagation(); openEditModal(ad, v as 1|2|3, adPrefix); }}
                               className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-bl bg-black/70 text-[9px] text-white hover:bg-blue-600/90 transition-colors"
                             >✏️</button>
                           </div>
