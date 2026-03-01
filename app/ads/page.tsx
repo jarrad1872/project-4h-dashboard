@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
 import { AIGeneratePanel } from "@/components/ai-generate-panel";
@@ -39,7 +40,11 @@ const emptyAd: Partial<Ad> = {
 export default function AdsPage() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [templates, setTemplates] = useState<AdTemplate[]>([]);
-  const [platform, setPlatform] = useState<(typeof platformFilters)[number]>("all");
+  const searchParams = useSearchParams();
+  const [platform, setPlatform] = useState<(typeof platformFilters)[number]>(() => {
+    const p = searchParams.get("platform") ?? "all";
+    return platformFilters.includes(p as any) ? (p as (typeof platformFilters)[number]) : "all";
+  });
   const [status, setStatus] = useState<(typeof statusFilters)[number]>("all");
   const [search, setSearch] = useState("");
   const [tradeFilter, setTradeFilter] = useState("all");
