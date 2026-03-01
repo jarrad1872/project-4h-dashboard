@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { getProjectState } from "@/lib/project-state-data";
+import { TRADE_MAP, getCreativeUrls } from "@/lib/trade-utils";
 
 type AssetStatus = "pending" | "approved" | "rejected";
 
 interface TradeAsset {
   id: string;
   trade_slug: string;
-  asset_type: "hero" | "og";
+  asset_type: "hero" | "og" | "hero_a" | "hero_b" | "og_nb2";
   image_url: string | null;
   status: AssetStatus;
   notes: string | null;
@@ -28,6 +29,12 @@ const TIER_LABEL: Record<number, string> = {
   3: "Tier 3",
 };
 
+const ASSET_TYPES = [
+  { key: "hero_a", label: "Hero A (Zoom)", desc: "Ad creative primary focus" },
+  { key: "hero_b", label: "Hero B (Wide)", desc: "Landing page background" },
+  { key: "og_nb2", label: "OG (NB2)", desc: "Social link previews" },
+] as const;
+
 function AssetSlot({
   tradeSlug,
   assetType,
@@ -35,7 +42,7 @@ function AssetSlot({
   onRefresh,
 }: {
   tradeSlug: string;
-  assetType: "hero" | "og";
+  assetType: string;
   asset: TradeAsset | undefined;
   onRefresh: () => void;
 }) {
@@ -63,78 +70,99 @@ function AssetSlot({
     onRefresh();
   };
 
-  const label = assetType === "hero" ? "Hero Image" : "OG Image";
   const status = asset?.status ?? "pending";
   const hasImage = !!asset?.image_url;
 
   return (
-    <div className="rounded border border-slate-700 bg-slate-800/50 p-3 space-y-2">
+    <div className="rounded border border-slate-700 bg-slate-800/30 p-2 space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</span>
-        <span className={`rounded px-2 py-0.5 text-xs font-bold uppercase ${STATUS_STYLES[status]}`}>
+        <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${STATUS_STYLES[status]}`}>
           {status}
         </span>
       </div>
 
-      {hasImage && (
-        <div className="rounded overflow-hidden border border-slate-700 bg-slate-900">
+      {hasImage ? (
+        <div className="rounded overflow-hidden border border-slate-700 bg-slate-900 group relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={asset!.image_url!}
             alt={`${tradeSlug} ${assetType}`}
-            className="w-full object-cover max-h-36"
+            className="w-full object-cover aspect-video"
           />
+          <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+             <button
+                onClick={() => decide("approved")}
+                disabled={status === "approved"}
+                className="rounded bg-green-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-green-500 disabled:opacity-30"
+              >
+                ✓
+              </button>
+              <button
+                onClick={() => decide("rejected")}
+                disabled={status === "rejected"}
+                className="rounded bg-red-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-red-500 disabled:opacity-30"
+              >
+                ✗
+              </button>
+          </div>
         </div>
-      )}
-
-      {!hasImage && (
-        <div className="flex h-20 items-center justify-center rounded border border-dashed border-slate-600 text-xs text-slate-500">
-          No image yet
+      ) : (
+        <div className="flex aspect-video items-center justify-center rounded border border-dashed border-slate-600 text-[10px] text-slate-500 bg-slate-900">
+          No image
         </div>
       )}
 
       <div className="flex gap-1">
         <input
           type="url"
-          placeholder="Paste image URL…"
+          placeholder="URL…"
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
-          className="flex-1 min-w-0 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-slate-400"
+          className="flex-1 min-w-0 rounded border border-slate-600 bg-slate-900 px-1.5 py-1 text-[10px] text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-slate-400"
         />
         <button
           onClick={save}
           disabled={saving}
-          className="rounded bg-slate-700 px-2 py-1 text-xs text-slate-200 hover:bg-slate-600 disabled:opacity-50"
+          className="rounded bg-slate-700 px-1.5 py-1 text-[10px] text-slate-200 hover:bg-slate-600"
         >
           {saving ? "…" : "Set"}
         </button>
       </div>
+    </div>
+  );
+}
 
-      {asset && (
-        <div className="flex gap-1">
-          <button
-            onClick={() => decide("approved")}
-            disabled={status === "approved"}
-            className="flex-1 rounded border border-green-700 px-2 py-1 text-xs text-green-400 hover:bg-green-900/30 disabled:opacity-40"
-          >
-            ✓ Approve
-          </button>
-          <button
-            onClick={() => decide("rejected")}
-            disabled={status === "rejected"}
-            className="flex-1 rounded border border-red-700 px-2 py-1 text-xs text-red-400 hover:bg-red-900/30 disabled:opacity-40"
-          >
-            ✗ Reject
-          </button>
-          <button
-            onClick={() => decide("pending")}
-            disabled={status === "pending"}
-            className="flex-1 rounded border border-slate-600 px-2 py-1 text-xs text-slate-400 hover:bg-slate-700 disabled:opacity-40"
-          >
-            Reset
-          </button>
+function StorageAssetSlot({ tradeSlug, variant }: { tradeSlug: string; variant: "c2" | "c3" }) {
+  const urls = getCreativeUrls(tradeSlug);
+  const url = urls[variant];
+
+  return (
+    <div className="rounded border border-slate-700 bg-slate-800/30 p-2 space-y-2 grayscale hover:grayscale-0 transition-all">
+      <div className="flex items-center justify-between">
+        <span className="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase bg-slate-700 text-slate-400 border border-slate-600">
+          STAGED
+        </span>
+      </div>
+      <div className="rounded overflow-hidden border border-slate-700 bg-slate-900 group relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt={`${tradeSlug} ${variant}`}
+          className="w-full object-cover aspect-video"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
+        <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
+            <span className="text-[10px] font-semibold text-white/50">{variant.toUpperCase()}</span>
         </div>
-      )}
+      </div>
+      <div className="flex gap-1">
+        <button
+          onClick={() => { void navigator.clipboard.writeText(url); alert("Storage URL copied!"); }}
+          className="w-full rounded bg-slate-700 px-1.5 py-1 text-[10px] text-slate-200 hover:bg-slate-600"
+        >
+          Copy Storage URL
+        </button>
+      </div>
     </div>
   );
 }
@@ -144,6 +172,7 @@ export default function AssetsPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<"all" | AssetStatus>("all");
   const [tierFilter, setTierFilter] = useState<"all" | 1 | 2 | 3>("all");
+  const [search, setSearch] = useState("");
 
   const state = getProjectState();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,88 +193,123 @@ export default function AssetsPage() {
 
   useEffect(() => { void fetchAssets(); }, [fetchAssets]);
 
-  // Group trades by tier, exclude forwarding/platform
-  const activeTrades = allTrades.filter((t) => t.status === "live" || t.status === "upcoming");
+  const activeTrades = useMemo(() => {
+    return allTrades.filter((t) => (t.status === "live" || t.status === "upcoming"));
+  }, [allTrades]);
+
+  const filteredTrades = useMemo(() => {
+    return activeTrades.filter((t) => {
+      if (tierFilter !== "all" && t.tier !== tierFilter) return false;
+      if (search && !t.domain.includes(search.toLowerCase()) && !t.slug.includes(search.toLowerCase())) return false;
+      if (statusFilter === "all") return true;
+      for (const type of ASSET_TYPES) {
+        const a = assetMap[t.slug]?.[type.key];
+        const s = a?.status ?? "pending";
+        if (s === statusFilter) return true;
+      }
+      return false;
+    });
+  }, [activeTrades, tierFilter, search, statusFilter, assetMap]);
 
   // Summary counts
-  let totalSlots = activeTrades.length * 2;
-  let approvedCount = 0;
-  let pendingCount = 0;
-  let missingCount = 0;
-  for (const t of activeTrades) {
-    for (const type of ["hero", "og"] as const) {
-      const a = assetMap[t.slug]?.[type];
-      if (!a) { missingCount++; }
-      else if (a.status === "approved") { approvedCount++; }
-      else { pendingCount++; }
+  const stats = useMemo(() => {
+    let approved = 0;
+    let pending = 0;
+    let missing = 0;
+    for (const t of activeTrades) {
+      for (const type of ASSET_TYPES) {
+        const a = assetMap[t.slug]?.[type.key];
+        if (!a || !a.image_url) { missing++; }
+        else if (a.status === "approved") { approved++; }
+        else { pending++; }
+      }
     }
-  }
+    return { approved, pending, missing, total: activeTrades.length * ASSET_TYPES.length };
+  }, [activeTrades, assetMap]);
 
   const tiers = [1, 2, 3] as const;
 
-  const filteredTrades = activeTrades.filter((t) => {
-    if (tierFilter !== "all" && t.tier !== tierFilter) return false;
-    if (statusFilter === "all") return true;
-    for (const type of ["hero", "og"] as const) {
-      const a = assetMap[t.slug]?.[type];
-      const s = a?.status ?? "pending";
-      if (s === statusFilter) return true;
-    }
-    return false;
-  });
-
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Trade Asset Staging</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Hero images + OG images per trade — generated, reviewed, and approved here before use in Saw.City LITE.
-          No app connection. Assets staged only.
-        </p>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 className="text-2xl font-bold text-white">Trade Asset Staging</h1>
+            <p className="mt-1 text-sm text-slate-400">
+                Review and approve the 5 core visual blocks per trade.
+            </p>
+        </div>
+        <div className="flex gap-2">
+            <button
+                onClick={fetchAssets}
+                className="rounded bg-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-600"
+            >
+                ↻ Refresh
+            </button>
+        </div>
       </div>
 
       {/* Summary bar */}
-      <div className="flex flex-wrap gap-4 rounded border border-slate-700 bg-slate-800/50 p-4 text-sm">
-        <div><span className="font-semibold text-white">{totalSlots}</span> <span className="text-slate-400">total slots</span></div>
-        <div><span className="font-semibold text-green-400">{approvedCount}</span> <span className="text-slate-400">approved</span></div>
-        <div><span className="font-semibold text-yellow-400">{pendingCount}</span> <span className="text-slate-400">pending</span></div>
-        <div><span className="font-semibold text-slate-500">{missingCount}</span> <span className="text-slate-400">no image</span></div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="rounded border border-slate-700 bg-slate-800/50 p-3">
+            <p className="text-xl font-bold text-white">{stats.total}</p>
+            <p className="text-xs text-slate-400">DB Slots</p>
+        </div>
+        <div className="rounded border border-slate-700 bg-slate-800/50 p-3">
+            <p className="text-xl font-bold text-green-400">{stats.approved}</p>
+            <p className="text-xs text-slate-400">Approved</p>
+        </div>
+        <div className="rounded border border-slate-700 bg-slate-800/50 p-3">
+            <p className="text-xl font-bold text-yellow-400">{stats.pending}</p>
+            <p className="text-xs text-slate-400">Pending</p>
+        </div>
+        <div className="rounded border border-slate-700 bg-slate-800/50 p-3">
+            <p className="text-xl font-bold text-slate-500">{stats.missing}</p>
+            <p className="text-xs text-slate-400">Missing</p>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2">
-        <div className="flex gap-1">
-          {(["all", "approved", "pending", "rejected"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`rounded px-3 py-1 text-xs capitalize ${statusFilter === s ? "bg-slate-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}
-            >
-              {s}
-            </button>
-          ))}
+      <div className="flex flex-wrap gap-4 rounded border border-slate-700 bg-slate-800/30 p-4">
+        <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-bold uppercase text-slate-500">Search</span>
+            <input
+                type="text"
+                placeholder="Trade slug/domain…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="rounded border border-slate-600 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-slate-400"
+            />
         </div>
-        <div className="flex gap-1 ml-4">
-          {(["all", 1, 2, 3] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTierFilter(t)}
-              className={`rounded px-3 py-1 text-xs ${tierFilter === t ? "bg-slate-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}
-            >
-              {t === "all" ? "All Tiers" : `Tier ${t}`}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-bold uppercase text-slate-500">Status</span>
+            <div className="flex gap-1">
+                {(["all", "approved", "pending", "rejected"] as const).map((s) => (
+                    <button
+                    key={s}
+                    onClick={() => setStatusFilter(s)}
+                    className={`rounded px-3 py-1.5 text-xs capitalize ${statusFilter === s ? "bg-slate-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}
+                    >
+                    {s}
+                    </button>
+                ))}
+            </div>
+        </div>
+        <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-bold uppercase text-slate-500">Tier</span>
+            <div className="flex gap-1">
+                {(["all", 1, 2, 3] as const).map((t) => (
+                    <button
+                    key={t}
+                    onClick={() => setTierFilter(t)}
+                    className={`rounded px-3 py-1.5 text-xs ${tierFilter === t ? "bg-slate-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}
+                    >
+                    {t === "all" ? "All" : `T${t}`}
+                    </button>
+                ))}
+            </div>
         </div>
       </div>
-
-      {/* Setup notice */}
-      {!loading && Object.keys(assetMap).length === 0 && (
-        <div className="rounded border border-yellow-700 bg-yellow-900/20 p-4 text-sm text-yellow-300">
-          <strong>DB setup required.</strong> Run <code className="rounded bg-slate-900 px-1 text-yellow-200">supabase/migrations/005_trade_assets.sql</code> in the{" "}
-          <a href="https://supabase.com/dashboard/project/vzawlfitqnjhypnkguas/sql" target="_blank" rel="noopener noreferrer" className="underline">Supabase SQL editor</a>.
-        </div>
-      )}
 
       {/* Trade grid by tier */}
       {loading ? (
@@ -255,43 +319,55 @@ export default function AssetsPage() {
           const tierTrades = filteredTrades.filter((t) => t.tier === tier);
           if (tierTrades.length === 0) return null;
           return (
-            <section key={tier} className="space-y-3">
+            <section key={tier} className="space-y-4">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-300">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">
                   {TIER_LABEL[tier]}
                 </h2>
-                {tier === 1 && (
-                  <span className="rounded bg-yellow-500/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-yellow-400">
-                    Priority
-                  </span>
-                )}
+                <div className="flex-1 border-t border-slate-800" />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {tierTrades.map((trade) => (
-                  <div key={trade.slug} className="rounded border border-slate-700 bg-slate-900 p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-white">{trade.appName}</p>
-                        <p className="text-xs text-slate-500">{trade.domain} · {trade.slug}</p>
-                      </div>
-                      <span className={`rounded px-2 py-0.5 text-xs font-bold uppercase ${trade.status === 'live' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                        {trade.status}
-                      </span>
+
+              <div className="grid gap-6">
+                {tierTrades.map((trade) => {
+                   const tradeInfo = TRADE_MAP[trade.slug] ?? TRADE_MAP.saw;
+                   return (
+                    <div key={trade.slug} className="rounded-xl border border-slate-700 bg-slate-900/60 p-5 space-y-4">
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <h3 className={`text-lg font-bold ${tradeInfo.color}`}>{tradeInfo.label}</h3>
+                                <p className="text-xs text-slate-500">{trade.domain} · {trade.slug}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${trade.status === 'live' ? 'bg-green-900/40 text-green-400' : 'bg-blue-900/40 text-blue-400'}`}>
+                                    {trade.status}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            {/* DB-backed assets (Hero A, Hero B, OG) */}
+                            {ASSET_TYPES.map((type) => (
+                                <div key={type.key} className="space-y-1">
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase px-1">{type.label}</p>
+                                    <AssetSlot
+                                        tradeSlug={trade.slug}
+                                        assetType={type.key}
+                                        asset={assetMap[trade.slug]?.[type.key]}
+                                        onRefresh={fetchAssets}
+                                    />
+                                </div>
+                            ))}
+                            {/* Storage-backed assets (C2, C3) */}
+                            {(["c2", "c3"] as const).map((v) => (
+                                <div key={v} className="space-y-1">
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase px-1">{v.toUpperCase()}</p>
+                                    <StorageAssetSlot tradeSlug={trade.slug} variant={v} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    {/* Hero + OG slots */}
-                    <div className="grid grid-cols-2 gap-2">
-                      {(["hero", "og"] as const).map((type) => (
-                        <AssetSlot
-                          key={type}
-                          tradeSlug={trade.slug}
-                          assetType={type}
-                          asset={assetMap[trade.slug]?.[type]}
-                          onRefresh={fetchAssets}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                   );
+                })}
               </div>
             </section>
           );

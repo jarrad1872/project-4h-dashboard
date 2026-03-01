@@ -1,3 +1,5 @@
+import { TRADE_MAP } from "./trade-utils";
+
 export type CreativeFormat = "linkedin-single" | "meta-square" | "instagram-story" | "youtube-thumb";
 export type CreativeStyle = "pain-point" | "feature-demo" | "social-proof" | "retargeting";
 
@@ -17,28 +19,14 @@ export interface FormatSpec {
   composition: string;
 }
 
-export const TRADE_DOMAIN_REGISTRY: TradeDomainEntry[] = [
-  { slug: "concrete-cutting", trade: "Concrete Cutting", appName: "Saw.City", domain: "saw.city", tier: 1 },
-  { slug: "pressure-washing", trade: "Pressure Washing", appName: "Rinse.City", domain: "rinse.city", tier: 1 },
-  { slug: "lawn-care", trade: "Lawn Care", appName: "Mow.City", domain: "mow.city", tier: 1 },
-  { slug: "drain-cleaning", trade: "Drain Cleaning", appName: "Rooter.City", domain: "rooter.city", tier: 1 },
-  { slug: "locksmith", trade: "Locksmith", appName: "Lockout.City", domain: "lockout.city", tier: 2 },
-  { slug: "pest-control", trade: "Pest Control", appName: "Pest.City", domain: "pest.city", tier: 2 },
-  { slug: "hvac", trade: "HVAC", appName: "Duct.City", domain: "duct.city", tier: 2 },
-  { slug: "auto-detailing", trade: "Auto Detailing", appName: "Detail.City", domain: "detail.city", tier: 2 },
-  { slug: "snow-removal", trade: "Snow Removal", appName: "Plow.City", domain: "plow.city", tier: 3 },
-  { slug: "tree-service", trade: "Tree Service", appName: "Prune.City", domain: "prune.city", tier: 3 },
-  { slug: "chimney-sweep", trade: "Chimney Sweep", appName: "Chimney.City", domain: "chimney.city", tier: 3 },
-  { slug: "hauling", trade: "Hauling", appName: "Haul.City", domain: "haul.city", tier: 3 },
-  { slug: "grading", trade: "Grading", appName: "Grade.City", domain: "grade.city", tier: 3 },
-  { slug: "painting", trade: "Painting", appName: "Coat.City", domain: "coat.city", tier: 3 },
-  { slug: "auto-repair", trade: "Auto Repair", appName: "Brake.City", domain: "brake.city", tier: 3 },
-  { slug: "mechanic", trade: "Mechanic", appName: "Wrench.City", domain: "wrench.city", tier: 3 },
-  { slug: "floor-polishing", trade: "Floor Polishing", appName: "Polish.City", domain: "polish.city", tier: 3 },
-  { slug: "paving", trade: "Paving", appName: "Pave.City", domain: "pave.city", tier: 3 },
-  { slug: "demolition", trade: "Demolition", appName: "Wreck.City", domain: "wreck.city", tier: 3 },
-  { slug: "plumbing", trade: "Plumbing", appName: "Pipe.City", domain: "pipe.city", tier: 3 },
-];
+// Dynamically derive registry from the master TRADE_MAP
+export const TRADE_DOMAIN_REGISTRY: TradeDomainEntry[] = Object.entries(TRADE_MAP).map(([slug, info]) => ({
+  slug,
+  trade: info.label.replace(".City", ""),
+  appName: info.label,
+  domain: info.domain,
+  tier: info.tier as 1 | 2 | 3,
+}));
 
 export const FORMAT_SPECS: Record<CreativeFormat, FormatSpec> = {
   "linkedin-single": {
@@ -118,22 +106,21 @@ export function buildCreativePrompt(input: PromptInput) {
   };
 
   return [
-    `Create a premium paid-social ad creative for ${input.appName} (${input.domain}) for ${normalizedTrade} operators.`,
-    `Output size: exactly ${formatSpec.width}x${formatSpec.height} pixels. Current date is 2026.`,
-    "Style: photorealistic 3D smartphone mockup, professional studio lighting, crisp typography, modern SaaS aesthetic.",
-    "Color palette: dark navy background #0F172A with orange accents #F97316, subtle depth shadows, high contrast readability.",
-    "Brand text rules:",
-    `- Top-left text: \"${input.appName}\" in bold sans-serif, non-italic, prominent and highly readable.`,
-    `- Supporting headline: \"Your AI employee for ${cleanTrade}\".`,
-    "- NO in-image CTA button text (do not include \"Try Free\", \"Get Started\", or any CTA button copy).",
-    "Phone UI rules (minimal UI, only 3 large readable elements on screen):",
-    "1) Green \"Call Answered\" notification",
-    `2) One bold revenue figure: ${revenueByStyle[input.style]}`,
-    `3) Domain name text: ${input.domain}`,
-    `- Small social proof line: \"Trusted by 500+ ${cleanTrade} operators\".`,
+    "--- PIXAR-INSPIRED ISOMETRIC 3D DESIGN SYSTEM ---",
+    "Style: high-end isometric 3D render (Octane/Cycles style), Pixar-quality character design (but no people), bright vibrant colors against a dark backdrop.",
+    `Subject: a premium tech ecosystem for ${normalizedTrade} operators.`,
+    `Trade Focus: ${normalizedTrade}. App: ${input.appName} (${input.domain}).`,
+    "Composition: isometric bird's-eye view. Floating clean 3D elements representing the trade (tools, equipment, icons).",
+    "Color palette: deep navy background #0F172A, neon orange #F97316 highlights, emerald green #10B981 success accents.",
+    "Central Object: a glowing, floating smartphone with a simplified, highly readable 3D UI.",
+    "Smartphone UI elements (3D, embossed, glowing):",
+    `- A giant green \"CHECKMARK\" or \"INCOMING CALL\" icon.`,
+    `- The revenue figure \"${revenueByStyle[input.style]}\" in oversized white 3D font.`,
+    `- The trade domain \"${input.domain}\" clearly visible on the screen.`,
+    "Atmosphere: professional, magical, high-tech but grounded in trade work. Volumetric lighting, soft shadows, sharp focus.",
     STYLE_DESCRIPTIONS[input.style],
     formatSpec.composition,
-    "Avoid visual clutter, avoid tiny illegible text, avoid gibberish lettering, avoid extra logos, avoid people.",
-    "Final result must look like a high-converting ad creative for LinkedIn/Meta quality standards.",
+    "Strictly avoid: people, faces, extra text, gibberish letters, messy logos, cluttered backgrounds.",
+    "The image must feel like a high-budget 3D movie still or a premium Apple-style product launch visual.",
   ].join("\n");
 }

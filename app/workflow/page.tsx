@@ -57,7 +57,6 @@ export default function WorkflowPage() {
     });
   }, [ads]);
 
-  // Per-trade breakdown for a given stage
   const tradeBreakdown = useMemo(() => {
     if (!expandedStage) return {};
     const stageAds = grouped[expandedStage];
@@ -78,18 +77,16 @@ export default function WorkflowPage() {
     if (!confirm(`Move all ${stageAds.length} ads from "${fromStage}" → "${nextStage}"?`)) return;
 
     setBulkMoving(fromStage);
-    // Batch in groups of 50 — parallel requests
-    const chunks: Ad[][] = [];
-    for (let i = 0; i < stageAds.length; i += 50) chunks.push(stageAds.slice(i, i + 50));
-    for (const chunk of chunks) {
-      await Promise.all(chunk.map((ad) =>
-        fetch(`/api/ads/${ad.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ workflowStage: nextStage }),
-        })
-      ));
-    }
+    
+    await fetch("/api/ads/bulk-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        newWorkflowStage: nextStage, 
+        fromWorkflowStage: fromStage 
+      }),
+    });
+
     setBulkMoving(null);
     void load();
   }
@@ -104,7 +101,6 @@ export default function WorkflowPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">Workflow Pipeline</h1>
@@ -117,7 +113,6 @@ export default function WorkflowPage() {
         </Link>
       </div>
 
-      {/* Pipeline funnel */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {STAGES.map((stage, idx) => {
           const count = grouped[stage.key].length;
@@ -141,7 +136,7 @@ export default function WorkflowPage() {
                 {count > 0 && nextStage && (
                   <button
                     onClick={(e) => { e.stopPropagation(); void bulkAdvance(stage.key); }}
-                    disabled={isBulkMoving}
+                    disabled={!!bulkMoving}
                     className="rounded bg-slate-700 px-1.5 py-0.5 text-xs text-slate-300 hover:bg-slate-600 transition-colors"
                     title={`Advance all → ${nextStage}`}
                   >
@@ -165,7 +160,6 @@ export default function WorkflowPage() {
         })}
       </div>
 
-      {/* Flow diagram */}
       <Card>
         <div className="flex flex-wrap items-center gap-2 text-sm">
           {STAGES.map((s, i) => (
@@ -178,11 +172,10 @@ export default function WorkflowPage() {
           ))}
         </div>
         <p className="mt-2 text-xs text-slate-500">
-          Click the <span className="text-slate-300">→</span> button on any stage to bulk-advance all ads to the next stage (batched 50 at a time).
+          Click the <span className="text-slate-300">→</span> button on any stage to bulk-advance all ads to the next stage using a single server-side query.
         </p>
       </Card>
 
-      {/* Expanded stage breakdown by trade */}
       {expandedStage && (
         <Card>
           <div className="flex items-center justify-between mb-4">
@@ -195,7 +188,7 @@ export default function WorkflowPage() {
             {STAGE_NEXT[expandedStage] && (
               <Button
                 onClick={() => bulkAdvance(expandedStage)}
-                disabled={bulkMoving === expandedStage || grouped[expandedStage].length === 0}
+                disabled={!!bulkMoving || grouped[expandedStage].length === 0}
               >
                 {bulkMoving === expandedStage
                   ? "Moving…"
@@ -232,7 +225,6 @@ export default function WorkflowPage() {
         </Card>
       )}
 
-      {/* Per-stage trade summary (all stages, compact) */}
       <Card>
         <h2 className="mb-4 font-semibold">Trade Progress Overview</h2>
         <p className="mb-3 text-xs text-slate-500">
@@ -244,17 +236,16 @@ export default function WorkflowPage() {
               <tr className="border-b border-slate-700 text-left text-xs uppercase tracking-wide text-slate-400">
                 <th className="pb-2 pr-3">Trade</th>
                 <th className="pb-2 pr-3">Tier</th>
-                <th className="pb-2 pr-3">Concept</th>
-                <th className="pb-2 pr-3">Copy Ready</th>
-                <th className="pb-2 pr-3">Approved</th>
-                <th className="pb-2 pr-3">Brief</th>
-                <th className="pb-2 pr-3">Uploaded</th>
-                <th className="pb-2">Live</th>
+                <th className="pb-2 pr-3 text-center">Concept</th>
+                <th className="pb-2 pr-3 text-center">Copy Ready</th>
+                <th className="pb-2 pr-3 text-center">Approved</th>
+                <th className="pb-2 pr-3 text-center">Brief</th>
+                <th className="pb-2 pr-3 text-center">Uploaded</th>
+                <th className="pb-2 text-center">Live</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/50">
               {(() => {
-                // Aggregate by trade across all stages
                 const tradeStage: Record<string, Record<WorkflowStage, number>> = {};
                 for (const ad of ads) {
                   const t = tradeFromAd(ad);
@@ -273,7 +264,6 @@ export default function WorkflowPage() {
                   })
                   .map(([trade, stages]) => {
                     const info = TRADE_MAP[trade] ?? TRADE_MAP.saw;
-                    const total = Object.values(stages).reduce((s, n) => s + n, 0);
                     return (
                       <tr key={trade}>
                         <td className="py-1.5 pr-3">
@@ -284,11 +274,11 @@ export default function WorkflowPage() {
                             T{info.tier}
                           </span>
                         </td>
-                        {(["concept", "copy-ready", "approved", "creative-brief", "uploaded", "live"] as WorkflowStage[]).map((s) => (
-                          <td key={s} className="py-1.5 pr-3 text-center">
-                            {stages[s] > 0 ? (
-                              <span className={`text-xs font-bold ${s === "live" ? "text-green-400" : s === "approved" ? "text-blue-400" : "text-slate-300"}`}>
-                                {stages[s]}
+                        {STAGES.map((s) => (
+                          <td key={s.key} className="py-1.5 pr-3 text-center">
+                            {stages[s.key] > 0 ? (
+                              <span className={`text-xs font-bold ${s.key === "live" ? "text-green-400" : s.key === "approved" ? "text-blue-400" : "text-slate-300"}`}>
+                                {stages[s.key]}
                               </span>
                             ) : (
                               <span className="text-xs text-slate-700">—</span>

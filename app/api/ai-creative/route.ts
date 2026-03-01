@@ -9,7 +9,8 @@ import {
   type CreativeStyle,
 } from "@/lib/ai-creative";
 
-const MODEL_NAME = "gemini-3-pro-image-preview";
+// Nano Banana 2 (NB2)
+const MODEL_NAME = "gemini-3.1-flash-image-preview";
 
 interface AiCreativeRequest {
   trade: string;
@@ -85,6 +86,7 @@ export async function POST(request: Request) {
 
     const ai = new GoogleGenAI({ apiKey });
 
+    // Ensure we're using the correct SDK pattern for image generation
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
       contents: prompt,
@@ -116,6 +118,8 @@ export async function POST(request: Request) {
 
     const target = FORMAT_SPECS[body.format];
     const sourceBuffer = Buffer.from(imagePart.inlineData.data, "base64");
+    
+    // NB2 returns 1:1 by default. We resize to target format.
     const pngBuffer = await sharp(sourceBuffer)
       .resize(target.width, target.height, { fit: "cover" })
       .png({ compressionLevel: 9 })

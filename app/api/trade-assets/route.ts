@@ -30,15 +30,47 @@ export async function POST(req: Request) {
 
   const body = (await req.json()) as {
     trade_slug: string;
-    asset_type: "hero" | "og";
+    asset_type: "hero_a" | "hero_b" | "og_nb2";
     image_url?: string;
+    imageBase64?: string; // Optional: upload to storage
     notes?: string;
   };
+
+  let imageUrl = body.image_url;
+
+  // Handle base64 upload if provided
+  if (body.imageBase64) {
+    const buffer = Buffer.from(body.imageBase64, "base64");
+    const fileName = `trade-heros/nb2/${body.trade_slug}-${body.asset_type.replace("_", "-")}.jpg`;
+    
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+      .from("ad-creatives")
+      .upload(fileName, buffer, {
+        contentType: "image/jpeg",
+        upsert: true,
+      });
+
+    if (uploadError) return errorJson(`Upload failed: ${uploadError.message}`, 500);
+
+    const { data: urlData } = supabaseAdmin.storage
+      .from("ad-creatives")
+      .getPublicUrl(fileName);
+      
+    imageUrl = urlData.publicUrl;
+  }
+
+  if (!imageUrl) return errorJson("image_url or imageBase64 required", 400);
 
   const { data, error } = await supabaseAdmin
     .from("trade_assets")
     .upsert(
-      { ...body, status: "pending", updated_at: new Date().toISOString() },
+      { 
+        trade_slug: body.trade_slug, 
+        asset_type: body.asset_type, 
+        image_url: imageUrl,
+        status: "pending", 
+        updated_at: new Date().toISOString() 
+      },
       { onConflict: "trade_slug,asset_type" }
     )
     .select()
