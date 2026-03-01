@@ -10,6 +10,7 @@
 
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { optionsResponse } from "@/lib/api";
 
 const MODEL = "gemini-3.1-flash-image-preview";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -32,6 +33,13 @@ const ISOMETRIC_STYLE =
   "Rich saturated colors. Deep dark navy #0f172a background. " +
   "Dramatic three-point cinematic lighting — key light upper-left, fill right, rim outline. " +
   "No text. No logos. No words anywhere in the image. Square composition. High resolution.";
+
+// Gemini image generation can take 15-30s — extend Vercel function timeout
+export const maxDuration = 60;
+
+export function OPTIONS() {
+  return optionsResponse();
+}
 
 export async function POST(request: Request) {
   try {
