@@ -144,6 +144,8 @@ export function normalizeAd(input: any): Ad {
     workflowStage,
     imageUrl: (input.image_url ?? input.imageUrl ?? null) as string | null,
     image_url: (input.image_url ?? input.imageUrl ?? null) as string | null,
+    creative_variant: (input.creative_variant ?? input.creativeVariant ?? 1) as number,
+    creativeVariant: (input.creative_variant ?? input.creativeVariant ?? 1) as number,
     statusHistory: normalizeStatusHistory(input),
   };
 }
