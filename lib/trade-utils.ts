@@ -109,3 +109,25 @@ export function tradeBadge(ad: Ad) {
   const key = tradeFromAd(ad);
   return TRADE_MAP[key] ?? TRADE_MAP.saw;
 }
+
+const STORAGE_BASE = "https://vzawlfitqnjhypnkguas.supabase.co/storage/v1/object/public/ad-creatives";
+
+/**
+ * Returns the three swappable creative image URLs for a given trade.
+ * C1 = existing hero_a (passed in as the ad's current imageUrl — already in DB)
+ * C2 = company overview (shop, trucks, equipment, staff) — isometric bird's-eye
+ * C3 = on-site action wide shot — isometric zoomed-out job site
+ */
+export function getCreativeUrls(prefix: string, heroAUrl?: string | null) {
+  return {
+    c1: heroAUrl ?? `${STORAGE_BASE}/trade-heros/nb2/${prefix}-hero-a.jpg`,
+    c2: `${STORAGE_BASE}/nb2-creatives/${prefix}-c2.jpg`,
+    c3: `${STORAGE_BASE}/nb2-creatives/${prefix}-c3.jpg`,
+  };
+}
+
+export const CREATIVE_LABELS: Record<number, string> = {
+  1: "C1 — Hands-on zoom",
+  2: "C2 — Company overview",
+  3: "C3 — On-site wide shot",
+};

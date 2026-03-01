@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { PlatformChip, StatusChip } from "@/components/chips";
-import { tradeBadge, TRADE_MAP, tradeFromAd } from "@/lib/trade-utils";
+import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
 import { AIGeneratePanel } from "@/components/ai-generate-panel";
 import { Button, Card, GhostButton } from "@/components/ui";
 import type { Ad, AdStatus, AdTemplate, WorkflowStage } from "@/lib/types";
@@ -39,6 +39,18 @@ export default function AdsPage() {
   const [startFromTemplate, setStartFromTemplate] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [form, setForm] = useState<Partial<Ad>>(emptyAd);
+  const [savingCreative, setSavingCreative] = useState<Set<string>>(new Set());
+
+  async function setCreativeVariant(adId: string, variant: number) {
+    setSavingCreative((prev) => new Set(prev).add(adId));
+    setAds((prev) => prev.map((a) => a.id === adId ? { ...a, creative_variant: variant, creativeVariant: variant } : a));
+    await fetch(`/api/ads/${adId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ creative_variant: variant }),
+    });
+    setSavingCreative((prev) => { const next = new Set(prev); next.delete(adId); return next; });
+  }
 
   async function loadAds() {
     const res = await fetch("/api/ads", { cache: "no-store" });
@@ -210,16 +222,48 @@ export default function AdsPage() {
 
           return (
             <Card key={ad.id}>
-              {(ad.imageUrl ?? ad.image_url) && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={ad.imageUrl ?? ad.image_url ?? ""}
-                  alt={ad.headline ?? "Ad creative"}
-                  className="mb-3 w-full rounded object-cover"
-                  style={{ maxHeight: 180 }}
-                  loading="lazy"
-                />
-              )}
+              {(() => {
+                const prefix = tradeFromAd(ad);
+                const urls = getCreativeUrls(prefix, ad.imageUrl ?? ad.image_url);
+                const activeVariant = ad.creative_variant ?? ad.creativeVariant ?? 1;
+                const activeUrl = activeVariant === 2 ? urls.c2 : activeVariant === 3 ? urls.c3 : urls.c1;
+                const isSaving = savingCreative.has(ad.id);
+                return (
+                  <>
+                    {/* Main creative preview */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={activeUrl}
+                      alt={ad.headline ?? "Ad creative"}
+                      className="mb-2 w-full rounded object-cover"
+                      style={{ maxHeight: 160 }}
+                      loading="lazy"
+                    />
+                    {/* 3-slot creative picker */}
+                    <div className="mb-3 flex gap-1.5">
+                      {([1, 2, 3] as const).map((v) => {
+                        const thumbUrl = v === 2 ? urls.c2 : v === 3 ? urls.c3 : urls.c1;
+                        const isActive = activeVariant === v;
+                        return (
+                          <button
+                            key={v}
+                            title={CREATIVE_LABELS[v]}
+                            disabled={isSaving}
+                            onClick={() => setCreativeVariant(ad.id, v)}
+                            className={`relative flex-1 overflow-hidden rounded border-2 transition-all ${isActive ? "border-blue-400 opacity-100" : "border-slate-700 opacity-50 hover:opacity-80"}`}
+                            style={{ height: 40 }}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={thumbUrl} alt={`C${v}`} className="h-full w-full object-cover" loading="lazy" />
+                            <span className={`absolute bottom-0 left-0 right-0 py-0.5 text-center text-[9px] font-bold ${isActive ? "bg-blue-500/80 text-white" : "bg-black/50 text-slate-300"}`}>C{v}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {isSaving && <p className="mb-1 text-center text-xs text-slate-400">Saving…</p>}
+                  </>
+                );
+              })()}
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <PlatformChip platform={ad.platform} />
                 {(() => { const t = tradeBadge(ad); return (

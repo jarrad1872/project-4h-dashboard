@@ -36,6 +36,8 @@ export interface Ad {
   workflowStage: WorkflowStage;
   imageUrl?: string | null;
   image_url?: string | null;
+  creative_variant?: number | null;  // 1 = hands-on zoom (c1/hero_a), 2 = company overview, 3 = on-site action wide
+  creativeVariant?: number | null;
   statusHistory?: StatusHistoryItem[];
 }
 

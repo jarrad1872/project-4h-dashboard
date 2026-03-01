@@ -176,6 +176,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     setIfDefined("utm_content", payload.utm_content ?? payload.utmContent);
     setIfDefined("utm_term", payload.utm_term ?? payload.utmTerm);
     setIfDefined("status", payload.status);
+    setIfDefined("creative_variant", payload.creative_variant ?? payload.creativeVariant);
     setIfDefined(
       "workflow_stage",
       payload.workflow_stage ??
