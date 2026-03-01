@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Card, Button, GhostButton } from "@/components/ui";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import type { Ad, CampaignStatusData } from "@/lib/types";
+import { TRADE_MAP } from "@/lib/trade-utils";
 
 const PLATFORMS = ["linkedin", "youtube", "facebook", "instagram"] as const;
 const PLATFORM_ICONS: Record<string, string> = {
@@ -353,7 +354,7 @@ export default function OverviewPage() {
         </div>
         <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-xs text-slate-500">
           <span className="font-semibold text-slate-400">Live:</span>
-          {["saw", "rinse", "mow", "rooter", "pipe", "lockout", "pest", "duct", "detail", "plow", "prune", "chimney", "haul", "grade", "coat", "brake", "wrench", "polish", "pave", "wreck"].map(t => (
+          {Object.entries(TRADE_MAP).filter(([, v]) => v.tier === 1).map(([t]) => (
             <span key={t} className="rounded bg-slate-800 px-1.5 py-0.5 font-mono">{t}.city</span>
           ))}
         </div>

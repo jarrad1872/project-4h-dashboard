@@ -168,6 +168,7 @@ export function adToDb(ad: Partial<Ad>) {
     status: ad.status,
     workflow_stage: ad.workflow_stage ?? ad.workflowStage,
     image_url: ad.image_url ?? ad.imageUrl ?? null,
+    creative_variant: ad.creative_variant ?? ad.creativeVariant ?? undefined,
     created_at: ad.created_at ?? ad.createdAt,
     updated_at: ad.updated_at ?? ad.updatedAt,
   };

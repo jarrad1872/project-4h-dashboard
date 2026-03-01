@@ -122,13 +122,9 @@ export default function ApprovalPage() {
 
   async function load() {
     setLoading(true);
-    const [pendRes, reviewedRes] = await Promise.all([
-      fetch("/api/ads?status=pending", { cache: "no-store" }),
-      fetch("/api/ads", { cache: "no-store" }),
-    ]);
-    const pendData = (await pendRes.json()) as Ad[];
-    const allData = (await reviewedRes.json()) as Ad[];
-    setPending(pendData);
+    const res = await fetch("/api/ads", { cache: "no-store" });
+    const allData = (await res.json()) as Ad[];
+    setPending(allData.filter((a) => a.status === "pending"));
     setReviewed(allData.filter((a) => a.status !== "pending"));
     setLoading(false);
   }

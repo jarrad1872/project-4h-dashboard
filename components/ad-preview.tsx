@@ -5,11 +5,13 @@ export function AdPreview({
   headline,
   primaryText,
   cta,
+  appName,
 }: {
   platform: AdPlatform;
   headline: string;
   primaryText: string;
   cta: string;
+  appName?: string;
 }) {
   if (platform === "youtube") {
     return (
@@ -31,7 +33,7 @@ export function AdPreview({
         <div className="mb-3 flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-slate-600" />
           <div>
-            <p className="text-sm font-semibold">Saw.City</p>
+            <p className="text-sm font-semibold">{appName ?? "Saw.City"}</p>
             <p className="text-xs text-slate-400">Sponsored</p>
           </div>
         </div>
@@ -48,7 +50,7 @@ export function AdPreview({
       <div className="mb-3 flex items-center gap-2">
         <div className="h-9 w-9 rounded-full bg-slate-300" />
         <div>
-          <p className="text-sm font-semibold">Saw.City</p>
+          <p className="text-sm font-semibold">{appName ?? "Saw.City"}</p>
           <p className="text-xs text-slate-500">Sponsored</p>
         </div>
       </div>

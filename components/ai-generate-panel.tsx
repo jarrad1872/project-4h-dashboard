@@ -1,51 +1,69 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, GhostButton } from "@/components/ui";
+import { Button, Card } from "@/components/ui";
 import type { AdPlatform } from "@/lib/types";
+import type { CreativeFormat, CreativeStyle } from "@/lib/ai-creative";
 
-type Variation = { headline: string; primaryText: string };
+const PLATFORM_FORMAT_MAP: Record<AdPlatform, CreativeFormat> = {
+  linkedin: "linkedin-single",
+  facebook: "meta-square",
+  instagram: "instagram-story",
+  youtube: "youtube-thumb",
+};
 
-const tones = ["Direct", "Friendly", "Urgent", "Authority", "Practical"];
+const STYLES: { value: CreativeStyle; label: string }[] = [
+  { value: "pain-point", label: "Pain Point" },
+  { value: "feature-demo", label: "Feature Demo" },
+  { value: "social-proof", label: "Social Proof" },
+  { value: "retargeting", label: "Retargeting" },
+];
 
 export function AIGeneratePanel({
+  trade = "saw",
   platform,
   onUseVariation,
 }: {
+  trade?: string;
   platform: AdPlatform;
-  onUseVariation: (variation: Variation) => void;
+  /** @deprecated — panel now generates image creatives, not text variations */
+  onUseVariation?: (variation: { headline: string; primaryText: string }) => void;
 }) {
-  const [prompt, setPrompt] = useState("");
-  const [tone, setTone] = useState(tones[0]);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [style, setStyle] = useState<CreativeStyle>("pain-point");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [variations, setVariations] = useState<Variation[]>([]);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [imageMime, setImageMime] = useState("image/png");
+
+  const format = PLATFORM_FORMAT_MAP[platform] ?? "linkedin-single";
 
   async function generate() {
-    if (!prompt.trim()) return;
     setLoading(true);
     setError(null);
+    setImageBase64(null);
 
     try {
-      const res = await fetch("/api/generate", {
+      const res = await fetch("/api/ai-creative", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          platform,
-          prompt,
-          tone,
-          count: 2,
+          trade,
+          format,
+          style,
+          customPrompt: customPrompt.trim() || undefined,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data?.error ?? "Failed to generate copy");
+        throw new Error(data?.error ?? "Failed to generate creative");
       }
 
-      setVariations(Array.isArray(data?.variations) ? data.variations : []);
+      setImageBase64(data.imageBase64 ?? null);
+      setImageMime(data.mimeType ?? "image/png");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate copy");
+      setError(err instanceof Error ? err.message : "Failed to generate creative");
     } finally {
       setLoading(false);
     }
@@ -53,63 +71,61 @@ export function AIGeneratePanel({
 
   return (
     <Card className="space-y-3">
-      <h3 className="text-base font-semibold">🤖 AI Generate</h3>
+      <h3 className="text-base font-semibold">🎨 AI Generate Creative</h3>
       <textarea
         className="w-full rounded border border-slate-600 bg-slate-900 p-2 text-sm"
         rows={3}
-        placeholder="Describe the ad angle or audience you want..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Optional: describe the angle, audience, or scene you want…"
+        value={customPrompt}
+        onChange={(e) => setCustomPrompt(e.target.value)}
       />
 
       <div className="grid gap-3 md:grid-cols-2">
         <label className="text-sm">
-          Platform
+          Platform / Format
           <select
             disabled
             className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2 text-sm text-slate-300"
             value={platform}
           >
-            <option value="linkedin">LinkedIn</option>
-            <option value="youtube">YouTube</option>
-            <option value="facebook">Facebook</option>
-            <option value="instagram">Instagram</option>
+            <option value="linkedin">LinkedIn ({format})</option>
+            <option value="youtube">YouTube ({format})</option>
+            <option value="facebook">Facebook ({format})</option>
+            <option value="instagram">Instagram ({format})</option>
           </select>
         </label>
 
         <label className="text-sm">
-          Tone
+          Style
           <select
             className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2 text-sm"
-            value={tone}
-            onChange={(e) => setTone(e.target.value)}
+            value={style}
+            onChange={(e) => setStyle(e.target.value as CreativeStyle)}
           >
-            {tones.map((value) => (
+            {STYLES.map(({ value, label }) => (
               <option key={value} value={value}>
-                {value}
+                {label}
               </option>
             ))}
           </select>
         </label>
       </div>
 
-      <Button onClick={generate} disabled={loading || !prompt.trim()}>
-        {loading ? "Generating..." : "Generate Variations"}
+      <Button onClick={generate} disabled={loading}>
+        {loading ? "Generating…" : "Generate Creative"}
       </Button>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
-      <div className="space-y-3">
-        {variations.map((variation, idx) => (
-          <div key={`${variation.headline}-${idx}`} className="rounded border border-slate-700 bg-slate-900 p-3">
-            <p className="text-sm font-semibold">Variation {idx + 1}: {variation.headline}</p>
-            <p className="mt-1 text-sm text-slate-300">{variation.primaryText}</p>
-            <GhostButton className="mt-3" onClick={() => onUseVariation(variation)}>
-              Use This
-            </GhostButton>
-          </div>
-        ))}
-      </div>
+      {imageBase64 && (
+        <div className="rounded border border-slate-700 bg-slate-900 p-2">
+          <img
+            src={`data:${imageMime};base64,${imageBase64}`}
+            alt="Generated creative"
+            className="w-full rounded"
+          />
+        </div>
+      )}
     </Card>
   );
 }
