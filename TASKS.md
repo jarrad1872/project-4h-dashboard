@@ -130,7 +130,11 @@ Priority order: electrical → roofing → disaster-restoration → Tier 2 trade
 - [x] **AGENTS.md Rule 5** added: update relevant .md files before every commit
 - [x] **Approval page: bulk approve all** — `POST /api/ads/bulk-status` endpoint (single Supabase query, not N sequential requests). "Approve All X Pending" button at top of /approval. Per-trade bulk also uses server-side query.
 - [x] **Budget page rebuilt** — replaced `prompt()` dialogs with inline edit fields per channel. Added kill/scale threshold card. Progress bars color-coded by burn rate.
-- [ ] **Continue dashboard overhaul** — GTM, workflow, scorecard, lifecycle pages still to review
+- [x] **GTM page** — converted to `"use client"`, added live stats bar (pulls real ad counts from Supabase), live ad counts column in trade registry with approved/pending breakdown per trade
+- [x] **Scorecard page** — replaced `prompt()` with inline date picker, added week totals row, all-time campaign totals, mission progress bar toward 2,000, signal legend card
+- [x] **Workflow page** — complete redesign: pipeline funnel (6 stage cards with counts), click-to-expand per-trade breakdown, bulk advance button (batched 50 at a time), per-trade progress table. No more 1,040 individual kanban cards.
+- [x] **Lifecycle page** — converted dense table to card layout, grouped by timing stage with dividers, active/paused filter, inline edit mode per card
+- [x] **Launch page** — per-platform progress bars, hard blockers card (separate from checklist), confirmed launch sequence (8 steps), GO LIVE requires confirm dialog, Mark All Ready requires confirm
 
 ### Infrastructure
 - [x] Full Next.js dashboard live at pumpcans.com (GitHub: jarrad1872/project-4h-dashboard)
