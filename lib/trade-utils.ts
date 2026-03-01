@@ -110,6 +110,54 @@ export function tradeBadge(ad: Ad) {
   return TRADE_MAP[key] ?? TRADE_MAP.saw;
 }
 
+// ─── Local rendered creative images (public/creatives/) ─────────────────────
+
+/** Prefixes that have locally rendered creative images in public/creatives/ */
+const CREATIVE_PREFIXES = new Set(["saw", "rinse", "mow", "rooter"]);
+
+/**
+ * Maps (domain, platform, format) → a local /creatives/{filename}.jpg URL.
+ * Returns null if no locally rendered image exists for this trade yet.
+ *
+ * Platform mapping:
+ *   facebook  → 1200x628-facebook
+ *   instagram + story/reel/1920 format → 1080x1920-instagram
+ *   instagram (default square)         → 1080x1080-meta
+ *   linkedin  → 1200x1200-linkedin
+ *   youtube   → 1280x720-youtube
+ */
+export function getCreativeUrl(
+  domain: string,
+  platform: string,
+  format?: string | null,
+): string | null {
+  // Extract prefix from domain (e.g. "saw.city" → "saw")
+  const prefix = domain.replace(/\.city$/, "").toLowerCase();
+  if (!CREATIVE_PREFIXES.has(prefix)) return null;
+
+  const p = platform.toLowerCase();
+  const f = (format ?? "").toLowerCase();
+
+  let suffix: string;
+  if (p === "facebook") {
+    suffix = "1200x628-facebook";
+  } else if (p === "instagram") {
+    const isStory = f.includes("story") || f.includes("reel") || f.includes("1920") || f.includes("4x5") || f === "instagram-story";
+    suffix = isStory ? "1080x1920-instagram" : "1080x1080-meta";
+  } else if (p === "linkedin") {
+    suffix = "1200x1200-linkedin";
+  } else if (p === "youtube") {
+    suffix = "1280x720-youtube";
+  } else {
+    // meta / unknown — fall back to square
+    suffix = "1080x1080-meta";
+  }
+
+  return `/creatives/${prefix}-${suffix}.jpg`;
+}
+
+// ─── Supabase storage creative URLs (NB2 isometric renders) ──────────────────
+
 const STORAGE_BASE = "https://vzawlfitqnjhypnkguas.supabase.co/storage/v1/object/public/ad-creatives";
 
 /**
