@@ -117,6 +117,19 @@ Priority order: electrical → roofing → disaster-restoration → Tier 2 trade
 
 ## 🟢 DONE (cumulative)
 
+### Dashboard Overhaul (2026-03-01) 🔄
+- [x] **Homepage rebuilt as live command center** (commit `9100a4a`) — real Supabase data, not file-based JSON
+  - Launch Blockers board — color-coded by severity (red/amber/grey), each with direct action link
+  - Campaign status inline toggle (pre-launch → live → paused → ended) — no longer buried in /settings
+  - Platform cards (LinkedIn/YouTube/Facebook/Instagram) — live ad counts, click-through to /ads filtered by platform
+  - Ad approvals + Trade Assets — side-by-side with progress bars and direct approve buttons
+  - Creative Variants panel — C1/C2/C3 coverage at a glance
+  - Trade Coverage — Tier 1/2/3 breakdown with all 20 live `.city` domain badges
+  - Quick Actions that navigate to the right places
+- [x] **`useSearchParams()` Suspense boundary** added to `/ads` — was causing Vercel build ERROR, now fixed
+- [x] **AGENTS.md Rule 5** added: update relevant .md files before every commit
+- [ ] **Continue dashboard overhaul** — remaining pages to review/improve
+
 ### Infrastructure
 - [x] Full Next.js dashboard live at pumpcans.com (GitHub: jarrad1872/project-4h-dashboard)
 - [x] Vercel auto-deploy via GitHub webhook (reconnected, verified)

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
@@ -37,7 +37,7 @@ const emptyAd: Partial<Ad> = {
   workflowStage: "concept",
 };
 
-export default function AdsPage() {
+function AdsContent() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [templates, setTemplates] = useState<AdTemplate[]>([]);
   const searchParams = useSearchParams();
@@ -578,5 +578,13 @@ export default function AdsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdsPage() {
+  return (
+    <Suspense fallback={<div className="flex h-64 items-center justify-center text-slate-400">Loading ads…</div>}>
+      <AdsContent />
+    </Suspense>
   );
 }

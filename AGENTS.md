@@ -23,7 +23,8 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 2. **Never push to a branch other than `main`** in this repo — Vercel webhook is wired to `main`.
 3. **Nothing goes live externally without Jarrad's approval** — no new ad accounts, no live campaigns, no external webhooks.
 4. **Verify before reporting done.** If you push code, confirm Vercel deployed. If you update DB, confirm the row exists. Show evidence.
-5. **Never move money or modify billing** in any system.
+5. **Update relevant .md files before every commit.** If the work affects how the system works, what's been built, or what's pending — update TASKS.md, SOP-WORKFLOW.md, or README.md in the same commit. Never push code that leaves the docs stale. The .md files are the system's memory.
+6. **Never move money or modify billing** in any system.
 
 ### TRADE_MAP Hard Rule
 **Every new trade added to the campaign MUST have its prefix added to `lib/trade-utils.ts → TRADE_MAP` in the same commit.**
