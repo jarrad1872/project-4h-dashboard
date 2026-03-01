@@ -121,7 +121,7 @@ export default function GeneratePage() {
         </div>
         <div className="flex items-center gap-2">
             <span className="rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-300">
-                Model: NB2 (Gemini 3 Pro)
+                Model: NB2 (Gemini 3.1)
             </span>
         </div>
       </div>

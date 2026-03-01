@@ -10,7 +10,7 @@ import {
 } from "@/lib/ai-creative";
 
 // Nano Banana 2 (NB2)
-const MODEL_NAME = "gemini-3-pro-image-preview"; // NB2 Pro (Ultra) — upgraded from Flash 2026-03-01
+const MODEL_NAME = "gemini-3.1-flash-image-preview"; // NB2 = Nano Banana 2 = Gemini 3.1 Flash Image
 
 interface AiCreativeRequest {
   trade: string;
