@@ -11,6 +11,14 @@ import type { Ad, AdStatus, AdTemplate, WorkflowStage } from "@/lib/types";
 const platformFilters = ["all", "linkedin", "youtube", "facebook", "instagram", "retargeting"] as const;
 const statusFilters = ["all", "approved", "pending", "paused", "rejected"] as const;
 
+interface EditTarget {
+  adId: string;
+  variant: 1 | 2 | 3;
+  label: string;
+  storagePath: string;
+  currentUrl: string;
+}
+
 const emptyAd: Partial<Ad> = {
   platform: "linkedin",
   campaignGroup: "4h_custom",
@@ -42,12 +50,13 @@ export default function AdsPage() {
   const [savingCreative, setSavingCreative] = useState<Set<string>>(new Set());
 
   // Creative edit modal
-  interface EditTarget { adId: string; variant: 1|2|3; label: string; storagePath: string; currentUrl: string; }
   const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
   const [editPrompt, setEditPrompt] = useState("");
   const [regenLoading, setRegenLoading] = useState(false);
   const [regenResult, setRegenResult] = useState<string | null>(null);
   const [regenError, setRegenError] = useState<string | null>(null);
+  // Cache-busted URL overrides after a regen — keyed by `${adId}-c${variant}`
+  const [creativeUrlOverrides, setCreativeUrlOverrides] = useState<Record<string, string>>({});
 
   function getStoragePath(variant: 1|2|3, prefix: string, imageUrl?: string | null): string {
     if (variant === 1 && imageUrl) {
@@ -61,7 +70,9 @@ export default function AdsPage() {
 
   function openEditModal(ad: Ad, variant: 1|2|3, prefix: string) {
     const urls = getCreativeUrls(prefix, ad.imageUrl ?? ad.image_url);
-    const currentUrl = variant === 2 ? urls.c2 : variant === 3 ? urls.c3 : urls.c1;
+    const overrideKey = `${ad.id}-c${variant}`;
+    const baseUrl = variant === 2 ? urls.c2 : variant === 3 ? urls.c3 : urls.c1;
+    const currentUrl = creativeUrlOverrides[overrideKey] ?? baseUrl;
     const storagePath = getStoragePath(variant, prefix, ad.imageUrl ?? ad.image_url);
     setEditTarget({ adId: ad.id, variant, label: `${prefix} · ${CREATIVE_LABELS[variant]}`, storagePath, currentUrl });
     setEditPrompt("");
@@ -91,12 +102,16 @@ export default function AdsPage() {
 
   function applyRegenResult() {
     if (!regenResult || !editTarget) return;
-    // Update local ad image URL so the card reflects the new image immediately
-    setAds((prev) => prev.map((a) => {
-      if (a.id !== editTarget.adId) return a;
-      if (editTarget.variant === 1) return { ...a, imageUrl: regenResult, image_url: regenResult };
-      return a; // C2/C3 are URL-constructed from storage, cache-busted by ?t= in the returned URL
-    }));
+    const overrideKey = `${editTarget.adId}-c${editTarget.variant}`;
+    if (editTarget.variant === 1) {
+      // C1: update the ad's imageUrl so the card and getCreativeUrls both pick it up
+      setAds((prev) => prev.map((a) =>
+        a.id === editTarget.adId ? { ...a, imageUrl: regenResult, image_url: regenResult } : a
+      ));
+    } else {
+      // C2/C3: store cache-busted URL override so the thumbnail and main preview update immediately
+      setCreativeUrlOverrides((prev) => ({ ...prev, [overrideKey]: regenResult }));
+    }
     setEditTarget(null);
   }
 
@@ -285,7 +300,13 @@ export default function AdsPage() {
                 const prefix = tradeFromAd(ad);
                 const urls = getCreativeUrls(prefix, ad.imageUrl ?? ad.image_url);
                 const activeVariant = ad.creative_variant ?? ad.creativeVariant ?? 1;
-                const activeUrl = activeVariant === 2 ? urls.c2 : activeVariant === 3 ? urls.c3 : urls.c1;
+                // Apply any post-regen cache-busted URL overrides
+                const resolvedUrls = {
+                  c1: creativeUrlOverrides[`${ad.id}-c1`] ?? urls.c1,
+                  c2: creativeUrlOverrides[`${ad.id}-c2`] ?? urls.c2,
+                  c3: creativeUrlOverrides[`${ad.id}-c3`] ?? urls.c3,
+                };
+                const activeUrl = activeVariant === 2 ? resolvedUrls.c2 : activeVariant === 3 ? resolvedUrls.c3 : resolvedUrls.c1;
                 const isSaving = savingCreative.has(ad.id);
                 return (
                   <>
@@ -301,7 +322,7 @@ export default function AdsPage() {
                     {/* 3-slot creative picker */}
                     <div className="mb-3 flex gap-1.5">
                       {([1, 2, 3] as const).map((v) => {
-                        const thumbUrl = v === 2 ? urls.c2 : v === 3 ? urls.c3 : urls.c1;
+                        const thumbUrl = v === 2 ? resolvedUrls.c2 : v === 3 ? resolvedUrls.c3 : resolvedUrls.c1;
                         const isActive = activeVariant === v;
                         return (
                           <div key={v} className="relative flex-1" style={{ height: 40 }}>
