@@ -70,8 +70,17 @@ const DOMAIN_TAGLINES: Record<string, string> = {
   "bookkeeper.city":    "on the books.",
 };
 
+// Sanitize CTA — some old DB records have model names stored in the cta field
+function sanitizeCta(cta?: string): string | undefined {
+  if (!cta) return undefined;
+  if (/gemini|preview|image-gen|model/i.test(cta)) return undefined;
+  if (cta.length > 80) return undefined; // too long to be a real CTA
+  return cta;
+}
+
 export function AdPreviewModal({ imageUrl, headline, domain, cta, onClose }: AdPreviewModalProps) {
   const tagline = DOMAIN_TAGLINES[domain] ?? "on the job.";
+  const cleanCta = sanitizeCta(cta);
 
   // Close on Escape
   useEffect(() => {
@@ -140,7 +149,7 @@ export function AdPreviewModal({ imageUrl, headline, domain, cta, onClose }: AdP
               className="rounded-md px-4 py-2 text-sm font-bold text-white"
               style={{ background: "#F97316", boxShadow: "0 2px 12px rgba(249,115,22,0.5)" }}
             >
-              {cta ?? "Get your AI employee — 14 days free →"}
+              {cleanCta ?? "Get your AI employee — 14 days free →"}
             </div>
 
             {/* Sub-pill */}
