@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
 import { AIGeneratePanel } from "@/components/ai-generate-panel";
+import { AdPreviewModal } from "@/components/ad-preview-modal";
 import { Button, Card, GhostButton } from "@/components/ui";
 import type { Ad, AdStatus, AdTemplate, WorkflowStage } from "@/lib/types";
 
@@ -62,6 +63,7 @@ function AdsContent() {
   const [regenError, setRegenError] = useState<string | null>(null);
   // Cache-busted URL overrides after a regen — keyed by `${adId}-c${variant}`
   const [creativeUrlOverrides, setCreativeUrlOverrides] = useState<Record<string, string>>({});
+  const [previewAd, setPreviewAd] = useState<{ imageUrl: string; headline: string; domain: string; cta?: string } | null>(null);
 
   function getStoragePath(variant: 1|2|3, prefix: string, imageUrl?: string | null): string {
     if (variant === 1 && imageUrl) {
@@ -299,19 +301,24 @@ function AdsContent() {
         {paginated.map((ad) => {
           const utmUrl = `https://saw.city${ad.landingPath}?utm_source=${ad.utmSource}&utm_medium=${ad.utmMedium}&utm_campaign=${ad.utmCampaign}&utm_content=${ad.utmContent}&utm_term=${ad.utmTerm}`;
 
+          const adPrefix = tradeFromAd(ad);
+          const adUrls = getCreativeUrls(adPrefix, ad.imageUrl ?? ad.image_url);
+          const adVariant = ad.creative_variant ?? ad.creativeVariant ?? 1;
+          const adResolvedUrls = {
+            c1: creativeUrlOverrides[`${ad.id}-c1`] ?? adUrls.c1,
+            c2: creativeUrlOverrides[`${ad.id}-c2`] ?? adUrls.c2,
+            c3: creativeUrlOverrides[`${ad.id}-c3`] ?? adUrls.c3,
+          };
+          const adActiveUrl = adVariant === 2 ? adResolvedUrls.c2 : adVariant === 3 ? adResolvedUrls.c3 : adResolvedUrls.c1;
+          const adDomain = tradeBadge(ad).domain;
+
           return (
             <Card key={ad.id}>
               {(() => {
-                const prefix = tradeFromAd(ad);
-                const urls = getCreativeUrls(prefix, ad.imageUrl ?? ad.image_url);
-                const activeVariant = ad.creative_variant ?? ad.creativeVariant ?? 1;
-                // Apply any post-regen cache-busted URL overrides
-                const resolvedUrls = {
-                  c1: creativeUrlOverrides[`${ad.id}-c1`] ?? urls.c1,
-                  c2: creativeUrlOverrides[`${ad.id}-c2`] ?? urls.c2,
-                  c3: creativeUrlOverrides[`${ad.id}-c3`] ?? urls.c3,
-                };
-                const activeUrl = activeVariant === 2 ? resolvedUrls.c2 : activeVariant === 3 ? resolvedUrls.c3 : resolvedUrls.c1;
+                const prefix = adPrefix;
+                const resolvedUrls = adResolvedUrls;
+                const activeUrl = adActiveUrl;
+                const activeVariant = adVariant;
                 const isSaving = savingCreative.has(ad.id);
                 return (
                   <>
@@ -381,6 +388,19 @@ function AdsContent() {
                   }}
                 >
                   Copy UTM
+                </GhostButton>
+                <GhostButton
+                  className="border-orange-500/60 text-orange-400 hover:bg-orange-900/30"
+                  onClick={() =>
+                    setPreviewAd({
+                      imageUrl: adActiveUrl,
+                      headline: ad.headline ?? ad.primaryText?.slice(0, 60) ?? "",
+                      domain: adDomain,
+                      cta: ad.cta ?? undefined,
+                    })
+                  }
+                >
+                  Preview Ad
                 </GhostButton>
               </div>
             </Card>
@@ -511,6 +531,17 @@ function AdsContent() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Ad Preview Modal ───────────────────────────────────────────────── */}
+      {previewAd && (
+        <AdPreviewModal
+          imageUrl={previewAd.imageUrl}
+          headline={previewAd.headline}
+          domain={previewAd.domain}
+          cta={previewAd.cta}
+          onClose={() => setPreviewAd(null)}
+        />
       )}
 
       {/* ── Creative Edit Modal ─────────────────────────────────────────────── */}

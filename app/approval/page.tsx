@@ -1,10 +1,42 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import type { Ad, AdStatus } from "@/lib/types";
-import { TRADE_MAP, tradeFromAd } from "@/lib/trade-utils";
+import { TRADE_MAP, tradeFromAd, getCreativeUrl } from "@/lib/trade-utils";
+
+/** Aspect-ratio container dims per creative type, keyed by the suffix */
+const CREATIVE_ASPECT: Record<string, { w: number; h: number }> = {
+  "1200x628-facebook":   { w: 1200, h: 628 },
+  "1080x1080-meta":      { w: 1080, h: 1080 },
+  "1080x1920-instagram": { w: 1080, h: 1920 },
+  "1200x1200-linkedin":  { w: 1200, h: 1200 },
+  "1280x720-youtube":    { w: 1280, h: 720 },
+};
+
+function AdCreativeImage({ src, alt }: { src: string; alt: string }) {
+  // Derive aspect ratio from filename suffix, defaulting to 16:9
+  const suffix = Object.keys(CREATIVE_ASPECT).find((s) => src.includes(s));
+  const dims = suffix ? CREATIVE_ASPECT[suffix] : { w: 1200, h: 628 };
+
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded border border-slate-700 bg-slate-900"
+      style={{ paddingBottom: `${(dims.h / dims.w) * 100}%` }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 640px) 100vw, 480px"
+        className="object-contain"
+        unoptimized
+      />
+    </div>
+  );
+}
 
 function AdCard({
   ad,
@@ -16,50 +48,61 @@ function AdCard({
   const trade = tradeFromAd(ad);
   const tradeInfo = TRADE_MAP[trade] ?? TRADE_MAP.saw;
 
-  return (
-    <div className="rounded border border-slate-700 bg-slate-800/50 p-4">
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <PlatformChip platform={ad.platform} />
-        <span className={`text-xs font-bold uppercase tracking-wider ${tradeInfo.color}`}>
-          {tradeInfo.domain}
-        </span>
-        <span className="rounded bg-slate-700 px-2 py-0.5 text-xs text-slate-400">{ad.format}</span>
-        <span className="text-xs text-slate-500">Workflow: {ad.workflowStage ?? ad.workflow_stage}</span>
-      </div>
+  // Prefer locally rendered creative; fall back to DB image_url; fall back to placeholder
+  const localCreativeUrl = getCreativeUrl(tradeInfo.domain, ad.platform, ad.format);
+  const creativeUrl = localCreativeUrl ?? ad.image_url ?? ad.imageUrl ?? null;
 
-      {ad.image_url && (
-        <div className="mb-3 overflow-hidden rounded border border-slate-700">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={ad.image_url}
-            alt={ad.headline ?? "Ad creative"}
-            className="w-full object-cover max-h-48"
+  return (
+    <div className="rounded border border-slate-700 bg-slate-800/50 overflow-hidden">
+      {/* Creative image — top of card */}
+      {creativeUrl ? (
+        <div className="p-3 pb-0">
+          <AdCreativeImage
+            src={creativeUrl}
+            alt={ad.headline ?? `${tradeInfo.domain} ${ad.platform} ad`}
           />
+        </div>
+      ) : (
+        <div className="flex items-center justify-center bg-slate-900/60 text-slate-600 text-xs py-6 border-b border-slate-700">
+          {tradeInfo.domain} — no creative yet
         </div>
       )}
 
-      {ad.headline && (
-        <p className="mb-2 text-base font-semibold text-white">{ad.headline}</p>
-      )}
+      {/* Copy block */}
+      <div className="p-4">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <PlatformChip platform={ad.platform} />
+          <span className={`text-xs font-bold uppercase tracking-wider ${tradeInfo.color}`}>
+            {tradeInfo.domain}
+          </span>
+          <span className="rounded bg-slate-700 px-2 py-0.5 text-xs text-slate-400">{ad.format}</span>
+          <span className="text-xs text-slate-500">Workflow: {ad.workflowStage ?? ad.workflow_stage}</span>
+        </div>
 
-      <p className="mb-3 text-sm leading-relaxed text-slate-300">{ad.primaryText ?? ad.primary_text}</p>
+        {ad.headline && (
+          <p className="mb-2 text-base font-semibold text-white">{ad.headline}</p>
+        )}
 
-      <p className="mb-1 text-xs text-cyan-400">CTA: {ad.cta}</p>
-      <p className="mb-3 font-mono text-xs text-slate-500">UTM: {ad.utmCampaign ?? ad.utm_campaign}</p>
+        <p className="mb-3 text-sm leading-relaxed text-slate-300">{ad.primaryText ?? ad.primary_text}</p>
 
-      <div className="flex flex-wrap gap-2">
-        <Button onClick={() => onDecision(ad.id, "approved")}>
-          Approve ✓
-        </Button>
-        <GhostButton onClick={() => onDecision(ad.id, "paused")}>
-          Hold ⏸
-        </GhostButton>
-        <GhostButton
-          className="border-red-500 text-red-400 hover:bg-red-900/40"
-          onClick={() => onDecision(ad.id, "rejected")}
-        >
-          Reject ✗
-        </GhostButton>
+        {/* CTA + UTM + actions */}
+        <p className="mb-1 text-xs text-cyan-400">CTA: {ad.cta}</p>
+        <p className="mb-3 font-mono text-xs text-slate-500">UTM: {ad.utmCampaign ?? ad.utm_campaign}</p>
+
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => onDecision(ad.id, "approved")}>
+            Approve ✓
+          </Button>
+          <GhostButton onClick={() => onDecision(ad.id, "paused")}>
+            Hold ⏸
+          </GhostButton>
+          <GhostButton
+            className="border-red-500 text-red-400 hover:bg-red-900/40"
+            onClick={() => onDecision(ad.id, "rejected")}
+          >
+            Reject ✗
+          </GhostButton>
+        </div>
       </div>
     </div>
   );
