@@ -19,6 +19,7 @@ interface AdPreviewModalProps {
   headline: string;
   domain: string;
   cta?: string;
+  primaryText?: string;
   onClose: () => void;
 }
 
@@ -78,7 +79,7 @@ function sanitizeCta(cta?: string): string | undefined {
   return cta;
 }
 
-export function AdPreviewModal({ imageUrl, headline, domain, cta, onClose }: AdPreviewModalProps) {
+export function AdPreviewModal({ imageUrl, headline, domain, cta, primaryText, onClose }: AdPreviewModalProps) {
   const tagline = DOMAIN_TAGLINES[domain] ?? "on the job.";
   const cleanCta = sanitizeCta(cta);
 
@@ -112,6 +113,13 @@ export function AdPreviewModal({ imageUrl, headline, domain, cta, onClose }: AdP
         <div className="absolute left-3 top-3 z-20 rounded bg-black/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-300">
           Ad Preview
         </div>
+
+        {/* Primary text — appears above image in real social ads */}
+        {primaryText && (
+          <div className="bg-slate-900 px-4 py-3 text-sm text-slate-200 leading-relaxed border-b border-slate-700 max-h-28 overflow-y-auto">
+            {primaryText}
+          </div>
+        )}
 
         {/* Image + overlay composite */}
         <div className="relative w-full" style={{ aspectRatio: "1200/628" }}>

@@ -63,7 +63,7 @@ function AdsContent() {
   const [regenError, setRegenError] = useState<string | null>(null);
   // Cache-busted URL overrides after a regen — keyed by `${adId}-c${variant}`
   const [creativeUrlOverrides, setCreativeUrlOverrides] = useState<Record<string, string>>({});
-  const [previewAd, setPreviewAd] = useState<{ imageUrl: string; headline: string; domain: string; cta?: string } | null>(null);
+  const [previewAd, setPreviewAd] = useState<{ imageUrl: string; headline: string; domain: string; cta?: string; primaryText?: string } | null>(null);
 
   function getStoragePath(variant: 1|2|3, prefix: string, imageUrl?: string | null): string {
     if (variant === 1 && imageUrl) {
@@ -393,6 +393,7 @@ function AdsContent() {
                       headline: ad.headline ?? ad.primaryText?.slice(0, 60) ?? "",
                       domain: adDomain,
                       cta: ad.cta ?? undefined,
+                      primaryText: ad.primaryText ?? ad.primary_text ?? undefined,
                     })
                   }
                 >
@@ -536,6 +537,7 @@ function AdsContent() {
           headline={previewAd.headline}
           domain={previewAd.domain}
           cta={previewAd.cta}
+          primaryText={previewAd.primaryText}
           onClose={() => setPreviewAd(null)}
         />
       )}
