@@ -41,6 +41,65 @@ export default function AdsPage() {
   const [form, setForm] = useState<Partial<Ad>>(emptyAd);
   const [savingCreative, setSavingCreative] = useState<Set<string>>(new Set());
 
+  // Creative edit modal
+  interface EditTarget { adId: string; variant: 1|2|3; label: string; storagePath: string; currentUrl: string; }
+  const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
+  const [editPrompt, setEditPrompt] = useState("");
+  const [regenLoading, setRegenLoading] = useState(false);
+  const [regenResult, setRegenResult] = useState<string | null>(null);
+  const [regenError, setRegenError] = useState<string | null>(null);
+
+  function getStoragePath(variant: 1|2|3, prefix: string, imageUrl?: string | null): string {
+    if (variant === 1 && imageUrl) {
+      const match = imageUrl.match(/\/public\/ad-creatives\/(.+?)(\?|$)/);
+      if (match) return match[1];
+    }
+    if (variant === 2) return `nb2-creatives/${prefix}-c2.jpg`;
+    if (variant === 3) return `nb2-creatives/${prefix}-c3.jpg`;
+    return `trade-heros/nb2/${prefix}-hero-a.jpg`;
+  }
+
+  function openEditModal(ad: Ad, variant: 1|2|3, prefix: string) {
+    const urls = getCreativeUrls(prefix, ad.imageUrl ?? ad.image_url);
+    const currentUrl = variant === 2 ? urls.c2 : variant === 3 ? urls.c3 : urls.c1;
+    const storagePath = getStoragePath(variant, prefix, ad.imageUrl ?? ad.image_url);
+    setEditTarget({ adId: ad.id, variant, label: `${prefix} · ${CREATIVE_LABELS[variant]}`, storagePath, currentUrl });
+    setEditPrompt("");
+    setRegenResult(null);
+    setRegenError(null);
+  }
+
+  async function regenCreative() {
+    if (!editTarget || !editPrompt.trim()) return;
+    setRegenLoading(true);
+    setRegenError(null);
+    setRegenResult(null);
+    try {
+      const res = await fetch("/api/regen-creative", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storagePath: editTarget.storagePath, prompt: editPrompt.trim(), label: editTarget.label }),
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (!res.ok || data.error) { setRegenError(data.error ?? "Unknown error"); }
+      else { setRegenResult(data.url ?? null); }
+    } catch (err) {
+      setRegenError(String(err));
+    }
+    setRegenLoading(false);
+  }
+
+  function applyRegenResult() {
+    if (!regenResult || !editTarget) return;
+    // Update local ad image URL so the card reflects the new image immediately
+    setAds((prev) => prev.map((a) => {
+      if (a.id !== editTarget.adId) return a;
+      if (editTarget.variant === 1) return { ...a, imageUrl: regenResult, image_url: regenResult };
+      return a; // C2/C3 are URL-constructed from storage, cache-busted by ?t= in the returned URL
+    }));
+    setEditTarget(null);
+  }
+
   async function setCreativeVariant(adId: string, variant: number) {
     setSavingCreative((prev) => new Set(prev).add(adId));
     setAds((prev) => prev.map((a) => a.id === adId ? { ...a, creative_variant: variant, creativeVariant: variant } : a));
@@ -245,18 +304,24 @@ export default function AdsPage() {
                         const thumbUrl = v === 2 ? urls.c2 : v === 3 ? urls.c3 : urls.c1;
                         const isActive = activeVariant === v;
                         return (
-                          <button
-                            key={v}
-                            title={CREATIVE_LABELS[v]}
-                            disabled={isSaving}
-                            onClick={() => setCreativeVariant(ad.id, v)}
-                            className={`relative flex-1 overflow-hidden rounded border-2 transition-all ${isActive ? "border-blue-400 opacity-100" : "border-slate-700 opacity-50 hover:opacity-80"}`}
-                            style={{ height: 40 }}
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={thumbUrl} alt={`C${v}`} className="h-full w-full object-cover" loading="lazy" />
-                            <span className={`absolute bottom-0 left-0 right-0 py-0.5 text-center text-[9px] font-bold ${isActive ? "bg-blue-500/80 text-white" : "bg-black/50 text-slate-300"}`}>C{v}</span>
-                          </button>
+                          <div key={v} className="relative flex-1" style={{ height: 40 }}>
+                            <button
+                              title={CREATIVE_LABELS[v]}
+                              disabled={isSaving}
+                              onClick={() => setCreativeVariant(ad.id, v)}
+                              className={`h-full w-full overflow-hidden rounded border-2 transition-all ${isActive ? "border-blue-400 opacity-100" : "border-slate-700 opacity-50 hover:opacity-80"}`}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={thumbUrl} alt={`C${v}`} className="h-full w-full object-cover" loading="lazy" />
+                              <span className={`absolute bottom-0 left-0 right-0 py-0.5 text-center text-[9px] font-bold ${isActive ? "bg-blue-500/80 text-white" : "bg-black/50 text-slate-300"}`}>C{v}</span>
+                            </button>
+                            {/* Pencil edit button */}
+                            <button
+                              title={`Edit C${v} with prompt`}
+                              onClick={(e) => { e.stopPropagation(); openEditModal(ad, v as 1|2|3, prefix); }}
+                              className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-bl bg-black/70 text-[9px] text-white hover:bg-blue-600/90 transition-colors"
+                            >✏️</button>
+                          </div>
                         );
                       })}
                     </div>
@@ -417,6 +482,71 @@ export default function AdsPage() {
             <div className="mt-4 flex justify-end gap-2">
               <GhostButton onClick={() => setShowModal(false)}>Cancel</GhostButton>
               <Button onClick={createAd}>Create</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Creative Edit Modal ─────────────────────────────────────────────── */}
+      {editTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-lg rounded-xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+            <div className="mb-4 flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-bold">Edit Creative</h2>
+                <p className="text-xs text-slate-400">{editTarget.label}</p>
+              </div>
+              <button onClick={() => setEditTarget(null)} className="text-slate-400 hover:text-white text-xl leading-none">✕</button>
+            </div>
+
+            {/* Current / result image */}
+            <div className="mb-4 overflow-hidden rounded-lg border border-slate-700">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={regenResult ?? editTarget.currentUrl}
+                alt="Creative preview"
+                className="w-full object-cover"
+                style={{ maxHeight: 240 }}
+              />
+              {regenResult && (
+                <div className="bg-green-900/30 px-3 py-1.5 text-center text-xs text-green-400">
+                  ✅ New image generated — looks good? Hit "Use This" to save.
+                </div>
+              )}
+            </div>
+
+            {/* Prompt input */}
+            <label className="mb-1 block text-sm font-medium text-slate-300">
+              Describe the image you want
+            </label>
+            <p className="mb-2 text-xs text-slate-500">
+              Tip: describe the full scene you want, or describe the fix (e.g. "painter on a ladder brushing the siding — window glass is clean, no paint on the glass panes")
+            </p>
+            <textarea
+              rows={3}
+              value={editPrompt}
+              onChange={(e) => setEditPrompt(e.target.value)}
+              placeholder="e.g. Painter on extension ladder brushing the exterior siding — window glass is clean and unpainted, clean brush stroke detail..."
+              className="mb-3 w-full rounded border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+            />
+
+            {regenError && (
+              <p className="mb-3 rounded border border-red-700 bg-red-900/30 px-3 py-2 text-xs text-red-400">
+                ❌ {regenError}
+              </p>
+            )}
+
+            <div className="flex gap-2">
+              <GhostButton onClick={() => setEditTarget(null)}>Cancel</GhostButton>
+              <GhostButton
+                onClick={regenCreative}
+                disabled={regenLoading || !editPrompt.trim()}
+              >
+                {regenLoading ? "Generating…" : regenResult ? "Regenerate Again" : "🎨 Generate"}
+              </GhostButton>
+              {regenResult && (
+                <Button onClick={applyRegenResult}>✅ Use This</Button>
+              )}
             </div>
           </div>
         </div>
