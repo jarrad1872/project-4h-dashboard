@@ -72,6 +72,32 @@ export default function SettingsPage() {
         </div>
       </Card>
 
+      <Card className="border-amber-600/40 bg-amber-950/20">
+        <h2 className="mb-1 text-lg font-semibold text-amber-400">⏳ Pending Doc Updates</h2>
+        <p className="mb-4 text-xs text-slate-400">
+          Deferred housekeeping from commit <code className="text-amber-300">820719f</code> (Feb 28, 2026). No urgency — code fix is live. Apply when convenient.
+        </p>
+        <div className="space-y-4">
+          <div className="rounded border border-slate-700 bg-slate-900 p-3">
+            <p className="mb-1 text-sm font-semibold text-slate-200">1. SOP-WORKFLOW.md — TRADE_MAP Maintenance Rule</p>
+            <p className="text-xs text-slate-400">
+              Add a hard rule: when a new trade is added, its prefix must be registered in <code>TRADE_MAP</code> in{" "}
+              <code>lib/trade-utils.ts</code> before deployment. Missing entries silently fall back to{" "}
+              <code>saw.city</code> badges — no error thrown. Baseline: 65 prefixes as of <code>820719f</code>.
+            </p>
+          </div>
+          <div className="rounded border border-slate-700 bg-slate-900 p-3">
+            <p className="mb-1 text-sm font-semibold text-slate-200">2. AGENTS.md — lib/trade-utils.ts Row Update</p>
+            <p className="text-xs text-slate-400">
+              Note that TRADE_MAP must contain ALL active prefixes (65 baseline). Document that{" "}
+              <code>tradeFromAd()</code> checks both <code>utm_campaign</code> and <code>campaign_group</code>, handles
+              last-segment / second-to-last-segment / substring patterns. Fallback is <code>saw</code> = silent failure.
+            </p>
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-slate-500">Full details: <code>docs/pending-doc-updates.md</code></p>
+      </Card>
+
       <Card>
         <h2 className="mb-2 text-lg font-semibold">Project 4H Source Docs</h2>
         <ul className="space-y-2 text-sm">
