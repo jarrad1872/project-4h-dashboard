@@ -1,6 +1,6 @@
 # TASKS.md — Project 4H Active Work
 
-**Updated:** 2026-02-28 (post-NB2 generation run)  
+**Updated:** 2026-03-01 (3-creative swap system + prompt-based regen)  
 **Mission:** 2,000 users on Saw.City LITE across 65+ trades via 4-channel paid acquisition ($20K budget)
 
 ---
@@ -126,6 +126,27 @@ Priority order: electrical → roofing → disaster-restoration → Tier 2 trade
 - [x] trade_assets check constraint expanded (hero_a, hero_b, og_nb2 now allowed)
 - [x] /ads page paginated (30/page) + lazy loading — fixes browser choke on large dataset
 - [x] Ad copy hard rules documented in AGENTS.md
+
+### NB2 Creative Variants (C1/C2/C3) — 3 Swappable Images per Trade 🔄
+- [x] **3-slot creative picker** on /ads page — click C1/C2/C3 thumbnail to swap; auto-saves `creative_variant` to DB
+- [x] **`creative_variant` column** added to ads table (INT DEFAULT 1, CHECK IN (1,2,3)) — Jarrad ran SQL 2026-03-01
+- [x] **Prompt-based regen modal** — pencil icon ✏️ on each slot → edit modal with Gemini NB2 → overwrite in Storage → live preview → "Use This"
+- [x] **`/api/regen-creative`** endpoint — POST `{storagePath, prompt}` → Gemini NB2 → Supabase Storage upsert → returns cache-busted URL
+- [x] **`getCreativeUrls(prefix, heroAUrl)`** helper in `lib/trade-utils.ts` — returns `{c1, c2, c3}` URLs per trade
+- [x] **`creativeUrlOverrides`** state — C2/C3 updates after regen apply immediately to card without full reload
+- [ ] **130 new images generating** — C2 (company overview) + C3 (on-site action wide shot) for all 65 trades → ~34/130 done at time of writing (sub-agent running, auto-announces on completion)
+
+**Creative types:**
+- **C1** = hands-on zoomed-in scene (= existing `hero_a`, no regeneration needed)
+- **C2** = company overview — shop, trucks, equipment, office, staff — bird's-eye isometric
+- **C3** = on-site action wide shot — full job site, multiple workers, equipment in use
+
+**Storage paths:**
+- C1: `trade-heros/nb2/{slug}-hero-a.jpg` (existing)
+- C2: `nb2-creatives/{prefix}-c2.jpg`
+- C3: `nb2-creatives/{prefix}-c3.jpg`
+
+**How to edit a bad image:** Go to /ads → find any ad for that trade → click ✏️ on the offending slot → describe the fix → Generate → Use This. Overwrites storage permanently.
 
 ### NB2 Image Generation — All 65 Trades ✅
 - [x] Image Agent A: 60/60 images for 20 live trades (hero_a + hero_b + og_nb2)

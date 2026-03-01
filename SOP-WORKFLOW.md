@@ -262,11 +262,42 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 
 ---
 
+## CREATIVE VARIANTS SYSTEM
+
+Each trade has **3 swappable isometric ad images** on `/ads`. Every ad card has a 3-slot thumbnail picker + a pencil ✏️ edit button per slot.
+
+| Slot | Type | Storage Path | Description |
+|------|------|-------------|-------------|
+| **C1** | Hands-on zoom | `trade-heros/nb2/{slug}-hero-a.jpg` | Existing hero_a — tight on hands/tool/moment |
+| **C2** | Company overview | `nb2-creatives/{prefix}-c2.jpg` | Shop, trucks, equipment, staff — bird's-eye |
+| **C3** | On-site action wide | `nb2-creatives/{prefix}-c3.jpg` | Full job site, multiple workers, equipment in use |
+
+**Swapping:** Click any C1/C2/C3 thumbnail on an ad card → persists to DB (`creative_variant` column, INT 1-3).
+
+**Editing a bad image:**
+1. Go to `/ads`, find an ad for the trade
+2. Click ✏️ on the offending slot
+3. Type a full description of the correct image (describe the scene from scratch for best results)
+4. Hit **Generate** (~15-30 sec Gemini NB2)
+5. Preview → **Use This** → overwrites Supabase Storage permanently, updates card live
+
+**Prompt tips:**
+- Describe the full scene, not just the fix: "painter on extension ladder brushing house siding, window glass is clean and unpainted, water-based paint, morning light"
+- The style suffix is auto-appended: isometric 3D, Pixar-inspired, dark navy background — don't add it yourself
+- If still wrong: regenerate again with more specific constraints
+
+**API:** `POST /api/regen-creative` — `{ storagePath, prompt, label? }` → `{ url }` (cache-busted)
+
+**TRADE_MAP maintenance rule:** When adding a new trade, its prefix must be in `TRADE_MAP` in `lib/trade-utils.ts` AND it must have C2/C3 images generated before going live. Baseline: 65 prefixes (commit `820719f`).
+
+---
+
 ## DB SCHEMA QUICK REF
 
 ```sql
 ads: id, platform, campaign_group, format, primary_text, headline, cta, 
-     landing_path, utm_*, status, workflow_stage, image_url, created_at, updated_at
+     landing_path, utm_*, status, workflow_stage, image_url, 
+     creative_variant (INT 1-3, default 1), created_at, updated_at
 
 trade_assets: id, trade_slug, asset_type (hero|og|hero_a|hero_b|og_nb2), 
               image_url, status (pending|approved|rejected), notes, created_at
@@ -286,4 +317,6 @@ ad_templates: id, name, platform, format, primary_text, headline, cta, landing_p
 "What's the status on the influencer outreach doc?"
 "Run the audit on the new ad batch"
 "Mark checklist item 4 complete"
+"Regenerate the C2 image for coat.city — painter is painting the window glass, fix it"
+"Generate C2 and C3 for [new trade prefix]"
 ```
