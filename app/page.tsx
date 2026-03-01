@@ -2,329 +2,360 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { PlatformChip } from "@/components/chips";
-import { Button, Card, GhostButton } from "@/components/ui";
+import { Card, Button, GhostButton } from "@/components/ui";
+import { PlatformChip, StatusChip } from "@/components/chips";
 import type { Ad, CampaignStatusData } from "@/lib/types";
 
 const PLATFORMS = ["linkedin", "youtube", "facebook", "instagram"] as const;
-type Platform = (typeof PLATFORMS)[number];
-
-const PLATFORM_ICONS: Record<Platform, string> = {
-  linkedin: "🔵",
-  youtube: "🔴",
-  facebook: "🔷",
-  instagram: "🟣",
+const PLATFORM_ICONS: Record<string, string> = {
+  linkedin: "in",
+  youtube: "▶",
+  facebook: "f",
+  instagram: "ig",
 };
 
-const PLATFORM_COLORS: Record<Platform, string> = {
-  linkedin: "border-blue-500/40 bg-blue-950/20",
-  youtube: "border-red-500/40 bg-red-950/20",
-  facebook: "border-blue-400/40 bg-blue-900/20",
-  instagram: "border-purple-500/40 bg-purple-950/20",
+const BLOCKERS = [
+  { id: "trial", label: '14-day free trial missing from all 1,040 ads', severity: "high", action: "Decide: patch existing or regen v2", href: "/ads" },
+  { id: "accounts", label: "Ad accounts not created (LinkedIn, Meta, YouTube)", severity: "high", action: "Set up accounts — Jarrad-initiated step", href: null },
+  { id: "approval-ads", label: "1,040 ads pending approval", severity: "med", action: "Review & approve", href: "/approval" },
+  { id: "approval-assets", label: "325 trade assets pending approval", severity: "med", action: "Review & approve", href: "/assets" },
+  { id: "a2p", label: "A2P 10DLC campaign under review (~2–3 weeks from Feb 22)", severity: "low", action: "Waiting on TCR — no action needed", href: null },
+  { id: "landing", label: "Upcoming trades have no landing pages yet", severity: "low", action: "Build pages before launching those trades", href: "/gtm" },
+];
+
+const SEVERITY_STYLE: Record<string, string> = {
+  high: "border-red-700/50 bg-red-950/20 text-red-400",
+  med: "border-amber-700/50 bg-amber-950/20 text-amber-400",
+  low: "border-slate-700/50 bg-slate-800/40 text-slate-400",
 };
 
-const TARGET_USERS = 2000;
-const TOTAL_BUDGET = 20000;
-
-interface Stats {
-  totalAds: number;
-  adsByPlatform: Record<Platform, number>;
-  adsByStatus: Record<string, number>;
-  totalAssets: number;
-  pendingAssets: number;
-  approvedAds: number;
-  pendingAds: number;
-}
-
-export default function CommandCenter() {
-  const [stats, setStats] = useState<Stats | null>(null);
+export default function OverviewPage() {
+  const [ads, setAds] = useState<Ad[]>([]);
   const [campaign, setCampaign] = useState<CampaignStatusData | null>(null);
-  const [togglingStatus, setTogglingStatus] = useState(false);
-  const [dismissedBlockers, setDismissedBlockers] = useState<Set<string>>(new Set());
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  async function loadStats() {
-    const [adsRes, assetsRes, campaignRes] = await Promise.all([
-      fetch("/api/ads", { cache: "no-store" }),
-      fetch("/api/trade-assets", { cache: "no-store" }),
-      fetch("/api/campaign-status", { cache: "no-store" }),
-    ]);
-
-    const ads = (await adsRes.json()) as Ad[];
-    const assets = assetsRes.ok ? ((await assetsRes.json()) as any[]) : [];
-    const camp = (await campaignRes.json()) as CampaignStatusData;
-
-    const adsByPlatform = PLATFORMS.reduce((acc, p) => {
-      acc[p] = ads.filter((a) => a.platform === p).length;
-      return acc;
-    }, {} as Record<Platform, number>);
-
-    const adsByStatus = ads.reduce((acc, a) => {
-      acc[a.status] = (acc[a.status] ?? 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    setStats({
-      totalAds: ads.length,
-      adsByPlatform,
-      adsByStatus,
-      totalAssets: assets.length,
-      pendingAssets: assets.filter((a: any) => a.status === "pending").length,
-      approvedAds: adsByStatus["approved"] ?? 0,
-      pendingAds: adsByStatus["pending"] ?? 0,
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/ads", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/campaign-status", { cache: "no-store" }).then((r) => r.json()),
+    ]).then(([adsData, campaignData]: [Ad[], CampaignStatusData]) => {
+      setAds(adsData);
+      setCampaign(campaignData);
+      setLoading(false);
     });
-    setCampaign(camp);
-  }
+  }, []);
 
-  useEffect(() => { void loadStats(); }, []);
-
-  async function setCampaignPhase(status: CampaignStatusData["status"]) {
-    setTogglingStatus(true);
-    await fetch("/api/campaign-status", {
+  async function setCampaignStatus(status: CampaignStatusData["status"]) {
+    if (!campaign) return;
+    setSaving(true);
+    const patch = { status, ...(status === "live" ? { startDate: new Date().toISOString() } : {}) };
+    const updated = await fetch("/api/campaign-status", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    await loadStats();
-    setTogglingStatus(false);
+      body: JSON.stringify(patch),
+    }).then((r) => r.json()) as CampaignStatusData;
+    setCampaign(updated);
+    setSaving(false);
   }
 
-  function dismiss(key: string) {
-    setDismissedBlockers((prev) => new Set(prev).add(key));
+  // Derived stats
+  const byStatus = ads.reduce<Record<string, number>>((acc, ad) => {
+    acc[ad.status] = (acc[ad.status] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const byPlatform = ads.reduce<Record<string, number>>((acc, ad) => {
+    acc[ad.platform] = (acc[ad.platform] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const approvedAds = byStatus["approved"] ?? 0;
+  const pendingAds = byStatus["pending"] ?? 0;
+  const totalAds = ads.length;
+  const approvalPct = totalAds ? Math.round((approvedAds / totalAds) * 100) : 0;
+
+  // Creative coverage: ads with creative_variant > 1 (someone intentionally set C2/C3)
+  const customCreativeAds = ads.filter((a) => (a.creative_variant ?? 1) > 1).length;
+
+  const highBlockers = BLOCKERS.filter((b) => b.severity === "high").length;
+  const launchReady = highBlockers === 0;
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center text-slate-400">
+        Loading command center…
+      </div>
+    );
   }
-
-  const phases: CampaignStatusData["status"][] = ["pre-launch", "live", "paused", "ended"];
-  const phaseColors: Record<string, string> = {
-    "pre-launch": "bg-slate-700 text-slate-200",
-    live: "bg-green-600 text-white",
-    paused: "bg-amber-600 text-white",
-    ended: "bg-red-800 text-white",
-  };
-
-  // Blockers — ordered by priority
-  const blockers = [
-    {
-      key: "ad-accounts",
-      severity: "red",
-      title: "Ad accounts not set up",
-      detail: "LinkedIn Campaign Manager, Meta Ads Manager, Google Ads — all three required before launch.",
-      action: <Link href="/launch"><GhostButton>Open Launch Checklist →</GhostButton></Link>,
-    },
-    {
-      key: "trial-copy",
-      severity: "red",
-      title: "14-day free trial missing from all 1,040 ads",
-      detail: "\"14-day free trial, no credit card required\" is the key conversion hook. Currently absent from every NB2 ad. Decide: patch existing or generate v2 pass.",
-      action: (
-        <div className="flex gap-2">
-          <GhostButton onClick={() => dismiss("trial-copy")}>Patch Later</GhostButton>
-          <Link href="/ads"><Button>Go to Ads →</Button></Link>
-        </div>
-      ),
-    },
-    {
-      key: "approve-ads",
-      severity: "amber",
-      title: `${stats?.pendingAds ?? "..."} ads pending approval`,
-      detail: "All NB2 ads are in pending state. Review copy per trade and approve before campaign launch.",
-      action: <Link href="/approval"><Button>Open Approval Queue →</Button></Link>,
-    },
-    {
-      key: "approve-assets",
-      severity: "amber",
-      title: `${stats?.pendingAssets ?? "..."} trade assets pending approval`,
-      detail: "Hero A, Hero B, and OG images for all 65 trades need approval before ads go live.",
-      action: <Link href="/assets"><Button>Open Trade Assets →</Button></Link>,
-    },
-    {
-      key: "creatives-gen",
-      severity: "green",
-      title: "C2/C3 creative variants generating",
-      detail: "130 new images (company overview + on-site action) being generated for all 65 trades. Will complete automatically.",
-      action: <Link href="/ads"><GhostButton>View on /ads →</GhostButton></Link>,
-    },
-    {
-      key: "influencer",
-      severity: "amber",
-      title: "Influencer outreach not started",
-      detail: "Top 3 priority: Mike Andes (lawn), Brian's Lawn Maintenance, AC Service Tech LLC. Deal structure ready.",
-      action: <GhostButton onClick={() => dismiss("influencer")}>Mark In Progress</GhostButton>,
-    },
-  ].filter((b) => !dismissedBlockers.has(b.key));
-
-  const severityStyles = {
-    red: "border-red-600/50 bg-red-950/20",
-    amber: "border-amber-500/50 bg-amber-950/20",
-    green: "border-green-600/50 bg-green-950/20",
-  };
-  const severityDots = { red: "bg-red-500", amber: "bg-amber-400", green: "bg-green-500" };
 
   return (
     <div className="space-y-6">
 
-      {/* ── MISSION HEADER ───────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-slate-700 bg-slate-900 p-5">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Project 4H — Campaign Command</p>
-            <h1 className="text-3xl font-black tracking-tight">
-              <span className="text-white">0</span>
-              <span className="text-slate-500"> / {TARGET_USERS.toLocaleString()} users</span>
-            </h1>
-            <p className="mt-1 text-sm text-slate-400">65 trades · 4 channels · $20K budget · pre-launch</p>
-          </div>
-
-          {/* Phase toggle */}
-          <div className="flex flex-col gap-2">
-            <p className="text-xs text-slate-500">Campaign phase</p>
-            <div className="flex gap-1">
-              {phases.map((p) => (
-                <button
-                  key={p}
-                  disabled={togglingStatus}
-                  onClick={() => setCampaignPhase(p)}
-                  className={`rounded px-3 py-1.5 text-xs font-semibold transition-all ${
-                    campaign?.status === p
-                      ? phaseColors[p]
-                      : "bg-slate-800 text-slate-500 hover:bg-slate-700"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Project 4H — Command Center</h1>
+          <p className="mt-1 text-sm text-slate-400">
+            65 trades · 1,040 ads · 4 channels · <span className="font-semibold text-white">Target: 2,000 users</span>
+          </p>
         </div>
-
-        {/* Progress bar toward 2,000 */}
-        <div className="mt-4">
-          <div className="h-2 w-full rounded-full bg-slate-700">
-            <div className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500" style={{ width: "0%" }} />
-          </div>
-          <p className="mt-1 text-right text-xs text-slate-500">0% of 2,000-user target</p>
+        <div className="flex items-center gap-2">
+          {campaign && <StatusChip status={campaign.status} />}
+          <span className={`text-xs font-bold px-2 py-1 rounded ${launchReady ? "bg-green-700 text-green-100" : "bg-red-900 text-red-300"}`}>
+            {launchReady ? "LAUNCH READY" : `${highBlockers} BLOCKERS`}
+          </span>
         </div>
       </div>
 
-      {/* ── BLOCKERS BOARD ───────────────────────────────────────────────── */}
+      {/* ── Mission Progress Bar ─────────────────────────────────────────── */}
+      <Card>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Mission Progress</h2>
+          <span className="text-xs text-slate-500">2,000 users to hit profitability</span>
+        </div>
+        <div className="h-3 w-full rounded-full bg-slate-700">
+          <div className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500 transition-all" style={{ width: "0%" }} />
+        </div>
+        <div className="mt-2 flex justify-between text-xs text-slate-400">
+          <span>0 users</span>
+          <span className="text-slate-300 font-semibold">Pre-launch</span>
+          <span>2,000 users</span>
+        </div>
+      </Card>
+
+      {/* ── Campaign Status Toggle ────────────────────────────────────────── */}
+      <Card>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-1">Campaign Status</h2>
+            <p className="text-xs text-slate-500">Controls what's live across all 4 channels</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(["pre-launch", "live", "paused", "ended"] as const).map((s) => (
+              <button
+                key={s}
+                disabled={saving || campaign?.status === s}
+                onClick={() => setCampaignStatus(s)}
+                className={`rounded px-3 py-1.5 text-xs font-semibold transition-all ${
+                  campaign?.status === s
+                    ? "bg-blue-600 text-white"
+                    : "border border-slate-600 text-slate-400 hover:border-slate-400 hover:text-white"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* ── Blockers Board ────────────────────────────────────────────────── */}
       <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">
-          🚧 Launch Blockers — {blockers.filter(b => b.severity !== "green").length} remaining
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
+          🚧 Launch Blockers ({BLOCKERS.length} total · {highBlockers} critical)
         </h2>
         <div className="space-y-2">
-          {blockers.map((b) => (
-            <div
-              key={b.key}
-              className={`flex flex-col gap-3 rounded-lg border p-4 md:flex-row md:items-center md:justify-between ${severityStyles[b.severity as keyof typeof severityStyles]}`}
-            >
-              <div className="flex items-start gap-3">
-                <div className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${severityDots[b.severity as keyof typeof severityDots]}`} />
-                <div>
-                  <p className="font-semibold text-slate-100">{b.title}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">{b.detail}</p>
-                </div>
+          {BLOCKERS.map((b) => (
+            <div key={b.id} className={`flex items-start justify-between gap-4 rounded border p-3 ${SEVERITY_STYLE[b.severity]}`}>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-100">{b.label}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{b.action}</p>
               </div>
-              <div className="ml-5 shrink-0 md:ml-0">{b.action}</div>
+              {b.href ? (
+                <Link href={b.href} className="shrink-0 rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-600 transition-colors">
+                  Go →
+                </Link>
+              ) : (
+                <span className="shrink-0 rounded bg-slate-800 px-3 py-1 text-xs text-slate-500">Waiting</span>
+              )}
             </div>
           ))}
-          {blockers.length === 0 && (
-            <div className="rounded-lg border border-green-600/50 bg-green-950/20 p-4 text-center text-green-400 font-semibold">
-              ✅ All blockers cleared — ready to launch
-            </div>
-          )}
         </div>
       </div>
 
-      {/* ── PLATFORM CARDS ───────────────────────────────────────────────── */}
+      {/* ── Ad Stats by Platform ─────────────────────────────────────────── */}
       <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">Ad Inventory</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Ad Library</h2>
+          <Link href="/ads" className="text-xs text-blue-400 hover:underline">View all {totalAds} ads →</Link>
+        </div>
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {PLATFORMS.map((p) => (
-            <Link key={p} href={`/ads?platform=${p}`}>
-              <div className={`group rounded-lg border p-4 transition-all hover:brightness-110 cursor-pointer ${PLATFORM_COLORS[p]}`}>
-                <div className="mb-2 flex items-center justify-between">
-                  <PlatformChip platform={p} />
-                  <span className="text-lg">{PLATFORM_ICONS[p]}</span>
-                </div>
-                <p className="text-2xl font-bold">{stats?.adsByPlatform[p] ?? "—"}</p>
-                <p className="text-xs text-slate-400">ads total</p>
-                <p className="mt-2 text-xs text-slate-500">click to filter →</p>
-              </div>
-            </Link>
-          ))}
+          {PLATFORMS.map((p) => {
+            const count = byPlatform[p] ?? 0;
+            const platformApproved = ads.filter((a) => a.platform === p && a.status === "approved").length;
+            const platformPending = ads.filter((a) => a.platform === p && a.status === "pending").length;
+            return (
+              <Link key={p} href={`/ads?platform=${p}`} className="block">
+                <Card className="hover:border-blue-500/40 transition-colors cursor-pointer h-full">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="flex h-7 w-7 items-center justify-center rounded bg-slate-700 text-xs font-bold text-white">
+                      {PLATFORM_ICONS[p]}
+                    </span>
+                    <span className="text-sm font-semibold capitalize">{p}</span>
+                  </div>
+                  <p className="text-2xl font-bold">{count}</p>
+                  <p className="text-xs text-slate-400 mt-1">ads total</p>
+                  <div className="mt-2 flex gap-2 text-xs">
+                    <span className="text-green-400">{platformApproved} approved</span>
+                    <span className="text-amber-400">{platformPending} pending</span>
+                  </div>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
-      {/* ── STATS ROW ────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {[
-          { label: "Total Ads", value: stats?.totalAds ?? "—", sub: "in database", href: "/ads" },
-          { label: "Pending Approval", value: stats?.pendingAds ?? "—", sub: "need your review", href: "/approval" },
-          { label: "Trade Assets", value: stats?.pendingAssets ?? "—", sub: "images to approve", href: "/assets" },
-          { label: "Budget Remaining", value: `$${TOTAL_BUDGET.toLocaleString()}`, sub: "of $20K total", href: "/budget" },
-        ].map((s) => (
-          <Link key={s.label} href={s.href}>
-            <Card className="cursor-pointer hover:border-slate-500 transition-all group">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 group-hover:text-slate-300">{s.label}</p>
-              <p className="mt-1 text-3xl font-black text-white">{String(s.value)}</p>
-              <p className="text-xs text-slate-500">{s.sub} →</p>
-            </Card>
-          </Link>
-        ))}
-      </div>
-
-      {/* ── QUICK ACTIONS ────────────────────────────────────────────────── */}
-      <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-          {[
-            { label: "Approve Ads", icon: "✅", href: "/approval", badge: stats?.pendingAds, color: "border-green-600/40 hover:bg-green-950/30" },
-            { label: "Approve Assets", icon: "🖼️", href: "/assets", badge: stats?.pendingAssets, color: "border-blue-600/40 hover:bg-blue-950/30" },
-            { label: "Ad Library", icon: "📋", href: "/ads", color: "border-slate-600/40 hover:bg-slate-700/30" },
-            { label: "GTM Board", icon: "🎯", href: "/gtm", color: "border-slate-600/40 hover:bg-slate-700/30" },
-            { label: "AI Studio", icon: "🎨", href: "/generate", color: "border-purple-600/40 hover:bg-purple-950/30" },
-            { label: "Launch Gate", icon: "🚀", href: "/launch", color: "border-orange-600/40 hover:bg-orange-950/30" },
-          ].map((a) => (
-            <Link key={a.label} href={a.href}>
-              <div className={`relative flex flex-col items-center justify-center rounded-lg border p-4 text-center cursor-pointer transition-all ${a.color}`} style={{ minHeight: 80 }}>
-                {a.badge != null && a.badge > 0 && (
-                  <span className="absolute right-2 top-2 rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-black">
-                    {a.badge}
-                  </span>
-                )}
-                <span className="text-2xl">{a.icon}</span>
-                <span className="mt-1 text-xs font-semibold text-slate-300">{a.label}</span>
-              </div>
+      {/* ── Approval + Asset Status ──────────────────────────────────────── */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="font-semibold">Ad Approvals</h3>
+              <p className="text-xs text-slate-400 mt-0.5">{approvedAds} of {totalAds} approved ({approvalPct}%)</p>
+            </div>
+            <Link href="/approval" className="rounded bg-amber-700/30 px-3 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-700/50 transition-colors">
+              Approve →
             </Link>
-          ))}
-        </div>
+          </div>
+          <div className="h-2 w-full rounded-full bg-slate-700 mb-3">
+            <div className="h-2 rounded-full bg-amber-500 transition-all" style={{ width: `${approvalPct}%` }} />
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center text-sm">
+            <div className="rounded bg-slate-800 p-2">
+              <p className="text-lg font-bold text-amber-400">{pendingAds}</p>
+              <p className="text-xs text-slate-500">Pending</p>
+            </div>
+            <div className="rounded bg-slate-800 p-2">
+              <p className="text-lg font-bold text-green-400">{approvedAds}</p>
+              <p className="text-xs text-slate-500">Approved</p>
+            </div>
+            <div className="rounded bg-slate-800 p-2">
+              <p className="text-lg font-bold text-red-400">{byStatus["rejected"] ?? 0}</p>
+              <p className="text-xs text-slate-500">Rejected</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="font-semibold">Trade Assets</h3>
+              <p className="text-xs text-slate-400 mt-0.5">325 images across 65 trades · 5 types each</p>
+            </div>
+            <Link href="/assets" className="rounded bg-amber-700/30 px-3 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-700/50 transition-colors">
+              Review →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            {[
+              { label: "Hero A (ad zoom)", count: 65, type: "hero_a" },
+              { label: "Hero B (landing page)", count: 65, type: "hero_b" },
+              { label: "OG (link preview)", count: 65, type: "og_nb2" },
+              { label: "C2 (company overview)", count: 64, type: "c2" },
+              { label: "C3 (on-site wide)", count: 64, type: "c3" },
+            ].map((row) => (
+              <div key={row.type} className="rounded bg-slate-800 p-2 flex items-center justify-between">
+                <span className="text-xs text-slate-400">{row.label}</span>
+                <span className="text-xs font-bold text-slate-200">{row.count}</span>
+              </div>
+            ))}
+            <div className="rounded bg-slate-800 p-2 flex items-center justify-between">
+              <span className="text-xs text-slate-400">Total</span>
+              <span className="text-xs font-bold text-green-400">323</span>
+            </div>
+          </div>
+        </Card>
       </div>
 
-      {/* ── CREATIVE STATUS ──────────────────────────────────────────────── */}
+      {/* ── Creative Variant Status ───────────────────────────────────────── */}
       <Card>
-        <h3 className="mb-3 font-semibold">Creative Coverage — 65 Trades</h3>
-        <div className="space-y-3">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className="font-semibold">Creative Variants</h3>
+            <p className="text-xs text-slate-400 mt-0.5">3 swappable images per trade — C1/C2/C3</p>
+          </div>
+          <Link href="/ads" className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-600 transition-colors">
+            Manage →
+          </Link>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="rounded bg-slate-800 p-3">
+            <p className="text-xl font-bold text-slate-200">65</p>
+            <p className="text-xs text-slate-500 mt-1">C1 — Hands-on zoom</p>
+            <p className="text-xs text-green-400 mt-1">✓ All generated</p>
+          </div>
+          <div className="rounded bg-slate-800 p-3">
+            <p className="text-xl font-bold text-slate-200">64</p>
+            <p className="text-xs text-slate-500 mt-1">C2 — Company overview</p>
+            <p className="text-xs text-amber-400 mt-1">128 images in storage</p>
+          </div>
+          <div className="rounded bg-slate-800 p-3">
+            <p className="text-xl font-bold text-slate-200">64</p>
+            <p className="text-xs text-slate-500 mt-1">C3 — On-site action</p>
+            <p className="text-xs text-amber-400 mt-1">Edit bad images via ✏️</p>
+          </div>
+        </div>
+        {customCreativeAds > 0 && (
+          <p className="mt-3 text-xs text-blue-400">{customCreativeAds} ads have custom creative variant assigned (C2 or C3)</p>
+        )}
+      </Card>
+
+      {/* ── Quick Actions ─────────────────────────────────────────────────── */}
+      <Card>
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">Quick Actions</h2>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/approval">
+            <Button>Review Ads ({pendingAds} pending)</Button>
+          </Link>
+          <Link href="/assets">
+            <GhostButton>Review Assets (325 pending)</GhostButton>
+          </Link>
+          <Link href="/ads">
+            <GhostButton>Browse Ad Library</GhostButton>
+          </Link>
+          <Link href="/gtm">
+            <GhostButton>GTM Board</GhostButton>
+          </Link>
+          <Link href="/scorecard">
+            <GhostButton>Log Metrics</GhostButton>
+          </Link>
+          <Link href="/launch">
+            <GhostButton>Launch Checklist</GhostButton>
+          </Link>
+        </div>
+      </Card>
+
+      {/* ── Trade Coverage ────────────────────────────────────────────────── */}
+      <Card>
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className="font-semibold">Trade Coverage</h3>
+            <p className="text-xs text-slate-400 mt-0.5">65 trades · 3 tiers · each with own .city domain</p>
+          </div>
+          <Link href="/gtm" className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-600 transition-colors">
+            GTM Board →
+          </Link>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-center">
           {[
-            { label: "C1 — Hands-on zoom (hero_a)", done: 65, total: 65, color: "bg-green-500" },
-            { label: "C2 — Company overview (generating)", done: 0, total: 65, color: "bg-blue-500", note: "sub-agent running" },
-            { label: "C3 — On-site action wide (generating)", done: 0, total: 65, color: "bg-purple-500", note: "sub-agent running" },
-            { label: "Hero B — Wide top-down (landing pages)", done: 65, total: 65, color: "bg-green-500" },
-            { label: "OG — Link preview banner", done: 65, total: 65, color: "bg-green-500" },
-          ].map((row) => (
-            <div key={row.label}>
-              <div className="mb-1 flex items-center justify-between text-xs text-slate-300">
-                <span>{row.label}{row.note ? <span className="ml-2 text-amber-400">({row.note})</span> : null}</span>
-                <span className="font-semibold">{row.done}/{row.total}</span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-700">
-                <div
-                  className={`h-1.5 rounded-full transition-all ${row.color}`}
-                  style={{ width: `${(row.done / row.total) * 100}%` }}
-                />
-              </div>
+            { tier: "Tier 1", count: 8, desc: "Highest TAM — launch first", color: "text-blue-400" },
+            { tier: "Tier 2", count: 32, desc: "Strong TAM — queue behind T1", color: "text-slate-300" },
+            { tier: "Tier 3", count: 25, desc: "Niche — launch last", color: "text-slate-500" },
+          ].map((t) => (
+            <div key={t.tier} className="rounded bg-slate-800 p-3">
+              <p className={`text-xl font-bold ${t.color}`}>{t.count}</p>
+              <p className="text-xs font-semibold text-slate-300 mt-1">{t.tier}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{t.desc}</p>
             </div>
           ))}
         </div>
-        <div className="mt-3 flex justify-end">
-          <Link href="/assets"><GhostButton>View All Assets →</GhostButton></Link>
+        <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-xs text-slate-500">
+          <span className="font-semibold text-slate-400">Live:</span>
+          {["saw", "rinse", "mow", "rooter", "pipe", "lockout", "pest", "duct", "detail", "plow", "prune", "chimney", "haul", "grade", "coat", "brake", "wrench", "polish", "pave", "wreck"].map(t => (
+            <span key={t} className="rounded bg-slate-800 px-1.5 py-0.5 font-mono">{t}.city</span>
+          ))}
         </div>
       </Card>
 
