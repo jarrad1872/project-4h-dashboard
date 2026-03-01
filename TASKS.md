@@ -128,7 +128,9 @@ Priority order: electrical → roofing → disaster-restoration → Tier 2 trade
   - Quick Actions that navigate to the right places
 - [x] **`useSearchParams()` Suspense boundary** added to `/ads` — was causing Vercel build ERROR, now fixed
 - [x] **AGENTS.md Rule 5** added: update relevant .md files before every commit
-- [ ] **Continue dashboard overhaul** — remaining pages to review/improve
+- [x] **Approval page: bulk approve all** — `POST /api/ads/bulk-status` endpoint (single Supabase query, not N sequential requests). "Approve All X Pending" button at top of /approval. Per-trade bulk also uses server-side query.
+- [x] **Budget page rebuilt** — replaced `prompt()` dialogs with inline edit fields per channel. Added kill/scale threshold card. Progress bars color-coded by burn rate.
+- [ ] **Continue dashboard overhaul** — GTM, workflow, scorecard, lifecycle pages still to review
 
 ### Infrastructure
 - [x] Full Next.js dashboard live at pumpcans.com (GitHub: jarrad1872/project-4h-dashboard)

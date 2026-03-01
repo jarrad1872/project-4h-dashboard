@@ -103,16 +103,29 @@ export default function ApprovalPage() {
     void load();
   }
 
-  async function bulkDecide(trade: string, ads: Ad[], status: AdStatus) {
+  async function bulkDecide(trade: string, _ads: Ad[], status: AdStatus) {
     setBulkLoading((prev) => ({ ...prev, [trade]: true }));
-    for (const ad of ads) {
-      await fetch(`/api/ads/${ad.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-    }
+    // Single server-side query — not N sequential requests
+    await fetch("/api/ads/bulk-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newStatus: status, fromStatus: "pending", campaignGroupContains: `_${trade}` }),
+    });
     setBulkLoading((prev) => ({ ...prev, [trade]: false }));
+    void load();
+  }
+
+  const [approveAllLoading, setApproveAllLoading] = useState(false);
+
+  async function approveAllPending() {
+    if (!confirm(`Approve all ${pending.length} pending ads? This cannot be undone easily.`)) return;
+    setApproveAllLoading(true);
+    await fetch("/api/ads/bulk-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newStatus: "approved", fromStatus: "pending" }),
+    });
+    setApproveAllLoading(false);
     void load();
   }
 
@@ -166,11 +179,20 @@ export default function ApprovalPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold">Approval Queue</h1>
-        <span className="text-sm text-slate-400">
-          {pending.length} pending · {reviewed.length} reviewed
-        </span>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Approval Queue</h1>
+          <p className="text-sm text-slate-400 mt-0.5">{pending.length} pending · {reviewed.length} reviewed</p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            disabled={approveAllLoading || pending.length === 0}
+            onClick={approveAllPending}
+            className="bg-green-700 hover:bg-green-600"
+          >
+            {approveAllLoading ? "Approving…" : `✓ Approve All ${pending.length} Pending`}
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
