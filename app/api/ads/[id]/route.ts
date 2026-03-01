@@ -3,6 +3,39 @@ import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { adToLegacyJson, hasSupabase, logActivity, normalizeAd, readFallback, statusToWorkflowStage } from "@/lib/server-utils";
 import type { Ad, AdStatus, WorkflowStage } from "@/lib/types";
+import { backupCsvToDrive, isDriveConfigured } from "@/lib/drive-backup";
+
+/** Fire-and-forget: export all approved ads to Drive as CSV */
+function triggerApprovedExport() {
+  if (!isDriveConfigured()) return;
+  void (async () => {
+    try {
+      const { data } = await supabaseAdmin
+        .from("ads")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+
+      if (!data?.length) return;
+
+      const escape = (v: unknown) => {
+        if (v === null || v === undefined) return "";
+        const s = String(v);
+        return s.includes(",") || s.includes('"') || s.includes("\n")
+          ? `"${s.replace(/"/g, '""')}"`
+          : s;
+      };
+      const fields = ["id","platform","campaign_group","format","status","headline","primary_text","cta","landing_path","utm_campaign","utm_content","image_url","created_at"] as const;
+      const header = fields.join(",");
+      const rows = data.map((row) => fields.map((f) => escape((row as Record<string, unknown>)[f])).join(","));
+      const csv = [header, ...rows].join("\n");
+      const date = new Date().toISOString().slice(0, 10);
+      await backupCsvToDrive({ csv, dateLabel: `approved-${date}` });
+    } catch (e) {
+      console.error("[drive-backup] approved export failed:", e);
+    }
+  })();
+}
 
 export const dynamic = "force-dynamic";
 
@@ -248,6 +281,11 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       old_value: current,
       new_value: updated,
     });
+
+    // Auto-backup approved ads snapshot to Drive (fire-and-forget)
+    if (payload.status === "approved" && payload.status !== current.status) {
+      triggerApprovedExport();
+    }
 
     return okJson(updated);
   } catch (error) {

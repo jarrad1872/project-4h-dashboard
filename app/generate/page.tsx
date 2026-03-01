@@ -16,6 +16,7 @@ interface CreativeResponse {
   mimeType: string;
   prompt: string;
   model: string;
+  driveLink?: string | null;
 }
 
 const styleOptions: CreativeStyle[] = ["pain-point", "feature-demo", "social-proof", "retargeting"];
@@ -239,6 +240,17 @@ export default function GeneratePage() {
                             <GhostButton onClick={generateCreative} disabled={loading} className="text-[10px] font-bold uppercase">Regenerate</GhostButton>
                         </div>
                     </div>
+
+                    {creative.driveLink && (
+                        <a
+                            href={creative.driveLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 rounded border border-blue-800/40 bg-blue-950/20 px-3 py-2 text-[11px] font-bold text-blue-400 hover:text-blue-300 animate-in zoom-in-95 duration-300"
+                        >
+                            ☁ Backed up to Drive →
+                        </a>
+                    )}
 
                     {savedNotice && (
                         <div className="rounded border border-green-800/40 bg-green-950/20 px-3 py-2 text-[11px] font-bold text-green-400 animate-in zoom-in-95 duration-300">

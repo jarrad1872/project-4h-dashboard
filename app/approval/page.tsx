@@ -155,6 +155,8 @@ export default function ApprovalPage() {
   }
 
   const [approveAllLoading, setApproveAllLoading] = useState(false);
+  const [driveExportLoading, setDriveExportLoading] = useState(false);
+  const [driveExportLink, setDriveExportLink] = useState<string | null>(null);
 
   async function approveAllPending() {
     if (!confirm(`Approve all ${pending.length} pending ads? This cannot be undone easily.`)) return;
@@ -166,6 +168,21 @@ export default function ApprovalPage() {
     });
     setApproveAllLoading(false);
     void load();
+  }
+
+  async function exportToDrive() {
+    setDriveExportLoading(true);
+    setDriveExportLink(null);
+    try {
+      const res = await fetch("/api/drive-backup/export", { method: "POST" });
+      const data = (await res.json()) as { driveLink?: string; exported?: number };
+      if (data.driveLink) setDriveExportLink(data.driveLink);
+      else alert("Drive export finished (no link returned — check Drive).");
+    } catch {
+      alert("Drive export failed. Check Vercel env vars.");
+    } finally {
+      setDriveExportLoading(false);
+    }
   }
 
   const trades = useMemo(() => {
@@ -223,7 +240,24 @@ export default function ApprovalPage() {
           <h1 className="text-2xl font-bold">Approval Queue</h1>
           <p className="text-sm text-slate-400 mt-0.5">{pending.length} pending · {reviewed.length} reviewed</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            disabled={driveExportLoading}
+            onClick={exportToDrive}
+            className="bg-blue-700 hover:bg-blue-600 text-sm"
+          >
+            {driveExportLoading ? "Exporting…" : "☁ Backup to Drive"}
+          </Button>
+          {driveExportLink && (
+            <a
+              href={driveExportLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-3 py-1.5 rounded text-xs bg-blue-900/50 text-blue-300 hover:text-blue-200 border border-blue-700"
+            >
+              ✓ Open in Drive →
+            </a>
+          )}
           <Button
             disabled={approveAllLoading || pending.length === 0}
             onClick={approveAllPending}

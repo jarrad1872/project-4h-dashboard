@@ -8,6 +8,7 @@ import {
   getTradeBySlug,
   type CreativeStyle,
 } from "@/lib/ai-creative";
+import { backupImageToDrive } from "@/lib/drive-backup";
 
 // Nano Banana 2 (NB2)
 const MODEL_NAME = "gemini-3.1-flash-image-preview"; // NB2 = Nano Banana 2 = Gemini 3.1 Flash Image
@@ -125,11 +126,26 @@ export async function POST(request: Request) {
       .png({ compressionLevel: 9 })
       .toBuffer();
 
+    const pngBase64 = pngBuffer.toString("base64");
+
+    // Auto-backup to Google Drive (non-blocking — failure doesn't affect response)
+    const driveLink = await backupImageToDrive({
+      trade: body.trade,
+      format: body.format,
+      style: body.style,
+      imageBase64: pngBase64,
+      mimeType: "image/png",
+    }).catch((e) => {
+      console.error("[drive-backup] generation backup failed:", e);
+      return null;
+    });
+
     return NextResponse.json({
-      imageBase64: pngBuffer.toString("base64"),
+      imageBase64: pngBase64,
       mimeType: "image/png",
       prompt,
       model: MODEL_NAME,
+      driveLink,
     });
   } catch (error) {
     console.error("/api/ai-creative error", error);
