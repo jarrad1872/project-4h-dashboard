@@ -101,28 +101,37 @@ export function AdPreviewModal({ imageUrl, headline, domain, cta, primaryText, o
         className="relative w-full max-w-2xl overflow-hidden rounded-xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/90 transition-colors"
-        >
-          ✕
-        </button>
-
-        {/* Label */}
-        <div className="absolute left-3 top-3 z-20 rounded bg-black/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-          Ad Preview
-        </div>
-
         {/* Primary text — appears above image in real social ads */}
         {primaryText && (
-          <div className="bg-slate-900 px-4 py-3 text-sm text-slate-200 leading-relaxed border-b border-slate-700 max-h-28 overflow-y-auto">
+          <div className="relative bg-slate-900 border-b border-slate-700 px-4 pt-3 pb-3 pr-12 text-sm text-slate-200 leading-relaxed max-h-32 overflow-y-auto">
+            <span className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Primary Text</span>
             {primaryText}
+            {/* Close button — top right of primary text strip */}
+            <button
+              onClick={onClose}
+              className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-white hover:bg-slate-600 transition-colors text-xs"
+            >
+              ✕
+            </button>
           </div>
         )}
 
         {/* Image + overlay composite */}
         <div className="relative w-full" style={{ aspectRatio: "1200/628" }}>
+          {/* Close button when no primary text */}
+          {!primaryText && (
+            <button
+              onClick={onClose}
+              className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/90 transition-colors"
+            >
+              ✕
+            </button>
+          )}
+
+          {/* Label */}
+          <div className="absolute left-3 top-3 z-20 rounded bg-black/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-300">
+            Ad Preview
+          </div>
           {/* Raw hero image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
