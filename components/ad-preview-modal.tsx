@@ -117,7 +117,7 @@ export function AdPreviewModal({ imageUrl, headline, domain, cta, primaryText, o
         )}
 
         {/* Image + overlay composite */}
-        <div className="relative w-full" style={{ aspectRatio: "1200/628" }}>
+        <div className="relative w-full overflow-hidden" style={{ aspectRatio: "1200/628" }}>
           {/* Close button when no primary text */}
           {!primaryText && (
             <button
@@ -153,7 +153,7 @@ export function AdPreviewModal({ imageUrl, headline, domain, cta, primaryText, o
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-start gap-2 p-5">
             {/* Headline lines */}
             <div className="flex flex-col gap-0.5">
-              <span className="text-xl font-bold leading-snug text-white drop-shadow-lg" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}>
+              <span className="text-base font-bold leading-snug text-white drop-shadow-lg line-clamp-3" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}>
                 {headline}
               </span>
               <span className="text-base font-semibold text-orange-400" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}>
