@@ -23,53 +23,8 @@ interface AdPreviewModalProps {
   onClose: () => void;
 }
 
-// Per-domain tagline (matches produce-creatives.js trade taglines)
-const DOMAIN_TAGLINES: Record<string, string> = {
-  "saw.city":           "on the saw.",
-  "rinse.city":         "on the wand.",
-  "mow.city":           "on the mower.",
-  "rooter.city":        "on the snake.",
-  "pipe.city":          "on the pipe.",
-  "pave.city":          "on the paver.",
-  "haul.city":          "behind the wheel.",
-  "lockout.city":       "on the job.",
-  "pest.city":          "on the route.",
-  "chimney.city":       "on the roof.",
-  "duct.city":          "in the ducts.",
-  "detail.city":        "on the detail.",
-  "plow.city":          "on the plow.",
-  "grade.city":         "on the blade.",
-  "coat.city":          "on the floor.",
-  "brake.city":         "in the bay.",
-  "wrench.city":        "under the hood.",
-  "polish.city":        "on the buffer.",
-  "wreck.city":         "on the machine.",
-  "prune.city":         "in the lift.",
-  "drywall.city":       "on the wall.",
-  "excavation.city":    "on the excavator.",
-  "housecleaning.city": "on the clean.",
-  "insulation.city":    "in the attic.",
-  "metalworks.city":    "at the bench.",
-  "plank.city":         "on the floor.",
-  "refrigeration.city": "on the call.",
-  "remodels.city":      "on the build.",
-  "renewables.city":    "on the install.",
-  "sentry.city":        "on the install.",
-  "shrink.city":        "on the wrap.",
-  "bodyshop.city":      "in the bay.",
-  "carpetcleaning.city":"on the wand.",
-  "mold.city":          "on the job.",
-  "siding.city":        "on the wall.",
-  "septic.city":        "on the pump.",
-  "rolloff.city":       "on the route.",
-  "electricians.city":  "in the panel.",
-  "roofrepair.city":    "on the roof.",
-  "disaster.city":      "on the call.",
-  "alignment.city":     "in the bay.",
-  "appraisals.city":    "on the appraisal.",
-  "bartender.city":     "behind the bar.",
-  "bookkeeper.city":    "on the books.",
-};
+// Universal brand tagline — answered.city platform
+const UNIVERSAL_TAGLINE = "your calls, answered.";
 
 // Sanitize CTA — some old DB records have model names stored in the cta field
 function sanitizeCta(cta?: string): string | undefined {
@@ -80,7 +35,7 @@ function sanitizeCta(cta?: string): string | undefined {
 }
 
 export function AdPreviewModal({ imageUrl, headline, domain, cta, primaryText, onClose }: AdPreviewModalProps) {
-  const tagline = DOMAIN_TAGLINES[domain] ?? "on the job.";
+  const tagline = UNIVERSAL_TAGLINE;
   const cleanCta = sanitizeCta(cta);
 
   // Close on Escape
