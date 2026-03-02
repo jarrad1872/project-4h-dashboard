@@ -1,4 +1,5 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { adToLegacyJson, hasSupabase, logActivity, normalizeAd, readFallback, statusToWorkflowStage } from "@/lib/server-utils";
@@ -63,7 +64,9 @@ function isWorkflowStageColumnMissing(error: { code?: string; message?: string }
   );
 }
 
-export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const { id } = await context.params;
 
@@ -109,6 +112,8 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
 }
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const { id } = await context.params;
     const payload = (await request.json()) as Partial<Ad>;

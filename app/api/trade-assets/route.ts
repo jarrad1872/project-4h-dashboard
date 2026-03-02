@@ -1,4 +1,5 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +9,8 @@ export function OPTIONS() {
 }
 
 export async function GET(req: Request) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   const { searchParams } = new URL(req.url);
   const tradeSlug = searchParams.get("trade_slug");
   const status = searchParams.get("status");
@@ -26,6 +29,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   if (!supabaseAdmin) return errorJson("Supabase not configured", 503);
 
   const body = (await req.json()) as {
@@ -81,6 +86,8 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   if (!supabaseAdmin) return errorJson("Supabase not configured", 503);
 
   const body = (await req.json()) as {

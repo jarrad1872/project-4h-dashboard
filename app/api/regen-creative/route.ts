@@ -10,6 +10,7 @@
 
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { requireAuth } from "@/lib/auth";
 import { optionsResponse } from "@/lib/api";
 
 const MODEL = "gemini-3.1-flash-image-preview";
@@ -42,6 +43,8 @@ export function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const body = (await request.json()) as Partial<RegenRequest>;
 

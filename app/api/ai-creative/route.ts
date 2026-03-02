@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { requireAuth } from "@/lib/auth";
 import sharp from "sharp";
 import {
   buildCreativePrompt,
@@ -39,6 +40,8 @@ function isStyle(value: string): value is CreativeStyle {
 }
 
 export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const body = (await request.json()) as Partial<AiCreativeRequest>;
 

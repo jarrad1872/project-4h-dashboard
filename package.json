@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cli": "node scripts/4h-cli.js"
   },
   "dependencies": {
     "@google/genai": "^1.43.0",

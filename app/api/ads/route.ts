@@ -1,4 +1,5 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import {
@@ -50,6 +51,8 @@ function isWorkflowStageColumnMissing(error: { code?: string; message?: string }
 }
 
 export async function GET(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(request.url);
     const platform = searchParams.get("platform");
@@ -88,6 +91,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const payload = (await request.json()) as Partial<Ad>;
 
