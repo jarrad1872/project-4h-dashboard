@@ -1,4 +1,5 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { budgetRowsToData, hasSupabase, logActivity, readFallback } from "@/lib/server-utils";
@@ -11,6 +12,8 @@ export function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const payload = (await request.json()) as {
       channel?: BudgetRow["platform"];

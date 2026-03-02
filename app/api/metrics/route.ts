@@ -1,4 +1,5 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { hasSupabase, logActivity, metricsRowsToData, metricsWeekToRows, readFallback } from "@/lib/server-utils";
@@ -10,7 +11,9 @@ export function OPTIONS() {
   return optionsResponse();
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     if (!hasSupabase()) {
       const fallback = readFallback<MetricsData>(DataFiles.metrics, { weeks: [] });
@@ -33,6 +36,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const payload = (await request.json()) as Partial<WeeklyMetric> & Partial<MetricsWeek>;
 

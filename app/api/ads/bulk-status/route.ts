@@ -4,6 +4,7 @@
  */
 
 import { optionsResponse, okJson, errorJson } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { hasSupabase } from "@/lib/server-utils";
 import type { AdStatus, WorkflowStage } from "@/lib/types";
@@ -24,6 +25,8 @@ export function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const body = (await request.json()) as Partial<BulkRequest>;
 

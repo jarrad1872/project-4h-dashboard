@@ -193,3 +193,43 @@ See **[SOP-WORKFLOW.md](./SOP-WORKFLOW.md)** for the campaign operating SOP.
 ---
 
 *Last updated: 2026-02-28 post-NB2 | v4.0.0*
+
+---
+
+## CLI Usage
+
+The 4H CLI lets agents and developers operate the campaign without using the dashboard UI.
+
+### Setup
+
+```bash
+export PUMPCANS_TOKEN=your_token_here        # if auth is enabled
+export PUMPCANS_BASE_URL=https://pumpcans.com  # default
+```
+
+### Examples
+
+```bash
+node scripts/4h-cli.js report daily
+node scripts/4h-cli.js ads list --status pending --table
+node scripts/4h-cli.js ads approve --all
+node scripts/4h-cli.js campaign status
+node scripts/4h-cli.js creative gen --trade saw --format hero_a --style pain-point --push
+node scripts/4h-cli.js alerts list
+
+# Via npm:
+npm run cli -- report daily
+npm run cli -- ads list --table
+```
+
+### Auth
+
+Set `PUMPCANS_API_TOKEN` on the server to enable auth. Set `PUMPCANS_TOKEN` in your CLI environment to authenticate. When `PUMPCANS_API_TOKEN` is not set on the server, auth is disabled (backwards-compatible).
+
+### New Endpoints (feat/cli-auth)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/report/daily` | GET | Structured JSON daily summary |
+| `/api/creative/batch` | POST | Batch AI creative generation |
+| `/api/alerts` | GET/POST/DELETE | CRUD for threshold alert rules |

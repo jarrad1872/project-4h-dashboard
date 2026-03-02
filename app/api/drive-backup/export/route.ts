@@ -9,6 +9,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { hasSupabase, normalizeAd } from "@/lib/server-utils";
 import { backupCsvToDrive, isDriveConfigured } from "@/lib/drive-backup";
 import { okJson, errorJson, optionsResponse } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import type { Ad } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -54,11 +55,15 @@ function adsToCSV(ads: Ad[]): string {
   return [header, ...rows].join("\n");
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   return handleExport();
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   return handleExport();
 }
 

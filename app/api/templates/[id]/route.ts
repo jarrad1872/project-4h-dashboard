@@ -1,4 +1,5 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
+import { requireAuth } from "@/lib/auth";
 import { DataFiles, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { hasSupabase, logActivity, normalizeTemplate, readFallback } from "@/lib/server-utils";
@@ -23,7 +24,9 @@ function isMissingTemplatesTable(error: { code?: string; message?: string } | nu
   );
 }
 
-export async function DELETE(_: Request, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const { id } = await context.params;
 

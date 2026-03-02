@@ -31,4 +31,5 @@ export const DataFiles = {
   activity: "activity-log.json",
   templates: "templates.json",
   workflowStages: "workflow-stages.json",
+  alerts: "alerts.json",
 } as const;
