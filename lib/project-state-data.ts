@@ -11,7 +11,7 @@ export function getProjectState() {
       headline: 'AI phone receptionist + owner agent + job management for trades',
       url: 'https://sawcity-lite.vercel.app',
       status: 'production',
-      summary: 'One codebase, 20 .city domains. AI answers the phone, texts the owner, and lets them manage jobs by voice. $79/mo, no demo, self-serve.',
+      summary: 'One codebase, 20 .city domains. AI answers the phone, texts the owner, and lets them manage jobs by voice. $39/mo, no demo, self-serve.',
 
       readiness: [
         { label: 'AI Receptionist (20 trades)', status: 'done', note: 'Answers calls, qualifies leads, creates jobs, texts owner' },
@@ -21,7 +21,7 @@ export function getProjectState() {
         { label: 'Onboarding Interview', status: 'done', note: 'Voice-powered business config extraction on first login' },
         { label: 'Email Integration (Resend)', status: 'done', note: '20 .city domains verified, branded HTML templates' },
         { label: 'TCPA / SMS Compliance', status: 'done', note: 'Opt-out handling, consent tracking, privacy/terms pages live' },
-        { label: 'Stripe Billing ($79/mo)', status: 'done', note: 'Single tier, no feature gating. Trial → paid flow.' },
+        { label: 'Stripe Billing ($39/mo)', status: 'done', note: 'Single tier, no feature gating. Trial → paid flow.' },
         { label: 'Admin Panel', status: 'done', note: '10 pages — tenants, trades, logs, health, demo funnel, changelog' },
         { label: 'A2P 10DLC Campaign', status: 'in-review', note: 'TCR campaign under review (~2-3 weeks). SMS unblocked after approval.' },
         { label: 'Per-trade tool customization', status: 'pending', note: 'Different tool sets per trade (e.g. locksmith vs concrete cutter)' },
@@ -35,17 +35,26 @@ export function getProjectState() {
         total_tests: 810,
         api_endpoints: 71,
         trade_domains: 20,
-        monthly_price: 79,
+        monthly_price: 39,
         gross_margin_pct: '77–86%',
       },
     },
 
     campaign: {
-      name: 'Project 4H',
+      name: 'Influencer Launch',
       mission: '2,000 USERS — this is the number. Not 1,000. Not "customers." 2,000 users on Saw.City LITE.',
       target_users: 2000,
       budget_total: 20000,
-      channels: ['LinkedIn', 'YouTube', 'Facebook', 'Instagram'],
+      launch_date: '2026-03-15',
+      channels: ['Influencer (Primary)', 'LinkedIn', 'YouTube', 'Facebook', 'Instagram'],
+      strategy: 'Influencer-first. Market each trade domain as a custom-built solution for that trade. No direct answered.city branding.',
+      influencer_program: {
+        manager: 'Erin (Chris KCC\'s wife)',
+        deal_structure: 'Free account + flat fee ($150–$300) + 20% recurring commission (~$8/mo)',
+        promo: 'First month free promo code per influencer',
+        target: '20–30 micro-influencers (5k–50k followers, trade-specific)',
+        content_package: 'projects/answered-city/influencer-package/',
+      },
       status: 'pre-launch',
       dashboard: 'https://pumpcans.com',
       // Campaign Phase 1 trades (ads already built for these 4)
