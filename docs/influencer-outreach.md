@@ -1,6 +1,6 @@
 # Saw.City LITE — Influencer Outreach Campaign
 ### Project 4H: Trade Creator Partnerships
-*Last updated: 2026-02-28*
+*Last updated: 2026-03-06*
 
 ---
 
@@ -19,12 +19,12 @@ The single biggest trust signal in the trades is **peer endorsement**. A roofer 
 - Influencer trust carries: a mention at 200K subs with 10% trade audience = **20,000 warm prospects**
 
 **The Saw.City deal is uniquely influencer-friendly:**
-- $10/month per referral for up to 24 months = **up to $240/contractor**
+- 20% recurring commission (~$8/month at the $39 plan) for up to 24 months = **up to ~$192/contractor**
 - Recurring passive income — not one-time affiliate
-- Low price point ($79/mo) means easy yes from contractors with phone anxiety
+- Low price point ($39/mo) means easy yes from contractors with phone anxiety
 - Co-branded landing page makes creators look like partners, not promoters
 
-**This campaign targets the "1,000 true contractors" model** — each creator only needs to convert 10–50 contractors to generate $2,400–$12,000/year in recurring revenue. That's compelling for creators who are also business owners.
+**This campaign targets the "1,000 true contractors" model** — each creator only needs to convert 10–50 contractors to generate ~$1,920–$9,600/year in recurring revenue. That's compelling for creators who are also business owners.
 
 ---
 
@@ -53,7 +53,7 @@ The single biggest trust signal in the trades is **peer endorsement**. A roofer 
 - Ideal fit because pipe.city addresses the #1 pain: missing calls
 - URL: https://www.youtube.com/@MillionDollarPlumber
 
-**Estimated deal value (Roger Wakefield):** If 15% of audience is active contractors (~90K), with 1% conversion = 900 referrals × $240 = **$216,000 LTV potential** for creator.
+**Estimated deal value (Roger Wakefield):** If 15% of audience is active contractors (~90K), with 1% conversion = 900 referrals × $192 = **$172,800 LTV potential** for creator.
 
 ---
 
@@ -79,7 +79,7 @@ The single biggest trust signal in the trades is **peer endorsement**. A roofer 
 - "For Techs, By Techs" — the exact audience
 - URL: https://www.youtube.com/@HVACSchool / hvacschool.org
 
-**Estimated deal value (AC Service Tech):** 162K subs, ~60% tech/contractor = 97K. 1% conversion = 970 referrals × $240 = **$232,800 LTV for creator**.
+**Estimated deal value (AC Service Tech):** 162K subs, ~60% tech/contractor = 97K. 1% conversion = 970 referrals × $192 = **$186,240 LTV for creator**.
 
 ---
 
@@ -105,7 +105,7 @@ The single biggest trust signal in the trades is **peer endorsement**. A roofer 
 - Perfect peer-to-peer tone fit
 - URL: https://www.youtube.com/@SimonElectricLLC
 
-**Estimated deal value (Electrician U):** If 300K subs, 50% practicing electricians = 150K. 0.5% conversion = 750 × $240 = **$180,000 LTV for creator**.
+**Estimated deal value (Electrician U):** If 300K subs, 50% practicing electricians = 150K. 0.5% conversion = 750 × $192 = **$144,000 LTV for creator**.
 
 ---
 
@@ -132,7 +132,7 @@ The single biggest trust signal in the trades is **peer endorsement**. A roofer 
 - Active educator who does speaking + sponsorships
 - URL: roofstrategist.com
 
-**Estimated deal value (Roofing Insights):** 100K subs, ~80% contractors = 80K. 1% conversion = 800 × $240 = **$192,000 LTV for creator**.
+**Estimated deal value (Roofing Insights):** 100K subs, ~80% contractors = 80K. 1% conversion = 800 × $192 = **$153,600 LTV for creator**.
 
 ---
 
@@ -158,7 +158,7 @@ This is the hardest vertical for YouTube influencer reach. The pest control YouT
 - Operator + technician audience
 - URL: https://www.youtube.com/@PestGeekPodcast / pestgeekpodcast.com
 
-**Estimated deal value:** More limited. If 15K active operator followers, 2% conversion = 300 × $240 = **$72,000 LTV for creator** (smaller but highly targeted).
+**Estimated deal value:** More limited. If 15K active operator followers, 2% conversion = 300 × $192 = **$57,600 LTV for creator** (smaller but highly targeted).
 
 ---
 
@@ -188,7 +188,7 @@ Lawn care is the single strongest vertical. Multiple 200K–500K channels, all c
 - Actively promotes products and tools he actually uses
 - URL: https://www.youtube.com/@BriansLawnMaintenance
 
-**Estimated deal value (Blades of Grass):** 511K subs, ~60% operators = 307K audience. 0.5% conversion = 1,535 × $240 = **$368,400 LTV for creator** — highest potential in this campaign.
+**Estimated deal value (Blades of Grass):** 511K subs, ~60% operators = 307K audience. 0.5% conversion = 1,535 × $192 = **$294,720 LTV for creator** — highest potential in this campaign.
 
 ---
 
@@ -213,7 +213,7 @@ Consider supplementing with The Painting Podcast (audio-first) or Painter's Week
 - Has done in-video sponsored content before
 - URL: https://www.youtube.com/@PaintingBusinessPro / paintingbusinesspro.com
 
-**Estimated deal value:** 45K subs, ~80% painting contractors = 36K. 1% conversion = 360 × $240 = **$86,400 LTV for creator**.
+**Estimated deal value:** 45K subs, ~80% painting contractors = 36K. 1% conversion = 360 × $192 = **$69,120 LTV for creator**.
 
 ---
 
@@ -233,13 +233,13 @@ Consider supplementing with The Painting Podcast (audio-first) or Painter's Week
 - Perfect peer tone: "I was you, here's what I used to build it"
 - URL: https://www.youtube.com/@kingofpressurewash / kingofpressurewashing.com
 
-**Estimated deal value:** 50K subs, ~70% operators = 35K. 1.5% conversion = 525 × $240 = **$126,000 LTV for creator**.
+**Estimated deal value:** 50K subs, ~70% operators = 35K. 1.5% conversion = 525 × $192 = **$100,800 LTV for creator**.
 
 ---
 
 ## 3. Outreach Email Template
 
-**Subject:** Quick question — want to make $10/month from every contractor you send our way
+**Subject:** Quick question — want to make ~$8/month from every contractor you send our way
 
 ---
 
@@ -247,14 +247,14 @@ Hey [Name],
 
 I've been watching your channel for a while. You're one of the few creators who talks about running the business, not just doing the work — that's exactly who we built Saw.City for.
 
-Here's the short version: **Saw.City LITE is an AI that answers your phone for you.** $79/month. When a contractor misses a call at 9pm because they're on a job, the AI picks up, qualifies the lead, takes the message, and books the callback. It does not sound like a robot.
+Here's the short version: **Saw.City LITE is an AI that answers your phone for you.** $39/month. When a contractor misses a call at 9pm because they're on a job, the AI picks up, qualifies the lead, takes the message, and books the callback. It does not sound like a robot.
 
 We built it specifically for trade contractors — plumbers, HVAC guys, electricians, roofers. The guys watching your channel.
 
 **The deal we're offering creators:**
-$10/month for every contractor you refer, for up to 24 months. That's up to **$240 per contractor**, paid monthly as long as they stay subscribed. No cap on referrals. You get a unique code and a co-branded landing page we'll build specifically for you (like mow.city/[yourname]).
+20% recurring (about $8/month at current pricing) for every contractor you refer, for up to 24 months. That's up to **about $192 per contractor**, paid monthly as long as they stay subscribed. No cap on referrals. You get a unique code and a co-branded landing page we'll build specifically for you (like mow.city/[yourname]).
 
-This isn't a one-time affiliate click. It's recurring income. If 50 contractors in your audience sign up, that's $500/month — every month — for two years.
+This isn't a one-time affiliate click. It's recurring income. If 50 contractors in your audience sign up, that's about $400/month — every month — for two years.
 
 What I'm asking: **one honest mention in a video** where you talk about business tools. You don't have to fake excitement you don't have. If you try it and it genuinely helps guys like your audience, say that. If it doesn't fit, tell me and we'll move on — no pressure.
 
@@ -274,8 +274,8 @@ P.S. The landing page offer is time-limited — we're giving the first 20 creato
 
 | Benefit | Details |
 |---------|---------|
-| **Recurring Commission** | $10/month per referred contractor who stays subscribed |
-| **Maximum Per Referral** | $240 (24 months × $10) |
+| **Recurring Commission** | 20% recurring per referred contractor (~$8/month at current $39 pricing) |
+| **Maximum Per Referral** | ~$192 (24 months × ~$8) |
 | **No referral cap** | Unlimited referrals — unlimited income |
 | **Unique promo code** | Creator-specific code (e.g. BRIANSLAWN) |
 | **Co-branded landing page** | mow.city/brianslawn — looks like their product |
