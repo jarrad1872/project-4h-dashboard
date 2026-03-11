@@ -1,73 +1,67 @@
 # Project 4H — Task Board
 
-## 🔴 CRITICAL PATH (Next 24–48h)
-
-### TASK-001: Trial Messaging Strategy
-**Status:** BLOCKED (Waiting on Jarrad)  
-**Effort:** ~5 min  
-**Constraint:** Rule #5 (Price ALWAYS $79/mo)  
-
-1,040 NB2 ads generated without "14-day free trial, no credit card required" messaging.
-**Options:**
-- **A:** Patch existing ads (Bob writes a script to append messaging to primary text).
-- **B:** Generate v2 pass (higher quality, baked-in messaging, costs more context/tokens).
+**Last updated:** 2026-03-11
 
 ---
 
-## 🟡 PENDING JARRAD ACTION
+## BLOCKED — Waiting on Jarrad
 
-### TASK-002: Approve Trade Ad Variants
-**Status:** WAITING ON JARRAD  
-**Effort:** ~10 min (using Bulk Approve)  
-**Link:** https://pumpcans.com/approval
+### TASK-001: Trial Messaging Decision
+1,040 NB2 ads missing "14-day free trial, no credit card required" messaging.
+- **A:** Patch existing ads (script appends to primary_text)
+- **B:** Generate v2 pass (baked-in, higher quality, more tokens)
 
-1,040 NB2 ad variants sitting in approval queue.
-Use the new **"Approve All X Pending"** button to sign off on the whole batch at once.
+### TASK-002: Approve 1,040 Ad Variants
+https://pumpcans.com/approval — use Bulk Approve per trade group.
 
 ### TASK-003: Ad Account Setup
-**Status:** WAITING ON JARRAD  
-**Effort:** 30–45 min with Bob  
-
-Ad accounts need to be created:
-1. **LinkedIn:** Campaign Manager
-2. **Meta:** Ads Manager (Facebook/Instagram)
-3. **Google:** YouTube Ads
+Create accounts: LinkedIn Campaign Manager, Meta Ads Manager, Google/YouTube Ads.
 
 ### TASK-004: Master Asset Review
-**Status:** READY FOR REVIEW  
-**Effort:** ~5 min  
-**Link:** https://pumpcans.com/creatives
-
-All 65 trades now have verified master assets (Hero A/B, OG, C2, C3) staged in the gallery.
-Verify visual consistency.
+https://pumpcans.com/creatives — verify visual consistency across 65 trades.
 
 ---
 
-## ✅ DONE (Historical)
+## READY TO DO
 
-### Dashboard Overhaul (2026-03-01) 🚀
-- [x] **Command Center (Home)** — Live stats, blockers board, platform cards.
-- [x] **Ads Manager** — Creative picker, edit modal, pagination, lazy loading.
-- [x] **Approval Queue** — Server-side bulk approval (`POST /api/ads/bulk-status`).
-- [x] **Budget & Pacing** — Inline edits, burn rate bars, kill/scale thresholds.
-- [x] **GTM Strategy** — Live ad counts per trade registry.
-- [x] **KPI Scorecard** — Date picker, totals row, all-time summaries.
-- [x] **Workflow Pipeline** — Funnel view, bulk advance (50/batch), trade progress table.
-- [x] **Lifecycle Messaging** — Card layout, timing stages, active/paused filters.
-- [x] **Launch Gate** — Per-platform progress, hard blockers, launch sequence.
-- [x] **Asset Staging** — 5 slots (Hero A/B, OG, C2, C3), base64 uploads, storage support.
-- [x] **Master Gallery** — High-end verified asset library for all 65 trades.
-- [x] **AI Studio** — Nano Banana 2 (Gemini 3.1 Flash) integration, "Push to Assets" button.
-- [x] **Backend Infrastructure** — Consolidated `TRADE_MAP`, Base64 storage API, Unified Bulk Update API.
+### TASK-005: Apply Pending Doc Updates
+`docs/pending-doc-updates.md` has deferred TRADE_MAP maintenance sections for SOP-WORKFLOW.md and AGENTS.md. Apply them.
 
-### Infrastructure
-- [x] Full Next.js dashboard live at pumpcans.com (GitHub: jarrad1872/project-4h-dashboard)
-- [x] Supabase schema + seed applied (ads, ad_templates, marketing_events, lifecycle, checklist, trade_assets)
-- [x] Vercel auto-deploy working (GitHub webhook reconnected)
-- [x] trade_assets check constraint expanded to allow hero_a, hero_b, og_nb2
+### TASK-006: Influencer Outreach
+10 priority creators identified in `docs/influencer-outreach.md`. Outreach not started.
+Start with lawn care (Mike Andes, Brian's Lawn) + HVAC (AC Service Tech, HVAC School).
+
+---
+
+## DONE
+
+### Security Hardening (2026-03-11)
+- [x] CORS restricted to pumpcans.com (was wildcard)
+- [x] Security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy)
+- [x] Error responses no longer leak AI prompts/model details
+- [x] CSV formula injection fixed in both export functions
+- [x] Rate limiting on AI endpoints (10/min single, 5/min batch)
+- [x] Input validation with length limits on ad text fields
+- [x] RLS enabled on all 11 tables, anon key read-only
+- [x] DB indexes on workflow_stage, campaign_group, trade_slug, status
+- [x] Vitest set up with 74 tests (lib/ coverage)
+- [x] sharp added to package.json
+- [x] .env.local.example updated with all used vars
+- [x] CLAUDE.md created, CC memory system initialized
+- [x] Migration 007 applied to production Supabase
+
+### Dashboard Overhaul (2026-03-01)
+- [x] All 15 pages built and live
+- [x] 18 API routes operational
+- [x] Bulk approval, creative picker, AI Studio, workflow pipeline
 
 ### Creative Production (NB2)
-- [x] **Hero A + B + OG Pass** — 195/195 images generated + uploaded for all 65 trades.
-- [x] **C2 + C3 Pass** — 130/130 images generated + uploaded for all 65 trades.
-- [x] **Ad Copy Pass** — 1,040/1,040 ads inserted (65 trades × 2 directions × 8 ads).
-- [x] **Anti-slop Audit** — all 1,040 ads passed `audit-ads.mjs`.
+- [x] 195 NB2 images (Hero A/B/OG) for 65 trades
+- [x] 130 additional images (C2/C3) for 65 trades
+- [x] 1,040 ads inserted (65 trades x 2 directions x 8 variants)
+- [x] Anti-slop audit passed on all 1,040 ads
+
+### Infrastructure
+- [x] Next.js dashboard live at pumpcans.com
+- [x] Supabase schema + seed (migrations 001-007)
+- [x] Vercel auto-deploy on push to main
