@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import sharp from "sharp";
 import {
   buildCreativePrompt,
@@ -42,6 +43,15 @@ function isStyle(value: string): value is CreativeStyle {
 export async function POST(request: Request) {
   const authError = requireAuth(request);
   if (authError) return authError;
+
+  const rl = checkRateLimit(rateLimitKey(request), { limit: 10, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded", retryAfterMs: rl.retryAfterMs },
+      { status: 429 },
+    );
+  }
+
   try {
     const body = (await request.json()) as Partial<AiCreativeRequest>;
 
@@ -109,13 +119,9 @@ export async function POST(request: Request) {
         .join("\n")
         .trim();
 
+      console.error("[ai-creative] No image data returned", { prompt, model: MODEL_NAME, modelText });
       return NextResponse.json(
-        {
-          error: "Model returned no image data",
-          prompt,
-          model: MODEL_NAME,
-          modelText,
-        },
+        { error: "Model returned no image data" },
         { status: 502 },
       );
     }

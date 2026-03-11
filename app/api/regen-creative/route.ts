@@ -11,6 +11,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { optionsResponse } from "@/lib/api";
 
 const MODEL = "gemini-3.1-flash-image-preview";
@@ -45,6 +46,15 @@ export function OPTIONS() {
 export async function POST(request: Request) {
   const authError = requireAuth(request);
   if (authError) return authError;
+
+  const rl = checkRateLimit(rateLimitKey(request), { limit: 10, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded", retryAfterMs: rl.retryAfterMs },
+      { status: 429 },
+    );
+  }
+
   try {
     const body = (await request.json()) as Partial<RegenRequest>;
 
@@ -99,6 +109,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: publicUrl, label: body.label ?? body.storagePath });
   } catch (err) {
     console.error("[regen-creative]", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json({ error: "Failed to regenerate creative" }, { status: 500 });
   }
 }

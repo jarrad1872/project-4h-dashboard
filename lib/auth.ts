@@ -30,7 +30,7 @@ export function requireAuth(request: Request): NextResponse | null {
   if (authHeader !== `Bearer ${token}`) {
     return NextResponse.json(
       { error: "Unauthorized" },
-      { status: 401, headers: corsHeaders },
+      { status: 401, headers: corsHeaders(request) },
     );
   }
 

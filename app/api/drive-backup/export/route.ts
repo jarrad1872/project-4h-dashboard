@@ -43,7 +43,9 @@ const CSV_FIELDS: (keyof Ad)[] = [
 function adsToCSV(ads: Ad[]): string {
   const escape = (v: unknown): string => {
     if (v === null || v === undefined) return "";
-    const s = String(v);
+    let s = String(v);
+    // Prevent CSV formula injection
+    if (/^[=+@\-]/.test(s)) s = `'${s}`;
     if (s.includes(",") || s.includes('"') || s.includes("\n")) {
       return `"${s.replace(/"/g, '""')}"`;
     }

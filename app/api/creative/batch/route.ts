@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import sharp from "sharp";
 import { okJson, errorJson, optionsResponse } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import {
   buildCreativePrompt,
   type CreativeFormat,
@@ -62,6 +63,11 @@ export function OPTIONS() {
 export async function POST(request: Request) {
   const authError = requireAuth(request);
   if (authError) return authError;
+
+  const rl = checkRateLimit(rateLimitKey(request), { limit: 5, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return errorJson("Rate limit exceeded", 429);
+  }
 
   try {
     const body = (await request.json()) as Partial<BatchRequest>;

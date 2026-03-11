@@ -104,6 +104,12 @@ export async function POST(request: Request) {
       return errorJson("platform, primary_text, cta, and landing_path are required", 400);
     }
 
+    // Length limits to prevent abuse
+    if (primaryText.length > 2000) return errorJson("primary_text must be under 2000 characters", 400);
+    if (payload.headline && payload.headline.length > 300) return errorJson("headline must be under 300 characters", 400);
+    if (payload.cta.length > 200) return errorJson("cta must be under 200 characters", 400);
+    if (landingPath.length > 500) return errorJson("landing_path must be under 500 characters", 400);
+
     const id = payload.id ?? `${platform}-${Date.now()}`;
     const now = isoNow();
     const status = (payload.status ?? "pending") as AdStatus;
