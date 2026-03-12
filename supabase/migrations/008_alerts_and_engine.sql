@@ -46,7 +46,7 @@ CREATE INDEX IF NOT EXISTS idx_influencer_pipeline_trade ON influencer_pipeline 
 -- Updated-at trigger for influencer_pipeline
 CREATE OR REPLACE TRIGGER set_updated_at_influencer_pipeline
   BEFORE UPDATE ON influencer_pipeline
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- ─── RLS for new tables ─────────────────────────────────────────────────────
 
