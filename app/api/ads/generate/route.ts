@@ -136,7 +136,7 @@ export async function POST(request: Request) {
     for (const tradeSlug of trades) {
       const context = getTradeContext(tradeSlug)!;
       const tradeInfo = TRADE_MAP[tradeSlug];
-      const tradeTerms = [...context.services, ...context.painPoints, ...context.tools];
+      const tradeTerms = [...context.callScenarios];
 
       // Get image URL once per trade
       if (!(tradeSlug in imageUrlCache)) {

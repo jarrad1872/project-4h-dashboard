@@ -1085,11 +1085,9 @@ async function cmdContext(subArgs) {
     console.log(`\nTemplate:\n  ${flags.trade}: {`);
     console.log(`    trade: "Trade Name",`);
     console.log(`    domain: "${flags.trade}.city",`);
-    console.log(`    services: ["service1", "service2", "service3"],`);
-    console.log(`    painPoints: ["pain1", "pain2", "pain3"],`);
-    console.log(`    tools: ["tool1", "tool2", "tool3"],`);
-    console.log(`    persona: "description of target buyer",`);
-    console.log(`    seasonality: "when demand peaks",`);
+    console.log(`    callScenarios: ["who calls and why 1", "who calls and why 2", "who calls and why 3"],`);
+    console.log(`    missedCallCost: "$X,000 job gone to the next contractor",`);
+    console.log(`    busyMoment: "what they're doing when they can't answer",`);
     console.log(`  },`);
     return;
   }

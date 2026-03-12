@@ -7,7 +7,7 @@ import type { ValidationResult } from "../ad-copy-validator";
 /** Builds a fully valid ad copy for the "pipe" trade (domain: pipe.city). */
 function validCopy() {
   return {
-    primary_text: "Stop losing jobs. Pipe.City helps plumbers book more work — $39/mo, 14-day free trial, no credit card required.",
+    primary_text: "Phone rings. You're under a house. Pipe.City answers every call — $39/mo, 14-day free trial, no credit card required.",
     headline: "Try Pipe.City Today",
     cta: "Start Free Trial",
   };
@@ -16,7 +16,7 @@ function validCopy() {
 /** Builds a fully valid ad copy for the "saw" trade (domain: saw.city). */
 function validSawCopy() {
   return {
-    primary_text: "Grow your saw business with Saw.City — $39/mo, 14-day free trial, no credit card required.",
+    primary_text: "Missed calls cost you jobs. Saw.City answers every call — $39/mo, 14-day free trial, no credit card required.",
     headline: "See Saw.City Results",
     cta: "Start Free Trial",
   };
@@ -26,25 +26,25 @@ function validSawCopy() {
 
 describe("Hard rule 1 — Price check", () => {
   it('passes with "$39/mo"', () => {
-    const copy = { ...validCopy(), primary_text: "Pipe.City $39/mo 14-day free trial no credit card" };
+    const copy = { ...validCopy(), primary_text: "Pipe.City answers calls $39/mo 14-day free trial no credit card" };
     const result = validateAdCopy(copy, "pipe");
     expect(result.hardFailures.every((f) => !f.includes("pricing"))).toBe(true);
   });
 
   it('passes with "$39/month"', () => {
-    const copy = { ...validCopy(), primary_text: "Pipe.City $39/month 14-day free trial no credit card" };
+    const copy = { ...validCopy(), primary_text: "Pipe.City answers calls $39/month 14-day free trial no credit card" };
     const result = validateAdCopy(copy, "pipe");
     expect(result.hardFailures.every((f) => !f.includes("pricing"))).toBe(true);
   });
 
   it('passes with "$39 per month"', () => {
-    const copy = { ...validCopy(), primary_text: "Pipe.City $39 per month 14-day free trial no credit card" };
+    const copy = { ...validCopy(), primary_text: "Pipe.City answers calls $39 per month 14-day free trial no credit card" };
     const result = validateAdCopy(copy, "pipe");
     expect(result.hardFailures.every((f) => !f.includes("pricing"))).toBe(true);
   });
 
   it("fails without price", () => {
-    const copy = { ...validCopy(), primary_text: "Pipe.City 14-day free trial no credit card" };
+    const copy = { ...validCopy(), primary_text: "Pipe.City answers every call. 14-day free trial no credit card" };
     const result = validateAdCopy(copy, "pipe");
     expect(result.valid).toBe(false);
     expect(result.hardFailures).toContain(
@@ -63,7 +63,7 @@ describe("Hard rule 2 — Trial check", () => {
   it("fails without trial mention", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City helps plumbers — $39/mo, no credit card required.",
+      primary_text: "Pipe.City answers every call — $39/mo, no credit card required.",
     };
     const result = validateAdCopy(copy, "pipe");
     expect(result.valid).toBe(false);
@@ -83,7 +83,7 @@ describe("Hard rule 3 — No credit card", () => {
   it("fails without no-CC mention", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City helps plumbers — $39/mo, 14-day free trial.",
+      primary_text: "Pipe.City answers every call — $39/mo, 14-day free trial.",
     };
     const result = validateAdCopy(copy, "pipe");
     expect(result.valid).toBe(false);
@@ -101,7 +101,7 @@ describe("Hard rule 4 — Correct domain", () => {
 
   it("fails when trade domain is missing", () => {
     const copy = {
-      primary_text: "Stop losing jobs — $39/mo, 14-day free trial, no credit card required.",
+      primary_text: "Answers every call — $39/mo, 14-day free trial, no credit card required.",
       headline: "Book More Jobs",
       cta: "Start Free Trial",
     };
@@ -123,7 +123,7 @@ describe("Hard rule 5 — Forbidden domains", () => {
   it('"saw.city" in a non-saw trade ad fails', () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City and saw.city — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Pipe.City and saw.city answer calls — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe");
     expect(result.valid).toBe(false);
@@ -140,7 +140,7 @@ describe("Hard rule 5 — Forbidden domains", () => {
   it('"answered.city" in a non-saw trade ad fails', () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City answered.city — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Pipe.City answered.city calls — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe");
     expect(result.valid).toBe(false);
@@ -156,31 +156,31 @@ describe("Hard rule 6 — Character limits", () => {
     expect(result.hardFailures.every((f) => !f.includes("character limit"))).toBe(true);
   });
 
-  it("fails when primary_text exceeds 2000 characters", () => {
+  it("fails when primary_text exceeds 250 characters", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "x".repeat(2001),
+      primary_text: "x".repeat(251),
     };
     const result = validateAdCopy(copy, "pipe");
-    expect(result.hardFailures.some((f) => f.includes("primary_text exceeds 2000 character limit"))).toBe(true);
+    expect(result.hardFailures.some((f) => f.includes("primary_text exceeds 250 character limit"))).toBe(true);
   });
 
-  it("fails when headline exceeds 300 characters", () => {
+  it("fails when headline exceeds 80 characters", () => {
     const copy = {
       ...validCopy(),
-      headline: "x".repeat(301),
+      headline: "x".repeat(81),
     };
     const result = validateAdCopy(copy, "pipe");
-    expect(result.hardFailures.some((f) => f.includes("headline exceeds 300 character limit"))).toBe(true);
+    expect(result.hardFailures.some((f) => f.includes("headline exceeds 80 character limit"))).toBe(true);
   });
 
-  it("fails when cta exceeds 200 characters", () => {
+  it("fails when cta exceeds 40 characters", () => {
     const copy = {
       ...validCopy(),
-      cta: "x".repeat(201),
+      cta: "x".repeat(41),
     };
     const result = validateAdCopy(copy, "pipe");
-    expect(result.hardFailures.some((f) => f.includes("cta exceeds 200 character limit"))).toBe(true);
+    expect(result.hardFailures.some((f) => f.includes("cta exceeds 40 character limit"))).toBe(true);
   });
 });
 
@@ -189,7 +189,7 @@ describe("Hard rule 7 — No generic language", () => {
     const copy = {
       ...validCopy(),
       primary_text:
-        "Pipe.City for your trade business — $39/mo, 14-day free trial, no credit card.",
+        "Pipe.City answers calls for your trade business — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe");
     expect(result.valid).toBe(false);
@@ -200,7 +200,7 @@ describe("Hard rule 7 — No generic language", () => {
     const copy = {
       ...validCopy(),
       primary_text:
-        "Pipe.City is the best small business software — $39/mo, 14-day free trial, no credit card.",
+        "Pipe.City is the best small business software for calls — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe");
     expect(result.valid).toBe(false);
@@ -210,6 +210,53 @@ describe("Hard rule 7 — No generic language", () => {
   it("passes without generic language", () => {
     const result = validateAdCopy(validCopy(), "pipe");
     expect(result.hardFailures.every((f) => !f.includes("generic language"))).toBe(true);
+  });
+});
+
+describe("Hard rule 8 — Product mention", () => {
+  it('passes with "call" in copy', () => {
+    const result = validateAdCopy(validCopy(), "pipe");
+    expect(result.hardFailures.every((f) => !f.includes("product mention"))).toBe(true);
+  });
+
+  it('passes with "answers" in copy', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City answers for plumbers — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe");
+    expect(result.hardFailures.every((f) => !f.includes("product mention"))).toBe(true);
+  });
+
+  it('passes with "phone" in copy', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Your phone is covered. Pipe.City — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe");
+    expect(result.hardFailures.every((f) => !f.includes("product mention"))).toBe(true);
+  });
+
+  it('passes with "AI employee" in copy', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Your AI employee runs Pipe.City — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe");
+    expect(result.hardFailures.every((f) => !f.includes("product mention"))).toBe(true);
+  });
+
+  it("fails when no product terms present", () => {
+    const copy = {
+      primary_text: "Pipe.City helps plumbers grow — $39/mo, 14-day free trial, no credit card.",
+      headline: "Try Pipe.City",
+      cta: "Start Free Trial",
+    };
+    const result = validateAdCopy(copy, "pipe");
+    expect(result.valid).toBe(false);
+    expect(result.hardFailures).toContain(
+      'Missing product mention: must contain "call", "calls", "answer", "answers", "phone", or "AI employee"',
+    );
   });
 });
 
@@ -224,7 +271,7 @@ describe("Soft warning — Trade specificity", () => {
   it("does not warn when a trade term is present", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City helps plumbers with backflow — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Pipe.City answers backflow calls — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe", undefined, ["soldering", "backflow"]);
     expect(result.warnings).not.toContain("No trade-specific terminology found");
@@ -265,20 +312,16 @@ describe("Soft warning — Angle alignment", () => {
   it('warns when pain angle has no pain language', () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City is great — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Pipe.City answers calls — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe", "pain");
     expect(result.warnings).toContain('Copy angle is "pain" but no pain-point language detected');
   });
 
   it("does not warn when pain angle has pain language", () => {
-    const result = validateAdCopy(validCopy(), "pipe", "pain");
-    // validCopy has "losing" which matches \blose\b? Actually let's check — "losing" won't match "lose".
-    // The pattern is /\b(miss|lose|cost|without|struggle|chaos|risk|fail)\b/i
-    // "losing" does not match "lose" as a whole word. Let's use explicit pain language.
     const copy = {
       ...validCopy(),
-      primary_text: "Don't risk losing jobs. Pipe.City — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Don't risk losing calls. Pipe.City — $39/mo, 14-day free trial, no credit card.",
     };
     const r = validateAdCopy(copy, "pipe", "pain");
     expect(r.warnings).not.toContain('Copy angle is "pain" but no pain-point language detected');
@@ -287,7 +330,7 @@ describe("Soft warning — Angle alignment", () => {
   it('warns when proof angle has no proof language', () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City is great — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Pipe.City answers calls — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe", "proof");
     expect(result.warnings).toContain('Copy angle is "proof" but no social-proof language detected');
@@ -296,7 +339,7 @@ describe("Soft warning — Angle alignment", () => {
   it("does not warn when proof angle has proof language", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Plumbers increase bookings 40% with Pipe.City — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "62% of plumbing calls go unanswered. Pipe.City — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe", "proof");
     expect(result.warnings).not.toContain('Copy angle is "proof" but no social-proof language detected');
@@ -304,7 +347,7 @@ describe("Soft warning — Angle alignment", () => {
 
   it('warns when urgency angle has no urgency language', () => {
     const copy = {
-      primary_text: "Pipe.City is great — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Pipe.City answers calls — $39/mo, 14-day free trial, no credit card.",
       headline: "See Pipe.City",
       cta: "Start Free Trial",
     };
@@ -315,7 +358,7 @@ describe("Soft warning — Angle alignment", () => {
   it("does not warn when urgency angle has urgency language", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Don't wait — sign up for Pipe.City today. $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Don't wait — Pipe.City answers calls today. $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe", "urgency");
     expect(result.warnings).not.toContain('Copy angle is "urgency" but no urgency language detected');
@@ -324,7 +367,7 @@ describe("Soft warning — Angle alignment", () => {
   it("solution angle always passes (no warning)", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "Pipe.City is great — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "Pipe.City answers calls — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe", "solution");
     expect(result.warnings.every((w) => !w.includes("Copy angle"))).toBe(true);
@@ -366,7 +409,7 @@ describe("Integration", () => {
   it("a fully valid ad passes with no failures or warnings", () => {
     const copy = {
       primary_text:
-        "Stop losing jobs to competitors without an online presence. Pipe.City gets plumbers booked — $39/mo, 14-day free trial, no credit card required.",
+        "Don't miss a call. Pipe.City answers for plumbers — $39/mo, 14-day free trial, no credit card required.",
       headline: "Try Pipe.City Today",
       cta: "Start Free Trial",
     };
@@ -384,9 +427,9 @@ describe("Integration", () => {
     };
     const result = validateAdCopy(copy, "pipe", "pain", ["backflow"]);
 
-    // Should have hard failures for: price, trial, no-CC, domain, 2x generic language
+    // Should have hard failures for: price, trial, no-CC, domain, 2x generic language, product mention
     expect(result.valid).toBe(false);
-    expect(result.hardFailures.length).toBeGreaterThanOrEqual(5);
+    expect(result.hardFailures.length).toBeGreaterThanOrEqual(6);
 
     // Check specific failures are present
     expect(result.hardFailures.some((f) => f.includes("pricing"))).toBe(true);
@@ -394,6 +437,7 @@ describe("Integration", () => {
     expect(result.hardFailures.some((f) => f.includes("no-CC"))).toBe(true);
     expect(result.hardFailures.some((f) => f.includes("trade domain"))).toBe(true);
     expect(result.hardFailures.some((f) => f.includes("generic language"))).toBe(true);
+    expect(result.hardFailures.some((f) => f.includes("product mention"))).toBe(true);
 
     // Should also have soft warnings for: trade specificity, CTA verb, pain angle
     expect(result.warnings).toContain("No trade-specific terminology found");

@@ -7,81 +7,78 @@ export interface GeneratedAdCopy {
   cta: string;
 }
 
-// Platform-specific constraints
+// Platform-specific constraints — tighter limits to prevent truncation
 const PLATFORM_GUIDELINES: Record<
   AdPlatform,
   { maxPrimaryText: number; maxHeadline: number; maxCta: number; tone: string }
 > = {
   linkedin: {
-    maxPrimaryText: 600,
-    maxHeadline: 150,
-    maxCta: 100,
+    maxPrimaryText: 200,
+    maxHeadline: 70,
+    maxCta: 30,
     tone: "professional, B2B, industry authority",
   },
   facebook: {
-    maxPrimaryText: 500,
-    maxHeadline: 100,
-    maxCta: 80,
+    maxPrimaryText: 150,
+    maxHeadline: 60,
+    maxCta: 25,
     tone: "conversational, relatable, scroll-stopping",
   },
   instagram: {
-    maxPrimaryText: 300,
-    maxHeadline: 80,
-    maxCta: 60,
+    maxPrimaryText: 125,
+    maxHeadline: 50,
+    maxCta: 25,
     tone: "punchy, visual, action-oriented",
   },
   youtube: {
-    maxPrimaryText: 400,
-    maxHeadline: 100,
-    maxCta: 80,
+    maxPrimaryText: 150,
+    maxHeadline: 60,
+    maxCta: 25,
     tone: "direct, benefit-driven, curiosity",
   },
 };
 
-// Angle-specific prompt instructions
+// Angle-specific prompt instructions — all framed around AI answering calls
 const ANGLE_PROMPTS: Record<CopyAngle, string> = {
   pain: [
-    "Use a PROBLEM AMPLIFICATION angle.",
-    "Lead with the pain point — missed calls, lost revenue, scheduling chaos, jobs slipping through the cracks.",
-    "Paint a vivid picture of the problem the reader already knows they have.",
-    "Hook with the problem FIRST, then briefly introduce the solution as the relief.",
-    "Use emotional triggers: frustration, wasted time, money left on the table.",
-    "The reader should feel the cost of NOT acting before they see what the product does.",
+    "Use a MISSED CALL PAIN angle.",
+    "Lead with the moment the phone rings and they can't answer.",
+    "Paint the exact scenario: they're busy doing trade work, phone rings, that's a real job calling — gone.",
+    "Use the busyMoment and missedCallCost from the context.",
+    "The reader should FEEL the money walking out the door.",
+    'Example tone: "You\'re under a house fixing a leak. Phone rings. That\'s a $2K water heater job — gone."',
   ].join(" "),
 
   solution: [
-    "Use a FEATURE-LED / SOLUTION angle.",
-    "Lead with what the app actually does and how it works for this specific trade.",
-    "Highlight capabilities: scheduling, quoting, invoicing, job tracking, client comms — whatever fits the trade.",
-    "Show how it slots into their existing workflow without disruption.",
-    "Be concrete — mention specific actions they can take, not vague benefits.",
-    "Position the product as the obvious, modern way to run their operation.",
+    "Use a SOLUTION / WHAT THE AI EMPLOYEE DOES angle.",
+    "Lead with what the AI employee actually does: answers calls, qualifies leads, books jobs, texts the owner.",
+    "Be concrete — describe the AI picking up the phone, asking the right questions, creating the job, sending a text.",
+    "Position it as a crew member, not software.",
+    'Example tone: "Pipe.City answers every call. Qualifies the lead. Books the job. Texts you the details."',
   ].join(" "),
 
   proof: [
-    "Use a SOCIAL PROOF angle.",
-    "Lead with results, trust signals, or industry adoption.",
-    "Reference numbers where possible: time saved, revenue recovered, jobs managed.",
-    "Imply that other professionals in their trade are already using this.",
-    "Build credibility through specificity — mention the trade by name, reference real workflows.",
-    "The reader should feel they are behind the curve if they are not already on board.",
+    "Use a MATH / PROOF angle.",
+    "Lead with the 62% stat: 62% of trade calls go unanswered.",
+    "Then do the math: one answered call pays for a year of service at $39/mo.",
+    "Build credibility through the numbers — missed calls = missed revenue, and the math is undeniable.",
+    'Example tone: "62% of plumbing calls go unanswered. Yours won\'t. $39/mo."',
   ].join(" "),
 
   urgency: [
-    "Use a TIME PRESSURE / URGENCY angle.",
-    "Create FOMO — seasonal demand is ramping up, competitors are getting ahead, now is the time.",
-    "Reference seasonality if provided in the context (e.g., spring demand, storm season, renovation season).",
-    "Emphasize competitive advantage: the ones who adopt early win the best jobs.",
-    "Make inaction feel risky — waiting means losing ground.",
-    "Tie urgency to a concrete benefit of starting now (14-day free trial, no commitment).",
+    "Use a COMPETITOR PRESSURE / URGENCY angle.",
+    "Frame it as: while their phone goes to voicemail, their competitor's AI is booking those calls.",
+    "Create FOMO around competitors already using AI to answer calls.",
+    "Make inaction feel like losing — every unanswered call is a job for someone else.",
+    'Example tone: "While your phone goes to voicemail, your competitor\'s AI is booking their calls."',
   ].join(" "),
 };
 
 /**
  * Builds a complete Gemini prompt for generating trade-specific ad copy.
  *
- * Combines the trade context, copy angle, and platform constraints into
- * a single structured prompt that enforces all hard requirements.
+ * Includes an immutable product description block so Gemini always knows
+ * this is a PHONE CALL ANSWERING product, not scheduling software.
  */
 export function buildAdCopyPrompt(
   context: TradeCopyContext,
@@ -91,49 +88,45 @@ export function buildAdCopyPrompt(
   const guidelines = PLATFORM_GUIDELINES[platform];
   const angleInstruction = ANGLE_PROMPTS[angle];
 
-  const tradeContextBlock = [
-    `Trade: ${context.trade}`,
-    `Domain: ${context.domain}`,
-    `Services: ${context.services.join(", ")}`,
-    `Pain points: ${context.painPoints.join(", ")}`,
-    `Tools/equipment: ${context.tools.join(", ")}`,
-    `Target persona: ${context.persona}`,
-    context.seasonality
-      ? `Seasonality: ${context.seasonality}`
-      : null,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const prompt = `You are writing a short, punchy ad for a trade business product. Write 1-2 sentences MAX for primary_text. Every word must earn its place.
 
-  const prompt = `You are an expert ad copywriter specializing in trade businesses. You write copy that sounds like it was written BY someone in the trade, FOR someone in the trade. Never generic — always specific to the trade context below.
+=== PRODUCT (DO NOT DEVIATE) ===
+${context.domain} is an AI employee for ${context.trade.toLowerCase()} businesses. It answers every phone call 24/7, qualifies leads with trade-specific questions, books jobs automatically, and texts the owner a summary. Your crew just got bigger.
+
+This is a PHONE CALL ANSWERING product. NOT scheduling software. NOT invoicing. NOT quoting. The hook is always about THE PHONE RINGING when you can't answer.
 
 === TRADE CONTEXT ===
-${tradeContextBlock}
+Trade: ${context.trade}
+Domain: ${context.domain}
+Who calls: ${context.callScenarios.join("; ")}
+Missed call cost: ${context.missedCallCost}
+Busy moment (when they can't answer): ${context.busyMoment}
 
 === COPY ANGLE ===
 ${angleInstruction}
 
 === PLATFORM: ${platform.toUpperCase()} ===
 Tone: ${guidelines.tone}
-Maximum primary_text length: ${guidelines.maxPrimaryText} characters
-Maximum headline length: ${guidelines.maxHeadline} characters
-Maximum cta length: ${guidelines.maxCta} characters
+primary_text: MAX ${guidelines.maxPrimaryText} characters (1-2 sentences, no more)
+headline: MAX ${guidelines.maxHeadline} characters
+cta: MAX ${guidelines.maxCta} characters
 
-=== HARD REQUIREMENTS (violating any of these is a failure) ===
+=== HARD REQUIREMENTS (violating any = failure) ===
 1. Price MUST be "$39/mo" or "$39/month" or "$39 per month" — no other price.
 2. MUST include "14-day free trial" somewhere in the copy.
-3. MUST include "no credit card" (as in "no credit card required") somewhere in the copy.
-4. MUST reference the trade's .city domain — use "${context.domain}" (e.g., "Try ${context.domain}").
-5. MUST use trade-specific language from the context above (services, tools, pain points). The reader should immediately recognize this is for THEIR trade.
-6. NEVER use any of these banned phrases: "trade business", "small business software", "saw.city", "answered.city", "Saw.City".
-7. Do NOT be generic. Do NOT write copy that could apply to any business. Every sentence should feel specific to ${context.trade} professionals.
+3. MUST include "no credit card" somewhere in the copy.
+4. MUST reference "${context.domain}" by name.
+5. Combined text MUST mention at least one of: "call", "calls", "answer", "answers", "phone", "AI employee".
+6. NEVER say "scheduling", "invoicing", "quoting", "CRM", "software", "app", "platform".
+7. NEVER use: "trade business", "small business software", "saw.city" (unless the domain IS saw.city), "answered.city".
+8. Keep it SHORT. No filler. No corporate speak. Sound like a tradesperson talking to another tradesperson.
 
 === OUTPUT FORMAT ===
-Return ONLY valid JSON with exactly this structure — no markdown, no explanation, no wrapping:
+Return ONLY valid JSON — no markdown, no explanation:
 {
-  "primary_text": "The main ad body text (max ${guidelines.maxPrimaryText} chars)",
-  "headline": "The headline (max ${guidelines.maxHeadline} chars)",
-  "cta": "The call-to-action button text (max ${guidelines.maxCta} chars)"
+  "primary_text": "max ${guidelines.maxPrimaryText} chars",
+  "headline": "max ${guidelines.maxHeadline} chars",
+  "cta": "max ${guidelines.maxCta} chars"
 }`;
 
   return prompt;

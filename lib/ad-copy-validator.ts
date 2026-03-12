@@ -21,28 +21,29 @@ const PRICE_PATTERN = /\$39\/mo|\$39\/month|\$39 per month/i;
 const TRIAL_PATTERN = /14-day free trial/i;
 const NO_CC_PATTERN = /no credit card/i;
 const GENERIC_PATTERNS = [/trade business/i, /small business software/i];
+const PRODUCT_MENTION_PATTERN = /\b(calls?|answers?|phone|AI employee)\b/i;
 
 const CTA_VERBS = /\b(start|try|get|book|sign|join|claim|explore|discover|launch)\b/i;
 
 const ANGLE_TERMS: Record<string, { pattern: RegExp; label: string }> = {
   pain: {
-    pattern: /\b(miss|lose|cost|without|struggle|chaos|risk|fail)\b/i,
+    pattern: /\b(miss|lose|cost|without|struggle|chaos|risk|fail|gone|ring)\b/i,
     label: "pain-point",
   },
   proof: {
-    pattern: /(%|more|increase|result|trust|rating|review|grow)/i,
+    pattern: /(%|more|increase|result|trust|rating|review|grow|62)/i,
     label: "social-proof",
   },
   urgency: {
-    pattern: /(now|today|before|season|limited|don't wait|already|behind)/i,
+    pattern: /(now|today|before|season|limited|don't wait|already|behind|competitor|voicemail)/i,
     label: "urgency",
   },
 };
 
 const CHAR_LIMITS: Record<keyof AdCopyFields, number> = {
-  primary_text: 2000,
-  headline: 300,
-  cta: 200,
+  primary_text: 250,
+  headline: 80,
+  cta: 40,
 };
 
 // ─── Main validator ─────────────────────────────────────────────────────────
@@ -111,9 +112,14 @@ export function validateAdCopy(
     }
   }
 
+  // 8. Product mention — must reference call answering / AI employee
+  if (!PRODUCT_MENTION_PATTERN.test(combined)) {
+    hardFailures.push('Missing product mention: must contain "call", "calls", "answer", "answers", "phone", or "AI employee"');
+  }
+
   // ── Soft warnings ────────────────────────────────────────────────────────
 
-  // 1. Trade specificity — check if any services/painPoints/tools terms appear
+  // 1. Trade specificity — check if any trade-specific terms appear
   if (tradeTerms && tradeTerms.length > 0) {
     const hasSpecificTerm = tradeTerms.some((term) =>
       combinedLower.includes(term.toLowerCase()),
