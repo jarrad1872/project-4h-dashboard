@@ -7,8 +7,9 @@
 ## BLOCKED — Waiting on Jarrad
 
 ### TASK-002: Approve Generated Ad Variants
-Generate 320 ads (`4h generate-copy --trades all --angles all`), then review at https://pumpcans.com/approval.
-Ads now show angle badges (pain/solution/proof/urgency) and validation warnings.
+320 ads generated and pending at https://pumpcans.com/approval (20 trades x 4 platforms x 4 angles).
+All copy describes the AI call-answering product (not generic business software). coat.city correctly says "Painting".
+Ads show angle badges (pain/solution/proof/urgency) and validation warnings.
 
 ### TASK-010: Archive Old NB2 Ads
 Run `4h ads archive --campaign-group nb2` to archive the 1,040 old NB2 ads before generating replacements.
@@ -75,7 +76,14 @@ Then verify at https://pumpcans.com/influencer.
 - [x] Approval page: angle badges + validation warning display
 - [x] DB columns: angle, validation_notes, generation_model added to ads table
 - [x] Price updated: $79/mo → $39/mo across all docs and code
-- [x] 40 new validator tests (136 total)
+- [x] Content rewrite: trade context, prompts, and validator rewritten to describe AI call-answering product
+  - New interface: callScenarios, missedCallCost, busyMoment (replaces services/painPoints/tools)
+  - Immutable product definition in prompt ("AI employee that answers calls 24/7")
+  - New hard rule: copy must mention call/answer/phone/AI employee
+  - Tighter char limits (250/80/40) to prevent truncation
+  - coat.city fixed from "Epoxy" to "Painting"
+- [x] 320 ads generated (old gen_ ads archived), all pending approval
+- [x] 45 validator tests (141 total)
 
 ### Automation Engine (2026-03-12)
 - [x] Telegram notifications (lib/telegram.ts, lib/notification-templates.ts)
