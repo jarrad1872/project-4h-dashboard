@@ -5,6 +5,8 @@
  * Config:
  *   PUMPCANS_BASE_URL  — default: https://pumpcans.com
  *   PUMPCANS_TOKEN     — Bearer token (optional if API auth disabled)
+ *   TELEGRAM_BOT_TOKEN — Telegram Bot API token (for notify commands)
+ *   TELEGRAM_CHAT_ID   — Jarrad's Telegram chat ID
  *
  * Usage:
  *   node scripts/4h-cli.js <command> [options]
@@ -17,6 +19,8 @@
 
 const BASE_URL = process.env.PUMPCANS_BASE_URL || 'https://pumpcans.com';
 const TOKEN = process.env.PUMPCANS_TOKEN;
+const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TG_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -91,6 +95,55 @@ function printJson(data) {
   console.log(JSON.stringify(data, null, 2));
 }
 
+async function sendTelegram(text) {
+  if (!TG_TOKEN || !TG_CHAT_ID) {
+    console.error('TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set');
+    process.exit(1);
+  }
+  const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TG_CHAT_ID,
+      text,
+      parse_mode: 'Markdown',
+    }),
+  });
+  const data = await res.json();
+  if (!data.ok) {
+    console.error('Telegram error:', data.description);
+    process.exit(1);
+  }
+  return data;
+}
+
+// Signal logic (mirrors lib/metrics.ts)
+function calcCtr(m) { return m.impressions ? (m.clicks / m.impressions) * 100 : 0; }
+function calcCpaPaid(m) { return m.paid ? m.spend / m.paid : 0; }
+function calcActivationRate(m) { return m.signups ? (m.activations / m.signups) * 100 : 0; }
+function signal(m) {
+  const ctr = calcCtr(m);
+  const cpaPaid = calcCpaPaid(m);
+  const activationRate = calcActivationRate(m);
+  if (m.spend >= 300 && (ctr < 0.9 || activationRate < 20 || cpaPaid > 600)) return 'kill';
+  if (ctr >= 1.6 && activationRate >= 35 && (cpaPaid === 0 || cpaPaid <= 350)) return 'scale';
+  return 'watch';
+}
+function signalEmoji(s) {
+  if (s === 'scale') return '🟢';
+  if (s === 'kill') return '🔴';
+  return '🟡';
+}
+function metricValue(m, metric) {
+  switch (metric) {
+    case 'spend': return m.spend;
+    case 'ctr': return calcCtr(m);
+    case 'cac': case 'cpa': return calcCpaPaid(m);
+    case 'signups': return m.signups;
+    default: return 0;
+  }
+}
+
 // ─── Commands ─────────────────────────────────────────────────────────────────
 
 async function cmdAds(subArgs) {
@@ -115,7 +168,6 @@ async function cmdAds(subArgs) {
 
   if (sub === 'approve') {
     if (flags.all) {
-      // Fetch all pending (or filtered) ads and approve each
       const qs = new URLSearchParams({ status: flags.status || 'pending' });
       if (flags.trade) qs.set('trade', flags.trade);
       let ads = await api('GET', `/api/ads?${qs}`);
@@ -202,11 +254,28 @@ async function cmdBudget(subArgs) {
     return;
   }
 
-  console.error('Unknown budget subcommand. Use: status, set');
+  if (sub === 'recommend') {
+    await cmdBudgetRecommend();
+    return;
+  }
+
+  console.error('Unknown budget subcommand. Use: status, set, recommend');
   process.exit(1);
 }
 
 async function cmdMetrics(subArgs) {
+  const sub = subArgs[0];
+
+  if (sub === 'ingest') {
+    await cmdMetricsIngest(subArgs.slice(1));
+    return;
+  }
+
+  if (sub === 'import') {
+    await cmdMetricsImport(subArgs.slice(1));
+    return;
+  }
+
   const flags = parseArgs(subArgs);
   const fmt = flags.format || 'json';
   const data = await api('GET', '/api/metrics');
@@ -228,11 +297,111 @@ async function cmdMetrics(subArgs) {
   }
 }
 
+async function cmdMetricsIngest(subArgs) {
+  const flags = parseArgs(subArgs);
+  const required = ['platform', 'week'];
+  for (const r of required) {
+    if (!flags[r]) { console.error(`--${r} is required`); process.exit(1); }
+  }
+
+  const row = {
+    week_start: flags.week,
+    platform: flags.platform,
+    spend: Number(flags.spend || 0),
+    impressions: Number(flags.impressions || 0),
+    clicks: Number(flags.clicks || 0),
+    signups: Number(flags.signups || 0),
+    activations: Number(flags.activations || 0),
+    paid: Number(flags.paid || 0),
+  };
+
+  console.log(`Ingesting metrics for ${row.platform} week ${row.week_start}...`);
+  const result = await api('POST', '/api/metrics', row);
+  console.log('Done.');
+  printJson(result);
+}
+
+async function cmdMetricsImport(subArgs) {
+  const flags = parseArgs(subArgs);
+  if (!flags.file) { console.error('--file is required'); process.exit(1); }
+
+  const fs = await import('node:fs');
+  const raw = fs.readFileSync(flags.file, 'utf-8');
+  const lines = raw.trim().split('\n');
+
+  if (lines.length < 2) {
+    console.error('CSV must have a header row and at least one data row');
+    process.exit(1);
+  }
+
+  // Parse header
+  const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const expectedCols = ['week_start', 'platform', 'spend', 'impressions', 'clicks', 'signups', 'activations', 'paid'];
+
+  // Map header to expected columns
+  const colMap = {};
+  for (const col of expectedCols) {
+    const idx = header.indexOf(col);
+    if (idx >= 0) colMap[col] = idx;
+  }
+
+  if (colMap.week_start === undefined || colMap.platform === undefined) {
+    console.error(`CSV header must include at minimum: week_start, platform`);
+    console.error(`Found: ${header.join(', ')}`);
+    process.exit(1);
+  }
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = lines[i].split(',').map(v => v.trim());
+    if (vals.length < 2) continue; // skip empty lines
+
+    rows.push({
+      week_start: vals[colMap.week_start],
+      platform: vals[colMap.platform],
+      spend: Number(vals[colMap.spend] || 0),
+      impressions: Number(vals[colMap.impressions] || 0),
+      clicks: Number(vals[colMap.clicks] || 0),
+      signups: Number(vals[colMap.signups] || 0),
+      activations: Number(vals[colMap.activations] || 0),
+      paid: Number(vals[colMap.paid] || 0),
+    });
+  }
+
+  console.log(`Importing ${rows.length} metric rows from ${flags.file}...`);
+  const result = await api('POST', '/api/metrics/batch', rows);
+  console.log(`Done. Inserted: ${result.inserted}`);
+  if (result.errors) {
+    console.log('Errors:');
+    for (const e of result.errors) console.log(`  - ${e}`);
+  }
+}
+
 async function cmdReport(subArgs) {
   const sub = subArgs[0];
+  const flags = parseArgs(subArgs.slice(1));
 
   if (sub === 'daily') {
     const data = await api('GET', '/api/report/daily');
+
+    if (flags.send) {
+      // Build Telegram message and send
+      const m = data.metrics_summary || { total_spend: 0, total_impressions: 0, total_clicks: 0, total_signups: 0 };
+      const lines = [
+        `📊 *4H Daily Report*`,
+        `Campaign: ${data.campaign_status}`,
+        '',
+        `*Totals (latest week):*`,
+        `Spend: $${m.total_spend} | Impr: ${m.total_impressions} | Clicks: ${m.total_clicks} | Signups: ${m.total_signups}`,
+      ];
+      if (data.blockers && data.blockers.length > 0) {
+        lines.push('', `*Blockers (${data.blockers.length}):*`);
+        for (const b of data.blockers) lines.push(`• ${b}`);
+      }
+      await sendTelegram(lines.join('\n'));
+      console.log('Daily report sent to Telegram.');
+      return;
+    }
 
     console.log('\n📊 4H Daily Report —', data.generated_at);
     console.log('═══════════════════════════════════════');
@@ -264,7 +433,46 @@ async function cmdReport(subArgs) {
     return;
   }
 
-  console.error('Unknown report subcommand. Use: daily');
+  if (sub === 'weekly') {
+    const data = await api('GET', '/api/report/weekly');
+
+    if (flags.send) {
+      const lines = [
+        `📈 *4H Weekly Report — ${data.week_start}*`,
+        '',
+        `*Budget:* $${data.total_spend} of $${data.budget_total} (${data.budget_used_pct}%)`,
+        '',
+        '*Platform Breakdown:*',
+      ];
+      for (const p of (data.platforms || [])) {
+        if (p.spend === 0 && p.ctr === 0) continue;
+        const emoji = p.signal === 'scale' ? '🟢' : p.signal === 'kill' ? '🔴' : '🟡';
+        const sigChange = p.prev_signal && p.prev_signal !== p.signal ? ` (was ${p.prev_signal})` : '';
+        lines.push(`${emoji} *${p.platform.toUpperCase()}* — ${p.signal.toUpperCase()}${sigChange}`);
+        lines.push(`  Spend: $${p.spend} | CTR: ${p.ctr}% | CPA: $${p.cpa_paid}`);
+        lines.push(`  Activation: ${p.activation_rate}% | Signups: ${p.signups}`);
+      }
+      await sendTelegram(lines.join('\n'));
+      console.log('Weekly report sent to Telegram.');
+      return;
+    }
+
+    console.log(`\n📈 4H Weekly Report — ${data.week_start}`);
+    console.log('═══════════════════════════════════════');
+    console.log(`Budget: $${data.total_spend} of $${data.budget_total} (${data.budget_used_pct}%)`);
+    console.log('');
+    for (const p of (data.platforms || [])) {
+      const emoji = p.signal === 'scale' ? '🟢' : p.signal === 'kill' ? '🔴' : '🟡';
+      const sigChange = p.prev_signal && p.prev_signal !== p.signal ? ` (was ${p.prev_signal})` : '';
+      console.log(`${emoji} ${p.platform.toUpperCase()} — ${p.signal.toUpperCase()}${sigChange}`);
+      console.log(`   Spend: $${p.spend} | CTR: ${p.ctr}% | CPA: $${p.cpa_paid}`);
+      console.log(`   Activation: ${p.activation_rate}% | Signups: ${p.signups}`);
+    }
+    console.log('');
+    return;
+  }
+
+  console.error('Unknown report subcommand. Use: daily, weekly');
   process.exit(1);
 }
 
@@ -307,7 +515,6 @@ async function cmdCreative(subArgs) {
     const fs = await import('node:fs');
     const raw = fs.readFileSync(file, 'utf-8');
     const batchData = JSON.parse(raw);
-    // Resolve format aliases in jobs
     if (batchData.jobs) {
       batchData.jobs = batchData.jobs.map((j) => ({ ...j, format: resolveFormat(j.format) }));
     }
@@ -394,6 +601,410 @@ async function cmdLaunch(subArgs) {
   process.exit(1);
 }
 
+// ─── Phase 1: Notify ──────────────────────────────────────────────────────────
+
+async function cmdNotify(subArgs) {
+  const sub = subArgs[0];
+
+  if (sub === 'test') {
+    const msg = [
+      '🔧 *4H Engine — Test Message*',
+      '',
+      'Telegram notifications are working.',
+      `Sent at: ${new Date().toISOString()}`,
+    ].join('\n');
+    await sendTelegram(msg);
+    console.log('Test message sent to Telegram.');
+    return;
+  }
+
+  if (sub === 'send') {
+    const flags = parseArgs(subArgs.slice(1));
+    if (!flags.message) { console.error('--message is required'); process.exit(1); }
+    await sendTelegram(flags.message);
+    console.log('Message sent to Telegram.');
+    return;
+  }
+
+  console.error('Unknown notify subcommand. Use: test, send');
+  process.exit(1);
+}
+
+// ─── Phase 3: Engine + Signals ────────────────────────────────────────────────
+
+async function cmdEngine(subArgs) {
+  const sub = subArgs[0];
+  const flags = parseArgs(subArgs.slice(1));
+
+  if (sub === 'evaluate') {
+    const metricsData = await api('GET', '/api/metrics');
+    const weeks = metricsData.weeks || [];
+
+    if (weeks.length === 0) {
+      console.log('No metrics data — nothing to evaluate.');
+      return;
+    }
+
+    const latestWeek = weeks[weeks.length - 1];
+    console.log(`Evaluating week: ${latestWeek.weekStart}\n`);
+
+    const alertRules = await api('GET', '/api/alerts');
+    const platforms = ['linkedin', 'youtube', 'facebook', 'instagram'];
+    const signals = [];
+    const alertsFired = [];
+    const notifications = [];
+
+    // Evaluate signals
+    for (const p of platforms) {
+      const ch = latestWeek[p];
+      if (!ch || (ch.spend === 0 && ch.impressions === 0)) continue;
+
+      const sig = signal(ch);
+      const data = {
+        platform: p,
+        signal: sig,
+        ctr: calcCtr(ch),
+        cpa_paid: calcCpaPaid(ch),
+        activation_rate: calcActivationRate(ch),
+        spend: ch.spend,
+      };
+      signals.push(data);
+
+      if (sig === 'kill') {
+        notifications.push([
+          `🔴 *KILL SIGNAL: ${p.toUpperCase()}*`,
+          '',
+          `CTR: ${data.ctr.toFixed(1)}% | CPA: $${data.cpa_paid.toFixed(0)} | Activation: ${data.activation_rate.toFixed(0)}%`,
+          `Spend: $${data.spend.toFixed(0)}`,
+          '',
+          `*Recommend:* Pause ${p} ads immediately.`,
+        ].join('\n'));
+      } else if (sig === 'scale') {
+        notifications.push([
+          `🟢 *SCALE SIGNAL: ${p.toUpperCase()}*`,
+          '',
+          `CTR: ${data.ctr.toFixed(1)}% | CPA: $${data.cpa_paid.toFixed(0)} | Activation: ${data.activation_rate.toFixed(0)}%`,
+          `Spend: $${data.spend.toFixed(0)}`,
+          '',
+          `*Recommend:* Increase ${p} budget by 50%.`,
+        ].join('\n'));
+      }
+    }
+
+    // Evaluate alerts
+    for (const rule of alertRules) {
+      const targetPlatforms = rule.platform === 'all' ? platforms : [rule.platform];
+      for (const p of targetPlatforms) {
+        const ch = latestWeek[p];
+        if (!ch) continue;
+        const current = metricValue(ch, rule.metric);
+        let triggered = false;
+        if (rule.operator === 'gt' && current > rule.threshold) triggered = true;
+        if (rule.operator === 'lt' && current < rule.threshold) triggered = true;
+        if (triggered) {
+          alertsFired.push({ id: rule.id, metric: rule.metric, platform: p, current: Math.round(current * 100) / 100, threshold: rule.threshold });
+          const opLabel = rule.operator === 'gt' ? 'exceeded' : 'fell below';
+          notifications.push(`⚠️ *ALERT: ${rule.metric.toUpperCase()} ${opLabel} threshold*\nPlatform: ${p} | Current: ${Math.round(current * 100) / 100} | Threshold: ${rule.threshold}`);
+        }
+      }
+    }
+
+    // Print results
+    console.log('Signals:');
+    for (const s of signals) {
+      console.log(`  ${signalEmoji(s.signal)} ${s.platform}: ${s.signal.toUpperCase()} (CTR ${s.ctr.toFixed(1)}%, CPA $${s.cpa_paid.toFixed(0)}, Act ${s.activation_rate.toFixed(0)}%)`);
+    }
+    if (signals.length === 0) console.log('  (no active platforms)');
+
+    if (alertsFired.length > 0) {
+      console.log(`\nAlerts Fired (${alertsFired.length}):`);
+      for (const a of alertsFired) {
+        console.log(`  ⚠️  ${a.platform} ${a.metric}: ${a.current} (threshold: ${a.threshold})`);
+      }
+    }
+
+    if (notifications.length > 0) {
+      console.log(`\nNotifications: ${notifications.length}`);
+    }
+
+    const isDryRun = flags['dry-run'] || flags.dry;
+
+    if (isDryRun) {
+      console.log('\n[DRY RUN] Would send the following Telegram messages:');
+      for (const n of notifications) {
+        console.log('---');
+        console.log(n);
+      }
+      return;
+    }
+
+    if (flags.execute && notifications.length > 0) {
+      console.log('\nSending Telegram notifications...');
+      for (const msg of notifications) {
+        await sendTelegram(msg);
+        console.log('  ✓ Sent');
+      }
+      console.log('Done.');
+    } else if (notifications.length > 0) {
+      console.log('\nUse --execute to send notifications, or --dry-run to preview.');
+    }
+    return;
+  }
+
+  if (sub === 'status') {
+    const data = await api('GET', '/api/engine/status');
+    printJson(data);
+    return;
+  }
+
+  console.error('Unknown engine subcommand. Use: evaluate, status');
+  process.exit(1);
+}
+
+async function cmdSignals(subArgs) {
+  const metricsData = await api('GET', '/api/metrics');
+  const weeks = metricsData.weeks || [];
+
+  if (weeks.length === 0) {
+    console.log('No metrics data.');
+    return;
+  }
+
+  const latestWeek = weeks[weeks.length - 1];
+  console.log(`\n📡 Signals for week: ${latestWeek.weekStart}\n`);
+
+  const platforms = ['linkedin', 'youtube', 'facebook', 'instagram'];
+  const rows = [];
+
+  for (const p of platforms) {
+    const ch = latestWeek[p];
+    if (!ch) continue;
+    const sig = signal(ch);
+    rows.push({
+      platform: p,
+      signal: `${signalEmoji(sig)} ${sig.toUpperCase()}`,
+      spend: `$${ch.spend}`,
+      ctr: `${calcCtr(ch).toFixed(1)}%`,
+      cpa_paid: `$${calcCpaPaid(ch).toFixed(0)}`,
+      activation: `${calcActivationRate(ch).toFixed(0)}%`,
+      signups: ch.signups,
+    });
+  }
+
+  printTable(rows, ['platform', 'signal', 'spend', 'ctr', 'cpa_paid', 'activation', 'signups']);
+  console.log('');
+}
+
+// ─── Phase 5: Morning ─────────────────────────────────────────────────────────
+
+async function cmdMorning() {
+  console.log('\n☀️  4H Morning Check\n═══════════════════════════════════════\n');
+
+  // 1. Daily report
+  const report = await api('GET', '/api/report/daily');
+  console.log(`Campaign: ${report.campaign_status}`);
+  console.log(`Ads: ${report.ads.total} total, ${report.ads.approved} approved, ${report.ads.pending_approval} pending`);
+
+  const m = report.metrics_summary;
+  if (m) {
+    console.log(`\nLast Week: $${m.total_spend} spend | ${m.total_impressions} impr | ${m.total_clicks} clicks | ${m.total_signups} signups`);
+  }
+
+  // 2. Signals
+  const metricsData = await api('GET', '/api/metrics');
+  const weeks = metricsData.weeks || [];
+  if (weeks.length > 0) {
+    const latestWeek = weeks[weeks.length - 1];
+    const platforms = ['linkedin', 'youtube', 'facebook', 'instagram'];
+
+    console.log(`\nSignals (${latestWeek.weekStart}):`);
+    for (const p of platforms) {
+      const ch = latestWeek[p];
+      if (!ch || (ch.spend === 0 && ch.impressions === 0)) continue;
+      const sig = signal(ch);
+      console.log(`  ${signalEmoji(sig)} ${p}: ${sig.toUpperCase()} (CTR ${calcCtr(ch).toFixed(1)}%, CPA $${calcCpaPaid(ch).toFixed(0)}, Act ${calcActivationRate(ch).toFixed(0)}%)`);
+    }
+
+    // 3. Alert check
+    const alertRules = await api('GET', '/api/alerts');
+    let alertCount = 0;
+    for (const rule of alertRules) {
+      const targetPlatforms = rule.platform === 'all' ? platforms : [rule.platform];
+      for (const p of targetPlatforms) {
+        const ch = latestWeek[p];
+        if (!ch) continue;
+        const current = metricValue(ch, rule.metric);
+        let triggered = false;
+        if (rule.operator === 'gt' && current > rule.threshold) triggered = true;
+        if (rule.operator === 'lt' && current < rule.threshold) triggered = true;
+        if (triggered) {
+          if (alertCount === 0) console.log('\nFired Alerts:');
+          alertCount++;
+          console.log(`  ⚠️  ${p} ${rule.metric}: ${Math.round(current * 100) / 100} (threshold: ${rule.threshold})`);
+        }
+      }
+    }
+    if (alertCount === 0) console.log('\nNo alerts firing.');
+  }
+
+  // 4. Blockers
+  if (report.blockers.length > 0) {
+    console.log(`\nBlockers (${report.blockers.length}):`);
+    for (const b of report.blockers) console.log(`  • ${b}`);
+  } else {
+    console.log('\n✅ No blockers.');
+  }
+
+  // 5. Budget recommendations
+  if (weeks.length > 0) {
+    const latestWeek = weeks[weeks.length - 1];
+    const platforms = ['linkedin', 'youtube', 'facebook', 'instagram'];
+    const recs = [];
+    for (const p of platforms) {
+      const ch = latestWeek[p];
+      if (!ch || (ch.spend === 0 && ch.impressions === 0)) continue;
+      const sig = signal(ch);
+      if (sig === 'scale') recs.push(`  📈 ${p}: Increase budget by 50%`);
+      if (sig === 'kill') recs.push(`  🛑 ${p}: Pause — underperforming`);
+    }
+    if (recs.length > 0) {
+      console.log('\nRecommendations:');
+      for (const r of recs) console.log(r);
+    }
+  }
+
+  console.log('\n═══════════════════════════════════════\n');
+}
+
+// ─── Phase 6: Influencer ──────────────────────────────────────────────────────
+
+async function cmdInfluencer(subArgs) {
+  const sub = subArgs[0];
+  const flags = parseArgs(subArgs.slice(1));
+  const useTable = Boolean(flags.table);
+
+  if (sub === 'list') {
+    const qs = new URLSearchParams();
+    if (flags.status) qs.set('status', flags.status);
+    const data = await api('GET', `/api/influencers?${qs}`);
+    const rows = Array.isArray(data) ? data : [];
+
+    if (useTable || !flags.json) {
+      printTable(rows, ['id', 'creator_name', 'trade', 'platform', 'status', 'deal_page', 'updated_at']);
+    } else {
+      printJson(rows);
+    }
+    return;
+  }
+
+  if (sub === 'add') {
+    if (!flags.creator || !flags.trade) {
+      console.error('Required: --creator --trade [--channel] [--platform youtube]');
+      process.exit(1);
+    }
+    const result = await api('POST', '/api/influencers', {
+      creator_name: flags.creator,
+      trade: flags.trade,
+      platform: flags.platform || 'youtube',
+      channel_url: flags.channel || null,
+      estimated_reach: flags.reach || null,
+      deal_page: flags['deal-page'] || null,
+    });
+    console.log('Influencer added.');
+    printJson(result);
+    return;
+  }
+
+  if (sub === 'update') {
+    if (!flags.id) { console.error('--id is required'); process.exit(1); }
+    const update = {};
+    if (flags.status) update.status = flags.status;
+    if (flags.note || flags.notes) update.notes = flags.note || flags.notes;
+    if (flags['deal-page']) update.deal_page = flags['deal-page'];
+    if (flags.code) update.referral_code = flags.code;
+    if (flags.contact) update.last_contact_at = flags.contact;
+
+    if (Object.keys(update).length === 0) {
+      console.error('Provide at least one field to update: --status, --note, --deal-page, --code, --contact');
+      process.exit(1);
+    }
+
+    const result = await api('PATCH', `/api/influencers/${flags.id}`, update);
+    console.log('Influencer updated.');
+    printJson(result);
+    return;
+  }
+
+  if (sub === 'seed') {
+    console.log('Seeding influencer pipeline from static data...');
+    const creators = [
+      { creator_name: "Mike Andes", trade: "Lawn Care", platform: "youtube", channel_url: "https://www.youtube.com/@MikeAndes", estimated_reach: "80K+ operators", deal_page: "mow.city/mikeandes", status: "identified" },
+      { creator_name: "Brian's Lawn Maintenance", trade: "Lawn Care", platform: "youtube", channel_url: "https://www.youtube.com/@BriansLawnMaintenance", estimated_reach: "150K+ operators", deal_page: "mow.city/brianslawn", status: "identified" },
+      { creator_name: "AC Service Tech LLC", trade: "HVAC", platform: "youtube", channel_url: "https://www.youtube.com/@ACServiceTech", estimated_reach: "90K+ techs/owners", deal_page: "duct.city/acservicetech", status: "identified" },
+      { creator_name: "Blades of Grass Lawn Care", trade: "Lawn Care", platform: "youtube", channel_url: "https://www.youtube.com/channel/UCPIZI7", estimated_reach: "300K+ operators", deal_page: "mow.city/bladesofgrass", status: "identified" },
+      { creator_name: "HVAC School (Bryan Orr)", trade: "HVAC", platform: "youtube", channel_url: "https://www.youtube.com/@HVACSchool", estimated_reach: "60K+ techs/owners", deal_page: "duct.city/hvacschool", status: "identified" },
+      { creator_name: "Roofing Insights (Dmitry)", trade: "Roofing", platform: "youtube", channel_url: "https://www.youtube.com/@RoofingInsights3.0", estimated_reach: "60K+ contractors", deal_page: "roofrepair.city/roofinginsights", status: "identified" },
+      { creator_name: "Electrician U (Dustin Stelzer)", trade: "Electrical", platform: "youtube", channel_url: "https://www.youtube.com/@ElectricianU", estimated_reach: "120K+ electricians", deal_page: "electricians.city/electricianu", status: "identified" },
+      { creator_name: "Roger Wakefield", trade: "Plumbing", platform: "youtube", channel_url: "https://www.youtube.com/@rogerplumbing", estimated_reach: "120K+ contractor-adjacent", deal_page: "pipe.city/rogerwakefield", status: "identified" },
+      { creator_name: "King of Pressure Washing", trade: "Pressure Washing", platform: "youtube", channel_url: "https://www.youtube.com/@kingofpressurewash", estimated_reach: "35K+ operators", deal_page: "rinse.city/kingofpw", status: "identified" },
+      { creator_name: "Painting Business Pro (Barstow)", trade: "Painting", platform: "youtube", channel_url: "https://www.youtube.com/@PaintingBusinessPro", estimated_reach: "36K operators", deal_page: "coat.city/paintingbizpro", status: "identified" },
+    ];
+
+    for (const c of creators) {
+      try {
+        await api('POST', '/api/influencers', c);
+        console.log(`  ✓ ${c.creator_name}`);
+      } catch {
+        console.log(`  ✗ ${c.creator_name} (may already exist)`);
+      }
+    }
+    console.log('Done.');
+    return;
+  }
+
+  console.error('Unknown influencer subcommand. Use: list, add, update, seed');
+  process.exit(1);
+}
+
+// ─── Phase 7: Budget Recommend ────────────────────────────────────────────────
+
+async function cmdBudgetRecommend() {
+  const metricsData = await api('GET', '/api/metrics');
+  const budgetData = await api('GET', '/api/budget');
+  const weeks = metricsData.weeks || [];
+
+  if (weeks.length === 0) {
+    console.log('No metrics data — can\'t make recommendations.');
+    return;
+  }
+
+  const latestWeek = weeks[weeks.length - 1];
+  const platforms = ['linkedin', 'youtube', 'facebook', 'instagram'];
+
+  console.log(`\n💰 Budget Recommendations (${latestWeek.weekStart})\n`);
+
+  for (const p of platforms) {
+    const ch = latestWeek[p];
+    if (!ch) continue;
+
+    const sig = signal(ch);
+    const current = budgetData.channels?.[p]?.allocated ?? 0;
+
+    if (sig === 'scale') {
+      const recommended = Math.round(current * 1.5);
+      console.log(`  📈 ${p.toUpperCase()}: INCREASE $${current} → $${recommended} (+50%)`);
+      console.log(`     CTR ${calcCtr(ch).toFixed(1)}%, CPA $${calcCpaPaid(ch).toFixed(0)}, Activation ${calcActivationRate(ch).toFixed(0)}%`);
+    } else if (sig === 'kill') {
+      console.log(`  🛑 ${p.toUpperCase()}: PAUSE (currently $${current})`);
+      console.log(`     CTR ${calcCtr(ch).toFixed(1)}%, CPA $${calcCpaPaid(ch).toFixed(0)}, Activation ${calcActivationRate(ch).toFixed(0)}%`);
+    } else {
+      console.log(`  🟡 ${p.toUpperCase()}: HOLD at $${current}`);
+      console.log(`     CTR ${calcCtr(ch).toFixed(1)}%, CPA $${calcCpaPaid(ch).toFixed(0)}, Activation ${calcActivationRate(ch).toFixed(0)}%`);
+    }
+    console.log('');
+  }
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -414,10 +1025,14 @@ Commands:
 
   budget status [--table]
   budget set --platform <p> --amount <n>
+  budget recommend
 
   metrics [--format json|table] [--table]
+  metrics ingest --platform <p> --week <YYYY-MM-DD> --spend <n> --impressions <n> --clicks <n> --signups <n> --activations <n> --paid <n>
+  metrics import --file <csv-file>
 
-  report daily
+  report daily [--send]
+  report weekly [--send]
 
   creative gen --trade <slug> --format hero_a|hero_b|og_nb2|linkedin-single|... --style pain-point|... [--push]
   creative batch --file <json-file>
@@ -428,9 +1043,26 @@ Commands:
 
   launch check
 
+  notify test
+  notify send --message "text"
+
+  engine evaluate [--dry-run | --execute]
+  engine status
+
+  signals
+
+  morning
+
+  influencer list [--status contacted] [--table]
+  influencer add --creator "Name" --trade "Trade" [--channel "url"] [--platform youtube]
+  influencer update --id <id> [--status contacted] [--note "Emailed 2026-03-10"]
+  influencer seed
+
 Config:
-  PUMPCANS_BASE_URL  (default: https://pumpcans.com)
-  PUMPCANS_TOKEN     (optional Bearer token)
+  PUMPCANS_BASE_URL   (default: https://pumpcans.com)
+  PUMPCANS_TOKEN      (optional Bearer token)
+  TELEGRAM_BOT_TOKEN  (for notify/report --send)
+  TELEGRAM_CHAT_ID    (for notify/report --send)
 `);
     return;
   }
@@ -447,6 +1079,11 @@ Config:
     creative: cmdCreative,
     alerts: cmdAlerts,
     launch: cmdLaunch,
+    notify: cmdNotify,
+    engine: cmdEngine,
+    signals: cmdSignals,
+    morning: cmdMorning,
+    influencer: cmdInfluencer,
   };
 
   const handler = commands[command];

@@ -15,24 +15,35 @@ const PLATFORM_ICONS: Record<string, string> = {
   instagram: "ig",
 };
 
-const BLOCKERS = [
-  { id: "trial", label: '14-day free trial missing from all 1,040 ads', severity: "high", action: "Decide: patch existing or regen v2", href: "/ads" },
-  { id: "accounts", label: "Ad accounts not created (LinkedIn, Meta, YouTube)", severity: "high", action: "Set up accounts — Jarrad-initiated step", href: null },
-  { id: "approval-ads", label: "1,040 ads pending approval", severity: "med", action: "Review & approve", href: "/approval" },
-  { id: "approval-assets", label: "325 trade assets pending approval", severity: "med", action: "Review & approve", href: "/assets" },
-  { id: "a2p", label: "A2P 10DLC campaign under review (~2–3 weeks from Feb 22)", severity: "low", action: "Waiting on TCR — no action needed", href: null },
-  { id: "landing", label: "Upcoming trades have no landing pages yet", severity: "low", action: "Build pages before launching those trades", href: "/gtm" },
-];
-
 const SEVERITY_STYLE: Record<string, string> = {
   high: "border-red-700/50 bg-red-950/20 text-red-400",
   med: "border-amber-700/50 bg-amber-950/20 text-amber-400",
   low: "border-slate-700/50 bg-slate-800/40 text-slate-400",
 };
 
+interface Blocker {
+  id: string;
+  label: string;
+  severity: "high" | "med" | "low";
+  action: string;
+  href: string | null;
+}
+
+interface EngineStatus {
+  configured: boolean;
+  last_run: {
+    id: string;
+    run_at: string;
+    signals: { platform: string; signal: string }[];
+    alerts_fired: unknown[];
+  } | null;
+}
+
 export default function OverviewPage() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [campaign, setCampaign] = useState<CampaignStatusData | null>(null);
+  const [blockers, setBlockers] = useState<Blocker[]>([]);
+  const [engineStatus, setEngineStatus] = useState<EngineStatus | null>(null);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -40,9 +51,13 @@ export default function OverviewPage() {
     Promise.all([
       fetch("/api/ads", { cache: "no-store" }).then((r) => r.json()),
       fetch("/api/campaign-status", { cache: "no-store" }).then((r) => r.json()),
-    ]).then(([adsData, campaignData]: [Ad[], CampaignStatusData]) => {
+      fetch("/api/blockers", { cache: "no-store" }).then((r) => r.json()).catch(() => null),
+      fetch("/api/engine/status", { cache: "no-store" }).then((r) => r.json()).catch(() => null),
+    ]).then(([adsData, campaignData, blockersData, engineData]: [Ad[], CampaignStatusData, { blockers: Blocker[] } | null, EngineStatus | null]) => {
       setAds(adsData);
       setCampaign(campaignData);
+      if (blockersData?.blockers) setBlockers(blockersData.blockers);
+      if (engineData) setEngineStatus(engineData);
       setLoading(false);
     });
   }, []);
@@ -76,10 +91,9 @@ export default function OverviewPage() {
   const totalAds = ads.length;
   const approvalPct = totalAds ? Math.round((approvedAds / totalAds) * 100) : 0;
 
-  // Creative coverage: ads with creative_variant > 1 (someone intentionally set C2/C3)
   const customCreativeAds = ads.filter((a) => (a.creative_variant ?? 1) > 1).length;
 
-  const highBlockers = BLOCKERS.filter((b) => b.severity === "high").length;
+  const highBlockers = blockers.filter((b) => b.severity === "high").length;
   const launchReady = highBlockers === 0;
 
   if (loading) {
@@ -125,6 +139,40 @@ export default function OverviewPage() {
         </div>
       </Card>
 
+      {/* ── Engine Status ────────────────────────────────────────────────── */}
+      {engineStatus && engineStatus.configured && (
+        <Card className="border-blue-800/40 bg-blue-950/20">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-400">Engine Status</h2>
+            {engineStatus.last_run && (
+              <span className="text-xs text-slate-500">
+                Last run: {new Date(engineStatus.last_run.run_at).toLocaleString()}
+              </span>
+            )}
+          </div>
+          {engineStatus.last_run ? (
+            <div className="flex flex-wrap gap-3">
+              {(engineStatus.last_run.signals ?? []).map((s: { platform: string; signal: string }) => (
+                <div key={s.platform} className="rounded bg-slate-900/60 px-3 py-1.5 text-xs">
+                  <span className="mr-1">
+                    {s.signal === "scale" ? "🟢" : s.signal === "kill" ? "🔴" : "🟡"}
+                  </span>
+                  <span className="font-semibold capitalize">{s.platform}</span>
+                  <span className="ml-1 uppercase text-slate-400">{s.signal}</span>
+                </div>
+              ))}
+              {Array.isArray(engineStatus.last_run.alerts_fired) && engineStatus.last_run.alerts_fired.length > 0 && (
+                <div className="rounded bg-red-900/30 px-3 py-1.5 text-xs text-red-300">
+                  {engineStatus.last_run.alerts_fired.length} alert(s) fired
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-500">No engine runs yet. Deploy 4h-engine.js to VPS.</p>
+          )}
+        </Card>
+      )}
+
       {/* ── Campaign Status Toggle ────────────────────────────────────────── */}
       <Card>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -154,25 +202,31 @@ export default function OverviewPage() {
       {/* ── Blockers Board ────────────────────────────────────────────────── */}
       <div>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
-          🚧 Launch Blockers ({BLOCKERS.length} total · {highBlockers} critical)
+          🚧 Launch Blockers ({blockers.length} total · {highBlockers} critical)
         </h2>
-        <div className="space-y-2">
-          {BLOCKERS.map((b) => (
-            <div key={b.id} className={`flex items-start justify-between gap-4 rounded border p-3 ${SEVERITY_STYLE[b.severity]}`}>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-100">{b.label}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{b.action}</p>
+        {blockers.length > 0 ? (
+          <div className="space-y-2">
+            {blockers.map((b) => (
+              <div key={b.id} className={`flex items-start justify-between gap-4 rounded border p-3 ${SEVERITY_STYLE[b.severity]}`}>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-slate-100">{b.label}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{b.action}</p>
+                </div>
+                {b.href ? (
+                  <Link href={b.href} className="shrink-0 rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-600 transition-colors">
+                    Go →
+                  </Link>
+                ) : (
+                  <span className="shrink-0 rounded bg-slate-800 px-3 py-1 text-xs text-slate-500">Waiting</span>
+                )}
               </div>
-              {b.href ? (
-                <Link href={b.href} className="shrink-0 rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-600 transition-colors">
-                  Go →
-                </Link>
-              ) : (
-                <span className="shrink-0 rounded bg-slate-800 px-3 py-1 text-xs text-slate-500">Waiting</span>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <Card className="text-center py-6">
+            <p className="text-green-400 font-semibold">No blockers detected</p>
+          </Card>
+        )}
       </div>
 
       {/* ── Ad Stats by Platform ─────────────────────────────────────────── */}
@@ -324,6 +378,9 @@ export default function OverviewPage() {
           </Link>
           <Link href="/launch">
             <GhostButton>Launch Checklist</GhostButton>
+          </Link>
+          <Link href="/influencer">
+            <GhostButton>Influencer Pipeline</GhostButton>
           </Link>
         </div>
       </Card>
