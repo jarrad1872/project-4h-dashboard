@@ -1,7 +1,7 @@
 # Pending Doc Updates
 
-**Created:** 2026-02-28  
-**Status:** Proposed — not yet applied  
+**Created:** 2026-02-28
+**Status:** Applied 2026-03-12
 **Trigger:** Commit `820719f` (TRADE_MAP fix — all 65 prefixes + `tradeFromAd()` upgrade)
 
 These changes were identified as follow-up housekeeping after the TRADE_MAP fix. Jarrad chose to defer applying them and park them here instead.
@@ -59,4 +59,7 @@ lib/trade-utils.ts — TRADE_MAP + tradeFromAd() helper
 
 Jarrad decided to defer these docs-only cleanups and park them here instead. No urgency — the code fix (`820719f`) is already live. These are just housekeeping notes so future-Bob knows what the rule should be when maintaining the TRADE_MAP.
 
-Apply when convenient. Both are small, surgical edits — no code changes, docs only.
+Both items were already substantively covered:
+- SOP-WORKFLOW.md has a full "TRADE_MAP — Maintenance Rule" section (lines 142-168)
+- AGENTS.md has a "TRADE_MAP Hard Rule" subsection + key files entry updated with fallback warning
+Applied 2026-03-12.

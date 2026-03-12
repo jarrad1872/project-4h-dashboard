@@ -198,17 +198,20 @@ async function cmdAds(subArgs) {
   if (sub === 'archive') {
     const campaignGroup = flags['campaign-group'] || flags.campaignGroup;
     if (!campaignGroup) { console.error('--campaign-group is required (e.g. nb2)'); process.exit(1); }
-    const qs = new URLSearchParams();
-    const data = await api('GET', `/api/ads?${qs}`);
-    let rows = Array.isArray(data) ? data : [];
-    rows = rows.filter((a) => a.campaign_group?.includes(campaignGroup) && a.status !== 'archived');
-    if (rows.length === 0) { console.log(`No ads found matching campaign group "${campaignGroup}".`); return; }
-    console.log(`Archiving ${rows.length} ads with campaign group containing "${campaignGroup}"...`);
-    const result = await api('POST', '/api/ads/bulk-status', {
-      newStatus: 'rejected',
-      campaignGroupContains: campaignGroup,
-    });
-    console.log(`Done. Archived ${result.updated ?? rows.length} ads.`);
+    // Archive pending ads matching the campaign group
+    const statuses = ['pending', 'approved', 'paused'];
+    let totalArchived = 0;
+    for (const fromStatus of statuses) {
+      const result = await api('POST', '/api/ads/bulk-status', {
+        newStatus: 'rejected',
+        fromStatus,
+        campaignGroupContains: campaignGroup,
+      });
+      const count = result.updated ?? 0;
+      if (count > 0) console.log(`  Archived ${count} ${fromStatus} ads`);
+      totalArchived += (typeof count === 'number' ? count : 0);
+    }
+    console.log(`Done. Archived ${totalArchived || 'all matching'} ads with campaign group "${campaignGroup}".`);
     return;
   }
 
@@ -1027,9 +1030,9 @@ async function cmdBudgetRecommend() {
 async function cmdGenerateCopy(subArgs) {
   const flags = parseArgs(subArgs);
 
-  const trades = flags.trades ? flags.trades.split(',') : 'all';
-  const platforms = flags.platforms ? flags.platforms.split(',') : 'all';
-  const angles = flags.angles ? flags.angles.split(',') : 'all';
+  const trades = !flags.trades || flags.trades === 'all' ? 'all' : flags.trades.split(',');
+  const platforms = !flags.platforms || flags.platforms === 'all' ? 'all' : flags.platforms.split(',');
+  const angles = !flags.angles || flags.angles === 'all' ? 'all' : flags.angles.split(',');
   const dryRun = Boolean(flags['dry-run'] || flags.dryRun);
 
   console.log(`Generating ad copy...`);

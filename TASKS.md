@@ -23,8 +23,8 @@ https://pumpcans.com/creatives — verify visual consistency across 65 trades.
 
 ## READY TO DO
 
-### TASK-005: Apply Pending Doc Updates
-`docs/pending-doc-updates.md` has deferred TRADE_MAP maintenance sections for SOP-WORKFLOW.md and AGENTS.md. Apply them.
+### ~~TASK-005: Apply Pending Doc Updates~~ (Done 2026-03-12)
+Both items already covered by existing sections. AGENTS.md key files entry updated with fallback warning.
 
 ### TASK-006: Influencer Outreach
 10 priority creators identified in `docs/influencer-outreach.md`. Outreach not started.

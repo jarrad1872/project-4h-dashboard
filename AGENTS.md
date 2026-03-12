@@ -74,7 +74,7 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 |------|---------|
 | `lib/project-state-data.ts` | Single source of truth for GTM board data — edit this to update all dashboard state |
 | `lib/types.ts` | TypeScript types for Ad, AdStatus, etc. |
-| `lib/trade-utils.ts` | TRADE_MAP (65 prefixes) and tradeFromAd() helper — **keep in sync with all trades** |
+| `lib/trade-utils.ts` | TRADE_MAP (65 prefixes) + tradeFromAd() — add prefix FIRST before any ads. Missing = silent saw.city fallback |
 | `lib/server-utils.ts` | normalizeAd(), adToDb() — DB↔API field mapping |
 | `app/gtm/page.tsx` | GTM Action Board — mission, product readiness, trade registry, actions |
 | `app/approval/page.tsx` | Approval queue — reads ads table, Approve/Hold/Reject per ad |
