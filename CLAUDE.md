@@ -47,16 +47,21 @@ npm run lint         # ESLint
 | `lib/auth.ts` | Bearer token auth for API routes |
 | `lib/rate-limit.ts` | In-memory rate limiter for AI endpoints |
 | `lib/metrics.ts` | KPI calculations, scale/watch/kill signal |
+| `lib/engine-logic.ts` | Signal evaluation, alert checking, recommendations |
+| `lib/telegram.ts` | Telegram Bot API wrapper |
+| `lib/notification-templates.ts` | Formatted messages for Telegram alerts/reports |
 | `lib/project-state-data.ts` | GTM board state (single source of truth) |
-| `app/api/*/route.ts` | 18 API routes |
+| `scripts/4h-cli.js` | CLI for all campaign operations |
+| `scripts/4h-engine.js` | VPS automation script (cron-driven) |
+| `app/api/*/route.ts` | 22 API routes |
 | `app/*/page.tsx` | 15 pages |
 | `supabase/migrations/` | SQL migrations (run via Supabase SQL Editor or pg) |
-| `lib/__tests__/` | Vitest test suites |
+| `lib/__tests__/` | Vitest test suites (96 tests) |
 
 ## Database
 
 - **Connection:** `db.vzawlfitqnjhypnkguas.supabase.co:5432` (postgres)
-- **Migrations:** Run in order via Supabase SQL Editor. Current: 001–007.
+- **Migrations:** Run in order via Supabase SQL Editor. Current: 001–008.
 - **RLS:** Enabled on all tables (migration 007). Service role bypasses RLS.
 - **Storage:** `ad-creatives` bucket (public)
 - **Fallback:** JSON files in `/data/` when Supabase is unavailable (dev mode)

@@ -1,6 +1,6 @@
 # Project 4H — Task Board
 
-**Last updated:** 2026-03-11
+**Last updated:** 2026-03-12
 
 ---
 
@@ -30,6 +30,11 @@ https://pumpcans.com/creatives — verify visual consistency across 65 trades.
 ### TASK-006: Influencer Outreach
 10 priority creators identified in `docs/influencer-outreach.md`. Outreach not started.
 Start with lawn care (Mike Andes, Brian's Lawn) + HVAC (AC Service Tech, HVAC School).
+Pipeline now trackable: `4h influencer seed` then `4h influencer list|update`.
+
+### TASK-007: Seed Influencer Pipeline
+Run `4h influencer seed` to populate the 10 creators from the shortlist into Supabase.
+Then verify at https://pumpcans.com/influencer.
 
 ---
 
@@ -61,7 +66,20 @@ Start with lawn care (Mike Andes, Brian's Lawn) + HVAC (AC Service Tech, HVAC Sc
 - [x] 1,040 ads inserted (65 trades x 2 directions x 8 variants)
 - [x] Anti-slop audit passed on all 1,040 ads
 
+### Automation Engine (2026-03-12)
+- [x] Telegram notifications (lib/telegram.ts, lib/notification-templates.ts)
+- [x] Metrics batch endpoint + CLI ingest/import commands
+- [x] Alert engine: Supabase tables, engine-logic.ts, VPS engine script
+- [x] Weekly report endpoint + Telegram delivery (--send flag)
+- [x] Morning command (4h morning) — single daily workflow check
+- [x] Influencer pipeline: API, Kanban dashboard, CLI commands
+- [x] Dynamic blockers + engine status on homepage
+- [x] Migration 008 applied (alert_rules, engine_runs, influencer_pipeline)
+- [x] 4h-engine.js deployed on Bob's VPS with cron (6h evaluate, daily/weekly reports)
+- [x] 96 tests passing (22 new for engine-logic + notification-templates)
+- [x] CLI expanded: notify, metrics ingest/import, engine, signals, morning, influencer, budget recommend
+
 ### Infrastructure
 - [x] Next.js dashboard live at pumpcans.com
-- [x] Supabase schema + seed (migrations 001-007)
+- [x] Supabase schema + seed (migrations 001-008)
 - [x] Vercel auto-deploy on push to main
