@@ -8,7 +8,7 @@
  *   node 4h-engine.js report weekly         Generate and send weekly report via Telegram
  *
  * Cron schedule (VPS):
- *   0 */6 * * *  node /path/to/4h-engine.js evaluate
+ *   0 *\/6 * * *  node /path/to/4h-engine.js evaluate
  *   0 8 * * *    node /path/to/4h-engine.js report daily
  *   0 8 * * 1    node /path/to/4h-engine.js report weekly
  *
