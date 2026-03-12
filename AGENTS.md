@@ -12,7 +12,7 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 
 **Live URL:** https://pumpcans.com  
 **GitHub:** `jarrad1872/project-4h-dashboard`  
-**Stack:** Next.js 15, TypeScript, Tailwind, Supabase  
+**Stack:** Next.js 16, TypeScript, Tailwind 4, Supabase, Gemini AI
 **Deployment:** Vercel (auto-deploys on push to `main`)
 
 ---
@@ -32,7 +32,7 @@ Missing entries silently fall back to `saw.city` badge on every page — this is
 Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 
 ### Ad Copy Hard Rules
-- **Price is ALWAYS $79/mo** — never $99, $149, $199, or any other amount.
+- **Price is ALWAYS $39/mo** — never $79, $99, $149, or any other amount.
 - **14-day free trial, no credit card required** — include this in ALL future ad copy. It's a key conversion hook and must appear in some form in every ad (primary text, headline, or CTA).
 - **Trade-authentic copy only** — mechanical find-and-replace fails the anti-slop audit. Use trade-specific vocabulary.
 - **No generic brand name** — ads always use the trade-specific `.city` domain (rinse.city, mow.city, etc.), never "Saw.City" as a catch-all.
@@ -61,9 +61,9 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 - **Gemini API:** `ask-bob-or-check-env` (use for copy gen + image gen)
 
 ### AI Generation
-- **Text copy:** `/api/generate` route (Gemini 2.5 Flash) — trade-aware TRADE_MAP inside
-- **Image gen:** `/api/ai-creative` route (model: `gemini-3-pro-image-preview`)
-- **Node.js generator:** `/tmp/genai-test/gen-tier1-ads.mjs` on VPS
+- **Ad copy generation:** `/api/ads/generate` route (Gemini 2.0 Flash) — constrained pipeline with validation
+- **Text copy (legacy):** `/api/generate` route (Gemini 2.5 Flash)
+- **Image gen:** `/api/ai-creative` route (model: `gemini-3.1-flash-image-preview`)
 - **OpenAI:** QUOTA EXHAUSTED — do not use
 
 ---
@@ -79,11 +79,15 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 | `app/gtm/page.tsx` | GTM Action Board — mission, product readiness, trade registry, actions |
 | `app/approval/page.tsx` | Approval queue — reads ads table, Approve/Hold/Reject per ad |
 | `app/api/ads/route.ts` | Ads CRUD API |
-| `app/api/generate/route.ts` | AI copy generation (Gemini) |
+| `app/api/ads/generate/route.ts` | Ad copy generation pipeline (Gemini + validator) |
+| `app/api/generate/route.ts` | Legacy AI copy generation (Gemini) |
 | `app/api/ai-creative/route.ts` | Image creative generation (Gemini) |
+| `lib/trade-copy-context.ts` | Per-trade context data for 20 live trades |
+| `lib/ad-copy-prompts.ts` | Prompt templates (4 angles x 4 platforms) |
+| `lib/ad-copy-validator.ts` | Hard rule validation + soft warnings |
 | `supabase/migrations/` | SQL migrations — apply via Supabase SQL editor |
-| `deploy.sh` | Manual deploy fallback if auto-deploy fails |
 | `TASKS.md` | Active tasks and backlog |
+| `BOB.md` | Full operating manual for Bob agent — CLI reference + ad system ops |
 
 ---
 
@@ -91,7 +95,7 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 
 ```sql
 ads (
-  id TEXT PRIMARY KEY,           -- e.g. "LI-01", "YT-R2"
+  id TEXT PRIMARY KEY,           -- e.g. "LI-01", "pipe_linkedin_pain_1741..."
   platform ad_platform,          -- linkedin | youtube | facebook | instagram
   format TEXT,
   headline TEXT,
@@ -101,6 +105,10 @@ ads (
   status ad_status,              -- pending | approved | paused | rejected | uploaded
   workflow_stage TEXT,           -- concept | approved | uploaded | live | paused
   image_url TEXT,                -- Supabase Storage URL for creative
+  creative_variant INT,          -- 1 = C1, 2 = C2, 3 = C3
+  angle TEXT,                    -- pain | solution | proof | urgency (generated ads)
+  validation_notes TEXT,         -- soft warnings from ad copy validator
+  generation_model TEXT,         -- AI model used (e.g. "gemini-2.0-flash")
   created_at TIMESTAMPTZ
 )
 
@@ -188,6 +196,48 @@ The campaign is pivoting from saw/rinse/mow/rooter to the **TAM-ranked Tier 1 tr
 | `pest.city` | Pest Control | $26B | 5 |
 
 Note: crimp/eave/excavation/disaster are Tier 1 by TAM but are `status: "upcoming"` in the app — campaigns for those come in Phase 2 once they're built.
+
+---
+
+## Ad Copy Generation Pipeline
+
+The generation pipeline replaces the old NB2 ad copy with constrained AI-generated copy. It produces trade-authentic, validated ads across 4 angles and 4 platforms.
+
+### Copy Angles (4 per trade)
+| Angle | Strategy |
+|-------|----------|
+| `pain` | Problem amplification — missed calls, lost revenue, chaos |
+| `solution` | Feature-led — what the app does, how it works |
+| `proof` | Social proof — results, trust, industry adoption |
+| `urgency` | Time pressure — seasonal demand, competitive advantage |
+
+### Pipeline Flow
+```
+Trade context → Prompt (angle + platform + trade) → Gemini 2.0 Flash → Validator → DB insert
+```
+
+### Validation Rules (Hard — blocks save)
+- Price must be "$39/mo"
+- Must include "14-day free trial" and "no credit card"
+- Must use trade's .city domain, never "saw.city" (unless trade IS saw)
+- Character limits: primary_text ≤ 2000, headline ≤ 300, cta ≤ 200
+- No generic language ("trade business", "small business software")
+
+### CLI Commands
+```bash
+4h generate-copy --trades all --platforms all --angles all     # Full run: 320 ads
+4h generate-copy --trades pipe,mow --platforms linkedin --angles pain  # Targeted
+4h generate-copy --trades pipe --dry-run                       # Preview without saving
+4h ads archive --campaign-group nb2                            # Archive old NB2 ads
+```
+
+### Key Files
+| File | Purpose |
+|------|---------|
+| `lib/trade-copy-context.ts` | Context data for 20 trades (services, pain points, tools, persona) |
+| `lib/ad-copy-prompts.ts` | Builds structured Gemini prompts per angle×platform |
+| `lib/ad-copy-validator.ts` | Validates generated copy against hard rules |
+| `app/api/ads/generate/route.ts` | POST endpoint — orchestrates the full pipeline |
 
 ---
 

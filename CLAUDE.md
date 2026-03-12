@@ -20,7 +20,7 @@ Marketing campaign command center for **sawcity-lite** (a separate repo at `~/pr
 ```bash
 npm run dev          # Dev server at localhost:3000
 npm run build        # Production build (sharp fails locally on Windows — works on Vercel)
-npm test             # Vitest — 74 tests covering lib/ functions
+npm test             # Vitest — 136 tests covering lib/ functions
 npm run lint         # ESLint
 ```
 
@@ -29,7 +29,7 @@ npm run lint         # ESLint
 1. **Never modify sawcity-lite.** It's a different project.
 2. **Only push to `main`** — Vercel webhook is wired to `main`.
 3. **Nothing goes live externally without Jarrad's approval.**
-4. **Price is ALWAYS $79/mo** in ad copy.
+4. **Price is ALWAYS $39/mo** in ad copy.
 5. **"14-day free trial, no credit card required"** in all ad copy.
 6. **Trade-authentic copy only** — use trade-specific `.city` domains, never generic "Saw.City".
 7. **TRADE_MAP rule:** New trades must be added to `lib/trade-utils.ts → TRADE_MAP` in the same commit. Missing entries silently fall back to `saw.city` badge.
@@ -50,13 +50,16 @@ npm run lint         # ESLint
 | `lib/engine-logic.ts` | Signal evaluation, alert checking, recommendations |
 | `lib/telegram.ts` | Telegram Bot API wrapper |
 | `lib/notification-templates.ts` | Formatted messages for Telegram alerts/reports |
+| `lib/trade-copy-context.ts` | Per-trade context data for AI copy generation (20 live trades) |
+| `lib/ad-copy-prompts.ts` | Prompt templates for constrained ad copy generation (4 angles x 4 platforms) |
+| `lib/ad-copy-validator.ts` | Hard rule validation + soft warnings for generated ad copy |
 | `lib/project-state-data.ts` | GTM board state (single source of truth) |
 | `scripts/4h-cli.js` | CLI for all campaign operations |
 | `scripts/4h-engine.js` | VPS automation script (cron-driven) |
-| `app/api/*/route.ts` | 22 API routes |
+| `app/api/*/route.ts` | 23 API routes (includes /api/ads/generate for AI copy) |
 | `app/*/page.tsx` | 15 pages |
 | `supabase/migrations/` | SQL migrations (run via Supabase SQL Editor or pg) |
-| `lib/__tests__/` | Vitest test suites (96 tests) |
+| `lib/__tests__/` | Vitest test suites (136 tests) |
 
 ## Database
 
@@ -70,6 +73,8 @@ npm run lint         # ESLint
 
 - API routes use `okJson()`/`errorJson()` from `lib/api.ts` — CORS is handled there
 - All routes call `requireAuth()` — auth passes through when no Bearer header (dashboard calls)
-- AI endpoints (`/api/ai-creative`, `/api/creative/batch`, `/api/regen-creative`) are rate-limited
+- AI endpoints (`/api/ai-creative`, `/api/creative/batch`, `/api/regen-creative`, `/api/ads/generate`) are rate-limited
 - `normalizeAd()` handles bidirectional snake_case ↔ camelCase
 - Non-blocking side effects: Drive backup and activity logging use fire-and-forget pattern
+- Ad copy generation pipeline: trade context → angle+platform prompt → Gemini → validator → DB insert
+- Ads table has `angle`, `validation_notes`, `generation_model` columns for AI-generated copy tracking

@@ -10,6 +10,13 @@ import { AdPreview } from "@/components/ad-preview/index";
 type TradeFilter = "all" | string;
 type PlatformFilter = "all" | "linkedin" | "youtube" | "facebook" | "instagram";
 
+const angleColors: Record<string, string> = {
+  pain: "bg-rose-900/50 text-rose-300",
+  solution: "bg-blue-900/50 text-blue-300",
+  proof: "bg-green-900/50 text-green-300",
+  urgency: "bg-amber-900/50 text-amber-300",
+};
+
 export default function ApprovalPage() {
   const [pending, setPending] = useState<Ad[]>([]);
   const [reviewed, setReviewed] = useState<Ad[]>([]);
@@ -260,7 +267,23 @@ export default function ApprovalPage() {
 
             <div className="space-y-4">
               {ads.map((ad) => (
-                <AdPreview key={ad.id} ad={ad} tradeInfo={info} onDecision={decide} />
+                <div key={ad.id} className="space-y-1">
+                  {(ad.angle || ad.validation_notes) && (
+                    <div className="flex flex-wrap items-center gap-2 px-1">
+                      {ad.angle && (
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${angleColors[ad.angle] ?? "bg-slate-700 text-slate-300"}`}>
+                          {ad.angle}
+                        </span>
+                      )}
+                      {ad.validation_notes && (
+                        <span className="text-xs text-amber-400" title={ad.validation_notes}>
+                          ⚠ {ad.validation_notes}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <AdPreview ad={ad} tradeInfo={info} onDecision={decide} />
+                </div>
               ))}
             </div>
           </Card>

@@ -146,6 +146,9 @@ export function normalizeAd(input: any): Ad {
     image_url: (input.image_url ?? input.imageUrl ?? null) as string | null,
     creative_variant: (input.creative_variant ?? input.creativeVariant ?? 1) as number,
     creativeVariant: (input.creative_variant ?? input.creativeVariant ?? 1) as number,
+    angle: (input.angle ?? null) as string | null,
+    validation_notes: (input.validation_notes ?? null) as string | null,
+    generation_model: (input.generation_model ?? null) as string | null,
     statusHistory: normalizeStatusHistory(input),
   };
 }
@@ -169,6 +172,9 @@ export function adToDb(ad: Partial<Ad>) {
     workflow_stage: ad.workflow_stage ?? ad.workflowStage,
     image_url: ad.image_url ?? ad.imageUrl ?? null,
     creative_variant: ad.creative_variant ?? ad.creativeVariant ?? undefined,
+    angle: ad.angle ?? undefined,
+    validation_notes: ad.validation_notes ?? undefined,
+    generation_model: ad.generation_model ?? undefined,
     created_at: ad.created_at ?? ad.createdAt,
     updated_at: ad.updated_at ?? ad.updatedAt,
   };

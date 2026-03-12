@@ -38,6 +38,9 @@ export interface Ad {
   image_url?: string | null;
   creative_variant?: number | null;  // 1 = hands-on zoom (c1/hero_a), 2 = company overview, 3 = on-site action wide
   creativeVariant?: number | null;
+  angle?: string | null;              // pain, solution, proof, urgency — for AI-generated copy
+  validation_notes?: string | null;   // soft warnings from ad copy validator
+  generation_model?: string | null;   // AI model used to generate copy (e.g., "gemini-2.0-flash")
   statusHistory?: StatusHistoryItem[];
 }
 

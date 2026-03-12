@@ -6,13 +6,12 @@
 
 ## BLOCKED — Waiting on Jarrad
 
-### TASK-001: Trial Messaging Decision
-1,040 NB2 ads missing "14-day free trial, no credit card required" messaging.
-- **A:** Patch existing ads (script appends to primary_text)
-- **B:** Generate v2 pass (baked-in, higher quality, more tokens)
+### TASK-002: Approve Generated Ad Variants
+Generate 320 ads (`4h generate-copy --trades all --angles all`), then review at https://pumpcans.com/approval.
+Ads now show angle badges (pain/solution/proof/urgency) and validation warnings.
 
-### TASK-002: Approve 1,040 Ad Variants
-https://pumpcans.com/approval — use Bulk Approve per trade group.
+### TASK-010: Archive Old NB2 Ads
+Run `4h ads archive --campaign-group nb2` to archive the 1,040 old NB2 ads before generating replacements.
 
 ### TASK-003: Ad Account Setup
 Create accounts: LinkedIn Campaign Manager, Meta Ads Manager, Google/YouTube Ads.
@@ -65,6 +64,18 @@ Then verify at https://pumpcans.com/influencer.
 - [x] 130 additional images (C2/C3) for 65 trades
 - [x] 1,040 ads inserted (65 trades x 2 directions x 8 variants)
 - [x] Anti-slop audit passed on all 1,040 ads
+
+### Ad Copy Generation Pipeline (2026-03-12)
+- [x] TASK-001 resolved: new pipeline replaces NB2 ads with validated, trade-authentic copy
+- [x] Trade copy context for 20 live trades (lib/trade-copy-context.ts)
+- [x] Prompt templates for 4 angles x 4 platforms (lib/ad-copy-prompts.ts)
+- [x] Ad copy validator with hard rules + soft warnings (lib/ad-copy-validator.ts)
+- [x] Generation API endpoint POST /api/ads/generate (Gemini 2.0 Flash)
+- [x] CLI commands: generate-copy, ads archive, context generate
+- [x] Approval page: angle badges + validation warning display
+- [x] DB columns: angle, validation_notes, generation_model added to ads table
+- [x] Price updated: $79/mo → $39/mo across all docs and code
+- [x] 40 new validator tests (136 total)
 
 ### Automation Engine (2026-03-12)
 - [x] Telegram notifications (lib/telegram.ts, lib/notification-templates.ts)

@@ -195,7 +195,24 @@ async function cmdAds(subArgs) {
     return;
   }
 
-  console.error('Unknown ads subcommand. Use: list, approve, reject');
+  if (sub === 'archive') {
+    const campaignGroup = flags['campaign-group'] || flags.campaignGroup;
+    if (!campaignGroup) { console.error('--campaign-group is required (e.g. nb2)'); process.exit(1); }
+    const qs = new URLSearchParams();
+    const data = await api('GET', `/api/ads?${qs}`);
+    let rows = Array.isArray(data) ? data : [];
+    rows = rows.filter((a) => a.campaign_group?.includes(campaignGroup) && a.status !== 'archived');
+    if (rows.length === 0) { console.log(`No ads found matching campaign group "${campaignGroup}".`); return; }
+    console.log(`Archiving ${rows.length} ads with campaign group containing "${campaignGroup}"...`);
+    const result = await api('POST', '/api/ads/bulk-status', {
+      newStatus: 'rejected',
+      campaignGroupContains: campaignGroup,
+    });
+    console.log(`Done. Archived ${result.updated ?? rows.length} ads.`);
+    return;
+  }
+
+  console.error('Unknown ads subcommand. Use: list, approve, reject, archive');
   process.exit(1);
 }
 
@@ -1005,6 +1022,79 @@ async function cmdBudgetRecommend() {
   }
 }
 
+// ─── Generate Copy ────────────────────────────────────────────────────────────
+
+async function cmdGenerateCopy(subArgs) {
+  const flags = parseArgs(subArgs);
+
+  const trades = flags.trades ? flags.trades.split(',') : 'all';
+  const platforms = flags.platforms ? flags.platforms.split(',') : 'all';
+  const angles = flags.angles ? flags.angles.split(',') : 'all';
+  const dryRun = Boolean(flags['dry-run'] || flags.dryRun);
+
+  console.log(`Generating ad copy...`);
+  console.log(`  Trades:    ${Array.isArray(trades) ? trades.join(', ') : trades}`);
+  console.log(`  Platforms: ${Array.isArray(platforms) ? platforms.join(', ') : platforms}`);
+  console.log(`  Angles:    ${Array.isArray(angles) ? angles.join(', ') : angles}`);
+  console.log(`  Dry run:   ${dryRun}`);
+  console.log('');
+
+  const result = await api('POST', '/api/ads/generate', {
+    trades,
+    platforms,
+    angles,
+    dryRun,
+  });
+
+  console.log(`Generated: ${result.generated}`);
+  console.log(`Validated: ${result.validated}`);
+  console.log(`Failed:    ${result.failed_validation}`);
+
+  if (result.validation_failures?.length > 0) {
+    console.log('\nValidation failures:');
+    for (const f of result.validation_failures) {
+      console.log(`  ✗ ${f.trade}/${f.platform}/${f.angle}: ${f.reason}`);
+    }
+  }
+
+  if (dryRun && result.ads?.length > 0) {
+    console.log('\nPreview (dry run):');
+    for (const ad of result.ads) {
+      console.log(`\n--- ${ad.id || `${ad.trade}/${ad.platform}/${ad.angle}`} ---`);
+      console.log(`Headline: ${ad.headline}`);
+      if (ad.primary_text) {
+        console.log(`Copy: ${ad.primary_text.slice(0, 200)}${ad.primary_text.length > 200 ? '...' : ''}`);
+      }
+    }
+  }
+}
+
+// ─── Context Generate ─────────────────────────────────────────────────────────
+
+async function cmdContext(subArgs) {
+  const sub = subArgs[0];
+  const flags = parseArgs(subArgs.slice(1));
+
+  if (sub === 'generate') {
+    if (!flags.trade) { console.error('--trade <slug> is required'); process.exit(1); }
+    console.log(`Generating trade context for "${flags.trade}"...`);
+    console.log('(Not yet implemented — manually add context to lib/trade-copy-context.ts)');
+    console.log(`\nTemplate:\n  ${flags.trade}: {`);
+    console.log(`    trade: "Trade Name",`);
+    console.log(`    domain: "${flags.trade}.city",`);
+    console.log(`    services: ["service1", "service2", "service3"],`);
+    console.log(`    painPoints: ["pain1", "pain2", "pain3"],`);
+    console.log(`    tools: ["tool1", "tool2", "tool3"],`);
+    console.log(`    persona: "description of target buyer",`);
+    console.log(`    seasonality: "when demand peaks",`);
+    console.log(`  },`);
+    return;
+  }
+
+  console.error('Unknown context subcommand. Use: generate');
+  process.exit(1);
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -1019,6 +1109,11 @@ Commands:
   ads approve --id <id>
   ads approve --all [--trade <slug>] [--status pending]
   ads reject --id <id>
+  ads archive --campaign-group <group>
+
+  generate-copy [--trades pipe,mow|all] [--platforms linkedin,facebook|all] [--angles pain,solution|all] [--dry-run]
+
+  context generate --trade <slug>
 
   campaign status [--table]
   campaign set-status --status active|paused|pre-launch
@@ -1072,6 +1167,8 @@ Config:
 
   const commands = {
     ads: cmdAds,
+    'generate-copy': cmdGenerateCopy,
+    context: cmdContext,
     campaign: cmdCampaign,
     budget: cmdBudget,
     metrics: cmdMetrics,

@@ -35,7 +35,7 @@ Jarrad issues commands in plain language. Bob does the work. Dashboard reflects 
 ## AD COPY SOPs
 
 ### Hard Rules (Non-Negotiable)
-1. **Price is ALWAYS $79/mo** — never $99, $149, $199, or any other amount.
+1. **Price is ALWAYS $39/mo** — never $99, $149, $199, or any other amount.
 2. **"14-day free trial, no credit card required"** must appear in every ad in some form.
 3. **Trade-authentic copy only** — mechanical find-and-replace fails the anti-slop audit. Each trade needs its own vocabulary.
 4. **Never use "Saw.City" as a catch-all brand** — ads use the trade-specific `.city` domain (rinse.city, mow.city, etc.).
@@ -59,11 +59,40 @@ Current NB2 run: 8 variants per direction → 16 ads per trade (1,040 total).
 | YouTube | video | 5 |
 | **Total** | | **27 per direction** |
 
-### Ad ID Format
+### Constrained AI Generation (replaces NB2 ad copy)
+
+The NB2 2-direction strategy is superseded by the 4-angle system for all new ad copy:
+
+**4 Copy Angles (per trade, per platform):**
+| Angle | Strategy | Hook |
+|-------|----------|------|
+| `pain` | Problem amplification | "Every unanswered call is a job your competitor picks up..." |
+| `solution` | Feature-led | "Pipe.City handles your scheduling, dispatch, and follow-ups..." |
+| `proof` | Social proof | "Trade businesses using Pipe.City are booking 30% more jobs..." |
+| `urgency` | Time pressure | "Peak season is coming. Your competitors are already automating..." |
+
+**Generation flow:**
+```
+1. 4h ads archive --campaign-group nb2          → Archive 1,040 old ads
+2. 4h generate-copy --trades all --angles all   → Generate 320 fresh ads (20 trades x 4 platforms x 4 angles)
+3. Visit /approval                              → Review by trade, approve/reject
+4. Approved ads ready for platform upload
+```
+
+**Validation is automatic.** Every generated ad is checked against hard rules (pricing, trial, domain, char limits, no generic language). Failed validation → auto-retry once → report failure.
+
+**Generated Ad ID Format:**
+```
+{trade}_{platform}_{angle}_{timestamp}
+```
+Campaign group: `gen_{trade}_{angle}`
+UTM campaign: `gen_2026-03_{trade}_{angle}`
+
+### Legacy Ad ID Format (NB2)
 ```
 NB2-D{1|2}-{LI|FB|IG|YT}-{CODE}{AW|RT}
 ```
-Campaign group: `nb2_d{1|2}_{platform}_{prefix}`  
+Campaign group: `nb2_d{1|2}_{platform}_{prefix}`
 Image URL: points to `trade-heros/nb2/{slug}-hero-a.jpg`
 
 ---
@@ -83,7 +112,7 @@ Every trade gets exactly 3 NB2 images:
 |------|-----------|--------------|-----|
 | **Hero A** | `hero_a` | `trade-heros/nb2/{slug}-hero-a.jpg` | Ads / scroll-stoppers — zoomed-in hands-on scene |
 | **Hero B** | `hero_b` | `trade-heros/nb2/{slug}-hero-b.jpg` | Landing page backdrop — wide bird's-eye top-down view |
-| **OG** | `og_nb2` | `trade-ogs/nb2/{slug}-og.jpg` | Link preview banner — domain + "AI answers your calls." + $79/mo |
+| **OG** | `og_nb2` | `trade-ogs/nb2/{slug}-og.jpg` | Link preview banner — domain + "AI answers your calls." + $39/mo |
 
 ### Image Prompt Templates
 
@@ -107,7 +136,7 @@ Overhead cinematic lighting. No text. No logos. High resolution.
 ```
 Clean professional marketing banner, landscape wider than tall. Left: large bold '{DOMAIN}' white 
 on dark navy #0f172a. Below: 'AI answers your calls.' in {BRAND_COLOR}. Right: small isometric 
-icon of {BRIEF_SCENE}. Far right: '$79/mo' white. Navy background with {BRAND_COLOR} radial glow. 
+icon of {BRIEF_SCENE}. Far right: '$39/mo' white. Navy background with {BRAND_COLOR} radial glow. 
 Modern minimal tech brand.
 ```
 
@@ -181,9 +210,11 @@ node scripts/audit-ads.mjs
 Checks:
 - image_url slug matches trade slug
 - landing_path matches domain prefix
-- $79/mo present (not $99, $149, etc.)
+- $39/mo present (not $79, $99, $149, etc.)
 - No blank headlines
 - Trade vocabulary signals present in copy (not find-and-replace slop)
+
+**Generated ads skip the audit** — they are validated at generation time by `lib/ad-copy-validator.ts`.
 
 If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 
@@ -239,9 +270,10 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 
 | Layer | What |
 |-------|------|
-| Frontend | Next.js 15, TypeScript, Tailwind CSS |
-| Backend | Supabase (PostgreSQL + Storage + PostgREST), 13 API routes |
-| AI Copy Gen | Gemini 2.5 Flash (`/api/generate` route) |
+| Frontend | Next.js 16, TypeScript, Tailwind 4 |
+| Backend | Supabase (PostgreSQL + Storage + PostgREST), 23 API routes |
+| AI Copy Gen | Gemini 2.0 Flash (`/api/ads/generate` — constrained pipeline with validator) |
+| AI Copy Gen (legacy) | Gemini 2.5 Flash (`/api/generate` route) |
 | AI Image Gen | Gemini 3.1 Flash Image — Nano Banana 2 (`gemini-3.1-flash-image-preview`) |
 | Domain | pumpcans.com (GoDaddy DNS → Vercel) |
 | Deploy | Vercel — auto-deploy on push to `main` in `jarrad1872/project-4h-dashboard` |
@@ -295,9 +327,10 @@ Each trade has **3 swappable isometric ad images** on `/ads`. Every ad card has 
 ## DB SCHEMA QUICK REF
 
 ```sql
-ads: id, platform, campaign_group, format, primary_text, headline, cta, 
-     landing_path, utm_*, status, workflow_stage, image_url, 
-     creative_variant (INT 1-3, default 1), created_at, updated_at
+ads: id, platform, campaign_group, format, primary_text, headline, cta,
+     landing_path, utm_*, status, workflow_stage, image_url,
+     creative_variant (INT 1-3, default 1), angle, validation_notes,
+     generation_model, created_at, updated_at
 
 trade_assets: id, trade_slug, asset_type (hero|og|hero_a|hero_b|og_nb2), 
               image_url, status (pending|approved|rejected), notes, created_at
