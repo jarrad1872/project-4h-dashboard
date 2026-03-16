@@ -1,6 +1,6 @@
 # Project 4H — Task Board
 
-**Last updated:** 2026-03-13
+**Last updated:** 2026-03-13 (evening)
 
 ---
 
@@ -37,69 +37,15 @@ Research shows message match between ad and landing page can increase conversion
 
 ## READY TO DO
 
-### TASK-011: Update Stats to Real Research Numbers
-Current ads use "62% of calls go unanswered." Actual data is stronger:
-- **74.1%** of trade calls go completely unanswered (NextPhone)
-- **85%** of callers who reach voicemail hang up and call the next guy (NextPhone)
-- **78%** of customers book with whoever answers first (NextPhone)
-- **$1,200** average revenue per missed call (Invoca)
-- **Less than 3%** of callers leave a voicemail (Invoca)
-- **60x less likely** to close a lead after waiting 1 day (multiple sources)
-**Changes:** Update `lib/trade-copy-context.ts` stats references, `lib/ad-copy-prompts.ts` proof angle to use 74.1%, and validator proof pattern to match new numbers.
-
-### TASK-012: Add Owner Agent to Ad Copy Pipeline
-The Owner Agent (voice-controlled business management) is the #1 competitive differentiator — no competitor has it. Zero current ads mention it.
-**Changes:**
-- Add `ownerAgentScenarios` field to `TradeCopyContext` (e.g., "Schedule Mike for Thursday at seven", "Mark ACME complete for $750", "Text the customer I'm on my way")
-- Add "voice-boss" angle to `CopyAngle` type and `ANGLE_PROMPTS`
-- Add Owner Agent to the immutable product description block in prompts
-- Update validator to accept "voice", "text", "manage" as product-mention terms for voice-boss angle
-
-### TASK-013: Add New Ad Angles (7 total)
-Current 4 angles (pain/solution/proof/urgency) are really 4 ways of saying "missed calls." Meta's Andromeda algorithm punishes creative sameness. Need radically different concepts.
-**New angles to add:**
-- `ai-employee` — "Like hiring a receptionist for $39/mo" (familiar comparison, not tech-scary)
-- `voice-boss` — "Run your business by voice from your truck" (Owner Agent feature, our unique moat)
-- `math` — "74% unanswered x $1,200/call = $260K/year gone" (pure numbers, undeniable ROI)
-- `junk-shield` — "Stop spam from cluttering your day" (different pain point entirely)
-- `demo-call` — "Call this number right now. Hear it yourself." (instant proof, zero friction)
-- `competitor` — keep current urgency, rename for clarity
-- `missed-call` — keep current pain, rename for clarity
-**Changes:** `lib/trade-copy-context.ts` (new CopyAngle values), `lib/ad-copy-prompts.ts` (new angle prompts), `lib/ad-copy-validator.ts` (angle term patterns), tests.
-
 ### TASK-014: Add Demo Phone CTA to Ads
 Every trade in sawcity-lite has a provisioned Twilio demo number. Landing pages feature "Call [PHONE] — Live Demo" prominently. Zero ads use this.
 **Why it's powerful:** Instant proof, zero commitment, memorable, pattern interrupt — no other SaaS ad asks them to call a number and hear the product work.
 **Changes:** Need to source demo numbers per trade from sawcity-lite config, add to trade context, create demo-call angle that includes the number. Facebook ads with "Call Now" CTA are supported natively.
 
-### TASK-015: Add Social Proof to Ad Copy
-Zero current ads mention user counts, results, or peer validation. Research: peer proof is #1 trust signal for trade owners.
-**Options (even directional helps):**
-- "Built by a concrete cutter who was tired of missing calls"
-- "Serving 20+ trades from plumbing to painting"
-- "One answered call pays for a year of service"
-- Founder credibility: "Built by the owner of a $5M concrete cutting company"
-**Changes:** Add `socialProof` field to prompt context, update prompt template.
-
 ### TASK-016: Reweight Platform Allocation
 Current: equal 25% per platform. Research shows blue-collar trade owners are 70.4% Facebook, ~60% Instagram, ~70% YouTube, only 28.3% LinkedIn.
 **New allocation:** Facebook 40%, Instagram 30%, YouTube 20%, LinkedIn 10%.
 **Changes:** Update generation commands/defaults. Consider platform-specific creative strategies (vertical video for IG/YT, carousel for FB, professional copy for LI targeting larger operations).
-
-### TASK-017: Add Junk Call Screening + Repeat Caller to Ad Copy
-Two product features with real emotional resonance that aren't in any ads:
-- **Junk call screening:** "Stop spam, robocalls, and dead-air dials from cluttering your day"
-- **Repeat caller recognition:** "Hello again, Mike" — AI greets returning customers by name
-**Changes:** Add to product description block in prompts, create junk-shield angle, add repeat-caller mention to solution/ai-employee angles.
-
-### TASK-018: Improve Copy Diversity in Generation
-Current ads are formulaic: `[busy moment]. [missed call]. [domain] answers. $39/mo. Trial.` After seeing 3, they become wallpaper.
-**Missing emotional beats:**
-- Guilt of checking voicemail at dinner and seeing 3 missed leads
-- Frustration of paying for Google Ads then missing the calls they generate
-- Embarrassment when a customer says "I called you three times"
-- Relief of waking up to a text saying "3 jobs booked while you slept"
-**Changes:** Add `emotionalScenarios` to trade context, update prompts with explicit diversity instructions ("Do NOT use the pattern [busy moment + missed call + domain answers]"), add more example tones per angle.
 
 ### ~~TASK-005: Apply Pending Doc Updates~~ (Done 2026-03-12)
 Both items already covered by existing sections. AGENTS.md key files entry updated with fallback warning.
@@ -119,6 +65,15 @@ Run `4h ads archive --campaign-group nb2` to archive the 1,040 old NB2 ads befor
 ---
 
 ## DONE
+
+### Campaign Improvement Sprint (2026-03-13)
+- [x] TASK-011: Stats updated from 62% to 74.1% with 5 real research data points (NextPhone, Invoca)
+- [x] TASK-012: Owner Agent added — ownerAgentScenarios on all 20 trades, voice-boss angle, product description updated
+- [x] TASK-013: Expanded from 4 to 8 angles (ai-employee, math, junk-shield, voice-boss + originals; demo-call pending TASK-014)
+- [x] TASK-015: Social proof section added (founder credibility, 20+ trades, ROI anchor, control assurance)
+- [x] TASK-017: Junk call screening + repeat caller recognition in product description block
+- [x] TASK-018: Creative diversity instructions + 5 emotional beats to break formulaic copy
+- [x] 151 tests passing (10 new), zero type errors
 
 ### Security Hardening (2026-03-11)
 - [x] CORS restricted to pumpcans.com (was wildcard)
