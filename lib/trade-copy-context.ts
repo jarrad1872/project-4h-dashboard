@@ -7,7 +7,7 @@
  * THE PHONE RINGING — not generic business software.
  */
 
-export type CopyAngle = "pain" | "solution" | "proof" | "urgency" | "voice-boss" | "ai-employee" | "math" | "junk-shield";
+export type CopyAngle = "pain" | "solution" | "proof" | "urgency" | "voice-boss" | "ai-employee" | "math" | "junk-shield" | "demo-call";
 
 export interface TradeCopyContext {
   trade: string;            // Human-readable trade name
@@ -16,6 +16,7 @@ export interface TradeCopyContext {
   missedCallCost: string;   // "$3K exterior job gone to the next painter"
   busyMoment: string;       // "up on a ladder cutting in trim"
   ownerAgentScenarios: string[];  // Voice commands the owner can use — "Schedule Mike for Thursday at seven"
+  demoPhone?: string;             // Formatted demo number — "(385) 475-3881" (not all trades have one)
 }
 
 export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
@@ -36,6 +37,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the Johnson re-pipe complete for twenty-two hundred",
       "Text the customer I'm on my way",
     ],
+    demoPhone: "(385) 475-3881",
   },
 
   mow: {
@@ -53,6 +55,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "What's on my route today?",
       "Text Mrs. Patterson we'll be there by noon",
     ],
+    demoPhone: "(385) 458-9028",
   },
 
   coat: {
@@ -70,6 +73,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the Wilson interior complete for eighteen hundred",
       "How many calls did I get this week?",
     ],
+    demoPhone: "(385) 334-5577",
   },
 
   duct: {
@@ -87,6 +91,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the furnace install complete for forty-five hundred",
       "Add a change order — capacitor and contactor both needed replacing",
     ],
+    demoPhone: "(385) 458-3456",
   },
 
   pest: {
@@ -104,6 +109,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the restaurant job complete for eight hundred",
       "Text the homeowner the inspection report is ready",
     ],
+    demoPhone: "(385) 354-6514",
   },
 
   electricians: {
@@ -174,6 +180,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the Chen Plumbing slab cut complete for seven fifty",
       "Add a change order — extra doorway cut for two hundred",
     ],
+    demoPhone: "(385) 475-6437",
   },
 
   rinse: {
@@ -191,6 +198,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the driveway job complete for four fifty",
       "Text the restaurant owner we can do the parking lot Tuesday",
     ],
+    demoPhone: "(385) 378-6326",
   },
 
   rooter: {
@@ -208,6 +216,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the sewer camera job complete for six hundred",
       "What emergency calls came in today?",
     ],
+    demoPhone: "(385) 595-5804",
   },
 
   pave: {
@@ -225,6 +234,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the Henderson driveway complete for fifty-two hundred",
       "Text the property manager the sealcoat is curing — stay off 24 hours",
     ],
+    demoPhone: "(385) 469-2630",
   },
 
   haul: {
@@ -242,6 +252,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the equipment haul complete for eight hundred",
       "What loads are on the board for today?",
     ],
+    demoPhone: "(385) 360-2023",
   },
 
   grade: {
@@ -259,6 +270,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the site grading complete for forty-eight hundred",
       "Text the builder we'll be done by end of day",
     ],
+    demoPhone: "(385) 338-6542",
   },
 
   lockout: {
@@ -276,6 +288,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the car lockout complete for one fifty",
       "Text the business owner the new keys are ready for pickup",
     ],
+    demoPhone: "(385) 481-5772",
   },
 
   plow: {
@@ -293,6 +306,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the Target lot complete for three fifty",
       "What lots still need salting?",
     ],
+    demoPhone: "(385) 442-7588",
   },
 
   prune: {
@@ -310,6 +324,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the elm removal complete for twenty-two hundred",
       "Text the homeowner the stump grinding is done",
     ],
+    demoPhone: "(385) 474-4347",
   },
 
   chimney: {
@@ -327,6 +342,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the flue relining complete for twelve hundred",
       "How many sweep appointments do I have this week?",
     ],
+    demoPhone: "(385) 438-3357",
   },
 
   detail: {
@@ -344,6 +360,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the ceramic coating complete for three hundred",
       "Text the fleet manager the vans are ready for pickup",
     ],
+    demoPhone: "(385) 206-3062",
   },
 
   brake: {
@@ -361,6 +378,7 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
       "Mark the Martinez brake job complete for six fifty",
       "Add a change order — needed new spark plugs too, one twenty",
     ],
+    demoPhone: "(385) 360-4963",
   },
 };
 

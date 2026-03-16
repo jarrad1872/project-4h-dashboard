@@ -54,6 +54,10 @@ const ANGLE_TERMS: Record<string, { pattern: RegExp; label: string }> = {
     pattern: /\b(spam|junk|screen|filter|block|robocall|tire.?kick|garbage|bouncer)\b/i,
     label: "junk-shield",
   },
+  "demo-call": {
+    pattern: /(\(\d{3}\)\s?\d{3}-\d{4}|call.*right now|hear it|try it|live demo)/i,
+    label: "demo-call",
+  },
 };
 
 const CHAR_LIMITS: Record<keyof AdCopyFields, number> = {

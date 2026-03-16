@@ -462,6 +462,24 @@ describe("Soft warning — Angle alignment", () => {
     const result = validateAdCopy(copy, "pipe", "junk-shield");
     expect(result.warnings).not.toContain('Copy angle is "junk-shield" but no junk-shield language detected');
   });
+
+  it('warns when demo-call angle has no demo-call language', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City answers every call — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "demo-call");
+    expect(result.warnings).toContain('Copy angle is "demo-call" but no demo-call language detected');
+  });
+
+  it("does not warn when demo-call angle has phone number", () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Call (385) 475-3881 right now. Pipe.City AI for plumbers. $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "demo-call");
+    expect(result.warnings).not.toContain('Copy angle is "demo-call" but no demo-call language detected');
+  });
 });
 
 // ─── formatValidationNotes ────────────────────────────────────────────────────

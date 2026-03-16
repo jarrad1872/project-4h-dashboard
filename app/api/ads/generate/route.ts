@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 const COPY_MODEL = "gemini-2.0-flash";
 const ALL_PLATFORMS: AdPlatform[] = ["linkedin", "facebook", "instagram", "youtube"];
-const ALL_ANGLES: CopyAngle[] = ["pain", "solution", "proof", "urgency", "voice-boss", "ai-employee", "math", "junk-shield"];
+const ALL_ANGLES: CopyAngle[] = ["pain", "solution", "proof", "urgency", "voice-boss", "ai-employee", "math", "junk-shield", "demo-call"];
 
 interface GenerateRequest {
   trades: string[] | "all";
@@ -146,6 +146,9 @@ export async function POST(request: Request) {
 
       for (const platform of platforms) {
         for (const angle of angles) {
+          // Skip demo-call for trades without a demo phone number
+          if (angle === "demo-call" && !context.demoPhone) continue;
+
           const prompt = buildAdCopyPrompt(context, angle, platform);
           let copy: GeneratedAdCopy | null = null;
           let attempt = 0;

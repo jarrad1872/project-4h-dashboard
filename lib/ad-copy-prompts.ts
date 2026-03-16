@@ -120,6 +120,16 @@ const ANGLE_PROMPTS: Record<CopyAngle, string> = {
     "Position it as freedom: hands on the wheel, mouth running the business.",
     'Example tone: "Driving between jobs? Just say: Schedule Mike for Thursday at seven. Done."',
   ].join(" "),
+
+  "demo-call": [
+    "Use a DEMO CALL / TRY IT NOW angle.",
+    "The ad MUST include the demo phone number from the context.",
+    "Challenge the reader to call the number RIGHT NOW and hear the AI answer.",
+    "This is the ultimate pattern interrupt — no other ad asks them to call a number.",
+    "Position it as zero-commitment proof: no signup, no email, just call and hear it.",
+    "Keep it short and daring. The phone number IS the hook.",
+    'Example tone: "Call (385) 475-3881 right now. That\'s an AI receptionist for plumbers. Ask it about a water heater. $39/mo."',
+  ].join(" "),
 };
 
 /**
@@ -149,7 +159,7 @@ Domain: ${context.domain}
 Who calls: ${context.callScenarios.join("; ")}
 Missed call cost: ${context.missedCallCost}
 Busy moment (when they can't answer): ${context.busyMoment}
-Owner voice commands: ${context.ownerAgentScenarios.join("; ")}
+Owner voice commands: ${context.ownerAgentScenarios.join("; ")}${context.demoPhone ? `\nDemo phone number: ${context.demoPhone} (live — anyone can call this right now to hear the AI)` : ""}
 
 === COPY ANGLE ===
 ${angleInstruction}
