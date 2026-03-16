@@ -31,7 +31,7 @@ const ANGLE_TERMS: Record<string, { pattern: RegExp; label: string }> = {
     label: "pain-point",
   },
   proof: {
-    pattern: /(%|more|increase|result|trust|rating|review|grow|62)/i,
+    pattern: /(%|more|increase|result|trust|rating|review|grow|74|85|78|\$1,?200)/i,
     label: "social-proof",
   },
   urgency: {

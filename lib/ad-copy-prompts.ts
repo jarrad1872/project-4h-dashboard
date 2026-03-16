@@ -59,10 +59,15 @@ const ANGLE_PROMPTS: Record<CopyAngle, string> = {
 
   proof: [
     "Use a MATH / PROOF angle.",
-    "Lead with the 62% stat: 62% of trade calls go unanswered.",
-    "Then do the math: one answered call pays for a year of service at $39/mo.",
+    "Lead with one of these real stats:",
+    "- 74% of trade calls go completely unanswered (NextPhone)",
+    "- 85% of callers who reach voicemail hang up and call the next guy",
+    "- 78% of customers book with whoever answers first",
+    "- Average missed call costs $1,200 in lost revenue",
+    "- Less than 3% of callers leave a voicemail",
+    "Pick the stat that hits hardest for this trade. Then do the math: one answered call pays for a year of service at $39/mo.",
     "Build credibility through the numbers — missed calls = missed revenue, and the math is undeniable.",
-    'Example tone: "62% of plumbing calls go unanswered. Yours won\'t. $39/mo."',
+    'Example tone: "74% of plumbing calls go unanswered. Yours won\'t. $39/mo."',
   ].join(" "),
 
   urgency: [

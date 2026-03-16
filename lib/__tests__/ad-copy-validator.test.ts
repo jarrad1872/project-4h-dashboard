@@ -339,7 +339,7 @@ describe("Soft warning — Angle alignment", () => {
   it("does not warn when proof angle has proof language", () => {
     const copy = {
       ...validCopy(),
-      primary_text: "62% of plumbing calls go unanswered. Pipe.City — $39/mo, 14-day free trial, no credit card.",
+      primary_text: "74% of plumbing calls go unanswered. Pipe.City — $39/mo, 14-day free trial, no credit card.",
     };
     const result = validateAdCopy(copy, "pipe", "proof");
     expect(result.warnings).not.toContain('Copy angle is "proof" but no social-proof language detected');
