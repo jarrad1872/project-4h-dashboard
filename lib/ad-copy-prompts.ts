@@ -161,12 +161,22 @@ cta: MAX ${guidelines.maxCta} characters
 - One answered call pays for a year of service
 - Every action the AI takes queues for your approval — you stay in control
 
+=== CREATIVE DIVERSITY (CRITICAL) ===
+Do NOT use the formula: "[busy moment]. [missed call]. [domain] answers. $39/mo. Trial."
+Vary your structure. Try these emotional beats:
+- Guilt: checking voicemail at dinner, seeing 3 missed leads
+- Frustration: paying for Google Ads then missing the calls they generate
+- Embarrassment: customer says "I called you three times"
+- Relief: waking up to a text saying "3 jobs booked while you slept"
+- Pride: "My AI handles the phone so I can handle the work"
+Be creative. Surprise the reader. Break patterns.
+
 === HARD REQUIREMENTS (violating any = failure) ===
 1. Price MUST be "$39/mo" or "$39/month" or "$39 per month" — no other price.
 2. MUST include "14-day free trial" somewhere in the copy.
 3. MUST include "no credit card" somewhere in the copy.
 4. MUST reference "${context.domain}" by name.
-5. Combined text MUST mention at least one of: "call", "calls", "answer", "answers", "phone", "AI employee".
+5. Combined text MUST mention at least one of: "call", "calls", "answer", "answers", "phone", "AI employee", "voice", "hands-free", "receptionist", "screen", "filter".
 6. NEVER say "scheduling", "invoicing", "quoting", "CRM", "software", "app", "platform".
 7. NEVER use: "trade business", "small business software", "saw.city" (unless the domain IS saw.city), "answered.city".
 8. Keep it SHORT. No filler. No corporate speak. Sound like a tradesperson talking to another tradesperson.
