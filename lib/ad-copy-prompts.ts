@@ -8,33 +8,38 @@ export interface GeneratedAdCopy {
 }
 
 // Platform-specific constraints — tighter limits to prevent truncation
+// Budget allocation: Facebook 40%, Instagram 30%, YouTube 20%, LinkedIn 10%
 const PLATFORM_GUIDELINES: Record<
   AdPlatform,
-  { maxPrimaryText: number; maxHeadline: number; maxCta: number; tone: string }
+  { maxPrimaryText: number; maxHeadline: number; maxCta: number; tone: string; audience: string }
 > = {
-  linkedin: {
-    maxPrimaryText: 200,
-    maxHeadline: 70,
-    maxCta: 30,
-    tone: "professional, B2B, industry authority",
-  },
   facebook: {
     maxPrimaryText: 150,
     maxHeadline: 60,
     maxCta: 25,
     tone: "conversational, relatable, scroll-stopping",
+    audience: "PRIMARY channel (40% budget). 70% of trade owners use Facebook daily. Solo operators and small crews scroll the feed between jobs. Write like you're talking to a buddy at the supply house.",
   },
   instagram: {
     maxPrimaryText: 125,
     maxHeadline: 50,
     maxCta: 25,
     tone: "punchy, visual, action-oriented",
+    audience: "HIGH-PRIORITY channel (30% budget). Younger trade owners and crews. Reels-first platform — copy must work without visuals since this is text-only. Ultra-short, hooks in first line.",
   },
   youtube: {
     maxPrimaryText: 150,
     maxHeadline: 60,
     maxCta: 25,
     tone: "direct, benefit-driven, curiosity",
+    audience: "SECONDARY channel (20% budget). Trade owners watching how-to and equipment content. Pre-roll ads — first 5 seconds must hook or they skip. Write the copy that makes them NOT skip.",
+  },
+  linkedin: {
+    maxPrimaryText: 200,
+    maxHeadline: 70,
+    maxCta: 30,
+    tone: "professional, B2B, industry authority",
+    audience: "TERTIARY channel (10% budget). Only 28% of blue-collar workers use LinkedIn. Target owners of larger operations (5+ trucks), office managers, and franchise owners. More formal, business-outcome focused.",
   },
 };
 
@@ -151,6 +156,7 @@ ${angleInstruction}
 
 === PLATFORM: ${platform.toUpperCase()} ===
 Tone: ${guidelines.tone}
+Audience: ${guidelines.audience}
 primary_text: MAX ${guidelines.maxPrimaryText} characters (1-2 sentences, no more)
 headline: MAX ${guidelines.maxHeadline} characters
 cta: MAX ${guidelines.maxCta} characters
