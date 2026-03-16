@@ -155,6 +155,12 @@ primary_text: MAX ${guidelines.maxPrimaryText} characters (1-2 sentences, no mor
 headline: MAX ${guidelines.maxHeadline} characters
 cta: MAX ${guidelines.maxCta} characters
 
+=== SOCIAL PROOF (use where natural, don't force) ===
+- Built by a concrete cutter who was tired of missing calls on the job site
+- Serving 20+ trades from plumbing to painting
+- One answered call pays for a year of service
+- Every action the AI takes queues for your approval — you stay in control
+
 === HARD REQUIREMENTS (violating any = failure) ===
 1. Price MUST be "$39/mo" or "$39/month" or "$39 per month" — no other price.
 2. MUST include "14-day free trial" somewhere in the copy.
