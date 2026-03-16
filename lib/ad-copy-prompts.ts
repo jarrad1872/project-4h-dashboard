@@ -78,6 +78,34 @@ const ANGLE_PROMPTS: Record<CopyAngle, string> = {
     'Example tone: "While your phone goes to voicemail, your competitor\'s AI is booking their calls."',
   ].join(" "),
 
+  "ai-employee": [
+    "Use an AI EMPLOYEE / RECEPTIONIST COMPARISON angle.",
+    "Position the product as hiring a team member, not buying software.",
+    "Compare to a full-time receptionist: they cost $35K+/year, call in sick, quit. This one is $39/mo and never misses a day.",
+    "Use language like 'hire', 'crew member', 'new employee', 'your receptionist'.",
+    "Make it feel like adding a person to the team, not installing an app.",
+    'Example tone: "Hire a receptionist that never calls in sick. Pipe.City — $39/mo."',
+  ].join(" "),
+
+  "math": [
+    "Use a PURE MATH / ROI angle.",
+    "Lead with a specific calculation the reader can verify in their head.",
+    "Use concrete numbers: 74% of calls unanswered × $1,200 per missed call = real dollar loss.",
+    "Or: $39/mo ÷ $1,200 per answered call = pays for itself in one call.",
+    "Or: $39/mo × 12 = $468/year. One answered call covers it.",
+    "The math must be simple, specific, and undeniable. No vague claims.",
+    'Example tone: "$39/mo. One call covers the whole year. Do the math."',
+  ].join(" "),
+
+  "junk-shield": [
+    "Use a JUNK CALL SCREENING angle.",
+    "Lead with the frustration of spam calls, robocalls, and tire-kickers.",
+    "The AI screens every call — blocks spam, filters junk, only passes real leads.",
+    "Returning customers get recognized: 'Hello again, Mike — how can I help?'",
+    "Position it as a bouncer for your phone: keeps the garbage out, lets the money in.",
+    'Example tone: "Spam, robocalls, tire-kickers — filtered. Real jobs? Booked. $39/mo."',
+  ].join(" "),
+
   "voice-boss": [
     "Use a VOICE BOSS / RUN YOUR BUSINESS BY VOICE angle.",
     "Lead with the Owner Agent — the ability to manage your entire business by voice from your truck, job site, or couch.",

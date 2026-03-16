@@ -7,7 +7,7 @@
  * THE PHONE RINGING — not generic business software.
  */
 
-export type CopyAngle = "pain" | "solution" | "proof" | "urgency" | "voice-boss";
+export type CopyAngle = "pain" | "solution" | "proof" | "urgency" | "voice-boss" | "ai-employee" | "math" | "junk-shield";
 
 export interface TradeCopyContext {
   trade: string;            // Human-readable trade name

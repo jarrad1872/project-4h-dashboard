@@ -408,6 +408,60 @@ describe("Soft warning — Angle alignment", () => {
     const result = validateAdCopy(copy, "pipe", "voice-boss");
     expect(result.warnings).not.toContain('Copy angle is "voice-boss" but no voice-boss language detected');
   });
+
+  it('warns when ai-employee angle has no ai-employee language', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City answers calls — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "ai-employee");
+    expect(result.warnings).toContain('Copy angle is "ai-employee" but no ai-employee language detected');
+  });
+
+  it("does not warn when ai-employee angle has ai-employee language", () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Hire a receptionist that never calls in sick. Pipe.City — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "ai-employee");
+    expect(result.warnings).not.toContain('Copy angle is "ai-employee" but no ai-employee language detected');
+  });
+
+  it('warns when math angle has no math language', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City answers calls — great for plumbers. 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "math");
+    expect(result.warnings).toContain('Copy angle is "math" but no math language detected');
+  });
+
+  it("does not warn when math angle has math language", () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City: $39/mo pays for itself in one call. 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "math");
+    expect(result.warnings).not.toContain('Copy angle is "math" but no math language detected');
+  });
+
+  it('warns when junk-shield angle has no junk-shield language', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City answers calls — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "junk-shield");
+    expect(result.warnings).toContain('Copy angle is "junk-shield" but no junk-shield language detected');
+  });
+
+  it("does not warn when junk-shield angle has junk-shield language", () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City screens spam and books real calls — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "junk-shield");
+    expect(result.warnings).not.toContain('Copy angle is "junk-shield" but no junk-shield language detected');
+  });
 });
 
 // ─── formatValidationNotes ────────────────────────────────────────────────────
