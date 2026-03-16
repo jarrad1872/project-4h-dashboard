@@ -134,7 +134,7 @@ export function buildAdCopyPrompt(
   const prompt = `You are writing a short, punchy ad for a trade business product. Write 1-2 sentences MAX for primary_text. Every word must earn its place.
 
 === PRODUCT (DO NOT DEVIATE) ===
-${context.domain} is an AI employee for ${context.trade.toLowerCase()} businesses. It answers every phone call 24/7, qualifies leads with trade-specific questions, books jobs automatically, and texts the owner a summary. Plus: an Owner Agent you can talk to by voice — schedule jobs, complete jobs, text customers, check your day, all hands-free from your truck. Your crew just got bigger.
+${context.domain} is an AI employee for ${context.trade.toLowerCase()} businesses. It answers every phone call 24/7, qualifies leads with trade-specific questions, books jobs automatically, and texts the owner a summary. It screens junk calls (spam, robocalls, tire-kickers) and greets returning customers by name ("Hello again, Mike"). Plus: an Owner Agent you can talk to by voice — schedule jobs, complete jobs, text customers, check your day, all hands-free from your truck. Your crew just got bigger.
 
 This is a PHONE CALL ANSWERING + VOICE BUSINESS MANAGEMENT product. NOT scheduling software. NOT invoicing. NOT quoting. The hook is always about THE PHONE RINGING when you can't answer, OR running your business by voice.
 
