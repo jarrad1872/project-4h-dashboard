@@ -1,6 +1,6 @@
 # Project 4H — Task Board
 
-**Last updated:** 2026-03-13 (evening)
+**Last updated:** 2026-03-13 (evening, sprint complete)
 
 ---
 
@@ -37,16 +37,6 @@ Research shows message match between ad and landing page can increase conversion
 
 ## READY TO DO
 
-### TASK-014: Add Demo Phone CTA to Ads
-Every trade in sawcity-lite has a provisioned Twilio demo number. Landing pages feature "Call [PHONE] — Live Demo" prominently. Zero ads use this.
-**Why it's powerful:** Instant proof, zero commitment, memorable, pattern interrupt — no other SaaS ad asks them to call a number and hear the product work.
-**Changes:** Need to source demo numbers per trade from sawcity-lite config, add to trade context, create demo-call angle that includes the number. Facebook ads with "Call Now" CTA are supported natively.
-
-### TASK-016: Reweight Platform Allocation
-Current: equal 25% per platform. Research shows blue-collar trade owners are 70.4% Facebook, ~60% Instagram, ~70% YouTube, only 28.3% LinkedIn.
-**New allocation:** Facebook 40%, Instagram 30%, YouTube 20%, LinkedIn 10%.
-**Changes:** Update generation commands/defaults. Consider platform-specific creative strategies (vertical video for IG/YT, carousel for FB, professional copy for LI targeting larger operations).
-
 ### ~~TASK-005: Apply Pending Doc Updates~~ (Done 2026-03-12)
 Both items already covered by existing sections. AGENTS.md key files entry updated with fallback warning.
 
@@ -69,11 +59,13 @@ Run `4h ads archive --campaign-group nb2` to archive the 1,040 old NB2 ads befor
 ### Campaign Improvement Sprint (2026-03-13)
 - [x] TASK-011: Stats updated from 62% to 74.1% with 5 real research data points (NextPhone, Invoca)
 - [x] TASK-012: Owner Agent added — ownerAgentScenarios on all 20 trades, voice-boss angle, product description updated
-- [x] TASK-013: Expanded from 4 to 8 angles (ai-employee, math, junk-shield, voice-boss + originals; demo-call pending TASK-014)
+- [x] TASK-013: Expanded from 4 to 9 angles (ai-employee, math, junk-shield, voice-boss, demo-call + originals)
+- [x] TASK-014: Demo phone numbers from sawcity-lite added to 17 trades, demo-call angle with live phone CTA
 - [x] TASK-015: Social proof section added (founder credibility, 20+ trades, ROI anchor, control assurance)
+- [x] TASK-016: Platform audience context + budget allocation (FB 40%, IG 30%, YT 20%, LI 10%)
 - [x] TASK-017: Junk call screening + repeat caller recognition in product description block
 - [x] TASK-018: Creative diversity instructions + 5 emotional beats to break formulaic copy
-- [x] 151 tests passing (10 new), zero type errors
+- [x] 153 tests passing (12 new), zero type errors
 
 ### Security Hardening (2026-03-11)
 - [x] CORS restricted to pumpcans.com (was wildcard)
