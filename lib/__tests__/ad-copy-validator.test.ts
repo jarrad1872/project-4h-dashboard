@@ -246,6 +246,24 @@ describe("Hard rule 8 — Product mention", () => {
     expect(result.hardFailures.every((f) => !f.includes("product mention"))).toBe(true);
   });
 
+  it('passes with "voice" in copy', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Run Pipe.City by voice — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe");
+    expect(result.hardFailures.every((f) => !f.includes("product mention"))).toBe(true);
+  });
+
+  it('passes with "hands-free" in copy', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Manage Pipe.City hands-free — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe");
+    expect(result.hardFailures.every((f) => !f.includes("product mention"))).toBe(true);
+  });
+
   it("fails when no product terms present", () => {
     const copy = {
       primary_text: "Pipe.City helps plumbers grow — $39/mo, 14-day free trial, no credit card.",
@@ -371,6 +389,24 @@ describe("Soft warning — Angle alignment", () => {
     };
     const result = validateAdCopy(copy, "pipe", "solution");
     expect(result.warnings.every((w) => !w.includes("Copy angle"))).toBe(true);
+  });
+
+  it('warns when voice-boss angle has no voice-boss language', () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Pipe.City answers calls — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "voice-boss");
+    expect(result.warnings).toContain('Copy angle is "voice-boss" but no voice-boss language detected');
+  });
+
+  it("does not warn when voice-boss angle has voice-boss language", () => {
+    const copy = {
+      ...validCopy(),
+      primary_text: "Just say: schedule the job. Pipe.City — $39/mo, 14-day free trial, no credit card.",
+    };
+    const result = validateAdCopy(copy, "pipe", "voice-boss");
+    expect(result.warnings).not.toContain('Copy angle is "voice-boss" but no voice-boss language detected');
   });
 });
 

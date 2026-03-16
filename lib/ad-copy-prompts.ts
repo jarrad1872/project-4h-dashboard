@@ -77,6 +77,16 @@ const ANGLE_PROMPTS: Record<CopyAngle, string> = {
     "Make inaction feel like losing — every unanswered call is a job for someone else.",
     'Example tone: "While your phone goes to voicemail, your competitor\'s AI is booking their calls."',
   ].join(" "),
+
+  "voice-boss": [
+    "Use a VOICE BOSS / RUN YOUR BUSINESS BY VOICE angle.",
+    "Lead with the Owner Agent — the ability to manage your entire business by voice from your truck, job site, or couch.",
+    "Use a specific ownerAgentScenario from the context as the hook.",
+    "Show that it's not just call answering — it's a full AI employee you can talk to.",
+    "Emphasize: schedule jobs, complete jobs, text customers, check your day — all by voice.",
+    "Position it as freedom: hands on the wheel, mouth running the business.",
+    'Example tone: "Driving between jobs? Just say: Schedule Mike for Thursday at seven. Done."',
+  ].join(" "),
 };
 
 /**
@@ -96,9 +106,9 @@ export function buildAdCopyPrompt(
   const prompt = `You are writing a short, punchy ad for a trade business product. Write 1-2 sentences MAX for primary_text. Every word must earn its place.
 
 === PRODUCT (DO NOT DEVIATE) ===
-${context.domain} is an AI employee for ${context.trade.toLowerCase()} businesses. It answers every phone call 24/7, qualifies leads with trade-specific questions, books jobs automatically, and texts the owner a summary. Your crew just got bigger.
+${context.domain} is an AI employee for ${context.trade.toLowerCase()} businesses. It answers every phone call 24/7, qualifies leads with trade-specific questions, books jobs automatically, and texts the owner a summary. Plus: an Owner Agent you can talk to by voice — schedule jobs, complete jobs, text customers, check your day, all hands-free from your truck. Your crew just got bigger.
 
-This is a PHONE CALL ANSWERING product. NOT scheduling software. NOT invoicing. NOT quoting. The hook is always about THE PHONE RINGING when you can't answer.
+This is a PHONE CALL ANSWERING + VOICE BUSINESS MANAGEMENT product. NOT scheduling software. NOT invoicing. NOT quoting. The hook is always about THE PHONE RINGING when you can't answer, OR running your business by voice.
 
 === TRADE CONTEXT ===
 Trade: ${context.trade}
@@ -106,6 +116,7 @@ Domain: ${context.domain}
 Who calls: ${context.callScenarios.join("; ")}
 Missed call cost: ${context.missedCallCost}
 Busy moment (when they can't answer): ${context.busyMoment}
+Owner voice commands: ${context.ownerAgentScenarios.join("; ")}
 
 === COPY ANGLE ===
 ${angleInstruction}

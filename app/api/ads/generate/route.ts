@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 const COPY_MODEL = "gemini-2.0-flash";
 const ALL_PLATFORMS: AdPlatform[] = ["linkedin", "facebook", "instagram", "youtube"];
-const ALL_ANGLES: CopyAngle[] = ["pain", "solution", "proof", "urgency"];
+const ALL_ANGLES: CopyAngle[] = ["pain", "solution", "proof", "urgency", "voice-boss"];
 
 interface GenerateRequest {
   trades: string[] | "all";

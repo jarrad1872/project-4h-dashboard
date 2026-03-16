@@ -7,7 +7,7 @@
  * THE PHONE RINGING — not generic business software.
  */
 
-export type CopyAngle = "pain" | "solution" | "proof" | "urgency";
+export type CopyAngle = "pain" | "solution" | "proof" | "urgency" | "voice-boss";
 
 export interface TradeCopyContext {
   trade: string;            // Human-readable trade name
@@ -15,6 +15,7 @@ export interface TradeCopyContext {
   callScenarios: string[];  // WHO calls and WHY — "homeowner wants exterior quote"
   missedCallCost: string;   // "$3K exterior job gone to the next painter"
   busyMoment: string;       // "up on a ladder cutting in trim"
+  ownerAgentScenarios: string[];  // Voice commands the owner can use — "Schedule Mike for Thursday at seven"
 }
 
 export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
@@ -30,6 +31,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$2K water heater install gone to the next plumber",
     busyMoment: "under a house fixing a leak with both hands on a torch",
+    ownerAgentScenarios: [
+      "Schedule the water heater install for Thursday at eight",
+      "Mark the Johnson re-pipe complete for twenty-two hundred",
+      "Text the customer I'm on my way",
+    ],
   },
 
   mow: {
@@ -42,6 +48,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$5K annual mowing contract gone to the next crew",
     busyMoment: "on a zero-turn in the middle of a 2-acre lot",
+    ownerAgentScenarios: [
+      "Schedule the HOA cleanup for Monday at seven",
+      "What's on my route today?",
+      "Text Mrs. Patterson we'll be there by noon",
+    ],
   },
 
   coat: {
@@ -54,6 +65,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$3K exterior job gone to the next painter",
     busyMoment: "up on a ladder cutting in trim two stories up",
+    ownerAgentScenarios: [
+      "Schedule the exterior quote for Tuesday at nine",
+      "Mark the Wilson interior complete for eighteen hundred",
+      "How many calls did I get this week?",
+    ],
   },
 
   duct: {
@@ -66,6 +82,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$1,500 AC repair call gone to the next tech",
     busyMoment: "in an attic swapping out a blower motor in 130-degree heat",
+    ownerAgentScenarios: [
+      "Schedule the AC repair on Maple Drive for tomorrow at eight",
+      "Mark the furnace install complete for forty-five hundred",
+      "Add a change order — capacitor and contactor both needed replacing",
+    ],
   },
 
   pest: {
@@ -78,6 +99,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$800 termite treatment gone to the national chain",
     busyMoment: "crawling under a house doing a termite inspection",
+    ownerAgentScenarios: [
+      "Schedule the Rodriguez termite treatment for Wednesday",
+      "Mark the restaurant job complete for eight hundred",
+      "Text the homeowner the inspection report is ready",
+    ],
   },
 
   electricians: {
@@ -90,6 +116,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$2,500 panel upgrade gone to the next electrician",
     busyMoment: "pulling wire through a commercial ceiling on a tight deadline",
+    ownerAgentScenarios: [
+      "Schedule the EV charger install for Friday at ten",
+      "Mark the panel upgrade complete for twenty-five hundred",
+      "What jobs do I have tomorrow?",
+    ],
   },
 
   roofrepair: {
@@ -102,6 +133,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$8K roof replacement gone to the storm chaser who answered first",
     busyMoment: "three stories up tearing off shingles in the heat",
+    ownerAgentScenarios: [
+      "Schedule the storm damage inspection for Monday morning",
+      "Mark the Thompson roof complete for eighty-two hundred",
+      "Text the adjuster we'll have the supplement ready Friday",
+    ],
   },
 
   disaster: {
@@ -114,6 +150,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$10K water mitigation job gone to whoever answered first",
     busyMoment: "running dehumidifiers on a flood job across town",
+    ownerAgentScenarios: [
+      "Schedule the mitigation crew for the Oak Street flood — now",
+      "Mark the fire restoration complete for twelve thousand",
+      "How many emergency calls came in overnight?",
+    ],
   },
 
   // ── Tier 2 ──────────────────────────────────────────────────────────────────
@@ -128,6 +169,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$1,200 core drilling job gone to the next cutter",
     busyMoment: "running a wall saw on a concrete pour with water everywhere",
+    ownerAgentScenarios: [
+      "Schedule ACME Electric for core drilling Thursday at seven",
+      "Mark the Chen Plumbing slab cut complete for seven fifty",
+      "Add a change order — extra doorway cut for two hundred",
+    ],
   },
 
   rinse: {
@@ -140,6 +186,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$500 house wash gone to the guy who picked up",
     busyMoment: "on a ladder soft-washing a two-story vinyl house",
+    ownerAgentScenarios: [
+      "Schedule the fleet wash for Saturday at six AM",
+      "Mark the driveway job complete for four fifty",
+      "Text the restaurant owner we can do the parking lot Tuesday",
+    ],
   },
 
   rooter: {
@@ -152,6 +203,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$600 emergency drain call gone to the franchise",
     busyMoment: "running a snake through a main line in a crawlspace",
+    ownerAgentScenarios: [
+      "Schedule the restaurant drain cleaning for tonight at nine",
+      "Mark the sewer camera job complete for six hundred",
+      "What emergency calls came in today?",
+    ],
   },
 
   pave: {
@@ -164,6 +220,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$15K parking lot job gone to the paver who answered",
     busyMoment: "rolling hot asphalt on a commercial lot before it cools",
+    ownerAgentScenarios: [
+      "Schedule the parking lot resurface for next Monday",
+      "Mark the Henderson driveway complete for fifty-two hundred",
+      "Text the property manager the sealcoat is curing — stay off 24 hours",
+    ],
   },
 
   haul: {
@@ -176,6 +237,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$800 material delivery gone to the next trucker",
     busyMoment: "behind the wheel making a delivery run across town",
+    ownerAgentScenarios: [
+      "Schedule the gravel delivery for tomorrow at six AM",
+      "Mark the equipment haul complete for eight hundred",
+      "What loads are on the board for today?",
+    ],
   },
 
   grade: {
@@ -188,6 +254,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$5K site grading job gone to the next operator",
     busyMoment: "in the cab of a motor grader cutting a pad to grade",
+    ownerAgentScenarios: [
+      "Schedule the lot clearing for Wednesday at seven",
+      "Mark the site grading complete for forty-eight hundred",
+      "Text the builder we'll be done by end of day",
+    ],
   },
 
   lockout: {
@@ -200,6 +271,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$150 lockout call gone to the scam listing",
     busyMoment: "picking a commercial lock across town on another call",
+    ownerAgentScenarios: [
+      "Schedule the office rekeying for Friday morning",
+      "Mark the car lockout complete for one fifty",
+      "Text the business owner the new keys are ready for pickup",
+    ],
   },
 
   plow: {
@@ -212,6 +288,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$1,500 seasonal plowing contract gone to the next plow",
     busyMoment: "plowing a commercial lot at 3 AM in a whiteout",
+    ownerAgentScenarios: [
+      "Deploy all trucks — four inches expected by midnight",
+      "Mark the Target lot complete for three fifty",
+      "What lots still need salting?",
+    ],
   },
 
   prune: {
@@ -224,6 +305,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$2K tree removal gone to the crew that answered",
     busyMoment: "40 feet up in a bucket truck cutting a widow-maker",
+    ownerAgentScenarios: [
+      "Schedule the hazard tree removal for Thursday at eight",
+      "Mark the elm removal complete for twenty-two hundred",
+      "Text the homeowner the stump grinding is done",
+    ],
   },
 
   chimney: {
@@ -236,6 +322,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$400 sweep-and-inspect gone to the next sweep",
     busyMoment: "on a steep roof running a brush down a flue",
+    ownerAgentScenarios: [
+      "Schedule the chimney inspection for Saturday at ten",
+      "Mark the flue relining complete for twelve hundred",
+      "How many sweep appointments do I have this week?",
+    ],
   },
 
   detail: {
@@ -248,6 +339,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$300 ceramic coating job gone to the detailer who picked up",
     busyMoment: "elbow-deep in a paint correction with a DA polisher",
+    ownerAgentScenarios: [
+      "Schedule the dealership batch for Monday — ten cars",
+      "Mark the ceramic coating complete for three hundred",
+      "Text the fleet manager the vans are ready for pickup",
+    ],
   },
 
   brake: {
@@ -260,6 +356,11 @@ export const TRADE_COPY_CONTEXT: Record<string, TradeCopyContext> = {
     ],
     missedCallCost: "$600 brake job gone to the dealership down the road",
     busyMoment: "under a lift replacing rotors with a line of cars waiting",
+    ownerAgentScenarios: [
+      "Schedule the Williams oil change for Friday morning",
+      "Mark the Martinez brake job complete for six fifty",
+      "Add a change order — needed new spark plugs too, one twenty",
+    ],
   },
 };
 

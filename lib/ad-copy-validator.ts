@@ -21,7 +21,7 @@ const PRICE_PATTERN = /\$39\/mo|\$39\/month|\$39 per month/i;
 const TRIAL_PATTERN = /14-day free trial/i;
 const NO_CC_PATTERN = /no credit card/i;
 const GENERIC_PATTERNS = [/trade business/i, /small business software/i];
-const PRODUCT_MENTION_PATTERN = /\b(calls?|answers?|phone|AI employee)\b/i;
+const PRODUCT_MENTION_PATTERN = /\b(calls?|answers?|phone|AI employee|voice|hands-free)\b/i;
 
 const CTA_VERBS = /\b(start|try|get|book|sign|join|claim|explore|discover|launch)\b/i;
 
@@ -37,6 +37,10 @@ const ANGLE_TERMS: Record<string, { pattern: RegExp; label: string }> = {
   urgency: {
     pattern: /(now|today|before|season|limited|don't wait|already|behind|competitor|voicemail)/i,
     label: "urgency",
+  },
+  "voice-boss": {
+    pattern: /\b(voice|schedule|complete|text|hands-free|truck|driving|say|just say)\b/i,
+    label: "voice-boss",
   },
 };
 
