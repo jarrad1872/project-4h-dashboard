@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { AIGeneratePanel } from "@/components/ai-generate-panel";
 import { AdPreview } from "@/components/ad-preview";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import type { Ad, AdStatus, WorkflowStage } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
 
 export default function AdDetailPage() {
   const params = useParams<{ id: string }>();
@@ -183,16 +184,6 @@ export default function AdDetailPage() {
             </GhostButton>
           </div>
 
-          <AIGeneratePanel
-            platform={(form.platform as Ad["platform"]) ?? ad.platform}
-            onUseVariation={(variation) =>
-              setForm((f) => ({
-                ...f,
-                headline: variation.headline,
-                primaryText: variation.primaryText,
-              }))
-            }
-          />
         </Card>
 
         <Card className="space-y-4">

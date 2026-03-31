@@ -2,421 +2,356 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Card, Button, GhostButton } from "@/components/ui";
-import { PlatformChip, StatusChip } from "@/components/chips";
-import type { Ad, CampaignStatusData } from "@/lib/types";
-import { TRADE_MAP } from "@/lib/trade-utils";
+import { Button, Card, GhostButton } from "@/components/ui";
+import {
+  formatCreativeAssetAngleLabel,
+  formatCreativeAssetStatusLabel,
+  formatInfluencerStatusLabel,
+  MONTHLY_BUDGET_CEILING,
+  MONTHLY_BUDGET_FLOOR,
+  PILOT_DOMAIN,
+  PILOT_LABEL,
+  PILOT_LAUNCH_DATE,
+  latestMetricsWeek,
+  summarizeBudget,
+  summarizeCreativePipeline,
+  summarizeInfluencerPipeline,
+  getCountdownDays,
+} from "@/lib/growth-command-center";
+import type { BudgetData, CampaignStatusData, CreativeAsset, Influencer, MetricsData } from "@/lib/types";
 
-const PLATFORMS = ["linkedin", "youtube", "facebook", "instagram"] as const;
-const PLATFORM_ICONS: Record<string, string> = {
-  linkedin: "in",
-  youtube: "▶",
-  facebook: "f",
-  instagram: "ig",
-};
+const PLATFORM_LABELS = {
+  linkedin: "LinkedIn",
+  youtube: "YouTube",
+  facebook: "Facebook",
+  instagram: "Instagram",
+} as const;
 
-const SEVERITY_STYLE: Record<string, string> = {
-  high: "border-red-700/50 bg-red-950/20 text-red-400",
-  med: "border-amber-700/50 bg-amber-950/20 text-amber-400",
-  low: "border-slate-700/50 bg-slate-800/40 text-slate-400",
-};
+const PLATFORM_COLORS = {
+  linkedin: "text-blue-300",
+  youtube: "text-red-300",
+  facebook: "text-sky-300",
+  instagram: "text-pink-300",
+} as const;
 
-interface Blocker {
-  id: string;
-  label: string;
-  severity: "high" | "med" | "low";
-  action: string;
-  href: string | null;
+interface OverviewState {
+  campaign: CampaignStatusData | null;
+  budget: BudgetData | null;
+  metrics: MetricsData | null;
+  influencers: Influencer[];
+  creativeAssets: CreativeAsset[];
 }
 
-interface EngineStatus {
-  configured: boolean;
-  last_run: {
-    id: string;
-    run_at: string;
-    signals: { platform: string; signal: string }[];
-    alerts_fired: unknown[];
-  } | null;
-}
+const EMPTY_OVERVIEW: OverviewState = {
+  campaign: null,
+  budget: null,
+  metrics: null,
+  influencers: [],
+  creativeAssets: [],
+};
 
 export default function OverviewPage() {
-  const [ads, setAds] = useState<Ad[]>([]);
-  const [campaign, setCampaign] = useState<CampaignStatusData | null>(null);
-  const [blockers, setBlockers] = useState<Blocker[]>([]);
-  const [engineStatus, setEngineStatus] = useState<EngineStatus | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [state, setState] = useState<OverviewState>(EMPTY_OVERVIEW);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/ads", { cache: "no-store" }).then((r) => r.json()),
-      fetch("/api/campaign-status", { cache: "no-store" }).then((r) => r.json()),
-      fetch("/api/blockers", { cache: "no-store" }).then((r) => r.json()).catch(() => null),
-      fetch("/api/engine/status", { cache: "no-store" }).then((r) => r.json()).catch(() => null),
-    ]).then(([adsData, campaignData, blockersData, engineData]: [Ad[], CampaignStatusData, { blockers: Blocker[] } | null, EngineStatus | null]) => {
-      setAds(adsData);
-      setCampaign(campaignData);
-      if (blockersData?.blockers) setBlockers(blockersData.blockers);
-      if (engineData) setEngineStatus(engineData);
+    async function load() {
+      const [campaign, budget, metrics, influencers, creativeAssets] = await Promise.all([
+        fetch("/api/campaign-status", { cache: "no-store" }).then((response) => response.json()),
+        fetch("/api/budget", { cache: "no-store" }).then((response) => response.json()),
+        fetch("/api/metrics", { cache: "no-store" }).then((response) => response.json()),
+        fetch("/api/influencers", { cache: "no-store" }).then((response) => response.json()).catch(() => []),
+        fetch("/api/creative-assets", { cache: "no-store" }).then((response) => response.json()).catch(() => []),
+      ]);
+
+      setState({
+        campaign,
+        budget,
+        metrics,
+        influencers: Array.isArray(influencers) ? influencers : [],
+        creativeAssets: Array.isArray(creativeAssets) ? creativeAssets : [],
+      });
       setLoading(false);
-    });
+    }
+
+    void load();
   }, []);
 
-  async function setCampaignStatus(status: CampaignStatusData["status"]) {
-    if (!campaign) return;
-    setSaving(true);
-    const patch = { status, ...(status === "live" ? { startDate: new Date().toISOString() } : {}) };
-    const updated = await fetch("/api/campaign-status", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
-    }).then((r) => r.json()) as CampaignStatusData;
-    setCampaign(updated);
-    setSaving(false);
-  }
-
-  // Derived stats
-  const byStatus = ads.reduce<Record<string, number>>((acc, ad) => {
-    acc[ad.status] = (acc[ad.status] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  const byPlatform = ads.reduce<Record<string, number>>((acc, ad) => {
-    acc[ad.platform] = (acc[ad.platform] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  const approvedAds = byStatus["approved"] ?? 0;
-  const pendingAds = byStatus["pending"] ?? 0;
-  const totalAds = ads.length;
-  const approvalPct = totalAds ? Math.round((approvedAds / totalAds) * 100) : 0;
-
-  const customCreativeAds = ads.filter((a) => (a.creative_variant ?? 1) > 1).length;
-
-  const highBlockers = blockers.filter((b) => b.severity === "high").length;
-  const launchReady = highBlockers === 0;
-
   if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center text-slate-400">
-        Loading command center…
-      </div>
-    );
+    return <div className="flex h-64 items-center justify-center text-slate-400">Loading growth command center...</div>;
   }
+
+  const countdownDays = getCountdownDays(PILOT_LAUNCH_DATE);
+  const creativeSummary = summarizeCreativePipeline(state.creativeAssets);
+  const influencerSummary = summarizeInfluencerPipeline(state.influencers);
+  const budgetSummary = summarizeBudget(state.budget);
+  const latestWeek = latestMetricsWeek(state.metrics);
+  const hasLiveMetrics = Boolean(
+    latestWeek &&
+      Object.values(PLATFORM_LABELS).some((_, index) => {
+        const platform = Object.keys(PLATFORM_LABELS)[index] as keyof typeof PLATFORM_LABELS;
+        return latestWeek[platform].impressions > 0 || latestWeek[platform].clicks > 0 || latestWeek[platform].signups > 0;
+      }),
+  );
+  const recentInfluencers = [...state.influencers]
+    .sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""))
+    .slice(0, 4);
+  const recentAssets = [...state.creativeAssets]
+    .sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""))
+    .slice(0, 4);
 
   return (
     <div className="space-y-6">
-
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Project 4H — Command Center</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            65 trades · 1,040 ads · 4 channels · <span className="font-semibold text-white">Target: 2,000 users</span>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">Project 4H</p>
+          <h1 className="mt-2 text-3xl font-bold text-white">Growth Command Center</h1>
+          <p className="mt-2 max-w-3xl text-sm text-slate-400">
+            Live focus is the {PILOT_LABEL.toLowerCase()} for <span className="font-semibold text-slate-200">{PILOT_DOMAIN}</span>:
+            influencer outreach, AI UGC production, channel readiness, and spend discipline for the first launch window.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {campaign && <StatusChip status={campaign.status} />}
-          <span className={`text-xs font-bold px-2 py-1 rounded ${launchReady ? "bg-green-700 text-green-100" : "bg-red-900 text-red-300"}`}>
-            {launchReady ? "LAUNCH READY" : `${highBlockers} BLOCKERS`}
-          </span>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/influencer">
+            <Button>Influencer Pipeline</Button>
+          </Link>
+          <Link href="/assets">
+            <GhostButton>Creative Assets</GhostButton>
+          </Link>
         </div>
       </div>
 
-      {/* ── Mission Progress Bar ─────────────────────────────────────────── */}
-      <Card>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Mission Progress</h2>
-          <span className="text-xs text-slate-500">2,000 users to hit profitability</span>
-        </div>
-        <div className="h-3 w-full rounded-full bg-slate-700">
-          <div className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500 transition-all" style={{ width: "0%" }} />
-        </div>
-        <div className="mt-2 flex justify-between text-xs text-slate-400">
-          <span>0 users</span>
-          <span className="text-slate-300 font-semibold">Pre-launch</span>
-          <span>2,000 users</span>
-        </div>
-      </Card>
-
-      {/* ── Engine Status ────────────────────────────────────────────────── */}
-      {engineStatus && engineStatus.configured && (
-        <Card className="border-blue-800/40 bg-blue-950/20">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-400">Engine Status</h2>
-            {engineStatus.last_run && (
-              <span className="text-xs text-slate-500">
-                Last run: {new Date(engineStatus.last_run.run_at).toLocaleString()}
-              </span>
-            )}
-          </div>
-          {engineStatus.last_run ? (
-            <div className="flex flex-wrap gap-3">
-              {(engineStatus.last_run.signals ?? []).map((s: { platform: string; signal: string }) => (
-                <div key={s.platform} className="rounded bg-slate-900/60 px-3 py-1.5 text-xs">
-                  <span className="mr-1">
-                    {s.signal === "scale" ? "🟢" : s.signal === "kill" ? "🔴" : "🟡"}
-                  </span>
-                  <span className="font-semibold capitalize">{s.platform}</span>
-                  <span className="ml-1 uppercase text-slate-400">{s.signal}</span>
-                </div>
-              ))}
-              {Array.isArray(engineStatus.last_run.alerts_fired) && engineStatus.last_run.alerts_fired.length > 0 && (
-                <div className="rounded bg-red-900/30 px-3 py-1.5 text-xs text-red-300">
-                  {engineStatus.last_run.alerts_fired.length} alert(s) fired
-                </div>
-              )}
+      <div className="grid gap-4 xl:grid-cols-[1.3fr,1fr]">
+        <Card className="border-cyan-900/40 bg-cyan-950/10">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Active Pilot Status</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">{PILOT_LABEL}</h2>
+              <p className="mt-1 text-sm text-slate-300">Plumbing owners on {PILOT_DOMAIN}. Countdown is tracking the first two-week launch window.</p>
             </div>
-          ) : (
-            <p className="text-xs text-slate-500">No engine runs yet. Deploy 4h-engine.js to VPS.</p>
-          )}
+            <span className="rounded-full border border-cyan-700/50 bg-cyan-900/40 px-3 py-1 text-xs font-semibold uppercase text-cyan-200">
+              {state.campaign?.status ?? "pre-launch"}
+            </span>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Launch target</p>
+              <p className="mt-2 text-xl font-semibold text-white">Apr 14</p>
+              <p className="text-xs text-slate-500">2026 launch checkpoint</p>
+            </div>
+            <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Countdown</p>
+              <p className="mt-2 text-xl font-semibold text-white">{countdownDays} days</p>
+              <p className="text-xs text-slate-500">Two-week pilot runway</p>
+            </div>
+            <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Budget window</p>
+              <p className="mt-2 text-xl font-semibold text-white">${MONTHLY_BUDGET_FLOOR.toLocaleString()}-${MONTHLY_BUDGET_CEILING.toLocaleString()}</p>
+              <p className="text-xs text-slate-500">Target monthly test range</p>
+            </div>
+          </div>
         </Card>
-      )}
 
-      {/* ── Campaign Status Toggle ────────────────────────────────────────── */}
-      <Card>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-1">Campaign Status</h2>
-            <p className="text-xs text-slate-500">Controls what's live across all 4 channels</p>
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quick Actions</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Link href="/influencer" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
+              <p className="text-sm font-semibold text-white">Manage creator outreach</p>
+              <p className="mt-1 text-xs text-slate-500">Track researching to paid across the pilot roster.</p>
+            </Link>
+            <Link href="/assets" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
+              <p className="text-sm font-semibold text-white">Review AI UGC assets</p>
+              <p className="mt-1 text-xs text-slate-500">Keep draft, review, approved, and live assets visible.</p>
+            </Link>
+            <Link href="/approval" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
+              <p className="text-sm font-semibold text-white">Approval queue</p>
+              <p className="mt-1 text-xs text-slate-500">CEO and CMO signoff still gates what goes live.</p>
+            </Link>
+            <Link href="/launch" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
+              <p className="text-sm font-semibold text-white">Launch checklist</p>
+              <p className="mt-1 text-xs text-slate-500">Track readiness beyond the pilot metrics surface.</p>
+            </Link>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {(["pre-launch", "live", "paused", "ended"] as const).map((s) => (
-              <button
-                key={s}
-                disabled={saving || campaign?.status === s}
-                onClick={() => setCampaignStatus(s)}
-                className={`rounded px-3 py-1.5 text-xs font-semibold transition-all ${
-                  campaign?.status === s
-                    ? "bg-blue-600 text-white"
-                    : "border border-slate-600 text-slate-400 hover:border-slate-400 hover:text-white"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
-      {/* ── Blockers Board ────────────────────────────────────────────────── */}
-      <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
-          🚧 Launch Blockers ({blockers.length} total · {highBlockers} critical)
-        </h2>
-        {blockers.length > 0 ? (
-          <div className="space-y-2">
-            {blockers.map((b) => (
-              <div key={b.id} className={`flex items-start justify-between gap-4 rounded border p-3 ${SEVERITY_STYLE[b.severity]}`}>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-100">{b.label}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{b.action}</p>
-                </div>
-                {b.href ? (
-                  <Link href={b.href} className="shrink-0 rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-600 transition-colors">
-                    Go →
-                  </Link>
-                ) : (
-                  <span className="shrink-0 rounded bg-slate-800 px-3 py-1 text-xs text-slate-500">Waiting</span>
-                )}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Creative Pipeline</p>
+              <h2 className="mt-1 text-lg font-semibold text-white">{creativeSummary.total} AI UGC assets tracked</h2>
+            </div>
+            <Link href="/assets" className="text-xs text-cyan-300 hover:underline">
+              Open assets
+            </Link>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-4">
+            {[
+              { label: "Draft", value: creativeSummary.draft, color: "text-slate-200" },
+              { label: "Review", value: creativeSummary.review, color: "text-amber-300" },
+              { label: "Approved", value: creativeSummary.approved, color: "text-emerald-300" },
+              { label: "Live", value: creativeSummary.live, color: "text-cyan-300" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+                <p className={`mt-2 text-2xl font-semibold ${item.color}`}>{item.value}</p>
               </div>
             ))}
           </div>
-        ) : (
-          <Card className="text-center py-6">
-            <p className="text-green-400 font-semibold">No blockers detected</p>
-          </Card>
-        )}
+          <div className="mt-4 space-y-2">
+            {recentAssets.length ? (
+              recentAssets.map((asset) => (
+                <div key={asset.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2">
+                  <div>
+                    <p className="text-sm font-medium text-white">{asset.title}</p>
+                    <p className="text-xs text-slate-500">{formatCreativeAssetAngleLabel(asset.angle)} · {asset.tool_used}</p>
+                  </div>
+                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs uppercase text-slate-300">
+                    {formatCreativeAssetStatusLabel(asset.status)}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-xl border border-dashed border-slate-700 p-4 text-sm text-slate-500">
+                No pilot assets saved yet. Use /assets to add the first missed-call, voice-boss, demo, or math creative.
+              </div>
+            )}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Influencer Pipeline</p>
+              <h2 className="mt-1 text-lg font-semibold text-white">{state.influencers.length} creator prospects in play</h2>
+            </div>
+            <Link href="/influencer" className="text-xs text-cyan-300 hover:underline">
+              Open pipeline
+            </Link>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[
+              { label: "Contacted", value: influencerSummary.contacted, color: "text-sky-300" },
+              { label: "Negotiating", value: influencerSummary.negotiating, color: "text-amber-300" },
+              { label: "Contracted", value: influencerSummary.contracted, color: "text-emerald-300" },
+              { label: "Content Live", value: influencerSummary.content_live, color: "text-cyan-300" },
+              { label: "Paid", value: influencerSummary.paid, color: "text-violet-300" },
+              { label: "Researching", value: influencerSummary.researching, color: "text-slate-200" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+                <p className={`mt-2 text-2xl font-semibold ${item.color}`}>{item.value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 space-y-2">
+            {recentInfluencers.length ? (
+              recentInfluencers.map((influencer) => (
+                <div key={influencer.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2">
+                  <div>
+                    <p className="text-sm font-medium text-white">{influencer.creator_name}</p>
+                    <p className="text-xs text-slate-500">{influencer.trade} · {influencer.platform}</p>
+                  </div>
+                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs uppercase text-slate-300">
+                    {formatInfluencerStatusLabel(influencer.status)}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-xl border border-dashed border-slate-700 p-4 text-sm text-slate-500">
+                No influencer records yet. Seed or add pilot creators on /influencer.
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
 
-      {/* ── Ad Stats by Platform ─────────────────────────────────────────── */}
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Ad Library</h2>
-          <Link href="/ads" className="text-xs text-blue-400 hover:underline">View all {totalAds} ads →</Link>
+      <Card>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Channel Metrics</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">
+              {hasLiveMetrics ? `Latest week: ${latestWeek?.weekStart}` : "Placeholder metrics until launch"}
+            </h2>
+          </div>
+          <p className="text-xs text-slate-500">Impressions, clicks, signups, and CAC by channel will populate from weekly_metrics.</p>
         </div>
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {PLATFORMS.map((p) => {
-            const count = byPlatform[p] ?? 0;
-            const platformApproved = ads.filter((a) => a.platform === p && a.status === "approved").length;
-            const platformPending = ads.filter((a) => a.platform === p && a.status === "pending").length;
+        <div className="mt-4 grid gap-3 xl:grid-cols-4">
+          {(Object.keys(PLATFORM_LABELS) as Array<keyof typeof PLATFORM_LABELS>).map((platform) => {
+            const metrics = latestWeek?.[platform] ?? { spend: 0, impressions: 0, clicks: 0, signups: 0, activations: 0, paid: 0 };
+            const cac = metrics.signups > 0 ? metrics.spend / metrics.signups : null;
+
             return (
-              <Link key={p} href={`/ads?platform=${p}`} className="block">
-                <Card className="hover:border-blue-500/40 transition-colors cursor-pointer h-full">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="flex h-7 w-7 items-center justify-center rounded bg-slate-700 text-xs font-bold text-white">
-                      {PLATFORM_ICONS[p]}
-                    </span>
-                    <span className="text-sm font-semibold capitalize">{p}</span>
+              <div key={platform} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                <p className={`text-sm font-semibold ${PLATFORM_COLORS[platform]}`}>{PLATFORM_LABELS[platform]}</p>
+                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Impressions</span>
+                    <span>{metrics.impressions ? metrics.impressions.toLocaleString() : "--"}</span>
                   </div>
-                  <p className="text-2xl font-bold">{count}</p>
-                  <p className="text-xs text-slate-400 mt-1">ads total</p>
-                  <div className="mt-2 flex gap-2 text-xs">
-                    <span className="text-green-400">{platformApproved} approved</span>
-                    <span className="text-amber-400">{platformPending} pending</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Clicks</span>
+                    <span>{metrics.clicks ? metrics.clicks.toLocaleString() : "--"}</span>
                   </div>
-                </Card>
-              </Link>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Signups</span>
+                    <span>{metrics.signups ? metrics.signups.toLocaleString() : "--"}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">CAC</span>
+                    <span>{cac !== null ? `$${cac.toFixed(2)}` : "--"}</span>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
-      </div>
+      </Card>
 
-      {/* ── Approval + Asset Status ──────────────────────────────────────── */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="font-semibold">Ad Approvals</h3>
-              <p className="text-xs text-slate-400 mt-0.5">{approvedAds} of {totalAds} approved ({approvalPct}%)</p>
-            </div>
-            <Link href="/approval" className="rounded bg-amber-700/30 px-3 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-700/50 transition-colors">
-              Approve →
-            </Link>
+      <Card>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Budget Tracker</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">${budgetSummary.spent.toLocaleString()} spent so far</h2>
           </div>
-          <div className="h-2 w-full rounded-full bg-slate-700 mb-3">
-            <div className="h-2 rounded-full bg-amber-500 transition-all" style={{ width: `${approvalPct}%` }} />
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-center text-sm">
-            <div className="rounded bg-slate-800 p-2">
-              <p className="text-lg font-bold text-amber-400">{pendingAds}</p>
-              <p className="text-xs text-slate-500">Pending</p>
-            </div>
-            <div className="rounded bg-slate-800 p-2">
-              <p className="text-lg font-bold text-green-400">{approvedAds}</p>
-              <p className="text-xs text-slate-500">Approved</p>
-            </div>
-            <div className="rounded bg-slate-800 p-2">
-              <p className="text-lg font-bold text-red-400">{byStatus["rejected"] ?? 0}</p>
-              <p className="text-xs text-slate-500">Rejected</p>
-            </div>
-          </div>
-        </Card>
+          <p className="text-xs text-slate-500">
+            Target spend band is ${budgetSummary.floor.toLocaleString()}-${budgetSummary.ceiling.toLocaleString()} for the monthly pilot.
+          </p>
+        </div>
+        <div className="mt-4 h-3 w-full rounded-full bg-slate-800">
+          <div
+            className="h-3 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500"
+            style={{ width: `${Math.min(100, (budgetSummary.spent / budgetSummary.ceiling) * 100)}%` }}
+          />
+        </div>
+        <div className="mt-2 flex justify-between text-xs text-slate-500">
+          <span>$0</span>
+          <span>${budgetSummary.floor.toLocaleString()} floor</span>
+          <span>${budgetSummary.ceiling.toLocaleString()} ceiling</span>
+        </div>
+        <div className="mt-4 grid gap-3 xl:grid-cols-4">
+          {(Object.keys(PLATFORM_LABELS) as Array<keyof typeof PLATFORM_LABELS>).map((platform) => {
+            const channel = state.budget?.channels[platform] ?? { allocated: 0, spent: 0 };
+            const percent = channel.allocated > 0 ? Math.min(100, (channel.spent / channel.allocated) * 100) : 0;
 
-        <Card>
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="font-semibold">Trade Assets</h3>
-              <p className="text-xs text-slate-400 mt-0.5">325 images across 65 trades · 5 types each</p>
-            </div>
-            <Link href="/assets" className="rounded bg-amber-700/30 px-3 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-700/50 transition-colors">
-              Review →
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {[
-              { label: "Hero A (ad zoom)", count: 65, type: "hero_a" },
-              { label: "Hero B (landing page)", count: 65, type: "hero_b" },
-              { label: "OG (link preview)", count: 65, type: "og_nb2" },
-              { label: "C2 (company overview)", count: 64, type: "c2" },
-              { label: "C3 (on-site wide)", count: 64, type: "c3" },
-            ].map((row) => (
-              <div key={row.type} className="rounded bg-slate-800 p-2 flex items-center justify-between">
-                <span className="text-xs text-slate-400">{row.label}</span>
-                <span className="text-xs font-bold text-slate-200">{row.count}</span>
+            return (
+              <div key={platform} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                <div className="flex items-center justify-between">
+                  <p className={`text-sm font-semibold ${PLATFORM_COLORS[platform]}`}>{PLATFORM_LABELS[platform]}</p>
+                  <span className="text-xs text-slate-500">{percent.toFixed(0)}%</span>
+                </div>
+                <p className="mt-3 text-sm text-slate-300">
+                  ${channel.spent.toLocaleString()} / ${channel.allocated.toLocaleString()}
+                </p>
+                <div className="mt-2 h-2 w-full rounded-full bg-slate-800">
+                  <div className="h-2 rounded-full bg-slate-400" style={{ width: `${percent}%` }} />
+                </div>
               </div>
-            ))}
-            <div className="rounded bg-slate-800 p-2 flex items-center justify-between">
-              <span className="text-xs text-slate-400">Total</span>
-              <span className="text-xs font-bold text-green-400">323</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* ── Creative Variant Status ───────────────────────────────────────── */}
-      <Card>
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h3 className="font-semibold">Creative Variants</h3>
-            <p className="text-xs text-slate-400 mt-0.5">3 swappable images per trade — C1/C2/C3</p>
-          </div>
-          <Link href="/ads" className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-600 transition-colors">
-            Manage →
-          </Link>
-        </div>
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="rounded bg-slate-800 p-3">
-            <p className="text-xl font-bold text-slate-200">65</p>
-            <p className="text-xs text-slate-500 mt-1">C1 — Hands-on zoom</p>
-            <p className="text-xs text-green-400 mt-1">✓ All generated</p>
-          </div>
-          <div className="rounded bg-slate-800 p-3">
-            <p className="text-xl font-bold text-slate-200">64</p>
-            <p className="text-xs text-slate-500 mt-1">C2 — Company overview</p>
-            <p className="text-xs text-amber-400 mt-1">128 images in storage</p>
-          </div>
-          <div className="rounded bg-slate-800 p-3">
-            <p className="text-xl font-bold text-slate-200">64</p>
-            <p className="text-xs text-slate-500 mt-1">C3 — On-site action</p>
-            <p className="text-xs text-amber-400 mt-1">Edit bad images via ✏️</p>
-          </div>
-        </div>
-        {customCreativeAds > 0 && (
-          <p className="mt-3 text-xs text-blue-400">{customCreativeAds} ads have custom creative variant assigned (C2 or C3)</p>
-        )}
-      </Card>
-
-      {/* ── Quick Actions ─────────────────────────────────────────────────── */}
-      <Card>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">Quick Actions</h2>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/approval">
-            <Button>Review Ads ({pendingAds} pending)</Button>
-          </Link>
-          <Link href="/assets">
-            <GhostButton>Review Assets (325 pending)</GhostButton>
-          </Link>
-          <Link href="/ads">
-            <GhostButton>Browse Ad Library</GhostButton>
-          </Link>
-          <Link href="/gtm">
-            <GhostButton>GTM Board</GhostButton>
-          </Link>
-          <Link href="/scorecard">
-            <GhostButton>Log Metrics</GhostButton>
-          </Link>
-          <Link href="/launch">
-            <GhostButton>Launch Checklist</GhostButton>
-          </Link>
-          <Link href="/influencer">
-            <GhostButton>Influencer Pipeline</GhostButton>
-          </Link>
+            );
+          })}
         </div>
       </Card>
-
-      {/* ── Trade Coverage ────────────────────────────────────────────────── */}
-      <Card>
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h3 className="font-semibold">Trade Coverage</h3>
-            <p className="text-xs text-slate-400 mt-0.5">65 trades · 3 tiers · each with own .city domain</p>
-          </div>
-          <Link href="/gtm" className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-600 transition-colors">
-            GTM Board →
-          </Link>
-        </div>
-        <div className="grid grid-cols-3 gap-3 text-center">
-          {[
-            { tier: "Tier 1", count: 8, desc: "Highest TAM — launch first", color: "text-blue-400" },
-            { tier: "Tier 2", count: 32, desc: "Strong TAM — queue behind T1", color: "text-slate-300" },
-            { tier: "Tier 3", count: 25, desc: "Niche — launch last", color: "text-slate-500" },
-          ].map((t) => (
-            <div key={t.tier} className="rounded bg-slate-800 p-3">
-              <p className={`text-xl font-bold ${t.color}`}>{t.count}</p>
-              <p className="text-xs font-semibold text-slate-300 mt-1">{t.tier}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{t.desc}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-xs text-slate-500">
-          <span className="font-semibold text-slate-400">Live:</span>
-          {Object.entries(TRADE_MAP).filter(([, v]) => v.tier === 1).map(([t]) => (
-            <span key={t} className="rounded bg-slate-800 px-1.5 py-0.5 font-mono">{t}.city</span>
-          ))}
-        </div>
-      </Card>
-
     </div>
   );
 }

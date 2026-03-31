@@ -1,8 +1,8 @@
-# Project 4H — Campaign Command Center
+# Project 4H — Growth Command Center
 
 **Live:** https://pumpcans.com  
 **GitHub:** `jarrad1872/project-4h-dashboard`  
-**Stack:** Next.js 15 · TypeScript · Tailwind · Supabase · Vercel · Gemini NB2 (image gen)
+**Stack:** Next.js 16 · TypeScript · Tailwind · Supabase · Vercel · Gemini
 
 ---
 
@@ -30,6 +30,12 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 | Dashboard | Read-only view of campaign state for Jarrad |
 
 Nothing goes external (ad accounts, live campaigns) without Jarrad's explicit approval.
+
+### Current Cleanup Notes (2026-03-30)
+
+- `/approval` now loads its initial ads snapshot server-side to avoid the duplicate client-mount fetch against `/api/ads`
+- `/generate` is the active creative generation entry point; the embedded AI generator was removed from the ad CRUD screens
+- `/api/drive-backup/export` is archived from the active dashboard flow and now returns `410 Gone`
 
 ---
 
@@ -59,12 +65,12 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 
 | Page | URL | Purpose |
 |------|-----|---------|
-| Overview | `/` | Campaign snapshot, metrics, quick actions |
+| Overview | `/` | Plumbing-pilot growth command center: launch countdown, creative pipeline, influencer pipeline, metrics, budget |
 | GTM Board | `/gtm` | Full mission brief, product state, trade registry, action board |
 | Ads | `/ads` | All ads with status, images, pause/unpause |
 | Approval | `/approval` | Approve/Hold/Reject pending ads — Bulk Approve All per trade |
 | Creatives | `/creatives` | Generated ad creative thumbnails |
-| Assets | `/assets` | NB2 hero + OG image staging, approve/reject per trade |
+| Assets | `/assets` | AI UGC creative asset tracking with draft/review/approved/live workflow |
 | Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences |
 | Scorecard | `/scorecard` | Weekly performance metrics |
@@ -192,7 +198,14 @@ See **[SOP-WORKFLOW.md](./SOP-WORKFLOW.md)** for the campaign operating SOP.
 
 ---
 
-*Last updated: 2026-02-28 post-NB2 | v4.0.0*
+### Growth Command Center Notes (2026-03-31)
+
+- `/` now focuses on the live plumbing pilot (`pipe.city`) with launch countdown, influencer pipeline, creative pipeline, channel placeholders, and budget tracking
+- `/influencer` now supports the full outreach workflow (`researching -> contacted -> negotiating -> contracted -> content_live -> paid`) with audience size and flat-fee tracking
+- `/assets` now tracks AI UGC creative assets instead of the older trade-image staging flow
+- `supabase/migrations/009_growth_command_center.sql` adds `creative_assets` plus richer influencer fields for persistent production storage
+
+*Last updated: 2026-03-31 growth command center | v4.1.0*
 
 ---
 

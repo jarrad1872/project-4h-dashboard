@@ -5,10 +5,11 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
-import { AIGeneratePanel } from "@/components/ai-generate-panel";
 import { AdPreviewModal } from "@/components/ad-preview-modal";
 import { Button, Card, GhostButton } from "@/components/ui";
 import type { Ad, AdStatus, AdTemplate, WorkflowStage } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
 
 const platformFilters = ["all", "linkedin", "youtube", "facebook", "instagram", "retargeting"] as const;
 const statusFilters = ["all", "approved", "pending", "paused", "rejected"] as const;
@@ -507,19 +508,6 @@ function AdsContent() {
                   <option value="live">Live</option>
                 </select>
               </label>
-            </div>
-
-            <div className="mt-4">
-              <AIGeneratePanel
-                platform={(form.platform as Ad["platform"]) ?? "linkedin"}
-                onUseVariation={(variation) =>
-                  setForm((f) => ({
-                    ...f,
-                    headline: variation.headline,
-                    primaryText: variation.primaryText,
-                  }))
-                }
-              />
             </div>
 
             <div className="mt-4 flex justify-end gap-2">

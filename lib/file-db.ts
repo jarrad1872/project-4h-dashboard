@@ -32,4 +32,6 @@ export const DataFiles = {
   templates: "templates.json",
   workflowStages: "workflow-stages.json",
   alerts: "alerts.json",
+  influencers: "influencers.json",
+  creativeAssets: "creative-assets.json",
 } as const;

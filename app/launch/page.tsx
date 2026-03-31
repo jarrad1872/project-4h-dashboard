@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
+import { getTierTrades } from "@/lib/trade-utils";
 import type { CampaignStatusData, LaunchChecklistItem } from "@/lib/types";
 
 const GROUP_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
@@ -90,6 +91,7 @@ export default function LaunchPage() {
   const allChecked = items.length > 0 && complete === items.length;
   const readyToGo = allChecked && status?.status === "pre-launch";
   const overallPct = items.length ? Math.round((complete / items.length) * 100) : 0;
+  const tierOneLaunchOrder = getTierTrades(1).join("/");
 
   if (!status) {
     return <div className="flex h-64 items-center justify-center text-slate-400">Loading launch gate…</div>;
@@ -216,7 +218,7 @@ export default function LaunchPage() {
             { step: 4, label: "Upload approved ads with correct UTMs to each platform", done: false },
             { step: 5, label: "Verify tracking pixels on all .city landing pages", done: false },
             { step: 6, label: "Set daily budgets: LinkedIn $200, YouTube $167, Facebook $133, Instagram $100", done: false },
-            { step: 7, label: "Launch Tier 1 trades first: mow/pipe/coat/duct/pest/electricians/roofrepair/disaster", done: false },
+            { step: 7, label: `Launch Tier 1 trades first: ${tierOneLaunchOrder}`, done: false },
             { step: 8, label: "Log Week 1 metrics in /scorecard — apply kill/scale rules", done: false },
           ].map((s) => (
             <div key={s.step} className={`flex items-start gap-3 rounded border px-3 py-2 ${s.done ? "border-green-800/30 bg-green-950/20" : "border-slate-700"}`}>

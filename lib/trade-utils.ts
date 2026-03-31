@@ -1,6 +1,14 @@
 import type { Ad } from "./types";
 
-export const TRADE_MAP: Record<string, { label: string; color: string; bg: string; domain: string; tier: number }> = {
+export interface TradeInfo {
+  label: string;
+  color: string;
+  bg: string;
+  domain: string;
+  tier: number;
+}
+
+export const TRADE_MAP: Record<string, TradeInfo> = {
   // ── Tier 1 — highest TAM / campaign priority ──────────────────────────────
   pipe:          { label: "Pipe.City",          color: "text-cyan-300",    bg: "bg-cyan-900/40",    domain: "pipe.city",          tier: 1 },
   mow:           { label: "Mow.City",           color: "text-green-300",   bg: "bg-green-900/40",   domain: "mow.city",           tier: 1 },
@@ -108,6 +116,30 @@ export function tradeFromAd(ad: Ad): string {
 export function tradeBadge(ad: Ad) {
   const key = tradeFromAd(ad);
   return TRADE_MAP[key] ?? TRADE_MAP.saw;
+}
+
+export function getTradeTierCounts() {
+  return Object.values(TRADE_MAP).reduce<Record<number, number>>((counts, trade) => {
+    counts[trade.tier] = (counts[trade.tier] ?? 0) + 1;
+    return counts;
+  }, { 1: 0, 2: 0, 3: 0 });
+}
+
+export function getTierTrades(tier: number) {
+  return Object.entries(TRADE_MAP)
+    .filter(([, trade]) => trade.tier === tier)
+    .map(([slug]) => slug);
+}
+
+export function getTierDomains(tier: number) {
+  return getTierTrades(tier).map((slug) => TRADE_MAP[slug]?.domain ?? `${slug}.city`);
+}
+
+export function getTierLabel(tier: number) {
+  if (tier === 1) return "Tier 1 — Priority";
+  if (tier === 2) return "Tier 2";
+  if (tier === 3) return "Tier 3";
+  return `Tier ${tier}`;
 }
 
 // ─── Local rendered creative images (public/creatives/) ─────────────────────

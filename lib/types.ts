@@ -2,6 +2,17 @@ export type AdStatus = "approved" | "pending" | "paused" | "rejected";
 export type AdPlatform = "linkedin" | "youtube" | "facebook" | "instagram";
 export type CampaignStatus = "pre-launch" | "live" | "paused" | "ended";
 export type WorkflowStage = "concept" | "copy-ready" | "approved" | "creative-brief" | "uploaded" | "live";
+export type InfluencerStatus =
+  | "researching"
+  | "contacted"
+  | "negotiating"
+  | "contracted"
+  | "content_live"
+  | "paid"
+  | "declined";
+export type CreativeAssetStatus = "draft" | "review" | "approved" | "live";
+export type CreativeAssetAngle = "missed-call" | "voice-boss" | "demo" | "math";
+export type CreativeAssetPlatform = AdPlatform | "multi";
 
 export interface Ad {
   id: string;
@@ -143,6 +154,39 @@ export interface ActivityLog {
   new_value: any;
   note: string | null;
   created_at: string;
+}
+
+export interface Influencer {
+  id: string;
+  creator_name: string;
+  trade: string;
+  platform: string;
+  channel_url: string | null;
+  audience_size: number | null;
+  estimated_reach: string | null;
+  status: InfluencerStatus;
+  flat_fee_amount: number | null;
+  deal_page: string | null;
+  referral_code: string | null;
+  notes: string | null;
+  last_contact_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreativeAsset {
+  id: string;
+  trade_slug: string;
+  title: string;
+  angle: CreativeAssetAngle;
+  tool_used: string;
+  status: CreativeAssetStatus;
+  target_platform: CreativeAssetPlatform;
+  thumbnail_url: string | null;
+  asset_url: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // ─── Compatibility Types used by existing UI components ───────────────────────
