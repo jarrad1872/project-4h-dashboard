@@ -15,7 +15,7 @@ export const PILOT_LABEL = "Plumbing Pilot";
 export const PILOT_LAUNCH_DATE = "2026-04-14T00:00:00.000Z";
 export const MONTHLY_BUDGET_FLOOR = 5000;
 export const MONTHLY_BUDGET_CEILING = 10000;
-export const DEFAULT_CREATIVE_TOOL = "gemini-2.0-flash-preview-image-generation";
+export const DEFAULT_CREATIVE_TOOL = "gemini-3.1-flash-image-preview";
 
 export const INFLUENCER_STATUS_ORDER: InfluencerStatus[] = [
   "researching",

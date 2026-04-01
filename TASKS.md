@@ -1,6 +1,6 @@
 # Project 4H — Task Board
 
-**Last updated:** 2026-03-31 (growth command center)
+**Last updated:** 2026-04-01 (growth command center verification)
 
 ---
 
@@ -61,8 +61,8 @@ Run `4h ads archive --campaign-group nb2` to archive the 1,040 old NB2 ads befor
 - [x] Influencer page upgraded to the new workflow (`researching -> contacted -> negotiating -> contracted -> content_live -> paid`) with audience-size and flat-fee tracking
 - [x] Assets page repurposed into AI UGC creative asset management with draft/review/approved/live workflow
 - [x] Added `creative_assets` API + migration `009_growth_command_center.sql` and extended influencer APIs to tolerate pre-migration schemas safely
-- [x] Follow-up polish from [H-8](/H/issues/H-8): human-readable influencer status labels and a valid default AI tool/model on the assets form
-- [x] 163 tests passing, `npx tsc --noEmit` passing, `npm run build` passing under `NODE_ENV=production`
+- [x] Follow-up polish from [H-8](/H/issues/H-8): human-readable influencer status labels and the board-approved assets default tool (`gemini-3.1-flash-image-preview`)
+- [x] 166 tests passing, `npx tsc --noEmit` passing, `npm run build` passing under `NODE_ENV=production`
 
 ### Dashboard Cleanup Pass (2026-03-30)
 - [x] Approval page no longer does the duplicate client-mount `/api/ads` fetch; initial data now hydrates server-side

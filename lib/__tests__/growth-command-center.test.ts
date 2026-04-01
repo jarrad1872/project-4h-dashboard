@@ -56,8 +56,8 @@ describe("label helpers", () => {
     expect(formatCreativeAssetStatusLabel("approved")).toBe("Approved");
   });
 
-  it("uses a real default creative tool model", () => {
-    expect(DEFAULT_CREATIVE_TOOL).toBe("gemini-2.0-flash-preview-image-generation");
+  it("uses the configured default creative tool model", () => {
+    expect(DEFAULT_CREATIVE_TOOL).toBe("gemini-3.1-flash-image-preview");
   });
 });
 
