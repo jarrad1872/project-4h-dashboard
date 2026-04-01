@@ -1,6 +1,6 @@
 # SOP: Project 4H Dashboard — Operating Model
 
-**Last updated:** 2026-02-28  
+**Last updated:** 2026-04-01  
 **Dashboard:** https://pumpcans.com  
 **Repo:** `jarrad1872/project-4h-dashboard`
 
@@ -241,6 +241,33 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube
+
+---
+
+## COMPETITIVE AD RESEARCH SOP
+
+This is read-only market intelligence for 4H creative strategy. It does not touch our ad accounts.
+
+### Rules
+
+1. Validate provider access before automating. Do not assume Meta Ad Library API coverage just because the public library exists.
+2. Treat analysis cost as low-but-non-zero when using Claude API directly.
+3. Reports must distinguish observed ad patterns from inference.
+4. Weekly output must include coverage notes so strategy decisions are not made on hidden blind spots.
+
+### Foundation Files
+
+- `docs/competitive-ad-research-agent.md`
+- `lib/competitive-ad-research-agent.ts`
+- `lib/__tests__/competitive-ad-research-agent.test.ts`
+
+### Build Sequence
+
+1. Validate Meta token coverage against real search terms (`ai receptionist`, `plumber software`, direct competitor brands).
+2. Normalize collected snapshots into the shared internal schema.
+3. Run Claude analysis on normalized snapshots only.
+4. Generate markdown report for Paperclip and Telegram delivery.
+5. Only after validation succeeds should we schedule the workflow or request a dedicated always-on agent.
 
 ---
 

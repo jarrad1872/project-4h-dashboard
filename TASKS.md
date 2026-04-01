@@ -1,6 +1,6 @@
 # Project 4H — Task Board
 
-**Last updated:** 2026-04-01 (growth command center verification)
+**Last updated:** 2026-04-01 (competitive intelligence foundation)
 
 ---
 
@@ -45,12 +45,21 @@ Both items already covered by existing sections. AGENTS.md key files entry updat
 Start with lawn care (Mike Andes, Brian's Lawn) + HVAC (AC Service Tech, HVAC School).
 Pipeline now trackable: `4h influencer seed` then `4h influencer list|update`.
 
+### TASK-021: Apply Influencer Outreach Agent Migration
+Run `supabase/migrations/010_influencer_outreach_agent.sql` in the Supabase SQL editor before using the new approval and follow-up fields on production.
+Then verify at https://pumpcans.com/influencer that qualification scores, approval queue, and follow-up states render from live rows.
+
 ### TASK-007: Seed Influencer Pipeline
 Run `4h influencer seed` to populate the 10 creators from the shortlist into Supabase.
 Then verify at https://pumpcans.com/influencer.
 
 ### TASK-010: Archive Old NB2 Ads
 Run `4h ads archive --campaign-group nb2` to archive the 1,040 old NB2 ads before generating replacements.
+
+### TASK-022: Validate Meta Competitive Research Access
+Use a real Meta token and run validation queries for `ai receptionist`, `plumber software`, and `smith.ai`.
+Confirm whether the authenticated path returns enough useful commercial-ad coverage to justify weekly automation.
+Reference architecture: `docs/competitive-ad-research-agent.md`.
 
 ---
 
@@ -63,6 +72,18 @@ Run `4h ads archive --campaign-group nb2` to archive the 1,040 old NB2 ads befor
 - [x] Added `creative_assets` API + migration `009_growth_command_center.sql` and extended influencer APIs to tolerate pre-migration schemas safely
 - [x] Follow-up polish from [H-8](/H/issues/H-8): human-readable influencer status labels and the board-approved assets default tool (`gemini-3.1-flash-image-preview`)
 - [x] 166 tests passing, `npx tsc --noEmit` passing, `npm run build` passing under `NODE_ENV=production`
+
+### Influencer Outreach Agent Foundation (2026-04-01)
+- [x] Added workflow spec in `docs/influencer-outreach-agent.md`
+- [x] Extended `influencer_pipeline` for contact email, qualification inputs, approval status, and send/follow-up timestamps via migration `010_influencer_outreach_agent.sql`
+- [x] Added deterministic scoring and draft-generation utilities for initial outreach plus day-3/day-7 follow-ups
+- [x] Rebuilt `/influencer` into an approval-oriented operating queue with pending approval, ready-to-send, and follow-up due sections
+
+### Competitive Ad Research Foundation (2026-04-01)
+- [x] Added verified architecture notes in `docs/competitive-ad-research-agent.md`
+- [x] Corrected the Meta dependency assumption: public Ad Library exists, but automated access must be validated with a token before scheduling
+- [x] Added `lib/competitive-ad-research-agent.ts` for keyword seeds, Meta snapshot normalization, Claude prompt generation, and weekly report generation
+- [x] Added `lib/__tests__/competitive-ad-research-agent.test.ts` to lock the foundation contract before wiring a live collector
 
 ### Dashboard Cleanup Pass (2026-03-30)
 - [x] Approval page no longer does the duplicate client-mount `/api/ads` fetch; initial data now hydrates server-side

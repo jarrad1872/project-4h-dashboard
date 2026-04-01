@@ -78,6 +78,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Launch | `/launch` | Pre-launch gate checklist |
 | Templates | `/templates` | Creative briefs + ad template library |
 | Generate | `/generate` | AI copy + creative generation (Gemini) |
+| Influencer | `/influencer` | Semi-autonomous creator outreach: scoring, approvals, ready-to-send, and follow-up drafting |
 | Settings | `/settings` | Campaign configuration |
 
 ---
@@ -145,6 +146,7 @@ Supabase DB (vzawlfitqnjhypnkguas)
 - `weekly_metrics` — scorecard data per week per channel
 - `lifecycle_messages` — Day 0/1/3 email + SMS sequences
 - `launch_checklist` — pre-launch gate items
+- `influencer_pipeline` — creator qualification, draft approval, and send/follow-up state
 
 ---
 
@@ -201,11 +203,19 @@ See **[SOP-WORKFLOW.md](./SOP-WORKFLOW.md)** for the campaign operating SOP.
 ### Growth Command Center Notes (2026-03-31)
 
 - `/` now focuses on the live plumbing pilot (`pipe.city`) with launch countdown, influencer pipeline, creative pipeline, channel placeholders, and budget tracking
-- `/influencer` now supports the full outreach workflow (`researching -> contacted -> negotiating -> contracted -> content_live -> paid`) with audience size and flat-fee tracking
+- `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
 - `/assets` now tracks AI UGC creative assets instead of the older trade-image staging flow
 - `supabase/migrations/009_growth_command_center.sql` adds `creative_assets` plus richer influencer fields for persistent production storage
+- `supabase/migrations/010_influencer_outreach_agent.sql` adds the email-only outreach state model for human-gated creator approvals
 
-*Last updated: 2026-03-31 growth command center | v4.1.0*
+### Competitive Intelligence Foundation (2026-04-01)
+
+- `docs/competitive-ad-research-agent.md` documents the corrected architecture for H-16 after verifying Meta access assumptions against official sources
+- `lib/competitive-ad-research-agent.ts` provides provider-agnostic keyword seeds, Meta payload normalization, Claude prompt generation, and weekly markdown report generation
+- `lib/__tests__/competitive-ad-research-agent.test.ts` locks the shared snapshot/report contract before any live Meta collector is wired in
+- Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
+
+*Last updated: 2026-04-01 competitive intelligence foundation | v4.3.0*
 
 ---
 

@@ -10,6 +10,19 @@ export type InfluencerStatus =
   | "content_live"
   | "paid"
   | "declined";
+export type InfluencerBusinessFocus = "owners" | "mixed" | "consumer";
+export type InfluencerSponsorOpenness = "low" | "medium" | "high";
+export type InfluencerOutreachStage =
+  | "discovery"
+  | "qualified"
+  | "approval_pending"
+  | "approved"
+  | "sent"
+  | "follow_up_due"
+  | "responded"
+  | "closed";
+export type InfluencerOutreachDraftStatus = "not_started" | "drafted" | "pending_approval" | "approved" | "rejected" | "sent";
+export type InfluencerOutreachDraftStep = "initial" | "follow_up_1" | "follow_up_2";
 export type CreativeAssetStatus = "draft" | "review" | "approved" | "live";
 export type CreativeAssetAngle = "missed-call" | "voice-boss" | "demo" | "math";
 export type CreativeAssetPlatform = AdPlatform | "multi";
@@ -170,6 +183,22 @@ export interface Influencer {
   referral_code: string | null;
   notes: string | null;
   last_contact_at: string | null;
+  contact_email: string | null;
+  business_focus: InfluencerBusinessFocus;
+  average_views: number | null;
+  engagement_rate: number | null;
+  sponsor_openness: InfluencerSponsorOpenness;
+  outreach_stage: InfluencerOutreachStage;
+  draft_status: InfluencerOutreachDraftStatus;
+  draft_step: InfluencerOutreachDraftStep;
+  draft_subject: string | null;
+  draft_body: string | null;
+  approval_notes: string | null;
+  approved_at: string | null;
+  draft_generated_at: string | null;
+  sent_at: string | null;
+  follow_up_due_at: string | null;
+  last_response_at: string | null;
   created_at: string;
   updated_at: string;
 }

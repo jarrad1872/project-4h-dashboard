@@ -4,6 +4,10 @@ import type {
   CreativeAssetAngle,
   CreativeAssetStatus,
   Influencer,
+  InfluencerBusinessFocus,
+  InfluencerOutreachDraftStatus,
+  InfluencerOutreachStage,
+  InfluencerSponsorOpenness,
   InfluencerStatus,
   MetricsData,
   MetricsWeek,
@@ -42,6 +46,38 @@ const INFLUENCER_STATUS_LABELS: Record<InfluencerStatus, string> = {
   content_live: "Content Live",
   paid: "Paid",
   declined: "Declined",
+};
+
+const BUSINESS_FOCUS_LABELS: Record<InfluencerBusinessFocus, string> = {
+  owners: "Owners",
+  mixed: "Mixed",
+  consumer: "Consumer",
+};
+
+const SPONSOR_OPENNESS_LABELS: Record<InfluencerSponsorOpenness, string> = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+};
+
+const OUTREACH_STAGE_LABELS: Record<InfluencerOutreachStage, string> = {
+  discovery: "Discovery",
+  qualified: "Qualified",
+  approval_pending: "Approval Pending",
+  approved: "Approved",
+  sent: "Sent",
+  follow_up_due: "Follow-up Due",
+  responded: "Responded",
+  closed: "Closed",
+};
+
+const DRAFT_STATUS_LABELS: Record<InfluencerOutreachDraftStatus, string> = {
+  not_started: "Not Started",
+  drafted: "Drafted",
+  pending_approval: "Pending Approval",
+  approved: "Approved",
+  rejected: "Rejected",
+  sent: "Sent",
 };
 
 const CREATIVE_ASSET_STATUS_LABELS: Record<CreativeAssetStatus, string> = {
@@ -102,6 +138,22 @@ export function formatAudienceSize(value: number | null | undefined): string {
 
 export function formatInfluencerStatusLabel(status: InfluencerStatus): string {
   return INFLUENCER_STATUS_LABELS[status];
+}
+
+export function formatBusinessFocusLabel(value: InfluencerBusinessFocus): string {
+  return BUSINESS_FOCUS_LABELS[value];
+}
+
+export function formatSponsorOpennessLabel(value: InfluencerSponsorOpenness): string {
+  return SPONSOR_OPENNESS_LABELS[value];
+}
+
+export function formatOutreachStageLabel(value: InfluencerOutreachStage): string {
+  return OUTREACH_STAGE_LABELS[value];
+}
+
+export function formatDraftStatusLabel(value: InfluencerOutreachDraftStatus): string {
+  return DRAFT_STATUS_LABELS[value];
 }
 
 export function formatCreativeAssetStatusLabel(status: CreativeAssetStatus): string {

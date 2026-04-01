@@ -1,72 +1,26 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
-import { DataFiles, writeJsonFile } from "@/lib/file-db";
+import {
+  isInfluencerSchemaMismatch,
+  normalizeBusinessFocus,
+  normalizeDraftStatus,
+  normalizeDraftStep,
+  normalizeInfluencer,
+  normalizeOutreachStage,
+  normalizeSponsorOpenness,
+  readInfluencersFallback,
+  stripModernInfluencerPayload,
+  VALID_INFLUENCER_STATUSES,
+  writeInfluencersFallback,
+} from "@/lib/influencer-store";
 import { formatAudienceSize, normalizeAudienceSize, normalizeInfluencerStatus } from "@/lib/growth-command-center";
 import { supabaseAdmin } from "@/lib/supabase";
-import { hasSupabase, logActivity, readFallback } from "@/lib/server-utils";
-import type { Influencer, InfluencerStatus } from "@/lib/types";
+import { hasSupabase, logActivity } from "@/lib/server-utils";
 
 export const dynamic = "force-dynamic";
 
-const VALID_STATUSES = new Set<InfluencerStatus>([
-  "researching",
-  "contacted",
-  "negotiating",
-  "contracted",
-  "content_live",
-  "paid",
-  "declined",
-]);
-
 export function OPTIONS() {
   return optionsResponse();
-}
-
-function normalizeInfluencer(input: Record<string, unknown>): Influencer {
-  const audienceSize = normalizeAudienceSize(
-    typeof input.audience_size === "number" ? input.audience_size : null,
-    typeof input.estimated_reach === "string" ? input.estimated_reach : null,
-  );
-
-  return {
-    id: String(input.id),
-    creator_name: String(input.creator_name ?? ""),
-    trade: String(input.trade ?? ""),
-    platform: String(input.platform ?? ""),
-    channel_url: (input.channel_url as string | null | undefined) ?? null,
-    audience_size: audienceSize,
-    estimated_reach: (input.estimated_reach as string | null | undefined) ?? (audienceSize ? formatAudienceSize(audienceSize) : null),
-    status: normalizeInfluencerStatus(input.status as string | null | undefined),
-    flat_fee_amount:
-      typeof input.flat_fee_amount === "number" && Number.isFinite(input.flat_fee_amount)
-        ? input.flat_fee_amount
-        : null,
-    deal_page: (input.deal_page as string | null | undefined) ?? null,
-    referral_code: (input.referral_code as string | null | undefined) ?? null,
-    notes: (input.notes as string | null | undefined) ?? null,
-    last_contact_at: (input.last_contact_at as string | null | undefined) ?? null,
-    created_at: String(input.created_at ?? ""),
-    updated_at: String(input.updated_at ?? input.created_at ?? ""),
-  };
-}
-
-function readInfluencersFallback() {
-  return readFallback<Record<string, unknown>[]>(DataFiles.influencers, []).map(normalizeInfluencer);
-}
-
-function writeInfluencersFallback(influencers: Influencer[]) {
-  writeJsonFile(DataFiles.influencers, influencers);
-}
-
-function isInfluencerSchemaMismatch(error: { code?: string; message?: string } | null | undefined) {
-  return Boolean(
-    error &&
-      (error.code === "42703" ||
-        error.code === "PGRST204" ||
-        error.message?.includes("audience_size") ||
-        error.message?.includes("flat_fee_amount") ||
-        error.message?.includes("schema cache")),
-  );
 }
 
 export async function PATCH(
@@ -80,8 +34,8 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    if (body.status && !VALID_STATUSES.has(normalizeInfluencerStatus(body.status))) {
-      return errorJson(`status must be one of: ${Array.from(VALID_STATUSES).join(", ")}`, 400);
+    if (body.status && !VALID_INFLUENCER_STATUSES.includes(normalizeInfluencerStatus(body.status))) {
+      return errorJson(`status must be one of: ${VALID_INFLUENCER_STATUSES.join(", ")}`, 400);
     }
 
     const update: Record<string, unknown> = {};
@@ -106,6 +60,22 @@ export async function PATCH(
     if (body.creator_name !== undefined) update.creator_name = body.creator_name;
     if (body.trade !== undefined) update.trade = body.trade;
     if (body.platform !== undefined) update.platform = body.platform;
+    if (body.contact_email !== undefined) update.contact_email = body.contact_email;
+    if (body.business_focus !== undefined) update.business_focus = normalizeBusinessFocus(body.business_focus);
+    if (body.average_views !== undefined) update.average_views = body.average_views;
+    if (body.engagement_rate !== undefined) update.engagement_rate = body.engagement_rate;
+    if (body.sponsor_openness !== undefined) update.sponsor_openness = normalizeSponsorOpenness(body.sponsor_openness);
+    if (body.outreach_stage !== undefined) update.outreach_stage = normalizeOutreachStage(body.outreach_stage);
+    if (body.draft_status !== undefined) update.draft_status = normalizeDraftStatus(body.draft_status);
+    if (body.draft_step !== undefined) update.draft_step = normalizeDraftStep(body.draft_step);
+    if (body.draft_subject !== undefined) update.draft_subject = body.draft_subject;
+    if (body.draft_body !== undefined) update.draft_body = body.draft_body;
+    if (body.approval_notes !== undefined) update.approval_notes = body.approval_notes;
+    if (body.approved_at !== undefined) update.approved_at = body.approved_at;
+    if (body.draft_generated_at !== undefined) update.draft_generated_at = body.draft_generated_at;
+    if (body.sent_at !== undefined) update.sent_at = body.sent_at;
+    if (body.follow_up_due_at !== undefined) update.follow_up_due_at = body.follow_up_due_at;
+    if (body.last_response_at !== undefined) update.last_response_at = body.last_response_at;
 
     if (Object.keys(update).length === 0) {
       return errorJson("No fields to update", 400);
@@ -137,9 +107,7 @@ export async function PATCH(
     let { data, error } = await supabaseAdmin.from("influencer_pipeline").update(update).eq("id", id).select("*").single();
 
     if (isInfluencerSchemaMismatch(error)) {
-      const legacyUpdate = { ...update };
-      delete legacyUpdate.audience_size;
-      delete legacyUpdate.flat_fee_amount;
+      const legacyUpdate = stripModernInfluencerPayload(update);
       const retry = await supabaseAdmin.from("influencer_pipeline").update(legacyUpdate).eq("id", id).select("*").single();
       data = retry.data;
       error = retry.error;
