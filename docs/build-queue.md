@@ -63,12 +63,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-45 | Governance | Navigation | Preserve historical ad archive audit map | 2026-04-27 | Command now shows `/ads` archive classifier signals, current/historical row counts, dependencies, and no-external-action boundaries before archive-only work. |
 | Q-46 | Governance | Navigation | Draft clear-route cleanup packet | 2026-04-27 | Command now groups `/ads`, `/generate`, `/gtm`, and `/settings` into a draft cleanup packet with preservation evidence and blocked actions before route implementation work. |
 | Q-47 | Governance | Navigation | Apply legacy AI Studio redirect packet | 2026-04-27 | `/generate` now redirects internally to `/assets`; legacy API routes stay untouched and no external action is performed. |
+| Q-48 | Governance | Navigation | Apply legacy GTM archive-only packet | 2026-04-27 | `/gtm` now redirects internally to Command; product-route inventory remains preserved on Command/docs and sawcity-lite is untouched. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-48 | Governance | Navigation | Apply legacy GTM archive-only packet | none | `/gtm` uses an internal archive-only treatment or redirect to Command; no launch URLs, sawcity-lite files, external webhooks, uploads, launches, spend, or billing are changed. |
+| Q-49 | Governance | Navigation | Apply legacy Settings cleanup packet | none | `/settings` redirects internally to Approval or is removed via a documented delete-later packet; no credentials, campaign status, external webhooks, uploads, launches, spend, billing, or sawcity-lite files are changed. |
 
 ## Stop Conditions
 

@@ -79,6 +79,9 @@ describe("navigation IA", () => {
       "Setup/source notes inventoried in settings-source-notes",
     );
     expect(routeDependencyGuards.find((row) => row.route === "/gtm")?.dataDependencies).toContain(
+      "Internal /gtm page route redirects to Command",
+    );
+    expect(routeDependencyGuards.find((row) => row.route === "/gtm")?.dataDependencies).toContain(
       "Product-route inventory preserved in product-route-inventory",
     );
     expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.dataDependencies).toContain(
@@ -91,7 +94,7 @@ describe("navigation IA", () => {
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
       counts: { clear: 4, blocked: 2, support: 2 },
-      readyForRedirectOrDelete: 3,
+      readyForRedirectOrDelete: 2,
     });
   });
 });

@@ -380,6 +380,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-45 separates historical archive context from the legacy `/ads` page route. Future `/ads` archive-only packets must preserve classifier signals, current/historical filters, `/api/ads` history readability, and the no-upload/no-launch boundary.
 - Q-46 groups clear candidates into a cleanup packet before implementation. A cleanup packet must show preserved evidence, replacement route, verification requirements, and blocked actions before any redirect, archive-only, or delete-later change.
 - Q-47 applies the `/generate` cleanup packet. `/generate` should redirect internally to `/assets`; do not remove `/api/generate`, `/api/ai-creative`, or related legacy API routes without a separate API cleanup packet.
+- Q-48 applies the `/gtm` archive-only cleanup packet. `/gtm` should redirect internally to Command; do not remove product-route inventory data/docs or edit sawcity-lite.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

@@ -49,6 +49,7 @@ These routes are not active operating lanes. They remain available from the coll
 11. Q-45: Preserve historical `/ads` archive signals and dependencies in active data/docs. Complete; no redirects, deletions, uploads, launches, or external actions.
 12. Q-46: Draft the clear-route cleanup packet for `/ads`, `/generate`, `/gtm`, and `/settings`. Complete; no redirects, deletions, uploads, launches, or external actions.
 13. Q-47: Apply the legacy AI Studio redirect packet. Complete; `/generate` redirects internally to `/assets` and legacy API routes remain untouched.
+14. Q-48: Apply the legacy GTM archive-only packet. Complete; `/gtm` redirects internally to Command and product-route inventory remains preserved in Command/docs.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -77,7 +78,7 @@ The Command page now shows a route dependency guard with these current statuses:
 | Support | 2 | Keep as detail/support routes reached from active loops. |
 | Clear | 4 | Candidate or already-applied route cleanup after preserving useful notes. |
 
-Current pending clear routes: `/settings`, `/gtm`, `/ads`. Applied clear route: `/generate`.
+Current pending clear routes: `/settings`, `/ads`. Applied clear routes: `/generate`, `/gtm`.
 
 Current blockers to resolve first:
 
@@ -176,3 +177,9 @@ Q-46 did not redirect a route, delete a page, edit ads, upload to ad platforms, 
 Q-47 applies the first clear-route cleanup packet: the `/generate` page route now redirects internally to `/assets`. This only changes the page route. The legacy `/api/generate`, `/api/ai-creative`, and related data routes remain available until a separate API cleanup packet exists.
 
 Q-47 did not generate copy or images, remove API routes, delete files outside the page route, upload to ad platforms, launch campaigns, create webhooks, spend money, change billing, or touch sawcity-lite. Browser verification must confirm `/generate` lands on `/assets` and Creative Lab loads.
+
+## Q-48 Legacy GTM Archive-Only Packet
+
+Q-48 applies the second clear-route cleanup packet: the `/gtm` page route now redirects internally to Command. Product-route inventory remains preserved in `lib/product-route-inventory.ts`, `docs/product-route-inventory.md`, and the Command GTM product-route map.
+
+Q-48 did not change launch URLs, remove product-route data, edit sawcity-lite, upload to ad platforms, launch campaigns, create webhooks, spend money, or change billing. Browser verification must confirm `/gtm` lands on `/` and the Command GTM product-route map still loads.

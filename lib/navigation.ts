@@ -249,11 +249,11 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   {
     route: "/gtm",
     status: "clear",
-    readyForRedirectOrDelete: true,
-    activeReferences: ["Reference Shelf", "legacy banner only"],
-    dataDependencies: ["Product-route inventory preserved in product-route-inventory"],
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Reference Shelf link now lands on Command"],
+    dataDependencies: ["Internal /gtm page route redirects to Command", "Product-route inventory preserved in product-route-inventory"],
     docOrTestReferences: ["README", "SOP-WORKFLOW", "product-route-inventory docs", "navigation.test", "Command GTM product-route map"],
-    guardrail: "Candidate for future archive-only packet after confirming Command/docs cover the legacy GTM inventory.",
+    guardrail: "Implemented in Q-48. Keep product-route inventory on Command/docs and do not touch sawcity-lite.",
   },
   {
     route: "/settings",

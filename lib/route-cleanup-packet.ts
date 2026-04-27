@@ -32,6 +32,13 @@ export const appliedRouteCleanupPackets: AppliedRouteCleanupEntry[] = [
     verification: ["/generate redirects to /assets", "/assets loads Creative Lab", "/api/generate is not removed"],
     externalActionAllowed: false,
   },
+  {
+    route: "/gtm",
+    appliedIn: "Q-48",
+    outcome: "Internal page route redirects to Command while product-route inventory remains preserved in Command/docs.",
+    verification: ["/gtm redirects to /", "Command loads product-route inventory map", "sawcity-lite remains read-only"],
+    externalActionAllowed: false,
+  },
 ];
 
 function intentForRecommendation(recommendation: RouteRetirementRecommendation) {

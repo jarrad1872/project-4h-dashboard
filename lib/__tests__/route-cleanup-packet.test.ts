@@ -7,9 +7,10 @@ import {
 
 describe("clearRouteCleanupPacket", () => {
   it("groups only clear route candidates without authorizing implementation", () => {
-    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/ads", "/gtm", "/settings"]);
+    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/ads", "/settings"]);
     expect(clearRouteCleanupPacket.every((entry) => entry.implementationAllowed === false)).toBe(true);
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/generate")).toBeUndefined();
+    expect(clearRouteCleanupPacket.find((entry) => entry.route === "/gtm")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/creatives")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/workflow")).toBeUndefined();
   });
@@ -27,11 +28,11 @@ describe("clearRouteCleanupPacket", () => {
 
   it("summarizes packet counts and blocked actions", () => {
     expect(clearRouteCleanupPacketSummary()).toEqual({
-      total: 3,
-      routes: ["/ads", "/gtm", "/settings"],
-      appliedRoutes: ["/generate"],
-      counts: { rebuild: 0, redirect: 0, archive: 2, delete: 1 },
-      appliedCount: 1,
+      total: 2,
+      routes: ["/ads", "/settings"],
+      appliedRoutes: ["/generate", "/gtm"],
+      counts: { rebuild: 0, redirect: 0, archive: 1, delete: 1 },
+      appliedCount: 2,
       implementationAllowed: false,
       blockedActions: ["route redirect", "route deletion", "ad upload", "campaign launch", "webhook creation", "spend change"],
       preservationRule:
@@ -46,6 +47,13 @@ describe("clearRouteCleanupPacket", () => {
         appliedIn: "Q-47",
         outcome: "Internal page route redirects to /assets while legacy generation API routes remain unchanged.",
         verification: ["/generate redirects to /assets", "/assets loads Creative Lab", "/api/generate is not removed"],
+        externalActionAllowed: false,
+      },
+      {
+        route: "/gtm",
+        appliedIn: "Q-48",
+        outcome: "Internal page route redirects to Command while product-route inventory remains preserved in Command/docs.",
+        verification: ["/gtm redirects to /", "Command loads product-route inventory map", "sawcity-lite remains read-only"],
         externalActionAllowed: false,
       },
     ]);
