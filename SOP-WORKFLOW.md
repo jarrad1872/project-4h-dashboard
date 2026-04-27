@@ -363,6 +363,12 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - The stop screen is a planning surface only. It does not call ad-platform APIs, send messages, upload sheets, create webhooks, change billing, or move money.
 - The former launch-status action is not an external launch control. Any real campaign launch remains manual or separately approved by Jarrad.
 
+**Navigation and original-build cleanup:**
+- The primary sidebar is for active growth loops and launch governance only: Command, Creators, Sales, Creative Lab, Scorecard, Approval, Launch, and Budget.
+- Original-build routes such as `/ads`, `/generate`, `/gtm`, and `/settings` stay in the collapsed Reference Shelf until they are rebuilt, archived, redirected, or retired.
+- Direct-link support routes such as `/templates` and `/lifecycle` can stay available without taking primary sidebar space.
+- Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
+
 **Experiment budget planner:**
 - `/budget` assigns the first paid-test planning budget by experiment, not only by channel.
 - Experiment requests are local UI planning state. Editing them does not update billing, ad accounts, Supabase budget rows, webhooks, uploads, campaigns, or spend.

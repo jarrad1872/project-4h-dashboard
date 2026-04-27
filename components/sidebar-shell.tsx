@@ -1,36 +1,44 @@
 import Link from "next/link";
+import { legacyNavigationItems, navigationGroups } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { href: "/", label: "Command" },
-  { href: "/influencer", label: "Creators" },
-  { href: "/sales", label: "Sales" },
-  { href: "/assets", label: "Creative Lab" },
-  { href: "/scorecard", label: "Scorecard" },
-  { href: "/approval", label: "Approval" },
-  { href: "/generate", label: "AI Studio" },
-  { href: "/ads", label: "Ad Archive" },
-  { href: "/launch", label: "Launch" },
-  { href: "/budget", label: "Budget" },
-  { href: "/gtm", label: "Legacy GTM" },
-  { href: "/settings", label: "Settings" },
-];
 
 function SidebarNav() {
   return (
-    <nav className="space-y-1">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "block rounded-md px-3 py-2 text-sm font-medium transition-colors",
-            "text-slate-300 hover:bg-slate-700/60 hover:text-white",
-          )}
-        >
-          {item.label}
-        </Link>
+    <nav className="space-y-5" data-testid="primary-sidebar-nav">
+      {navigationGroups.map((group) => (
+        <div key={group.label} className="space-y-1">
+          <p className="px-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">{group.label}</p>
+          {group.items.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "block rounded-md px-3 py-2 text-sm font-semibold transition-colors",
+                "text-slate-200 hover:bg-slate-700/60 hover:text-white",
+              )}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
       ))}
+
+      <details className="px-3 text-xs text-slate-500" data-testid="legacy-sidebar-nav">
+        <summary className="cursor-pointer select-none font-semibold uppercase tracking-wide hover:text-slate-300">
+          Reference Shelf
+        </summary>
+        <div className="mt-2 space-y-1 border-l border-slate-700 pl-3">
+          {legacyNavigationItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="block rounded px-2 py-1 text-xs text-slate-400 hover:bg-slate-700/50 hover:text-slate-100"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </details>
     </nav>
   );
 }
