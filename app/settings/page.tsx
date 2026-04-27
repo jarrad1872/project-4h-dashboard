@@ -3,16 +3,10 @@
 import { useEffect, useState } from "react";
 import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { Button, Card } from "@/components/ui";
+import { settingsDocUpdateLog, settingsSetupGuides, settingsSourceDocs } from "@/lib/settings-source-notes";
 import type { CampaignStatusData } from "@/lib/types";
 
 const BOB_API_KEY = "bob_project4h_sk_live_7f4a2ca5_demo";
-
-const sourceDocs = [
-  "/home/node/.openclaw/workspace/projects/sawcity-lite/docs/project-4h/CAMPAIGN-UPLOAD-SHEET-v2.csv",
-  "/home/node/.openclaw/workspace/projects/sawcity-lite/docs/project-4h/LIFECYCLE-MESSAGING-v1.csv",
-  "/home/node/.openclaw/workspace/projects/sawcity-lite/docs/project-4h/APPROVAL-BATCH-002-CUSTOMER-FACING.md",
-  "/home/node/.openclaw/workspace/projects/sawcity-lite/docs/project-4h/PLATFORM-LAUNCH-GATE-v1.md",
-];
 
 export default function SettingsPage() {
   const [status, setStatus] = useState<CampaignStatusData | null>(null);
@@ -37,7 +31,7 @@ export default function SettingsPage() {
     void load();
   }
 
-  if (!status) return <p className="text-sm text-slate-400">Loading settings…</p>;
+  if (!status) return <p className="text-sm text-slate-400">Loading settings...</p>;
 
   return (
     <div className="space-y-6">
@@ -48,9 +42,9 @@ export default function SettingsPage() {
       <Card>
         <h2 className="mb-2 text-lg font-semibold">Platform Setup Guides</h2>
         <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
-          <li>LinkedIn Insight Tag: saw.city/li landing instrumentation checklist</li>
-          <li>Meta Pixel events: saw.city/fb and saw.city/ig launch package</li>
-          <li>YouTube / Google Tag config: saw.city/yt campaign setup</li>
+          {settingsSetupGuides.map((guide) => (
+            <li key={guide.id}>{guide.note}</li>
+          ))}
         </ul>
       </Card>
 
@@ -63,7 +57,9 @@ export default function SettingsPage() {
         <h2 className="mb-3 text-lg font-semibold">Campaign Status Control</h2>
         <select
           value={status.status}
-          onChange={(e) => setStatus((prev) => (prev ? { ...prev, status: e.target.value as CampaignStatusData["status"] } : prev))}
+          onChange={(event) =>
+            setStatus((prev) => (prev ? { ...prev, status: event.target.value as CampaignStatusData["status"] } : prev))
+          }
           className="rounded border border-slate-600 bg-slate-800 px-3 py-2"
         >
           <option value="pre-launch">pre-launch</option>
@@ -77,30 +73,36 @@ export default function SettingsPage() {
       </Card>
 
       <Card className="border-slate-700/40">
-        <h2 className="mb-1 text-lg font-semibold text-slate-300">📋 Doc Update Log</h2>
+        <h2 className="mb-1 text-lg font-semibold text-slate-300">Doc Update Log</h2>
         <div className="space-y-2">
-          <div className="rounded border border-green-800/40 bg-green-950/20 p-3">
-            <p className="mb-0.5 text-sm font-semibold text-green-400">✅ SOP-WORKFLOW.md — TRADE_MAP Maintenance Rule</p>
-            <p className="text-xs text-slate-400">Applied 2026-03-01 — rule added to SOP-WORKFLOW.md under CREATIVE VARIANTS SYSTEM section. Baseline: 65 prefixes (commit <code>820719f</code>).</p>
-          </div>
-          <div className="rounded border border-slate-700 bg-slate-900 p-3">
-            <p className="mb-0.5 text-sm font-semibold text-slate-200">⏳ AGENTS.md — lib/trade-utils.ts Row Update</p>
-            <p className="text-xs text-slate-400">
-              Still pending: note that TRADE_MAP must contain ALL active prefixes. Document <code>tradeFromAd()</code> behavior — checks both <code>utm_campaign</code> + <code>campaign_group</code>; fallback is <code>saw</code> (silent, not thrown).
-            </p>
-          </div>
+          {settingsDocUpdateLog.map((item) => (
+            <div
+              key={item.id}
+              className={`rounded border p-3 ${
+                item.status === "applied" ? "border-green-800/40 bg-green-950/20" : "border-slate-700 bg-slate-900"
+              }`}
+            >
+              <p className={`mb-0.5 text-sm font-semibold ${item.status === "applied" ? "text-green-400" : "text-slate-200"}`}>
+                {item.status === "applied" ? "Applied" : "Pending"}: {item.target}
+              </p>
+              <p className="text-xs text-slate-400">{item.note}</p>
+            </div>
+          ))}
         </div>
-        <p className="mt-2 text-xs text-slate-500">Details: <code>docs/pending-doc-updates.md</code></p>
+        <p className="mt-2 text-xs text-slate-500">
+          Details: <code>docs/pending-doc-updates.md</code>
+        </p>
       </Card>
 
       <Card>
         <h2 className="mb-2 text-lg font-semibold">Project 4H Source Docs</h2>
         <ul className="space-y-2 text-sm">
-          {sourceDocs.map((doc) => (
-            <li key={doc} className="rounded border border-slate-700 px-3 py-2">
-              <a href={`file://${doc}`} className="text-blue-300 underline" target="_blank" rel="noreferrer">
-                {doc}
+          {settingsSourceDocs.map((doc) => (
+            <li key={doc.id} className="rounded border border-slate-700 px-3 py-2">
+              <a href={`file://${doc.path}`} className="text-blue-300 underline" target="_blank" rel="noreferrer">
+                {doc.path}
               </a>
+              <p className="mt-1 text-xs text-slate-500">{doc.purpose}</p>
             </li>
           ))}
         </ul>

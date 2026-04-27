@@ -44,6 +44,7 @@ These routes are not active operating lanes. They remain available from the coll
 6. Q-40: Migrate stale creator campaign-flow links off `/creatives` and `/workflow`. Complete; no redirects or deletions.
 7. Q-41: Inventory static `/creatives/*.jpg` URLs separately from the `/creatives` page route. Complete; no redirects, deletions, or asset moves.
 8. Q-42: Inventory legacy `/workflow` bulk history separately from the `/workflow` page route. Complete; no redirects, deletions, or external actions.
+9. Q-43: Extract legacy `/settings` source/setup notes into active data/docs. Complete; no redirects, deletions, campaign-status changes, or external actions.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -68,17 +69,16 @@ The Command page now shows a route dependency guard with these current statuses:
 
 | Status | Count | Meaning |
 | --- | ---: | --- |
-| Blocked | 5 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
+| Blocked | 4 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
 | Support | 2 | Keep as detail/support routes reached from active loops. |
-| Clear | 1 | Candidate for a future redirect/delete packet after preserving useful notes. |
+| Clear | 2 | Candidate for a future redirect/delete packet after preserving useful notes. |
 
-Current clear route: `/generate`.
+Current clear routes: `/generate`, `/settings`.
 
 Current blockers to resolve first:
 
 - `/creatives`: 24 static `/creatives/*.jpg` URLs are inventoried; any redirect packet still needs explicit 200-check preservation.
 - `/workflow`: six-stage workflow history is inventoried; any redirect packet still needs Launch/Approval migration or explicit preservation.
-- `/settings`: old setup/source notes need extraction into docs before deletion.
 - `/gtm`: product-route inventory context still needs active-loop coverage before archive-only treatment.
 - `/ads`: historical ad archive remains useful audit evidence.
 
@@ -118,3 +118,15 @@ The `/workflow` page route and the workflow data it displays are separate depend
 | Dependencies | 5 | Preserve `ads.workflow_stage`, `data/workflow-stages.json`, `/api/ads/bulk-status`, `/workflow`, and trade breakdown logic. |
 
 Q-42 did not redirect `/workflow`, delete the old page, bulk-move ads, call the bulk API, upload to ad platforms, or change external systems. Any future redirect packet must prove this history is moved into Launch/Approval or intentionally preserved.
+
+## Q-43 Settings Source Note Extraction
+
+The `/settings` page route and the setup/source notes it displayed are separate dependencies. Q-43 preserves those notes in `lib/settings-source-notes.ts` and surfaces the map on Command before any future delete packet.
+
+| Source | Count | Preservation rule |
+| --- | ---: | --- |
+| Platform setup notes | 3 | Preserve LinkedIn, Meta, and YouTube setup checklist pointers under Launch/governance context. |
+| Read-only source docs | 4 | Preserve sawcity-lite Project 4H doc paths as read-only references only. |
+| Settings dependencies | 4 | Preserve campaign-status context, placeholder credential handling, source doc links, and doc-update reminders. |
+
+Q-43 did not delete `/settings`, redirect it, change campaign status, write to sawcity-lite, expose a real secret, or change external systems. The route is now a candidate for a future delete packet after one more explicit cleanup decision.

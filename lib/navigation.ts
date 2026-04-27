@@ -257,12 +257,12 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   },
   {
     route: "/settings",
-    status: "blocked",
-    readyForRedirectOrDelete: false,
+    status: "clear",
+    readyForRedirectOrDelete: true,
     activeReferences: ["Reference Shelf", "legacy banner only"],
-    dataDependencies: ["Old setup/source references have not been fully extracted into docs"],
-    docOrTestReferences: ["README route table", "route-disposition-plan", "navigation.test"],
-    guardrail: "Do not delete until unique notes are moved into README/SOP and active references are rechecked.",
+    dataDependencies: ["Setup/source notes inventoried in settings-source-notes"],
+    docOrTestReferences: ["README route table", "route-disposition-plan", "navigation.test", "Command settings source-note map"],
+    guardrail: "Candidate for future delete packet after confirming the source-note map covers the old page.",
   },
   {
     route: "/creatives",

@@ -27,6 +27,12 @@ import {
   workflowHistoryDependencySummary,
   workflowTransitionPairs,
 } from "@/lib/workflow-history";
+import {
+  settingsDependencyNotes,
+  settingsSetupGuides,
+  settingsSourceDocs,
+  settingsSourceNoteSummary,
+} from "@/lib/settings-source-notes";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -153,6 +159,7 @@ export default function OverviewPage() {
   const publicCreativeSummary = useMemo(() => publicCreativeUrlDependencySummary(), []);
   const workflowHistorySummary = useMemo(() => workflowHistoryDependencySummary(), []);
   const workflowTransitions = useMemo(() => workflowTransitionPairs(), []);
+  const settingsSummary = useMemo(() => settingsSourceNoteSummary(), []);
   const publicCreativeRows = useMemo(
     () =>
       publicCreativeUrlDependencies.reduce<Array<{ prefix: string; domain: string; urls: string[]; placements: string[] }>>(
@@ -591,6 +598,59 @@ export default function OverviewPage() {
                   <p className="mt-1 text-xs text-slate-500">{dependency.source}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      <section data-testid="settings-source-note-map">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Legacy settings source notes</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Setup references are preserved before delete work</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{settingsSummary.setupGuideCount} setup notes</StatusPill>
+            <StatusPill>{settingsSummary.sourceDocCount} source docs</StatusPill>
+            <StatusPill>{settingsSummary.dependencyCount} deps</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-violet-900/50 bg-violet-950/10">
+          <p className="text-sm leading-6 text-slate-300">{settingsSummary.preservationRule}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Route: {settingsSummary.route}; active replacement: {settingsSummary.replacement}; doc log items:{" "}
+            {settingsSummary.docLogCount}
+          </p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-3">
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Platform setup notes</p>
+              <ul className="mt-2 space-y-2 text-xs leading-5 text-slate-300">
+                {settingsSetupGuides.map((guide) => (
+                  <li key={guide.id}>
+                    <span className="font-semibold text-white">{guide.platform}:</span> {guide.note}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Read-only source docs</p>
+              <ul className="mt-2 space-y-2 text-xs leading-5 text-slate-300">
+                {settingsSourceDocs.map((doc) => (
+                  <li key={doc.id}>
+                    <span className="font-semibold text-white">{doc.label}:</span> {doc.purpose}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Delete-work dependencies</p>
+              <ul className="mt-2 space-y-2 text-xs leading-5 text-slate-300">
+                {settingsDependencyNotes.map((dependency) => (
+                  <li key={dependency.id}>
+                    <span className="font-semibold text-white">{dependency.surface}:</span> {dependency.preserves}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </Card>
