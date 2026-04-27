@@ -375,7 +375,7 @@ export const rebuildExecutionQueue = [
     lane: "Research",
     title: "Create competitor research report template",
     route: "/templates",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "A repeatable report format captures offers, hooks, visuals, platforms, and evidence quality.",
     acceptance: "Template avoids scraped-data overconfidence and includes citation fields.",

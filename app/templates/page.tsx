@@ -4,6 +4,10 @@
 
 import { useEffect, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
+import {
+  buildCompetitorResearchPacket,
+  COMPETITOR_RESEARCH_TEMPLATE,
+} from "@/lib/competitor-research-template";
 import { buildContentBriefPacket, CONTENT_BRIEF_TEMPLATES, type ContentBriefTemplateId } from "@/lib/content-brief-templates";
 import {
   buildMessageMatchPacket,
@@ -24,6 +28,7 @@ export default function TemplatesPage() {
   const [trackingUrl, setTrackingUrl] = useState("");
   const [copiedBrief, setCopiedBrief] = useState<ContentBriefTemplateId | null>(null);
   const [copiedMessageMatch, setCopiedMessageMatch] = useState<string | null>(null);
+  const [copiedCompetitorResearch, setCopiedCompetitorResearch] = useState(false);
   const [copyFallback, setCopyFallback] = useState("");
   const [messageMatchTrade, setMessageMatchTrade] = useState("all");
   const [messageMatchAngle, setMessageMatchAngle] = useState<MessageMatchAngle | "all">("all");
@@ -72,6 +77,7 @@ export default function TemplatesPage() {
       await navigator.clipboard.writeText(packet);
       setCopiedBrief(id);
       setCopiedMessageMatch(null);
+      setCopiedCompetitorResearch(false);
       setCopyFallback("");
     } catch {
       setCopiedBrief(null);
@@ -85,9 +91,24 @@ export default function TemplatesPage() {
       await navigator.clipboard.writeText(packet);
       setCopiedMessageMatch(brief.id);
       setCopiedBrief(null);
+      setCopiedCompetitorResearch(false);
       setCopyFallback("");
     } catch {
       setCopiedMessageMatch(null);
+      setCopyFallback(packet);
+    }
+  }
+
+  async function copyCompetitorResearchTemplate() {
+    const packet = buildCompetitorResearchPacket();
+    try {
+      await navigator.clipboard.writeText(packet);
+      setCopiedCompetitorResearch(true);
+      setCopiedMessageMatch(null);
+      setCopiedBrief(null);
+      setCopyFallback("");
+    } catch {
+      setCopiedCompetitorResearch(false);
       setCopyFallback(packet);
     }
   }
@@ -181,6 +202,79 @@ export default function TemplatesPage() {
               <ul className="mt-3 space-y-2 text-sm leading-5 text-slate-300">
                 {META_AD_LIBRARY_ACCESS_REPORT.blockedAutomation.map((item) => (
                   <li key={item}>- {item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-4 border-indigo-900/60 bg-slate-900/70">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Competitor research report template</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-400">
+              Manual-only capture format for competitor offers, hooks, visuals, platforms, citations, and evidence quality. Anything beyond human review remains approval-gated.
+            </p>
+          </div>
+          <GhostButton onClick={() => void copyCompetitorResearchTemplate()}>
+            {copiedCompetitorResearch ? "Copied template" : "Copy template"}
+          </GhostButton>
+        </div>
+
+        <div className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Source rule</p>
+          <p className="mt-2 text-sm leading-5 text-slate-300">{COMPETITOR_RESEARCH_TEMPLATE.sourceRule}</p>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1fr,0.95fr]">
+          <div className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Capture fields</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {COMPETITOR_RESEARCH_TEMPLATE.fields.map((field) => (
+                <div key={field.key} className="rounded border border-slate-800 bg-slate-900 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-white">{field.label}</p>
+                    {field.required ? (
+                      <span className="rounded border border-indigo-800/60 bg-indigo-950/30 px-2 py-1 text-xs font-semibold text-indigo-300">
+                        required
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-400">{field.guidance}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Evidence quality</p>
+              <div className="mt-3 space-y-3">
+                {COMPETITOR_RESEARCH_TEMPLATE.evidenceRules.map((rule) => (
+                  <div key={rule.quality} className="border-t border-slate-800 pt-3 first:border-t-0 first:pt-0">
+                    <p className="text-sm font-semibold text-white">{rule.label}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-400">{rule.meaning}</p>
+                    <p className="mt-1 text-xs leading-5 text-indigo-200">{rule.allowedUse}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Report sections</p>
+              <ol className="mt-3 space-y-1 text-sm leading-5 text-slate-400">
+                {COMPETITOR_RESEARCH_TEMPLATE.reportSections.map((section, index) => (
+                  <li key={section}>{index + 1}. {section}</li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="rounded-lg border border-red-900/50 bg-red-950/20 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Blocked claims</p>
+              <ul className="mt-3 space-y-2 text-sm leading-5 text-slate-300">
+                {COMPETITOR_RESEARCH_TEMPLATE.blockedClaims.map((claim) => (
+                  <li key={claim}>- {claim}</li>
                 ))}
               </ul>
             </div>

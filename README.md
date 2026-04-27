@@ -88,7 +88,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Scorecard | `/scorecard` | Weekly performance metrics, learning rankings, local keep/kill/iterate decisions, and customer pace forecast |
 | Budget | `/budget` | Spend allocation per platform plus local experiment-level budget planning |
 | Launch | `/launch` | Launch URL builder, bundle draft model, readiness validator, and pre-launch gate checklist |
-| Templates | `/templates` | Meta Ad Library access validation, message-match handoff briefs, creator content packets, and ad template library |
+| Templates | `/templates` | Meta Ad Library access validation, competitor research template, message-match handoff briefs, creator content packets, and ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
 | Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, approvals, ready-to-send, and follow-up drafting |
 | Settings | `/settings` | Campaign configuration |
@@ -235,7 +235,9 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/influencer` now builds deterministic creator UTM/referral URLs and can save the generated URL/code back to each creator row without sending outreach
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
+- `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
 - `docs/meta-ad-library-access-validation.md` records the manual-first Meta competitor research path and blocks scraping, scheduled collectors, and external actions
+- `docs/competitor-research-template.md` records the manual-first competitor capture fields and evidence-quality rules for Q-22 research
 - `docs/product-route-inventory.md` records the landing route and demo phone findings without touching sawcity-lite
 - `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage

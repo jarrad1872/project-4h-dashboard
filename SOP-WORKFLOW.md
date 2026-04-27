@@ -357,10 +357,13 @@ This is read-only market intelligence for 4H creative strategy. It does not touc
 
 - `docs/competitive-ad-research-agent.md`
 - `docs/meta-ad-library-access-validation.md`
+- `docs/competitor-research-template.md`
 - `lib/competitive-ad-research-agent.ts`
 - `lib/meta-ad-library-access.ts`
+- `lib/competitor-research-template.ts`
 - `lib/__tests__/competitive-ad-research-agent.test.ts`
 - `lib/__tests__/meta-ad-library-access.test.ts`
+- `lib/__tests__/competitor-research-template.test.ts`
 - `scripts/competitive-intel-meta.js`
 
 ### Build Sequence
@@ -370,6 +373,13 @@ This is read-only market intelligence for 4H creative strategy. It does not touc
 3. Run Claude analysis on normalized snapshots only.
 4. Generate markdown report for Paperclip and Telegram delivery.
 5. Only after validation succeeds should we schedule the workflow or request a dedicated always-on agent.
+
+### Manual competitor research template
+
+- `/templates` includes a copy-ready competitor research report template.
+- Every competitor row needs captured date, competitor name, citation URL, source type, country/region, platform, offer, hook, visual pattern, CTA, evidence quality, coverage note, and 4H takeaway.
+- Evidence quality must be one of observed, partial, inferred, or unverified. Inferred claims need a validation step; unverified claims cannot drive strategy.
+- Do not infer spend, call hooks winners, or treat vendor estimates as official Meta data unless the source directly supports the claim.
 
 ---
 

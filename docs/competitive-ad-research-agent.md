@@ -88,5 +88,8 @@ The repo foundation for this work lives in:
 
 - `lib/competitive-ad-research-agent.ts`
 - `lib/__tests__/competitive-ad-research-agent.test.ts`
+- `lib/competitor-research-template.ts`
+- `lib/__tests__/competitor-research-template.test.ts`
+- `docs/competitor-research-template.md`
 
-These files are intentionally provider-agnostic so they remain usable whether the collection layer ends up as authenticated API access, public-library scraping, or a hybrid workflow.
+These files are intentionally provider-agnostic so they remain usable whether the evidence source is manual public-library capture, an already-approved token validation run, or a later approved provider workflow.
