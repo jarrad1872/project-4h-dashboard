@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
-import type { LifecycleMessage } from "@/lib/types";
+import { buildLifecycleFollowupMeasurement } from "@/lib/lifecycle-followup-measurement";
+import type { LifecycleMessage, MarketingEventSummary } from "@/lib/types";
 
 const CHANNEL_COLOR: Record<string, string> = {
   email: "bg-blue-900/40 text-blue-300 border-blue-700/40",
@@ -24,13 +25,41 @@ const TIMING_STAGES = [
   "win_back",
 ];
 
+const EMPTY_MARKETING_SUMMARY: MarketingEventSummary = {
+  total: 0,
+  byType: {
+    asset_view: 0,
+    demo_call: 0,
+    signup: 0,
+    trial_started: 0,
+    activated: 0,
+    paid: 0,
+  },
+  byPlatform: {},
+  byTrade: {},
+  byAngle: {},
+  dimensions: {
+    trades: {},
+    creators: {},
+    creativeAssets: {},
+    angles: {},
+  },
+  paidValueCents: 0,
+};
+
 function stageSortKey(timing: string) {
   const idx = TIMING_STAGES.indexOf(timing);
   return idx >= 0 ? idx : 999;
 }
 
+function formatRate(rate: number | null) {
+  if (rate === null) return "Waiting";
+  return `${(rate * 100).toFixed(1)}%`;
+}
+
 export default function LifecyclePage() {
   const [rows, setRows] = useState<LifecycleMessage[]>([]);
+  const [marketingSummary, setMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_SUMMARY);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState<Partial<LifecycleMessage>>({});
   const [filter, setFilter] = useState<"all" | "active" | "paused">("all");
@@ -38,6 +67,13 @@ export default function LifecyclePage() {
   async function load() {
     const res = await fetch("/api/lifecycle", { cache: "no-store" });
     setRows((await res.json()) as LifecycleMessage[]);
+    const eventsRes = await fetch("/api/events?summary=1", { cache: "no-store" }).catch(() => null);
+    if (eventsRes?.ok) {
+      const data = (await eventsRes.json()) as { summary?: MarketingEventSummary };
+      setMarketingSummary(data.summary ?? EMPTY_MARKETING_SUMMARY);
+    } else {
+      setMarketingSummary(EMPTY_MARKETING_SUMMARY);
+    }
   }
 
   useEffect(() => { void load(); }, []);
@@ -68,6 +104,7 @@ export default function LifecyclePage() {
 
   const activeCount = rows.filter((r) => r.status === "active").length;
   const pausedCount = rows.filter((r) => r.status === "paused").length;
+  const lifecycleMeasurement = buildLifecycleFollowupMeasurement(rows, marketingSummary);
 
   // Group by timing for flow visualization
   const byTiming: Record<string, LifecycleMessage[]> = {};
@@ -109,6 +146,75 @@ export default function LifecyclePage() {
           </div>
         ))}
       </div>
+
+      <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/10">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Q-27 lifecycle measurement</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">Signup follow-up performance</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Measures whether after-signup follow-ups are moving users toward trial, activation, and paid conversion from logged
+              attribution events only. This panel does not send email, SMS, push notifications, webhooks, or external actions.
+            </p>
+          </div>
+          <div className="rounded-lg border border-cyan-900/50 bg-slate-950/50 p-3 lg:w-96">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Next lifecycle bet</p>
+            <p className="mt-2 text-sm text-slate-300">{lifecycleMeasurement.nextAction}</p>
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: "Signups", value: lifecycleMeasurement.signups, detail: "Logged attribution events" },
+            { label: "Trial starts", value: lifecycleMeasurement.trialStarts, detail: "After signup" },
+            { label: "Activations", value: lifecycleMeasurement.activations, detail: "First meaningful product action" },
+            { label: "Paid", value: lifecycleMeasurement.paid, detail: "$39/mo conversions" },
+          ].map((item) => (
+            <div key={item.label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-2xl font-semibold text-white">{item.value.toLocaleString()}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+              <p className="mt-2 text-xs text-slate-400">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-3">
+          {lifecycleMeasurement.rates.map((rate) => (
+            <div key={rate.label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-2xl font-semibold text-white">{formatRate(rate.rate)}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{rate.label}</p>
+              <p className="mt-2 text-xs text-slate-400">
+                {rate.to.toLocaleString()} / {rate.from.toLocaleString()} - {rate.note}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Follow-up stage coverage</p>
+            <p className="text-xs text-slate-500">
+              {lifecycleMeasurement.activeMessages} active / {lifecycleMeasurement.measuredMessages} measured follow-ups
+            </p>
+          </div>
+          {lifecycleMeasurement.coverage.length === 0 ? (
+            <p className="text-sm text-slate-500">No after-signup follow-up stages are configured yet.</p>
+          ) : (
+            <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+              {lifecycleMeasurement.coverage.map((stage) => (
+                <div key={stage.timing} className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                  <p className="text-sm font-semibold text-slate-200">{stage.timing.replace(/_/g, " ")}</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {stage.active} active, {stage.paused} paused, {stage.channelCount} channels
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <p className="text-xs text-slate-500">{lifecycleMeasurement.evidence}</p>
+      </Card>
 
       {/* Messages by timing stage */}
       {Object.entries(byTiming).map(([timing, messages]) => (

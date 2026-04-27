@@ -356,6 +356,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - If no paid customer metrics exist, the forecast must say no paid customer data is logged yet. Do not fabricate winners, customer pace, or creative fatigue from placeholder data.
 - The trade weekly target calculator splits the remaining required weekly paid-customer pace across the five beachhead domains until real trade-level paid signal is strong enough to reweight. It uses attribution-only `paid` events for weekly and all-time trade counts.
 - Trade targets are planning math only. They do not launch campaigns, upload sheets, send outreach, create webhooks, move money, or change billing.
+- `/lifecycle` measures after-signup follow-up performance from `marketing_events` only: signup to trial, trial to activation, and activation to paid. It may guide the next lifecycle bet, but it must not send email, SMS, push notifications, webhooks, or external actions.
 
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator

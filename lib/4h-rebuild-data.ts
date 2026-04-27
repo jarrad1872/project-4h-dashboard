@@ -439,4 +439,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "Creative Lab tracks founder-shot proof clips for each beachhead domain across missed-call and demo-proof angles.",
     acceptance: "Each packet includes hook, shot list, offer, platform use, and a no-publish approval gate.",
   },
+  {
+    id: "Q-27",
+    phase: "Phase 6",
+    lane: "Learning",
+    title: "Add lifecycle follow-up measurement",
+    route: "/lifecycle",
+    status: "complete",
+    approval: "none",
+    outcome: "Lifecycle page measures signup-to-trial, trial-to-activation, and activation-to-paid movement from attribution events.",
+    acceptance: "Measurement uses marketing_events only and does not send email, SMS, push, webhooks, or external actions.",
+  },
 ];

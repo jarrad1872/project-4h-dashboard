@@ -153,6 +153,7 @@ Core offer rules:
 - [x] Add competitor/ad-library research only after Meta access is validated.
 - [x] Add a simple forecast: customers needed this month, current pace, gap, and next bets.
 - [x] Add trade-level weekly target calculator for the five beachhead domains.
+- [x] Add lifecycle follow-up measurement after signup.
 
 ---
 
@@ -182,6 +183,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Work through Q-01 through Q-24 governance/build queue items. Current: Q-01 through Q-24 complete; no ready queue item remains.
 - [x] Start the next first-principles queue with Q-25 trade weekly targets on `/scorecard`.
 - [x] Add Q-26 founder video asset tracking on `/assets`.
+- [x] Add Q-27 lifecycle follow-up measurement on `/lifecycle`.
 
 ---
 
@@ -204,7 +206,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Experiment-level budget planner for first paid tests.
 - [x] Founder video asset tracker.
 - [x] Trade-level weekly target calculator.
-- [ ] Lifecycle follow-up measurement after signup.
+- [x] Lifecycle follow-up measurement after signup.
 - [x] Approval audit log for external launch decisions.
 - [x] External-action stop screen for launch, upload, outreach send, webhook, and spend actions.
 - [x] Weekly learning report rankings for trades, creators, images, and angles.
