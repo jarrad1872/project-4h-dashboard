@@ -51,9 +51,14 @@ function makeInfluencer(overrides: Partial<Influencer> = {}): Influencer {
 describe("qualifyInfluencer", () => {
   it("scores owner-focused creators higher", () => {
     const qualified = qualifyInfluencer(makeInfluencer());
-    expect(qualified.totalScore).toBe(98);
+    expect(qualified.totalScore).toBe(94);
     expect(qualified.recommendation).toBe("priority");
     expect(qualified.sizeTier).toBe("established");
+    expect(qualified.ownerAudienceScore).toBe(25);
+    expect(qualified.averageViewsScore).toBe(15);
+    expect(qualified.sponsorScore).toBe(15);
+    expect(qualified.trustScore).toBe(15);
+    expect(qualified.productionValueScore).toBe(10);
   });
 
   it("downgrades consumer-heavy creators", () => {
@@ -63,12 +68,28 @@ describe("qualifyInfluencer", () => {
         sponsor_openness: "low",
         engagement_rate: 1.2,
         audience_size: 8000,
+        average_views: 800,
+        channel_url: null,
+        contact_email: null,
+        notes: null,
+        platform: "linkedin",
       }),
     );
 
     expect(qualified.totalScore).toBeLessThan(40);
     expect(qualified.recommendation).toBe("watch");
     expect(qualified.sizeTier).toBe("micro");
+  });
+
+  it("rewards trade-language fit separately from owner-audience fit", () => {
+    const qualified = qualifyInfluencer(
+      makeInfluencer({
+        notes: "Plumbing business channel with water heater demos and dispatch advice for owner operators.",
+      }),
+    );
+
+    expect(qualified.tradeFitScore).toBe(20);
+    expect(qualified.scoreSignals).toContain("clear trade fit");
   });
 });
 

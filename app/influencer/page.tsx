@@ -75,6 +75,23 @@ function auditLabelTone(label: InfluencerAuditLabel) {
   return "border-sky-800 text-sky-300";
 }
 
+function scoreTone(score: number) {
+  if (score >= 75) return "text-emerald-300";
+  if (score >= 50) return "text-amber-300";
+  return "text-rose-300";
+}
+
+function ScoreLine({ label, value, max }: { label: string; value: number; max: number }) {
+  return (
+    <div className="flex items-center justify-between gap-3 text-xs">
+      <span className="text-slate-500">{label}</span>
+      <span className="font-medium text-slate-200">
+        {value}/{max}
+      </span>
+    </div>
+  );
+}
+
 export default function InfluencerPage() {
   const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -579,9 +596,20 @@ export default function InfluencerPage() {
                         <p className="mt-1 text-xs text-slate-500">{formatAudienceSize(influencer.audience_size)}</p>
                       </td>
                       <td className="py-3 pr-3">
-                        <p className="font-semibold text-white">{qualification.totalScore}/100</p>
+                        <p className={`font-semibold ${scoreTone(qualification.totalScore)}`}>{qualification.totalScore}/100</p>
                         <p className="text-xs text-slate-500">
                           {qualification.recommendation} · {qualification.sizeTier}
+                        </p>
+                        <div className="mt-2 w-44 space-y-1 rounded border border-slate-800 bg-slate-950/50 p-2">
+                          <ScoreLine label="Owner audience" value={qualification.ownerAudienceScore} max={25} />
+                          <ScoreLine label="Trade fit" value={qualification.tradeFitScore} max={20} />
+                          <ScoreLine label="Avg views" value={qualification.averageViewsScore} max={15} />
+                          <ScoreLine label="Trust" value={qualification.trustScore} max={15} />
+                          <ScoreLine label="Sponsors" value={qualification.sponsorScore} max={15} />
+                          <ScoreLine label="Production" value={qualification.productionValueScore} max={10} />
+                        </div>
+                        <p className="mt-2 max-w-[190px] text-xs text-slate-600">
+                          {qualification.scoreSignals.slice(0, 2).join(" · ")}
                         </p>
                       </td>
                       <td className="py-3 pr-3">

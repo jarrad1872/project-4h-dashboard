@@ -7,12 +7,18 @@ import type {
 
 export interface InfluencerQualification {
   totalScore: number;
+  ownerAudienceScore: number;
+  tradeFitScore: number;
+  averageViewsScore: number;
+  trustScore: number;
+  productionValueScore: number;
   audienceFitScore: number;
   engagementScore: number;
   sponsorScore: number;
   sizeScore: number;
   sizeTier: "micro" | "emerging" | "established" | "reach";
   recommendation: "priority" | "review" | "watch";
+  scoreSignals: string[];
 }
 
 export interface OutreachDraft {
@@ -21,16 +27,16 @@ export interface OutreachDraft {
   body: string;
 }
 
-const AUDIENCE_FIT_SCORES: Record<InfluencerBusinessFocus, number> = {
-  owners: 40,
-  mixed: 24,
-  consumer: 8,
+const OWNER_AUDIENCE_SCORES: Record<InfluencerBusinessFocus, number> = {
+  owners: 25,
+  mixed: 15,
+  consumer: 5,
 };
 
 const SPONSOR_OPENNESS_SCORES: Record<InfluencerSponsorOpenness, number> = {
-  low: 8,
-  medium: 16,
-  high: 24,
+  low: 5,
+  medium: 10,
+  high: 15,
 };
 
 const SIZE_TIER_SCORES = {
@@ -42,6 +48,10 @@ const SIZE_TIER_SCORES = {
 
 function safeLower(value: string | null | undefined) {
   return (value ?? "").trim().toLowerCase();
+}
+
+function scoreText(influencer: Pick<Influencer, "creator_name" | "channel_url" | "notes" | "platform">) {
+  return [influencer.creator_name, influencer.channel_url, influencer.notes, influencer.platform].map(safeLower).join(" ");
 }
 
 function toDisplayTrade(trade: string) {
@@ -70,12 +80,68 @@ function summarizeNote(notes: string | null | undefined) {
 }
 
 function engagementScore(rate: number | null | undefined) {
-  if (rate === null || rate === undefined || !Number.isFinite(rate)) return 8;
-  if (rate >= 8) return 14;
-  if (rate >= 5) return 12;
-  if (rate >= 3) return 10;
-  if (rate >= 1.5) return 8;
-  return 5;
+  if (rate === null || rate === undefined || !Number.isFinite(rate)) return 3;
+  if (rate >= 8) return 10;
+  if (rate >= 5) return 8;
+  if (rate >= 3) return 6;
+  if (rate >= 1.5) return 4;
+  return 2;
+}
+
+function averageViewsScore(value: number | null | undefined) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return 5;
+  if (value >= 40000) return 15;
+  if (value >= 15000) return 12;
+  if (value >= 5000) return 9;
+  if (value >= 1000) return 6;
+  return 3;
+}
+
+const TRADE_KEYWORDS: Record<string, string[]> = {
+  pipe: ["plumb", "drain", "sewer", "water heater", "leak", "pipe"],
+  duct: ["hvac", "heating", "cooling", "air conditioning", "refrigerant", "technician"],
+  mow: ["lawn", "landscape", "mow", "grass", "turf", "yard"],
+  pest: ["pest", "termite", "mosquito", "rodent", "exterminator"],
+  coat: ["paint", "painter", "painting", "coating", "drywall"],
+};
+
+function tradeSlug(trade: string | null | undefined) {
+  return safeLower(trade).replace(".city", "").replace(/[^a-z0-9]+/g, "");
+}
+
+function tradeFitScore(influencer: Pick<Influencer, "trade" | "creator_name" | "channel_url" | "notes" | "platform" | "business_focus">) {
+  const slug = tradeSlug(influencer.trade);
+  const text = scoreText(influencer);
+  const keywords = TRADE_KEYWORDS[slug] ?? [slug].filter(Boolean);
+  const hasTradeLanguage = keywords.some((keyword) => keyword && text.includes(keyword));
+  const hasTradeDomain = safeLower(influencer.trade).endsWith(".city");
+  const baseline = hasTradeDomain ? 10 : 6;
+  const ownerBoost = influencer.business_focus === "owners" ? 4 : influencer.business_focus === "mixed" ? 2 : 0;
+  const languageBoost = hasTradeLanguage ? 6 : 0;
+  return Math.min(20, baseline + ownerBoost + languageBoost);
+}
+
+function trustScore(influencer: Pick<Influencer, "engagement_rate" | "contact_email" | "channel_url" | "notes">) {
+  const engagement = engagementScore(influencer.engagement_rate);
+  const contact = influencer.contact_email ? 3 : 0;
+  const channel = influencer.channel_url ? 2 : 0;
+  const notes = influencer.notes ? 2 : 0;
+  return Math.min(15, engagement + contact + channel + notes);
+}
+
+function productionValueScore(influencer: Pick<Influencer, "platform" | "average_views" | "channel_url" | "notes">) {
+  const platform = safeLower(influencer.platform);
+  const visualPlatform = ["youtube", "instagram", "tiktok"].includes(platform) ? 4 : 2;
+  const viewSignal = typeof influencer.average_views === "number" && influencer.average_views >= 15000 ? 3 : 0;
+  const text = scoreText({
+    creator_name: "",
+    channel_url: influencer.channel_url,
+    notes: influencer.notes,
+    platform: influencer.platform,
+  });
+  const productionSignal = /video|demo|sponsor|review|business|operator|crew/.test(text) ? 2 : 0;
+  const channelSignal = influencer.channel_url ? 1 : 0;
+  return Math.min(10, visualPlatform + viewSignal + productionSignal + channelSignal);
 }
 
 export function getAudienceSizeTier(audienceSize: number | null | undefined): InfluencerQualification["sizeTier"] {
@@ -85,22 +151,55 @@ export function getAudienceSizeTier(audienceSize: number | null | undefined): In
   return "reach";
 }
 
-export function qualifyInfluencer(influencer: Pick<Influencer, "business_focus" | "engagement_rate" | "sponsor_openness" | "audience_size">) {
+export function qualifyInfluencer(
+  influencer: Pick<
+    Influencer,
+    | "business_focus"
+    | "engagement_rate"
+    | "sponsor_openness"
+    | "audience_size"
+    | "average_views"
+    | "trade"
+    | "creator_name"
+    | "channel_url"
+    | "notes"
+    | "platform"
+    | "contact_email"
+  >,
+) {
   const sizeTier = getAudienceSizeTier(influencer.audience_size);
-  const audienceFitScore = AUDIENCE_FIT_SCORES[influencer.business_focus ?? "mixed"];
-  const engagement = engagementScore(influencer.engagement_rate);
+  const ownerAudienceScore = OWNER_AUDIENCE_SCORES[influencer.business_focus ?? "mixed"];
+  const averageViews = averageViewsScore(influencer.average_views);
+  const tradeFit = tradeFitScore(influencer);
+  const trust = trustScore(influencer);
   const sponsorScore = SPONSOR_OPENNESS_SCORES[influencer.sponsor_openness ?? "medium"];
+  const productionValue = productionValueScore(influencer);
+  const engagement = engagementScore(influencer.engagement_rate);
   const sizeScore = SIZE_TIER_SCORES[sizeTier];
-  const totalScore = audienceFitScore + engagement + sponsorScore + sizeScore;
+  const totalScore = ownerAudienceScore + tradeFit + averageViews + sponsorScore + trust + productionValue;
+  const scoreSignals = [
+    ownerAudienceScore >= 20 ? "owner-heavy audience" : ownerAudienceScore >= 15 ? "mixed owner/DIY audience" : "consumer-heavy audience",
+    tradeFit >= 16 ? "clear trade fit" : tradeFit >= 12 ? "assigned trade fit" : "weak trade fit",
+    averageViews >= 12 ? "strong average views" : averageViews >= 9 ? "usable average views" : "thin average-view signal",
+    sponsorScore >= 15 ? "high sponsor openness" : sponsorScore >= 10 ? "some sponsor history" : "low sponsor signal",
+    trust >= 12 ? "trusted contact signals" : trust >= 8 ? "moderate trust signals" : "needs trust research",
+    productionValue >= 8 ? "strong production value" : productionValue >= 5 ? "usable production value" : "low production confidence",
+  ];
 
   return {
     totalScore,
-    audienceFitScore,
+    ownerAudienceScore,
+    tradeFitScore: tradeFit,
+    averageViewsScore: averageViews,
+    trustScore: trust,
+    productionValueScore: productionValue,
+    audienceFitScore: ownerAudienceScore,
     engagementScore: engagement,
     sponsorScore,
     sizeScore,
     sizeTier,
     recommendation: totalScore >= 70 ? "priority" : totalScore >= 50 ? "review" : "watch",
+    scoreSignals,
   } satisfies InfluencerQualification;
 }
 

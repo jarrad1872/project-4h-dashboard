@@ -199,7 +199,7 @@ export const rebuildExecutionQueue = [
     lane: "Creators",
     title: "Upgrade creator scoring model",
     route: "/influencer",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Creator rows score owner audience, trade fit, trust, sponsor openness, and expected production value.",
     acceptance: "Scores render in the UI and are covered by tests.",

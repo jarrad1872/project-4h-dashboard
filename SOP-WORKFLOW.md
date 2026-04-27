@@ -267,6 +267,11 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `remove` means deprioritize for this sprint, not delete the creator. Keep the row, notes, and history intact unless Jarrad explicitly asks for deletion.
 - `needs-research` means the creator may fit, but channel, average views, engagement, or audience evidence is incomplete.
 
+**Creator scoring model:**
+- Rank creators by trade-owner value, not vanity reach. The six visible factors are owner audience, trade fit, average views, sponsor openness, trust signals, and production value.
+- Treat `average_views` as more useful than subscriber count for first-pass outreach priority.
+- High score does not authorize outreach by itself. Drafting and sending still follow the approval workflow.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube

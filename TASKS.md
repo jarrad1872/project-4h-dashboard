@@ -106,7 +106,7 @@ Core offer rules:
 **Exit gate:** 30 qualified creators, 10 approved outreach drafts, 3 live creator tests, all tracked.
 
 - [x] Audit the current creator shortlist and label weak/non-trade matches without deleting history.
-- [ ] Add creator scoring fields that matter for trades: owner audience, average views, sponsor openness, trust level, trade fit.
+- [x] Add creator scoring fields that matter for trades: owner audience, average views, sponsor openness, trust level, trade fit, and production value.
 - [ ] Generate outreach drafts tied to a specific trade demo and offer.
 - [ ] Add Jarrad approval controls for outreach copy.
 - [ ] Track outreach states: qualified, approved, sent, follow-up due, replied, contracted, content live, paid.
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-05 complete; production desk is ready, images still need generation/upload.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 complete; production desk is ready, images still need generation/upload.
 
 ---
 

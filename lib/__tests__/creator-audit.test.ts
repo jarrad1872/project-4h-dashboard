@@ -66,7 +66,12 @@ describe("auditCreator", () => {
         business_focus: "consumer",
         sponsor_openness: "low",
         audience_size: 8000,
+        average_views: 800,
+        channel_url: null,
+        contact_email: null,
         engagement_rate: 1.2,
+        notes: null,
+        platform: "linkedin",
       }),
     );
 
