@@ -61,6 +61,14 @@ export const operatingLoops = [
     nextMove: "Recruit trade creators to call the live demo line on camera and show the job summary.",
   },
   {
+    name: "Human Field Sales Loop",
+    status: "AZ pilot",
+    owner: "Jarrad + Arizona founding rep",
+    metric: "Cards handed out, scanned URLs, demos booked, trials started, paid customers",
+    route: "/sales",
+    nextMove: "Use tracked business cards to find local SMB trade owners who will test Answered.City before paid spend scales.",
+  },
+  {
     name: "Image Creative Loop",
     status: "new driver",
     owner: "Bob + ChatGPT Pro image generation",
@@ -482,5 +490,16 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     approval: "none",
     outcome: "Influencer page exposes stable data-testid hooks for creator form fields, roster rows, review cards, tracking controls, and draft actions.",
     acceptance: "Codex browser can create a fake internal creator, locate the exact row, draft outreach, and verify pending approval without external sends or brittle text matching.",
+  },
+  {
+    id: "Q-31",
+    phase: "Phase 3",
+    lane: "Field Sales",
+    title: "Add human sales rep pipeline and print-ready cards",
+    route: "/sales",
+    status: "complete",
+    approval: "none",
+    outcome: "Sales page tracks the Arizona founding rep pilot, mini CRM stages, rep-coded field-sales URLs, and QR-backed business card exports.",
+    acceptance: "Cards include $39/mo, 14-day free trial, no credit card required, print-safe dimensions, and do not order cards, send outreach, create webhooks, or spend money.",
   },
 ];

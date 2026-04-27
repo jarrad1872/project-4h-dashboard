@@ -46,6 +46,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-28 | Phase 6 | Learning | Add creative fatigue and variant lineage tracking | 2026-04-27 | `/assets` groups image assets into prompt/variant families and flags high-view, low-signal creative fatigue from attribution events only. |
 | Q-29 | Phase 3 | Creators | Add creator outreach state tracker | 2026-04-27 | `/influencer` groups creators into qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid stages without sending messages or moving money. |
 | Q-30 | Governance | Testing | Add Codex browser flow test hooks | 2026-04-27 | `/influencer` exposes stable browser selectors for creator form fields, rows, cards, and draft actions so permanent flows can be tested by creating internal fake rows only. |
+| Q-31 | Phase 3 | Field Sales | Add human sales rep pipeline and print-ready cards | 2026-04-27 | `/sales` shows the Arizona founding rep pilot, CRM stages, rep-coded field-sales URLs, and QR-backed SVG/PNG business card exports without ordering cards or sending outreach. |
 
 ## Ready Queue
 

@@ -16,6 +16,7 @@ The year-end target is **1,000-2,000 paying customers by 2026-12-31**. That mean
 
 Primary loops:
 - Creator demo loop: trade creators call live demo lines and show the result.
+- Human field sales loop: rep-coded business cards and local SMB trade touches create early tester signal.
 - Image creative loop: ChatGPT Pro `chatgpt-image-latest` generates trade-specific proof visuals and platform variants.
 - Demo funnel loop: every asset tracks trade, creator, image variant, UTM, demo call, signup, activation, and paid conversion.
 - Approval loop: nothing external goes live without Jarrad approval.
@@ -91,6 +92,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Templates | `/templates` | Meta Ad Library access validation, competitor research template, message-match handoff briefs, creator content packets, and ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
 | Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, pipeline state tracker, browser-test hooks, approvals, ready-to-send, and follow-up drafting |
+| Sales | `/sales` | Arizona human sales rep pilot, mini CRM stages, rep-coded field-sales URLs, and print-ready business card exports |
 | Settings | `/settings` | Campaign configuration |
 
 ---
@@ -242,6 +244,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/influencer` now builds deterministic creator UTM/referral URLs and can save the generated URL/code back to each creator row without sending outreach
 - `/influencer` now tracks Q-29 creator outreach states from existing rows: qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid; this is internal state only and sends nothing
 - `/influencer` now exposes Q-30 Codex browser flow hooks so permanent tests can create a fake internal creator, locate the exact row, draft outreach, and verify pending approval without brittle text matching or external sends
+- `/sales` now adds the Q-31 human field sales pilot for Arizona: rep tracking, CRM stages, QR-backed business card exports, and field-sales UTMs without ordering cards or sending outreach
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -269,7 +272,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-30 Codex browser flow hooks | v4.3.9*
+*Last updated: 2026-04-27 Q-31 human sales rep pipeline | v4.4.0*
 
 ---
 

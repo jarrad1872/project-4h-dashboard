@@ -308,6 +308,16 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Every brief must include a hook, shot list, creator talking points, CTA, `$39/mo`, `14-day free trial, no credit card required`, and tracking guidance.
 - Copying a packet is drafting support only. It does not approve outreach, send messages, publish assets, or launch ads.
 
+**Human field sales SOP:**
+- `/sales` is the internal operating surface for the Arizona founding rep pilot.
+- Sales rep cards must include a stable rep code, `utm_medium=field-sales`, `utm_campaign=4h_YYYY-MM_{campaign}`, and a unique card ID in `utm_content`.
+- Printed cards must preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
+- The default Arizona pilot card points to `answered.city` for broad discovery, while lead-specific CRM rows can carry trade-domain tracking such as `pipe.city`, `duct.city`, `mow.city`, `pest.city`, or `coat.city`.
+- Business card exports use 3.75 x 2.25 inch bleed artwork at 300 DPI, with key text inside the safe area. The dashboard generates SVG/PNG assets only; it does not place a Vistaprint order or move money.
+- CRM stages are internal tracking states: prospect, qualified, visited, card-left, demo-booked, trial-started, activated, paid, and lost.
+- Placeholder lead rows are target archetypes unless a real owner is intentionally entered later. Do not represent them as contacted businesses, testers, or customers.
+- No external outreach, card ordering, webhooks, ad uploads, spend, billing, or customer claims are authorized by a CRM stage or card export alone.
+
 **Product route inventory:**
 - `/gtm` holds the 4H-owned inventory of live product routes copied from read-only sawcity-lite reference files.
 - Trade-specific paid and creator traffic should use the trade domain root, such as `pipe.city/`, with UTMs added by the 4H launch URL builder.

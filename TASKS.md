@@ -15,6 +15,7 @@ Build Project 4H into the acquisition operating system that gets Answered.City t
 That means 125-250 net new customers per month for the next eight months. 4H should not merely store ads. It should run the weekly growth loops that produce customers:
 
 - Creator demo loop
+- Human field sales loop
 - ChatGPT Pro image creative loop
 - Demo-call and signup funnel loop
 - Approval and launch governance loop
@@ -113,6 +114,7 @@ Core offer rules:
 - [x] Track outreach states: qualified, approved, sent, follow-up due, replied, contracted, content live, paid.
 - [x] Add creator-specific UTM/referral code generation.
 - [x] Add content brief templates for demo-call videos, founder-assisted creator posts, and screenshot-proof assets.
+- [x] Add Arizona human sales rep pilot with rep-coded cards, field-sales UTMs, and mini CRM stages.
 - [ ] Verify that every live creator asset lands in the scorecard.
 
 ### Phase 4 - Landing And Trial Path Alignment
@@ -187,6 +189,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-28 creative fatigue and variant lineage tracking on `/assets`.
 - [x] Add Q-29 creator outreach state tracking on `/influencer`.
 - [x] Add Q-30 Codex browser flow hooks on `/influencer`.
+- [x] Add Q-31 human sales rep pipeline and print-ready business cards on `/sales`.
 
 ---
 
@@ -216,6 +219,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Local reversible keep/kill/iterate decision board.
 - [x] Creator outreach state tracker.
 - [x] Codex browser flow hooks for permanent creator testing.
+- [x] Human sales rep pipeline and business card print assets.
 
 ---
 
