@@ -272,6 +272,11 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Treat `average_views` as more useful than subscriber count for first-pass outreach priority.
 - High score does not authorize outreach by itself. Drafting and sending still follow the approval workflow.
 
+**Creator tracking URLs:**
+- Creator URLs are deterministic and include `utm_source`, `utm_medium=creator`, `utm_campaign`, `utm_content`, `utm_term`, `creator`, `creator_id`, `trade`, and `ref`.
+- Saving a generated URL/code to `deal_page` and `referral_code` is internal 4H state only. It does not send outreach, launch a campaign, upload to an ad platform, or create an external webhook.
+- Use the tracking URL in outreach drafts only after the draft itself has passed Jarrad review.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube

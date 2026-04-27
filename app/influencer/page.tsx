@@ -13,6 +13,7 @@ import {
   summarizeInfluencerPipeline,
 } from "@/lib/growth-command-center";
 import { auditCreator, summarizeCreatorAudit } from "@/lib/creator-audit";
+import { buildCreatorUtmUrl } from "@/lib/creator-utm-builder";
 import {
   generateOutreachDraft,
   getNextDraftStep,
@@ -176,6 +177,19 @@ export default function InfluencerPage() {
       audit_label: "remove",
       audit_reason: "Manually deprioritized for this sprint; history preserved for future review.",
       audited_at: new Date().toISOString(),
+    });
+  }
+
+  async function copyCreatorUrl(influencer: Influencer) {
+    const tracking = buildCreatorUtmUrl(influencer);
+    await navigator.clipboard.writeText(tracking.url);
+  }
+
+  async function saveCreatorTracking(influencer: Influencer) {
+    const tracking = buildCreatorUtmUrl(influencer);
+    await updateInfluencer(influencer.id, {
+      referral_code: tracking.referralCode,
+      deal_page: tracking.url,
     });
   }
 
@@ -551,7 +565,7 @@ export default function InfluencerPage() {
           <div className="py-8 text-sm text-slate-500">No creators added yet.</div>
         ) : (
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[1680px] text-sm">
+            <table className="w-full min-w-[1900px] text-sm">
               <thead>
                 <tr className="border-b border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500">
                   <th className="pb-3 pr-3">Creator</th>
@@ -561,6 +575,7 @@ export default function InfluencerPage() {
                   <th className="pb-3 pr-3">Audit</th>
                   <th className="pb-3 pr-3">Pipeline</th>
                   <th className="pb-3 pr-3">Draft</th>
+                  <th className="pb-3 pr-3">Tracking</th>
                   <th className="pb-3 pr-3">Fee</th>
                   <th className="pb-3 pr-3">Notes</th>
                   <th className="pb-3 text-right">Actions</th>
@@ -571,6 +586,7 @@ export default function InfluencerPage() {
                   const previewDraft = generateOutreachDraft(influencer, nextDraftStep ?? "initial");
                   const displayedAuditLabel = influencer.audit_label ?? audit.label;
                   const displayedAuditReason = influencer.audit_reason ?? audit.reason;
+                  const tracking = buildCreatorUtmUrl(influencer);
 
                   return (
                     <tr key={influencer.id} className="align-top">
@@ -718,6 +734,31 @@ export default function InfluencerPage() {
                       <td className="py-3 pr-3">
                         <p className="text-xs text-slate-500">{formatDraftStatusLabel(influencer.draft_status)}</p>
                         <p className="mt-1 text-sm text-white">{influencer.draft_subject || previewDraft.subject}</p>
+                      </td>
+                      <td className="py-3 pr-3">
+                        <div className="space-y-2">
+                          <p className="text-xs uppercase tracking-wide text-slate-500">Referral</p>
+                          <code className="block rounded border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-cyan-200">
+                            {tracking.referralCode}
+                          </code>
+                          <textarea
+                            readOnly
+                            rows={3}
+                            value={tracking.url}
+                            className="w-full min-w-[300px] resize-none rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-300 outline-none"
+                          />
+                          <p className="text-xs text-slate-600">
+                            {tracking.campaign} · {tracking.contentId}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <GhostButton disabled={savingId === influencer.id} onClick={() => void copyCreatorUrl(influencer)}>
+                              Copy URL
+                            </GhostButton>
+                            <GhostButton disabled={savingId === influencer.id} onClick={() => void saveCreatorTracking(influencer)}>
+                              Save tracking
+                            </GhostButton>
+                          </div>
+                        </div>
                       </td>
                       <td className="py-3 pr-3">
                         <input

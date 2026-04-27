@@ -21,6 +21,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-04 | Phase 2 | Creative | Create Claude Design handoff packet | 2026-04-27 | `docs/claude-design-creative-lab-handoff.md` captures UX goals, data model, routes, screenshots, and constraints. |
 | Q-05 | Phase 3 | Creators | Audit creator shortlist | 2026-04-27 | `/influencer` labels creators as keep/maybe/remove/needs-research without deleting history. |
 | Q-06 | Phase 3 | Creators | Upgrade creator scoring model | 2026-04-27 | `/influencer` renders owner audience, trade fit, average views, trust, sponsor, and production value scores. |
+| Q-08 | Phase 3 | Creators | Add creator UTM builder | 2026-04-27 | `/influencer` builds deterministic creator referral URLs with creator, trade, platform, campaign, and content IDs. |
 
 ## Ready Queue
 
@@ -28,7 +29,6 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | --- | --- | --- | --- | --- | --- |
 | Q-01 | Phase 2 | Creative | Generate first beachhead image pack | None | In progress. Production desk, progress bar, copy packets, and per-card upload are ready. Finish by generating and uploading all 20 images. |
 | Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
-| Q-08 | Phase 3 | Creators | Add creator UTM builder | None | URLs include creator, trade, platform, campaign, and content IDs. |
 | Q-09 | Phase 3 | Creators | Build content brief templates | None | Demo-call, founder assist, and screenshot-proof templates include hook, shots, CTA, offer, and tracking. |
 | Q-10 | Phase 4 | Landing | Inventory read-only product routes | None | Findings are copied into 4H docs/data only; sawcity-lite is untouched. |
 | Q-11 | Phase 4 | Landing | Create launch URL builder | None | UTM format matches AGENTS.md and tests cover key permutations. |

@@ -221,7 +221,7 @@ export const rebuildExecutionQueue = [
     lane: "Creators",
     title: "Add creator UTM builder",
     route: "/influencer",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Each creator can receive a deterministic UTM/referral URL.",
     acceptance: "URL includes creator, trade, platform, campaign, and content IDs.",
