@@ -287,7 +287,7 @@ export const rebuildExecutionQueue = [
     lane: "Launch",
     title: "Archive historical ad library",
     route: "/ads",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Old ads are visibly archived so they cannot be mistaken for launch candidates.",
     acceptance: "No ad copy is deleted; statuses/labels preserve history.",

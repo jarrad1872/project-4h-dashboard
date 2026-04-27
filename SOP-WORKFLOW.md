@@ -88,6 +88,13 @@ The NB2 2-direction strategy is superseded by the 4-angle system for all new ad 
 Campaign group: `gen_{trade}_{angle}`
 UTM campaign: `gen_2026-03_{trade}_{angle}`
 
+### Historical Ad Archive
+
+- `/ads` separates current launch candidates from historical archive rows. Historical rows remain visible for reference, but they are not launch candidates.
+- The archive classifier labels NB2 runs, imported campaign upload-sheet rows, legacy platform landing paths (`/li`, `/yt`, `/fb`, `/ig`), and generic Saw.City copy.
+- Archiving is a view-layer label only. Do not delete old ad copy, rewrite historical rows, upload them to ad platforms, or treat an archive badge as approval.
+- A historical ad can only become current again by rebuilding it into a launch bundle with trade-specific domain, `$39/mo`, trial language, approved creative, approved copy, tracking URL, and Jarrad approval.
+
 ### Legacy Ad ID Format (NB2)
 ```
 NB2-D{1|2}-{LI|FB|IG|YT}-{CODE}{AW|RT}

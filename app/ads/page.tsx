@@ -1,9 +1,12 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect -- Ads page loads API rows after mount and resets pagination when filters change. */
+
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PlatformChip, StatusChip } from "@/components/chips";
+import { getAdArchiveState, summarizeAdArchive } from "@/lib/ad-archive";
 import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
 import { AdPreviewModal } from "@/components/ad-preview-modal";
 import { Button, Card, GhostButton } from "@/components/ui";
@@ -13,6 +16,11 @@ export const dynamic = "force-dynamic";
 
 const platformFilters = ["all", "linkedin", "youtube", "facebook", "instagram", "retargeting"] as const;
 const statusFilters = ["all", "approved", "pending", "paused", "rejected"] as const;
+const archiveFilters = ["current", "historical", "all"] as const;
+
+function isPlatformFilter(value: string): value is (typeof platformFilters)[number] {
+  return platformFilters.includes(value as (typeof platformFilters)[number]);
+}
 
 interface EditTarget {
   adId: string;
@@ -45,9 +53,10 @@ function AdsContent() {
   const searchParams = useSearchParams();
   const [platform, setPlatform] = useState<(typeof platformFilters)[number]>(() => {
     const p = searchParams.get("platform") ?? "all";
-    return platformFilters.includes(p as any) ? (p as (typeof platformFilters)[number]) : "all";
+    return isPlatformFilter(p) ? p : "all";
   });
   const [status, setStatus] = useState<(typeof statusFilters)[number]>("all");
+  const [archiveFilter, setArchiveFilter] = useState<(typeof archiveFilters)[number]>("current");
   const [search, setSearch] = useState("");
   const [tradeFilter, setTradeFilter] = useState("all");
   const [showModal, setShowModal] = useState(false);
@@ -154,10 +163,12 @@ function AdsContent() {
 
   const [page, setPage] = useState(0);
   const PAGE_SIZE = 30;
+  const archiveSummary = useMemo(() => summarizeAdArchive(ads), [ads]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     return ads.filter((ad) => {
+      const archiveState = getAdArchiveState(ad);
       const platformMatch =
         platform === "all"
           ? true
@@ -165,6 +176,7 @@ function AdsContent() {
             ? ad.campaignGroup.toLowerCase().includes("retarget")
             : ad.platform === platform;
       const statusMatch = status === "all" ? true : ad.status === status;
+      const archiveMatch = archiveFilter === "all" ? true : archiveState.bucket === archiveFilter;
       const tradeMatch = tradeFilter === "all" ? true : tradeFromAd(ad) === tradeFilter;
       const searchMatch = !q
         ? true
@@ -173,16 +185,16 @@ function AdsContent() {
           (ad.campaignGroup ?? "").toLowerCase().includes(q) ||
           (ad.landingPath ?? "").toLowerCase().includes(q) ||
           (TRADE_MAP[tradeFromAd(ad)]?.domain ?? "").toLowerCase().includes(q);
-      return platformMatch && statusMatch && tradeMatch && searchMatch;
+      return platformMatch && statusMatch && archiveMatch && tradeMatch && searchMatch;
     });
-  }, [ads, platform, status, search, tradeFilter]);
+  }, [ads, archiveFilter, platform, status, search, tradeFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   useEffect(() => {
     setPage(0);
-  }, [platform, status, search, tradeFilter]);
+  }, [archiveFilter, platform, status, search, tradeFilter]);
 
   async function togglePause(id: string, currentStatus: AdStatus) {
     const next: AdStatus = currentStatus === "paused" ? "pending" : "paused";
@@ -242,7 +254,49 @@ function AdsContent() {
         </Button>
       </div>
 
+      <Card className="border-amber-800/60 bg-amber-950/20">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Historical Archive</p>
+            <h2 className="mt-1 text-xl font-black text-white">{archiveSummary.historical} legacy ads labeled</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-300">
+              Old NB2, imported, and generic Saw.City rows stay visible for reference but are not current launch candidates.
+              No ad copy is deleted or sent anywhere from this page.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center text-xs text-slate-400 sm:min-w-80">
+            <div className="rounded border border-slate-700 bg-slate-950 px-3 py-2">
+              <p className="text-lg font-bold text-white">{archiveSummary.total}</p>
+              <p>Total</p>
+            </div>
+            <div className="rounded border border-emerald-800/60 bg-emerald-950/30 px-3 py-2">
+              <p className="text-lg font-bold text-emerald-200">{archiveSummary.current}</p>
+              <p>Current</p>
+            </div>
+            <div className="rounded border border-amber-800/60 bg-amber-950/30 px-3 py-2">
+              <p className="text-lg font-bold text-amber-200">{archiveSummary.historical}</p>
+              <p>Archived</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       <Card className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {archiveFilters.map((value) => (
+            <GhostButton
+              key={value}
+              className={archiveFilter === value ? "bg-slate-700" : ""}
+              onClick={() => setArchiveFilter(value)}
+            >
+              {value === "current"
+                ? "Current candidates"
+                : value === "historical"
+                  ? "Historical archive"
+                  : "All ads"}
+            </GhostButton>
+          ))}
+        </div>
         <div className="flex flex-wrap gap-2">
           {platformFilters.map((value) => (
             <GhostButton
@@ -290,7 +344,7 @@ function AdsContent() {
       </Card>
 
       <div className="flex items-center justify-between text-sm text-slate-400">
-        <span>{filtered.length} ads</span>
+        <span>{filtered.length} ads shown · {archiveFilter === "current" ? "historical rows hidden" : archiveFilter === "historical" ? "archive reference view" : "all rows visible"}</span>
         <div className="flex items-center gap-2">
           <GhostButton disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>← Prev</GhostButton>
           <span>Page {page + 1} / {totalPages || 1}</span>
@@ -301,6 +355,7 @@ function AdsContent() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {paginated.map((ad) => {
           const utmUrl = `https://saw.city${ad.landingPath}?utm_source=${ad.utmSource}&utm_medium=${ad.utmMedium}&utm_campaign=${ad.utmCampaign}&utm_content=${ad.utmContent}&utm_term=${ad.utmTerm}`;
+          const archiveState = getAdArchiveState(ad);
 
           const adPrefix = tradeFromAd(ad);
           const adUrls = getCreativeUrls(adPrefix, ad.imageUrl ?? ad.image_url);
@@ -314,7 +369,7 @@ function AdsContent() {
           const adDomain = tradeBadge(ad).domain;
 
           return (
-            <Card key={ad.id}>
+            <Card key={ad.id} className={archiveState.bucket === "historical" ? "border-amber-900/70 bg-slate-900/70" : ""}>
               {(() => {
                 const isSaving = savingCreative.has(ad.id);
                 return (
@@ -337,20 +392,23 @@ function AdsContent() {
                           <div key={v} className="relative flex-1" style={{ height: 40 }}>
                             <button
                               title={CREATIVE_LABELS[v]}
-                              disabled={isSaving}
-                              onClick={() => setCreativeVariant(ad.id, v)}
+                              disabled={isSaving || archiveState.bucket === "historical"}
+                              onClick={() => {
+                                if (archiveState.bucket !== "historical") void setCreativeVariant(ad.id, v);
+                              }}
                               className={`h-full w-full overflow-hidden rounded border-2 transition-all ${isActive ? "border-blue-400 opacity-100" : "border-slate-700 opacity-50 hover:opacity-80"}`}
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={thumbUrl} alt={`C${v}`} className="h-full w-full object-cover" loading="lazy" />
                               <span className={`absolute bottom-0 left-0 right-0 py-0.5 text-center text-[9px] font-bold ${isActive ? "bg-blue-500/80 text-white" : "bg-black/50 text-slate-300"}`}>C{v}</span>
                             </button>
-                            {/* Pencil edit button */}
-                            <button
-                              title={`Edit C${v} with prompt`}
-                              onClick={(e) => { e.stopPropagation(); openEditModal(ad, v as 1|2|3, adPrefix); }}
-                              className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-bl bg-black/70 text-[9px] text-white hover:bg-blue-600/90 transition-colors"
-                            >✏️</button>
+                            {archiveState.bucket !== "historical" && (
+                              <button
+                                title={`Edit C${v} with prompt`}
+                                onClick={(e) => { e.stopPropagation(); openEditModal(ad, v as 1|2|3, adPrefix); }}
+                                className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-bl bg-black/70 text-[9px] text-white hover:bg-blue-600/90 transition-colors"
+                              >✏️</button>
+                            )}
                           </div>
                         );
                       })}
@@ -366,6 +424,17 @@ function AdsContent() {
                 ); })()}
                 <span className="ml-auto rounded bg-slate-700 px-2 py-1 text-xs">{ad.format}</span>
               </div>
+              <div className={`mb-3 rounded border px-3 py-2 text-xs ${
+                archiveState.bucket === "historical"
+                  ? "border-amber-800/60 bg-amber-950/25 text-amber-100"
+                  : "border-emerald-800/60 bg-emerald-950/20 text-emerald-100"
+              }`}>
+                <p className="font-semibold">{archiveState.label}</p>
+                <p className="mt-1 text-slate-300">{archiveState.guidance}</p>
+                {archiveState.bucket === "historical" && (
+                  <p className="mt-1 text-amber-200">Archive signal: {archiveState.reason}</p>
+                )}
+              </div>
               <p className="mb-2 font-semibold">{ad.headline || "(No headline)"}</p>
               <p className="line-clamp-3 text-sm text-slate-300">{ad.primaryText}</p>
               <p className="mt-2 text-xs text-slate-400">CTA: {ad.cta}</p>
@@ -373,12 +442,20 @@ function AdsContent() {
               <p className="mb-3 text-xs text-slate-400">Workflow: {ad.workflowStage}</p>
               <StatusChip status={ad.status} className="mb-3" />
               <div className="flex flex-wrap gap-2">
-                <Link className="rounded-md border border-slate-600 px-3 py-2 text-sm hover:bg-slate-700" href={`/ads/${ad.id}`}>
-                  Edit
-                </Link>
-                <GhostButton onClick={() => togglePause(ad.id, ad.status)}>
-                  {ad.status === "paused" ? "Unpause" : "Pause"}
-                </GhostButton>
+                {archiveState.bucket === "historical" ? (
+                  <span className="rounded-md border border-amber-800/60 px-3 py-2 text-sm font-semibold text-amber-200">
+                    Archived reference
+                  </span>
+                ) : (
+                  <>
+                    <Link className="rounded-md border border-slate-600 px-3 py-2 text-sm hover:bg-slate-700" href={`/ads/${ad.id}`}>
+                      Edit
+                    </Link>
+                    <GhostButton onClick={() => togglePause(ad.id, ad.status)}>
+                      {ad.status === "paused" ? "Unpause" : "Pause"}
+                    </GhostButton>
+                  </>
+                )}
                 <GhostButton
                   onClick={() => {
                     navigator.clipboard.writeText(utmUrl).catch(() => null);
@@ -553,7 +630,7 @@ function AdsContent() {
               />
               {regenResult && (
                 <div className="bg-green-900/30 px-3 py-1.5 text-center text-xs text-green-400">
-                  ✅ New image generated — looks good? Hit "Use This" to save.
+                  ✅ New image generated — looks good? Hit &quot;Use This&quot; to save.
                 </div>
               )}
             </div>
@@ -563,7 +640,7 @@ function AdsContent() {
               Describe the image you want
             </label>
             <p className="mb-2 text-xs text-slate-500">
-              Tip: describe the full scene you want, or describe the fix (e.g. "painter on a ladder brushing the siding — window glass is clean, no paint on the glass panes")
+              Tip: describe the full scene you want, or describe the fix (e.g. &quot;painter on a ladder brushing the siding — window glass is clean, no paint on the glass panes&quot;)
             </p>
             <textarea
               rows={3}

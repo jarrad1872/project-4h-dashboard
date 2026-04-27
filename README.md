@@ -79,7 +79,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 |------|-----|---------|
 | Overview | `/` | Plumbing-pilot growth command center: launch countdown, creative pipeline, influencer pipeline, metrics, budget |
 | GTM Board | `/gtm` | Full mission brief, product state, trade registry, product route inventory, action board |
-| Ads | `/ads` | All ads with status, images, pause/unpause |
+| Ads | `/ads` | Current ad candidates plus historical archive labels for old generated ads |
 | Approval | `/approval` | Approve/Hold/Reject pending ads — Bulk Approve All per trade |
 | Creatives | `/creatives` | Generated ad creative thumbnails |
 | Assets | `/assets` | AI UGC creative asset tracking with draft/review/approved/live workflow |
@@ -221,6 +221,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/gtm` now includes a read-only product route inventory copied from sawcity-lite reference files: 21 routes, 20 live demo lines, and the five beachhead domains ready for creator/ad planning
 - `/launch` now builds deterministic trade-domain launch URLs with AGENTS-format paid-social UTMs, angle, asset, and optional creator metadata
 - `/launch` now runs an internal readiness validator that returns actionable blockers for domain, UTM, offer, trial, checklist, creative approval, copy approval, and Jarrad approval state
+- `/ads` now labels legacy NB2, imported, and generic Saw.City rows as historical archive entries so they stay visible without looking launch-ready
 - `/templates` now includes 20 message-match handoff briefs for the five beachhead domains across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
 - `/influencer` now audits the creator shortlist into keep/maybe/remove/needs-research buckets; `remove` deprioritizes while preserving creator history

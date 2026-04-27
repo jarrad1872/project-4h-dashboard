@@ -27,6 +27,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-11 | Phase 4 | Landing | Create launch URL builder | 2026-04-27 | `/launch` builds deterministic trade/domain URLs with AGENTS-format paid-social UTMs plus creator, asset, and angle metadata. |
 | Q-12 | Phase 4 | Landing | Create message-match briefs | 2026-04-27 | `/templates` includes 20 beachhead handoff briefs across five domains and four angles with headline promise, proof, offer, and trial. |
 | Q-13 | Phase 4 | Landing | Add launch readiness validator | 2026-04-27 | `/launch` returns actionable preflight blockers for URL, domain, UTM, offer, trial, checklist, creative approval, copy approval, and Jarrad approval state. |
+| Q-14 | Phase 5 | Launch | Archive historical ad library | 2026-04-27 | `/ads` separates current candidates from historical archive rows, labels old NB2/imported/Saw.City ads, and preserves copy without deletion. |
 
 ## Ready Queue
 
@@ -34,7 +35,6 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | --- | --- | --- | --- | --- | --- |
 | Q-01 | Phase 2 | Creative | Generate first beachhead image pack | None | In progress. Production desk, progress bar, copy packets, and per-card upload are ready. Finish by generating and uploading all 20 images. |
 | Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
-| Q-14 | Phase 5 | Launch | Archive historical ad library | None | Old ads are visibly archived/labeled, not deleted. |
 | Q-15 | Phase 5 | Launch | Build launch bundle model | None | Bundles connect trade, angle, image, copy, URL, budget, and approvals without launching. |
 | Q-16 | Phase 5 | Launch | Add experiment budget allocation | None | Planning state only; no billing changes. |
 | Q-17 | Phase 5 | Launch | Create platform upload sheets | Review required | Local/download exports only; no platform upload. |
