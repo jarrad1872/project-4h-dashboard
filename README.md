@@ -85,7 +85,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Assets | `/assets` | AI UGC creative asset tracking with draft/review/approved/live workflow |
 | Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences |
-| Scorecard | `/scorecard` | Weekly performance metrics, learning rankings, local keep/kill/iterate decisions, and customer pace forecast |
+| Scorecard | `/scorecard` | Weekly performance metrics, learning rankings, trade weekly targets, local keep/kill/iterate decisions, and customer pace forecast |
 | Budget | `/budget` | Spend allocation per platform plus local experiment-level budget planning |
 | Launch | `/launch` | Launch URL builder, bundle draft model, Q-17 local upload-sheet exports, readiness validator, external-action stop screen, and pre-launch gate checklist |
 | Templates | `/templates` | Meta Ad Library access validation, competitor research template, message-match handoff briefs, creator content packets, and ad template library |
@@ -229,6 +229,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/scorecard` now includes a weekly learning report that ranks trades, creators, images, and angles from attribution events while clearly labeling zero-data and no-paid-signal states
 - `/scorecard` now includes local keep/kill/iterate decisions with notes, timestamps, undo, and visible history; this does not pause, launch, upload, or spend
 - `/scorecard` now includes a customer pace forecast that shows logged paid customers, current weekly/monthly pace, projected gap to 1,000/2,000 by 2026-12-31, and an evidence-based next bet
+- `/scorecard` now includes a trade weekly target calculator that splits the required 1,000-2,000 customer pace across pipe, duct, mow, pest, and coat until trade-level paid signal justifies reweighting
 - `/approval` now includes an internal audit view that classifies approval activity across ad copy, creative, outreach, launch bundle, and export gates; the audit view is metadata only and does not send outreach, take ad-platform action, launch, create webhooks, spend, or change billing
 - `/ads` now labels legacy NB2, imported, and generic Saw.City rows as historical archive entries so they stay visible without looking launch-ready
 - `/templates` now includes 20 message-match handoff briefs for the five beachhead domains across missed-call, demo-call, owner-agent, and ROI-math angles
@@ -263,7 +264,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-17 local platform upload sheet exports | v4.3.3*
+*Last updated: 2026-04-27 Q-25 trade weekly target calculator | v4.3.4*
 
 ---
 

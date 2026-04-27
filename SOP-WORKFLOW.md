@@ -353,6 +353,8 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Decision entries do not pause campaigns, launch ads, upload sheets, send outreach, create webhooks, move money, or change billing.
 - The customer pace forecast uses logged weekly paid customer metrics only. It shows the 1,000-2,000 target range, weeks remaining to 2026-12-31, current weekly/monthly pace, required pace, projected gap, and the next internal bet.
 - If no paid customer metrics exist, the forecast must say no paid customer data is logged yet. Do not fabricate winners, customer pace, or creative fatigue from placeholder data.
+- The trade weekly target calculator splits the remaining required weekly paid-customer pace across the five beachhead domains until real trade-level paid signal is strong enough to reweight. It uses attribution-only `paid` events for weekly and all-time trade counts.
+- Trade targets are planning math only. They do not launch campaigns, upload sheets, send outreach, create webhooks, move money, or change billing.
 
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator

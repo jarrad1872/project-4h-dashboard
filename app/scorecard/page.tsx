@@ -15,6 +15,7 @@ import {
   type LearningDecisionTarget,
 } from "@/lib/learning-decisions";
 import { calcActivationRate, calcCpaPaid, calcCpaStart, calcCtr, signal } from "@/lib/metrics";
+import { buildTradeWeeklyTargetPlan, type TradeWeeklyTargetStatus } from "@/lib/trade-weekly-targets";
 import { buildWeeklyLearningReport, type LearningSignal } from "@/lib/weekly-learning-report";
 import type { ChannelMetrics, MarketingEventSummary, MetricsData, MetricsWeek } from "@/lib/types";
 
@@ -116,6 +117,20 @@ const PACE_STATUS_LABEL: Record<CustomerPaceStatus, string> = {
   "high-track": "On 2,000 pace",
 };
 
+const TRADE_TARGET_STATUS_STYLE: Record<TradeWeeklyTargetStatus, string> = {
+  waiting: "border-slate-700 bg-slate-800 text-slate-300",
+  behind: "border-red-700/40 bg-red-950/25 text-red-300",
+  "low-track": "border-amber-700/40 bg-amber-950/25 text-amber-300",
+  "high-track": "border-green-700/40 bg-green-950/25 text-green-300",
+};
+
+const TRADE_TARGET_STATUS_LABEL: Record<TradeWeeklyTargetStatus, string> = {
+  waiting: "Waiting",
+  behind: "Behind",
+  "low-track": "Low case",
+  "high-track": "High case",
+};
+
 function pct(value: number | null) {
   if (value === null) return "No view base";
   return `${(value * 100).toFixed(1)}%`;
@@ -140,6 +155,7 @@ function weekEventParams(weekStart: string) {
 export default function ScorecardPage() {
   const [metrics, setMetrics] = useState<MetricsData>({ weeks: [] });
   const [marketingSummary, setMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_SUMMARY);
+  const [allTimeMarketingSummary, setAllTimeMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_SUMMARY);
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState("");
   const [draft, setDraft] = useState<MetricsWeek | null>(null);
@@ -162,6 +178,13 @@ export default function ScorecardPage() {
     if (!latest) {
       setDraft(null);
       setMarketingSummary(EMPTY_MARKETING_SUMMARY);
+    }
+    const allTimeEventsRes = await fetch("/api/events?summary=1", { cache: "no-store" }).catch(() => null);
+    if (allTimeEventsRes?.ok) {
+      const allTimeEventsData = (await allTimeEventsRes.json()) as { summary?: MarketingEventSummary };
+      setAllTimeMarketingSummary(allTimeEventsData.summary ?? EMPTY_MARKETING_SUMMARY);
+    } else {
+      setAllTimeMarketingSummary(EMPTY_MARKETING_SUMMARY);
     }
     setLoading(false);
   }
@@ -217,6 +240,14 @@ export default function ScorecardPage() {
   const campaignTotals = useMemo(() => sumChannels(metrics.weeks), [metrics.weeks]);
   const totalUsers = metrics.weeks.reduce((sum, week) => sum + CHANNELS.reduce((inner, channel) => inner + week[channel].paid, 0), 0);
   const paceForecast = useMemo(() => buildCustomerPaceForecast(metrics.weeks), [metrics.weeks]);
+  const tradeTargetPlan = useMemo(
+    () => buildTradeWeeklyTargetPlan({
+      pace: paceForecast,
+      weeklySummary: marketingSummary,
+      allTimeSummary: allTimeMarketingSummary,
+    }),
+    [allTimeMarketingSummary, marketingSummary, paceForecast],
+  );
   const learningReport = useMemo(() => buildWeeklyLearningReport(marketingSummary), [marketingSummary]);
   const decisionTargets = useMemo(
     () => learningReport.reports.flatMap((report) =>
@@ -385,6 +416,72 @@ export default function ScorecardPage() {
         </div>
 
         <p className="mt-3 text-xs text-slate-500">{paceForecast.evidence}</p>
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Trade Weekly Target Calculator</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              First-principles weekly quotas for the five beachhead domains, tied to the 1,000-2,000 customer deadline.
+            </p>
+          </div>
+          <span className="rounded border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
+            {number(tradeTargetPlan.totalPaidThisWeek)} / {number(tradeTargetPlan.totalWeeklyLowTarget)} low-case this week
+          </span>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: "Weekly low target", value: number(tradeTargetPlan.totalWeeklyLowTarget), detail: "Across beachhead trades" },
+            { label: "Weekly high target", value: number(tradeTargetPlan.totalWeeklyHighTarget), detail: "2,000-customer case" },
+            { label: "Paid this week", value: number(tradeTargetPlan.totalPaidThisWeek), detail: "From selected-week attribution" },
+            { label: "Gap to low case", value: number(tradeTargetPlan.totalGapToLow), detail: `${number(tradeTargetPlan.totalGapToHigh)} to high case` },
+          ].map((item) => (
+            <div key={item.label} className="rounded border border-slate-700 bg-slate-800 p-3">
+              <p className="text-2xl font-bold text-slate-100">{item.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+              <p className="mt-2 text-xs text-slate-400">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-3 xl:grid-cols-5">
+          {tradeTargetPlan.trades.map((trade) => (
+            <div key={trade.domain} className="rounded border border-slate-700 bg-slate-900/50 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold text-slate-100">{trade.domain}</p>
+                  <p className="mt-1 text-xs text-slate-500">{trade.trade}</p>
+                </div>
+                <span className={`rounded border px-2 py-1 text-xs font-semibold ${TRADE_TARGET_STATUS_STYLE[trade.status]}`}>
+                  {TRADE_TARGET_STATUS_LABEL[trade.status]}
+                </span>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <p className="font-semibold text-slate-200">{number(trade.weeklyLowTarget)}-{number(trade.weeklyHighTarget)}</p>
+                  <p className="text-slate-500">Weekly target</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-200">{number(trade.paidThisWeek)}</p>
+                  <p className="text-slate-500">Paid this week</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-200">{number(trade.allTimePaid)}</p>
+                  <p className="text-slate-500">All-time paid</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-200">{number(trade.gapToLow)}</p>
+                  <p className="text-slate-500">Low gap</p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-slate-400">{trade.nextAction}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-3 text-xs text-slate-500">{tradeTargetPlan.evidence}</p>
       </Card>
 
       <Card>
