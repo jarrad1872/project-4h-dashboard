@@ -47,6 +47,7 @@ These routes are not active operating lanes. They remain available from the coll
 9. Q-43: Extract legacy `/settings` source/setup notes into active data/docs. Complete; no redirects, deletions, campaign-status changes, or external actions.
 10. Q-44: Preserve legacy `/gtm` product-route inventory in active data/docs. Complete; no redirects, deletions, or sawcity-lite writes.
 11. Q-45: Preserve historical `/ads` archive signals and dependencies in active data/docs. Complete; no redirects, deletions, uploads, launches, or external actions.
+12. Q-46: Draft the clear-route cleanup packet for `/ads`, `/generate`, `/gtm`, and `/settings`. Complete; no redirects, deletions, uploads, launches, or external actions.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -155,3 +156,16 @@ The `/ads` page route and the historical archive classifier it uses are separate
 | Route status | 1 | `/ads` is now clear for a future archive-only packet, not for deletion of history. |
 
 Q-45 did not redirect `/ads`, delete the old page, edit ads, upload to ad platforms, launch campaigns, create webhooks, spend money, or change external systems. Any future archive-only packet must keep historical rows readable and prove Launch/Approval still own current-candidate action.
+
+## Q-46 Clear Route Cleanup Packet
+
+Q-46 groups only clear route candidates into an explicit packet before implementation. This is a draft/control surface, not permission to change routes by itself.
+
+| Route | Packet recommendation | Replacement | Preserved evidence |
+| --- | --- | --- | --- |
+| `/ads` | Archive-only later | `/launch` | Ad archive audit map and classifier tests. |
+| `/generate` | Redirect later | `/assets` | Legacy generator notes and Creative Lab replacement path. |
+| `/gtm` | Archive-only later | `/` | Product-route inventory and sawcity-lite read-only evidence. |
+| `/settings` | Delete later | `/approval` | Source-note map and setup-doc references. |
+
+Q-46 did not redirect a route, delete a page, edit ads, upload to ad platforms, launch campaigns, create webhooks, spend money, or change external systems. The first implementation candidate is Q-47: internally redirect `/generate` to `/assets` while preserving the legacy API and docs.

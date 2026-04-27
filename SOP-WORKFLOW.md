@@ -378,6 +378,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-43 separates setup/source notes from the legacy `/settings` page route. Future `/settings` delete packets must preserve platform setup pointers, read-only sawcity-lite source doc paths, campaign-status context, placeholder credential handling, and doc-update reminders.
 - Q-44 separates product-route inventory from the legacy `/gtm` page route. Future `/gtm` archive-only packets must preserve the 21-route inventory, beachhead demo-line context, launch URL assumptions, and read-only sawcity-lite evidence paths.
 - Q-45 separates historical archive context from the legacy `/ads` page route. Future `/ads` archive-only packets must preserve classifier signals, current/historical filters, `/api/ads` history readability, and the no-upload/no-launch boundary.
+- Q-46 groups clear candidates into a cleanup packet before implementation. A cleanup packet must show preserved evidence, replacement route, verification requirements, and blocked actions before any redirect, archive-only, or delete-later change.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

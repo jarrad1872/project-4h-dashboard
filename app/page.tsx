@@ -43,6 +43,7 @@ import {
   adArchiveDependencies,
   adArchiveHistoricalSignals,
 } from "@/lib/ad-archive";
+import { clearRouteCleanupPacket, clearRouteCleanupPacketSummary } from "@/lib/route-cleanup-packet";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -173,6 +174,7 @@ export default function OverviewPage() {
   const gtmRouteSummary = useMemo(() => productRouteRetirementDependencySummary(), []);
   const gtmBeachheadRoutes = useMemo(() => getBeachheadProductRoutes(), []);
   const adArchiveSummary = useMemo(() => adArchiveAuditDependencySummary(state.ads), [state.ads]);
+  const cleanupPacketSummary = useMemo(() => clearRouteCleanupPacketSummary(), []);
   const publicCreativeRows = useMemo(
     () =>
       publicCreativeUrlDependencies.reduce<Array<{ prefix: string; domain: string; urls: string[]; placements: string[] }>>(
@@ -338,6 +340,47 @@ export default function OverviewPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </Card>
+      </section>
+
+      <section data-testid="clear-route-cleanup-packet">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Clear route cleanup packet</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Draft candidates before any route implementation</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{cleanupPacketSummary.total} candidates</StatusPill>
+            <StatusPill>{cleanupPacketSummary.counts.redirect} redirect</StatusPill>
+            <StatusPill>{cleanupPacketSummary.counts.archive} archive</StatusPill>
+            <StatusPill>{cleanupPacketSummary.counts.delete} delete-later</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-emerald-900/50 bg-emerald-950/10">
+          <p className="text-sm leading-6 text-slate-300">{cleanupPacketSummary.preservationRule}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Implementation allowed: {cleanupPacketSummary.implementationAllowed ? "yes" : "no"}; blocked actions:{" "}
+            {cleanupPacketSummary.blockedActions.join(", ")}
+          </p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-4">
+            {clearRouteCleanupPacket.map((entry) => (
+              <div key={entry.route} className="rounded border border-slate-700 bg-slate-900/60 p-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-base font-semibold text-white">{entry.route}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-emerald-300">{entry.recommendation}</p>
+                  </div>
+                  <StatusPill>draft only</StatusPill>
+                </div>
+                <p className="mt-3 text-xs leading-5 text-slate-300">{entry.packetIntent}</p>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Preserved evidence</p>
+                <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                  {entry.preservedEvidence.slice(0, 4).map((item) => <li key={item}>- {item}</li>)}
+                </ul>
+                <p className="mt-3 text-xs text-slate-500">Replacement: {entry.replacementHref ?? "none"}</p>
+              </div>
+            ))}
           </div>
         </Card>
       </section>

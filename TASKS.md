@@ -205,7 +205,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-43 legacy settings source-note extraction before `/settings` delete work.
 - [x] Add Q-44 legacy GTM product-route inventory preservation before `/gtm` archive-only work.
 - [x] Add Q-45 historical ad archive audit map before `/ads` archive-only work.
-- [ ] Add Q-46 clear-route cleanup packet before any redirect/delete/archive-only implementation.
+- [x] Add Q-46 clear-route cleanup packet before any redirect/delete/archive-only implementation.
+- [ ] Add Q-47 legacy AI Studio redirect packet from `/generate` to `/assets`.
 
 ---
 
@@ -250,7 +251,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Preserve unique `/settings` source notes before route retirement.
 - [x] Preserve legacy `/gtm` product-route inventory context before route retirement.
 - [x] Preserve historical `/ads` audit context before route retirement.
-- [ ] Draft clear-route cleanup packet for legacy route candidates.
+- [x] Draft clear-route cleanup packet for legacy route candidates.
+- [ ] Apply first clear-route cleanup packet for `/generate`.
 
 ---
 

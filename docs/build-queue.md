@@ -61,12 +61,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-43 | Governance | Navigation | Extract legacy settings source notes | 2026-04-27 | Command now shows `/settings` setup notes, read-only source doc paths, campaign-status context, and doc-update reminders outside the legacy page before delete-later work. |
 | Q-44 | Governance | Navigation | Preserve legacy GTM product-route inventory | 2026-04-27 | Command now shows `/gtm` product-route inventory context, beachhead demo lines, and read-only sawcity-lite evidence outside the legacy GTM board. |
 | Q-45 | Governance | Navigation | Preserve historical ad archive audit map | 2026-04-27 | Command now shows `/ads` archive classifier signals, current/historical row counts, dependencies, and no-external-action boundaries before archive-only work. |
+| Q-46 | Governance | Navigation | Draft clear-route cleanup packet | 2026-04-27 | Command now groups `/ads`, `/generate`, `/gtm`, and `/settings` into a draft cleanup packet with preservation evidence and blocked actions before route implementation work. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-46 | Governance | Navigation | Draft clear-route cleanup packet | none | Clear legacy-route candidates are grouped into an explicit cleanup packet without redirecting, deleting, launching, uploading, or taking external action. |
+| Q-47 | Governance | Navigation | Apply legacy AI Studio redirect packet | none | `/generate` redirects internally to `/assets`; no generated copy, API route, external webhook, upload, launch, spend, or sawcity-lite file is changed. |
 
 ## Stop Conditions
 
