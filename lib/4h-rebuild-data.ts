@@ -309,7 +309,7 @@ export const rebuildExecutionQueue = [
     lane: "Launch",
     title: "Add experiment budget allocation",
     route: "/budget",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Budget can be assigned by experiment, not only by channel.",
     acceptance: "No billing changes; this is planning state only.",

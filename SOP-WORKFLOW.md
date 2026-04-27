@@ -312,7 +312,12 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `/launch` renders a draft launch bundle from the selected trade, platform, angle, image asset ID, copy/offer/trial fields, launch URL, channel budget, readiness result, and approval states.
 - The bundle is an internal planning object only. It does not upload ads, launch campaigns, send outreach, create webhooks, or move money.
 - Bundle statuses are `blocked`, `draft`, `review-ready`, and `approved`; `approved` still means the bundle has internal approval state, not that any platform action has happened.
-- Q-16 can add experiment-level budget planning on top of the bundle model. Until then, the bundle only reads the current channel budget and suggested test amount.
+
+**Experiment budget planner:**
+- `/budget` assigns the first paid-test planning budget by experiment, not only by channel.
+- Experiment requests are local UI planning state. Editing them does not update billing, ad accounts, Supabase budget rows, webhooks, uploads, campaigns, or spend.
+- Allocations are clamped to the current remaining channel budget so a launch plan cannot silently overcommit a platform.
+- Use the planner to decide what budget belongs in future Q-17 local upload sheets after review approval.
 
 **Message-match briefs:**
 - `/templates` holds 4H-owned handoff briefs for future sawcity-lite landing work across the five beachhead domains and four creative angles.

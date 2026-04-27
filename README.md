@@ -86,7 +86,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences |
 | Scorecard | `/scorecard` | Weekly performance metrics |
-| Budget | `/budget` | Spend allocation per platform |
+| Budget | `/budget` | Spend allocation per platform plus local experiment-level budget planning |
 | Launch | `/launch` | Launch URL builder, bundle draft model, readiness validator, and pre-launch gate checklist |
 | Templates | `/templates` | Message-match handoff briefs, creator content packets, and ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
@@ -190,6 +190,7 @@ Legacy NB2/Gemini images still exist for historical campaign assets:
 - **Kill:** CPL > $40 after $500 spend on a platform
 - **Scale:** CPL < $20 AND 5+ sign-ups → double budget
 - **Pause creative:** CTR < 0.3% after 1,000 impressions
+- **Experiment planner:** `/budget` can locally assign test budgets by experiment and clamps requests to remaining channel budget. This is planning state only and does not update billing, ad accounts, webhooks, Supabase budget rows, or spend.
 
 ---
 
@@ -222,6 +223,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/launch` now builds deterministic trade-domain launch URLs with AGENTS-format paid-social UTMs, angle, asset, and optional creator metadata
 - `/launch` now runs an internal readiness validator that returns actionable blockers for domain, UTM, offer, trial, checklist, creative approval, copy approval, and Jarrad approval state
 - `/launch` now renders an internal launch bundle draft that connects trade, angle, image asset, copy, URL, budget, readiness, and approvals without any external action
+- `/budget` now includes an experiment-level budget planner for the first paid tests; it is local planning state only and cannot change billing or platform spend
 - `/ads` now labels legacy NB2, imported, and generic Saw.City rows as historical archive entries so they stay visible without looking launch-ready
 - `/templates` now includes 20 message-match handoff briefs for the five beachhead domains across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
