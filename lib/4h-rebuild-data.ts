@@ -342,9 +342,9 @@ export const rebuildExecutionQueue = [
     lane: "Learning",
     title: "Add keep/kill/iterate decisions",
     route: "/scorecard",
-    status: "ready",
+    status: "complete",
     approval: "none",
-    outcome: "Experiments can be marked keep, kill, iterate, or scale with notes.",
+    outcome: "Experiments can be marked keep, kill, or iterate with notes.",
     acceptance: "Decision history is visible and reversible.",
   },
   {

@@ -3,6 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { CHANNELS } from "@/lib/constants";
+import {
+  addLearningDecision,
+  currentLearningDecisions,
+  decisionTargetFromRankedItem,
+  LEARNING_DECISIONS_STORAGE_KEY,
+  reverseLatestDecision,
+  type LearningDecisionAction,
+  type LearningDecisionEntry,
+  type LearningDecisionTarget,
+} from "@/lib/learning-decisions";
 import { calcActivationRate, calcCpaPaid, calcCpaStart, calcCtr, signal } from "@/lib/metrics";
 import { buildWeeklyLearningReport, type LearningSignal } from "@/lib/weekly-learning-report";
 import type { ChannelMetrics, MarketingEventSummary, MetricsData, MetricsWeek } from "@/lib/types";
@@ -85,6 +95,12 @@ const LEARNING_SIGNAL_STYLE: Record<LearningSignal, string> = {
   waiting: "border-slate-700 bg-slate-800 text-slate-400",
 };
 
+const DECISION_STYLE: Record<LearningDecisionAction, string> = {
+  keep: "border-blue-700/40 bg-blue-950/25 text-blue-300",
+  kill: "border-red-700/40 bg-red-950/25 text-red-300",
+  iterate: "border-amber-700/40 bg-amber-950/25 text-amber-300",
+};
+
 function pct(value: number | null) {
   if (value === null) return "No view base";
   return `${(value * 100).toFixed(1)}%`;
@@ -111,6 +127,8 @@ export default function ScorecardPage() {
   const [saving, setSaving] = useState(false);
   const [newWeekDate, setNewWeekDate] = useState("");
   const [showAddWeek, setShowAddWeek] = useState(false);
+  const [decisionHistory, setDecisionHistory] = useState<LearningDecisionEntry[]>([]);
+  const [decisionNote, setDecisionNote] = useState("");
 
   async function load() {
     setLoading(true);
@@ -130,6 +148,19 @@ export default function ScorecardPage() {
   }
 
   useEffect(() => { void load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(LEARNING_DECISIONS_STORAGE_KEY);
+      if (raw) setDecisionHistory(JSON.parse(raw) as LearningDecisionEntry[]);
+    } catch {
+      setDecisionHistory([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(LEARNING_DECISIONS_STORAGE_KEY, JSON.stringify(decisionHistory));
+  }, [decisionHistory]);
 
   useEffect(() => {
     const week = metrics.weeks.find((item) => item.weekStart === selectedWeek);
@@ -167,6 +198,17 @@ export default function ScorecardPage() {
   const campaignTotals = useMemo(() => sumChannels(metrics.weeks), [metrics.weeks]);
   const totalUsers = metrics.weeks.reduce((sum, week) => sum + CHANNELS.reduce((inner, channel) => inner + week[channel].paid, 0), 0);
   const learningReport = useMemo(() => buildWeeklyLearningReport(marketingSummary), [marketingSummary]);
+  const decisionTargets = useMemo(
+    () => learningReport.reports.flatMap((report) =>
+      report.items.map((item) => decisionTargetFromRankedItem(report.dimension, item)),
+    ),
+    [learningReport],
+  );
+  const selectedWeekDecisionHistory = useMemo(
+    () => decisionHistory.filter((entry) => entry.weekStart === selectedWeek),
+    [decisionHistory, selectedWeek],
+  );
+  const currentDecisions = useMemo(() => currentLearningDecisions(selectedWeekDecisionHistory), [selectedWeekDecisionHistory]);
   const visibleWeek = draft ?? createWeek(selectedWeek || "No week selected");
   const weekTotals = useMemo(() => sumChannels([visibleWeek]), [visibleWeek]);
 
@@ -201,6 +243,17 @@ export default function ScorecardPage() {
     setShowAddWeek(false);
     setSelectedWeek(newWeekDate);
     void load();
+  }
+
+  function decide(target: LearningDecisionTarget, decision: LearningDecisionAction) {
+    if (!selectedWeek) return;
+    setDecisionHistory((history) => addLearningDecision(history, selectedWeek, target, decision, decisionNote, new Date().toISOString()));
+    setDecisionNote("");
+  }
+
+  function undoDecision(targetId: string) {
+    if (!selectedWeek) return;
+    setDecisionHistory((history) => reverseLatestDecision(history, selectedWeek, targetId, new Date().toISOString()));
   }
 
   if (loading) {
@@ -349,6 +402,98 @@ export default function ScorecardPage() {
             </section>
           ))}
         </div>
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Keep / Kill / Iterate Decisions</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Local learning notes for the selected week. Decisions are reversible and do not pause, launch, upload, or spend.
+            </p>
+          </div>
+          <span className="rounded border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
+            {Object.keys(currentDecisions).length} active
+          </span>
+        </div>
+
+        <div className="mb-4">
+          <label className="mb-1 block text-xs text-slate-400">Optional note for next decision</label>
+          <input
+            value={decisionNote}
+            onChange={(event) => setDecisionNote(event.target.value)}
+            placeholder="Why are we making this call?"
+            className="w-full rounded border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
+        {decisionTargets.length === 0 ? (
+          <p className="rounded border border-slate-700 bg-slate-800/60 p-3 text-sm text-slate-400">
+            Decision controls appear after tracked trades, creators, images, or angles have attribution in the selected week.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {decisionTargets.map((target) => {
+              const currentDecision = currentDecisions[target.id] ?? null;
+              return (
+                <div key={target.id} className="rounded border border-slate-700 bg-slate-900/40 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-100">{target.label}</p>
+                      <p className="mt-1 text-xs text-slate-500">{target.type} - {target.evidence}</p>
+                    </div>
+                    {currentDecision ? (
+                      <span className={`rounded border px-2 py-1 text-xs font-semibold ${DECISION_STYLE[currentDecision.decision]}`}>
+                        {currentDecision.decision} at {new Date(currentDecision.decidedAt).toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-400">
+                        undecided
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {(["keep", "kill", "iterate"] as const).map((decision) => (
+                      <Button
+                        key={decision}
+                        onClick={() => decide(target, decision)}
+                        disabled={!selectedWeek}
+                        className="bg-slate-700 px-2 py-1 text-xs text-slate-100 hover:bg-slate-600"
+                      >
+                        {decision}
+                      </Button>
+                    ))}
+                    <Button
+                      onClick={() => undoDecision(target.id)}
+                      disabled={!currentDecision}
+                      className="bg-slate-900 px-2 py-1 text-xs text-slate-200 hover:bg-slate-800"
+                    >
+                      Undo last
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {selectedWeekDecisionHistory.length > 0 && (
+          <div className="mt-4 border-t border-slate-700 pt-4">
+            <h3 className="mb-2 text-sm font-semibold text-slate-300">Decision History for {selectedWeek}</h3>
+            <div className="max-h-56 space-y-2 overflow-y-auto">
+              {[...selectedWeekDecisionHistory].reverse().map((entry) => (
+                <div key={entry.id} className="rounded border border-slate-700 bg-slate-800/50 p-2 text-xs text-slate-400">
+                  <span className="font-semibold text-slate-200">{entry.targetLabel}</span> marked{" "}
+                  <span className={entry.reversedAt ? "line-through" : "text-slate-200"}>{entry.decision}</span>{" "}
+                  at {new Date(entry.decidedAt).toLocaleString()}
+                  {entry.previousDecision && <span> from {entry.previousDecision}</span>}
+                  {entry.reversedAt && <span> - reversed at {new Date(entry.reversedAt).toLocaleString()}</span>}
+                  {entry.note && <p className="mt-1 text-slate-500">{entry.note}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Card>
 
       <Card className="overflow-x-auto">

@@ -329,7 +329,9 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `/scorecard` ranks trades, creators, images, and angles from `marketing_events` attribution only.
 - Rankings use funnel-weighted evidence: paid conversions outrank activations, trials, signups, demo calls, and raw asset views.
 - If no paid events exist, the report must say rankings are directional only. If no events exist, it must show empty states instead of recommendations.
-- Do not fabricate winners, customer pace, creative fatigue, or keep/kill decisions from placeholder data. Those belong to later queue items after real signal is present.
+- Keep/kill/iterate decisions on `/scorecard` are selected-week local learning notes with timestamps, optional notes, undo, and visible history.
+- Decision entries do not pause campaigns, launch ads, upload sheets, send outreach, create webhooks, move money, or change billing.
+- Do not fabricate winners, customer pace, or creative fatigue from placeholder data. Those belong to later queue items after real signal is present.
 
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator

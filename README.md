@@ -85,7 +85,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Assets | `/assets` | AI UGC creative asset tracking with draft/review/approved/live workflow |
 | Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences |
-| Scorecard | `/scorecard` | Weekly performance metrics plus learning rankings for trades, creators, images, and angles |
+| Scorecard | `/scorecard` | Weekly performance metrics, learning rankings, and local keep/kill/iterate decisions |
 | Budget | `/budget` | Spend allocation per platform plus local experiment-level budget planning |
 | Launch | `/launch` | Launch URL builder, bundle draft model, readiness validator, and pre-launch gate checklist |
 | Templates | `/templates` | Message-match handoff briefs, creator content packets, and ad template library |
@@ -225,6 +225,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/launch` now renders an internal launch bundle draft that connects trade, angle, image asset, copy, URL, budget, readiness, and approvals without any external action
 - `/budget` now includes an experiment-level budget planner for the first paid tests; it is local planning state only and cannot change billing or platform spend
 - `/scorecard` now includes a weekly learning report that ranks trades, creators, images, and angles from attribution events while clearly labeling zero-data and no-paid-signal states
+- `/scorecard` now includes local keep/kill/iterate decisions with notes, timestamps, undo, and visible history; this does not pause, launch, upload, or spend
 - `/ads` now labels legacy NB2, imported, and generic Saw.City rows as historical archive entries so they stay visible without looking launch-ready
 - `/templates` now includes 20 message-match handoff briefs for the five beachhead domains across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
