@@ -41,6 +41,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-23 | Governance | Safety | Add approval audit log | 2026-04-27 | `/approval` shows internal audit coverage for ad copy, creative, outreach, launch bundle, and export approvals with recent who/when/what/why activity. |
 | Q-24 | Governance | Safety | Add external-action stop screen | 2026-04-27 | `/launch` shows a stop screen for launch, upload, outreach send, webhook, and spend actions with exact approval requirements and no external API action. |
 | Q-25 | Phase 6 | Learning | Add trade weekly target calculator | 2026-04-27 | `/scorecard` turns the 1,000-2,000 customer deadline into weekly low/high paid-customer targets for the five beachhead domains using attribution-only paid counts. |
+| Q-26 | Phase 2 | Creative | Add founder video asset tracker | 2026-04-27 | `/assets` tracks 10 founder-shot proof clips for five beachhead domains across missed-call and demo-proof angles with copyable shoot packets and approval gates. |
 
 ## Ready Queue
 

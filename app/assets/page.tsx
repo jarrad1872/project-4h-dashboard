@@ -15,6 +15,13 @@ import {
   summarizeCreativePipeline,
 } from "@/lib/growth-command-center";
 import {
+  buildFounderVideoPacket,
+  founderVideoAssets,
+  summarizeFounderVideoAssets,
+  type FounderVideoAsset,
+  type FounderVideoStatus,
+} from "@/lib/founder-video-assets";
+import {
   BEACHHEAD_IMAGE_TRADES,
   CHATGPT_IMAGE_MODEL,
   IMAGE_CREATIVE_ANGLES,
@@ -33,6 +40,22 @@ const GENERATION_OPTIONS: { value: CreativeAssetGenerationFilter; label: string 
   { value: "generated", label: "Generated" },
   { value: "review-ready", label: "Review-ready" },
 ];
+
+const FOUNDER_VIDEO_STATUS_STYLE: Record<FounderVideoStatus, string> = {
+  needed: "border-slate-700 bg-slate-900 text-slate-300",
+  scripted: "border-cyan-800 bg-cyan-950/30 text-cyan-300",
+  filmed: "border-amber-800 bg-amber-950/30 text-amber-300",
+  edited: "border-violet-800 bg-violet-950/30 text-violet-300",
+  approved: "border-emerald-800 bg-emerald-950/30 text-emerald-300",
+};
+
+const FOUNDER_VIDEO_STATUS_LABEL: Record<FounderVideoStatus, string> = {
+  needed: "Needed",
+  scripted: "Scripted",
+  filmed: "Filmed",
+  edited: "Edited",
+  approved: "Approved",
+};
 
 const EMPTY_FORM = {
   title: "",
@@ -81,6 +104,7 @@ export default function AssetsPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedFounderVideoId, setCopiedFounderVideoId] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -211,6 +235,11 @@ export default function AssetsPage() {
     setCopiedId(asset.id);
   }
 
+  async function copyFounderVideoPacket(asset: FounderVideoAsset) {
+    await navigator.clipboard.writeText(buildFounderVideoPacket(asset));
+    setCopiedFounderVideoId(asset.id);
+  }
+
   async function updateAsset(id: string, patch: Partial<CreativeAsset>) {
     setSavingId(id);
     await fetch(`/api/creative-assets/${id}`, {
@@ -260,6 +289,7 @@ export default function AssetsPage() {
   );
   const summary = summarizeCreativePipeline(filteredAssets);
   const imagePack = useMemo(() => summarizeBeachheadImagePack(assets), [assets]);
+  const founderVideoSummary = useMemo(() => summarizeFounderVideoAssets(), []);
 
   return (
     <div className="space-y-6">
@@ -379,6 +409,81 @@ export default function AssetsPage() {
               </span>
             </p>
           </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-4 border-sky-900/60 bg-sky-950/10">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">Q-26 founder video tracker</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">
+              {founderVideoSummary.remainingToFilm} clips still need capture, {founderVideoSummary.readyForReview} ready for review
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Founder-shot proof clips for the five beachhead domains. These packets are local planning assets only; they do not
+              publish videos, upload to ad platforms, send outreach, create webhooks, launch campaigns, or spend money.
+            </p>
+          </div>
+          {founderVideoSummary.nextAsset ? (
+            <div className="rounded-lg border border-sky-900/60 bg-slate-950/50 p-3 xl:w-96">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Next clip to capture</p>
+              <p className="mt-1 text-sm font-semibold text-white">
+                {founderVideoSummary.nextAsset.domain} - {founderVideoSummary.nextAsset.angle.replace("-", " ")}
+              </p>
+              <p className="mt-2 text-xs text-slate-400">{founderVideoSummary.nextAsset.hook}</p>
+              <GhostButton className="mt-3" onClick={() => void copyFounderVideoPacket(founderVideoSummary.nextAsset!)}>
+                {copiedFounderVideoId === founderVideoSummary.nextAsset.id ? "Copied shoot packet" : "Copy shoot packet"}
+              </GhostButton>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          {[
+            { label: "Total clips", value: founderVideoSummary.total },
+            { label: "Needed", value: founderVideoSummary.needed },
+            { label: "Scripted", value: founderVideoSummary.scripted },
+            { label: "Filmed/edited", value: founderVideoSummary.filmed + founderVideoSummary.edited },
+            { label: "Approved", value: founderVideoSummary.approved },
+          ].map((item) => (
+            <div key={item.label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-2xl font-semibold text-white">{item.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-2">
+          {founderVideoAssets.map((asset) => (
+            <div key={asset.id} className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-white">{asset.domain}</p>
+                  <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">
+                    {asset.trade} - {asset.format} - {asset.angle.replace("-", " ")}
+                  </p>
+                </div>
+                <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${FOUNDER_VIDEO_STATUS_STYLE[asset.status]}`}>
+                  {FOUNDER_VIDEO_STATUS_LABEL[asset.status]}
+                </span>
+              </div>
+              <p className="mt-3 text-sm text-slate-300">{asset.hook}</p>
+              <p className="mt-2 text-xs text-slate-500">{asset.proofMoment}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {asset.platformUse.map((use) => (
+                  <span key={use} className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-400">
+                    {use}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs text-slate-600">{asset.reviewGate}</p>
+                <GhostButton onClick={() => void copyFounderVideoPacket(asset)}>
+                  {copiedFounderVideoId === asset.id ? "Copied packet" : "Copy packet"}
+                </GhostButton>
+              </div>
+            </div>
+          ))}
         </div>
       </Card>
 

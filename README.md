@@ -82,7 +82,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Ads | `/ads` | Current ad candidates plus historical archive labels for old generated ads |
 | Approval | `/approval` | Approve/Hold/Reject pending ads and review the internal approval audit trail |
 | Creatives | `/creatives` | Generated ad creative thumbnails |
-| Assets | `/assets` | AI UGC creative asset tracking with draft/review/approved/live workflow |
+| Assets | `/assets` | AI UGC creative asset tracking, founder video shoot packets, and draft/review/approved/live workflow |
 | Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences |
 | Scorecard | `/scorecard` | Weekly performance metrics, learning rankings, trade weekly targets, local keep/kill/iterate decisions, and customer pace forecast |
@@ -178,7 +178,7 @@ utm_source={platform}&utm_medium=paid-social&utm_campaign=4h_2026-03_{theme}&utm
   - Campaign group: `nb2_d{1|2}_{platform}_{prefix}`
 
 ### Image Assets
-The active rebuild path uses ChatGPT Pro `chatgpt-image-latest` prompt concepts in `/assets` and `/api/image-concepts`. Phase 2 stores prompt/model/variant lineage on `creative_assets`; generated image files are uploaded back into 4H for review and approval. Creative Lab filters narrow the queue by status, trade, angle, and generation state without a reload, and replacement prompts create deterministic v2/v3 variant IDs with parent/child lineage. The first Q-01 beachhead review pack stores 20 generated PNG assets under `public/creative-assets/q01-beachhead-pack` for five trades x four angles; they remain review assets until Jarrad approves. No OpenAI image API hookup is required.
+The active rebuild path uses ChatGPT Pro `chatgpt-image-latest` prompt concepts in `/assets` and `/api/image-concepts`. Phase 2 stores prompt/model/variant lineage on `creative_assets`; generated image files are uploaded back into 4H for review and approval. Creative Lab filters narrow the queue by status, trade, angle, and generation state without a reload, and replacement prompts create deterministic v2/v3 variant IDs with parent/child lineage. The first Q-01 beachhead review pack stores 20 generated PNG assets under `public/creative-assets/q01-beachhead-pack` for five trades x four angles; they remain review assets until Jarrad approves. Q-26 adds founder-shot video packets for the same beachhead trades so missed-call and demo-proof clips can be captured before they become ad or creator assets. No OpenAI image API hookup is required.
 
 Legacy NB2/Gemini images still exist for historical campaign assets:
 - **Hero A** (`hero_a`): `ad-creatives/trade-heros/nb2/{slug}-hero-a.jpg` — zoomed-in scene, for ads
@@ -249,6 +249,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/assets` now has the first Q-01 beachhead image pack generated and in review: pipe, duct, mow, pest, and coat across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state
 - `/assets` can create replacement v2/v3 prompts while preserving parent/child creative lineage
+- `/assets` now tracks founder-shot video packets for pipe, duct, mow, pest, and coat across missed-call and demo-proof angles; packets are copyable planning assets and cannot publish or launch anything
 - `docs/claude-design-creative-lab-handoff.md` gives Claude Design the Creative Lab UX goals, data model, routes, screenshot checklist, and constraints
 - `supabase/migrations/009_growth_command_center.sql` adds `creative_assets` plus richer influencer fields for persistent production storage
 - `supabase/migrations/010_influencer_outreach_agent.sql` adds the email-only outreach state model for human-gated creator approvals
@@ -264,7 +265,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-25 trade weekly target calculator | v4.3.4*
+*Last updated: 2026-04-27 Q-26 founder video asset tracker | v4.3.5*
 
 ---
 

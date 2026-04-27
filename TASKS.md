@@ -98,6 +98,7 @@ Core offer rules:
 - [x] Add replacement variant workflow with parent/child lineage and stable v2/v3 IDs.
 - [x] Add Claude Design handoff packet for Creative Lab UX polish.
 - [x] Generate and upload the first complete beachhead image set.
+- [x] Add founder-shot video asset tracker and copyable shoot packets.
 
 ### Phase 3 - Creator Demo Engine
 
@@ -180,6 +181,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Surface the next ready work on `/`.
 - [x] Work through Q-01 through Q-24 governance/build queue items. Current: Q-01 through Q-24 complete; no ready queue item remains.
 - [x] Start the next first-principles queue with Q-25 trade weekly targets on `/scorecard`.
+- [x] Add Q-26 founder video asset tracking on `/assets`.
 
 ---
 
@@ -200,7 +202,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Competitive research report template.
 - [x] Launch bundle exporter for platform upload sheets.
 - [x] Experiment-level budget planner for first paid tests.
-- [ ] Founder video asset tracker.
+- [x] Founder video asset tracker.
 - [x] Trade-level weekly target calculator.
 - [ ] Lifecycle follow-up measurement after signup.
 - [x] Approval audit log for external launch decisions.
