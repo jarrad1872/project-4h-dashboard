@@ -92,7 +92,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Templates | `/templates` | Meta Ad Library access validation, competitor research template, message-match handoff briefs, creator content packets, and ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
 | Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, pipeline state tracker, browser-test hooks, approvals, ready-to-send, and follow-up drafting |
-| Sales | `/sales` | Arizona human sales rep pilot, persistent mini CRM stages, rep-coded field-sales URLs, print-ready business card exports, and field-sales attribution |
+| Sales | `/sales` | Arizona human sales rep pilot, persistent mini CRM stages, rep-coded field-sales URLs, print-ready business card exports, field-sales attribution, and weekly rep packet |
 | Settings | `/settings` | Campaign configuration |
 
 ---
@@ -247,6 +247,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/sales` now adds the Q-31 human field sales pilot for Arizona: rep tracking, CRM stages, QR-backed business card exports, and field-sales UTMs without ordering cards or sending outreach
 - `/sales` now adds Q-32 persistent sales CRM rows with guarded create/update actions; archetype rows are separated from real leads and cannot be marked contacted, demo-booked, activated, or paid
 - `/sales` now adds Q-33 field-sales attribution from `marketing_events`: card scans, demo calls, signups, trials, activations, paid conversions, and top rep/card/trade buckets; this is measurement only and performs no external action
+- `/sales` now adds Q-34 weekly Arizona rep operating packets with touch targets, cards to carry, priority rows, daily cadence, and explicit no-external-action boundaries
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -275,7 +276,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-33 field-sales attribution | v4.4.2*
+*Last updated: 2026-04-27 Q-34 weekly AZ rep packet | v4.4.3*
 
 ---
 

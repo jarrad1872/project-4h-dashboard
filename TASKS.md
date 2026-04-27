@@ -193,6 +193,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-31 human sales rep pipeline and print-ready business cards on `/sales`.
 - [x] Add Q-32 persistent sales CRM lead creation/update on `/sales`.
 - [x] Add Q-33 field-sales attribution measurement on `/sales`.
+- [x] Add Q-34 weekly Arizona rep operating packet on `/sales`.
 
 ---
 
@@ -225,6 +226,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Human sales rep pipeline and business card print assets.
 - [x] Persistent field-sales CRM with archetype safeguards.
 - [x] Field-sales attribution panel for scans, demos, trials, and paid signal.
+- [x] Weekly field-sales operating packet for route planning and follow-up cadence.
 
 ---
 

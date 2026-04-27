@@ -319,6 +319,8 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-32 persists sales leads through `/api/sales/leads` and `/api/sales/leads/{id}` with Supabase/file fallback. Real rows can move through contacted/demo/trial stages; archetype rows are blocked from visited, card-left, demo-booked, trial-started, activated, and paid stages.
 - Q-33 adds field-sales attribution on `/sales` from `marketing_events` only. The panel filters rep-coded field-sales UTMs or card metadata, then reports card scans, demo calls, signups, trials, activations, paid conversions, and top rep/card/trade buckets.
 - Field-sales attribution is measurement only. It must not send outreach, order cards, create webhooks, upload to ad platforms, launch campaigns, move money, change billing, or claim customers from archetype CRM rows.
+- Q-34 adds a weekly Arizona rep operating packet on `/sales`. It converts CRM rows and field-sales attribution into touch targets, cards-to-carry guidance, priority rows, daily cadence, and a read-only packet body.
+- The Q-34 packet is internal route planning only. It must not send outreach, order cards, create webhooks, upload to ad platforms, launch campaigns, move money, change billing, or treat archetype rows as contacted businesses.
 - Sales CRM writes are localhost or authenticated Bob/CLI only. Public dashboard access can read the board but must not be able to mutate CRM rows without the server token.
 - Do not reclassify an archetype into a real lead. Create a fresh real row when a real owner/business is intentionally being tracked.
 - When testing in the browser, use fake internal lead names only unless Jarrad explicitly authorizes entering real contact/business details into the destination system.

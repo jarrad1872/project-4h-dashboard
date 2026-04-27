@@ -5,6 +5,7 @@ import {
   Activity,
   BadgeDollarSign,
   BarChart3,
+  CalendarDays,
   Download,
   MapPin,
   PhoneCall,
@@ -18,6 +19,7 @@ import {
 import Image from "next/image";
 import { Button, Card } from "@/components/ui";
 import { summarizeFieldSalesAttribution, type FieldSalesAttributionBucket } from "@/lib/field-sales-attribution";
+import { buildFieldSalesOperatingPacket } from "@/lib/field-sales-operating-plan";
 import {
   buildSalesTrackingUrl,
   businessCardPrintSpec,
@@ -182,6 +184,10 @@ export default function SalesPageClient() {
 
   const summary = useMemo(() => summarizeSalesPipeline(leads), [leads]);
   const attribution = useMemo(() => summarizeFieldSalesAttribution(attributionEvents), [attributionEvents]);
+  const operatingPacket = useMemo(
+    () => buildFieldSalesOperatingPacket({ leads, attribution, rep, cardVariant }),
+    [leads, attribution, rep, cardVariant],
+  );
   const leadsByStage = useMemo(
     () =>
       Object.fromEntries(salesStages.map((stage) => [stage.id, leads.filter((lead) => lead.stage === stage.id)])) as Record<
@@ -275,6 +281,97 @@ export default function SalesPageClient() {
             <p className="mt-3 text-sm text-slate-300">{attribution.nextAction}</p>
           </div>
         </div>
+      </Card>
+
+      <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/10" data-testid="sales-operating-packet">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-cyan-300">Q-34 weekly rep packet</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">Arizona operating plan</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Turns the CRM board and field-sales attribution into an internal route plan. It is not an outreach sender, card order, webhook, ad launch, or billing control.
+            </p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-400">
+            {operatingPacket.weekLabel} - {operatingPacket.evidence}
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {[
+            { label: "Weekly touches", value: operatingPacket.plannedTouches, detail: `${operatingPacket.dailyTouchTarget}/day`, icon: CalendarDays, testId: "sales-packet-weekly-touches" },
+            { label: "Cards to carry", value: operatingPacket.cardsToCarry, detail: "Tracked cards", icon: QrCode, testId: "sales-packet-cards" },
+            { label: "Real rows", value: operatingPacket.realLeadCount, detail: "Active only", icon: Users, testId: "sales-packet-real-rows" },
+            { label: "Archetypes", value: operatingPacket.archetypeCount, detail: "Research only", icon: ShieldCheck, testId: "sales-packet-archetypes" },
+            { label: "Scans logged", value: attribution.cardScans, detail: "Before scale", icon: ScanLine, testId: "sales-packet-scans" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3" data-testid={item.testId}>
+                <Icon className="h-4 w-4 text-cyan-300" aria-hidden="true" />
+                <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+                <p className="mt-1 text-2xl font-semibold text-white">{item.value.toLocaleString()}</p>
+                <p className="mt-1 text-xs text-slate-400">{item.detail}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3" data-testid="sales-packet-priority-leads">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Priority rows</p>
+            <div className="mt-3 space-y-2">
+              {operatingPacket.priorityLeads.length ? operatingPacket.priorityLeads.map((lead) => (
+                <div key={lead.id} className="rounded border border-slate-800 bg-slate-900/50 p-3">
+                  <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-white">{lead.businessName}</p>
+                      <p className="text-xs text-slate-400">
+                        {lead.cityState} - {lead.tradeDomain} - {lead.stage} - {lead.leadType}
+                      </p>
+                    </div>
+                    <span className="rounded-full border border-cyan-800 px-2 py-1 font-mono text-xs text-cyan-200">
+                      {lead.trackingCode}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-300">{lead.recommendedMove}</p>
+                  <p className="mt-2 text-xs text-slate-500">{lead.priorityReason}</p>
+                  <p className="mt-2 break-all font-mono text-[11px] text-cyan-200">{lead.contentId}</p>
+                </div>
+              )) : (
+                <p className="rounded border border-dashed border-slate-800 px-3 py-2 text-xs text-slate-500">
+                  No active rows. Add real owner leads before field activity.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3" data-testid="sales-packet-daily-plan">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Daily cadence</p>
+              <div className="mt-3 space-y-2">
+                {operatingPacket.dailyPlan.map((day) => (
+                  <div key={day.label} className="grid grid-cols-[2.5rem_1fr] gap-3 rounded border border-slate-800 bg-slate-900/50 px-3 py-2">
+                    <p className="font-semibold text-cyan-200">{day.label}</p>
+                    <p className="text-xs text-slate-300">{day.targetTouches} touches - {day.focus}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-amber-800 bg-amber-950/20 p-3" data-testid="sales-packet-boundary">
+              <p className="text-xs uppercase tracking-wide text-amber-300">Boundary</p>
+              <p className="mt-2 text-sm text-amber-100">{operatingPacket.safetyBoundary}</p>
+            </div>
+          </div>
+        </div>
+
+        <textarea
+          readOnly
+          value={operatingPacket.copyText}
+          data-testid="sales-packet-copy-text"
+          className="min-h-56 w-full resize-y rounded-lg border border-slate-800 bg-slate-950 p-3 font-mono text-xs text-slate-300 outline-none"
+        />
       </Card>
 
       <div className="grid gap-4 xl:grid-cols-[1fr_1.4fr]">

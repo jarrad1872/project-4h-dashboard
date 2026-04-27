@@ -524,4 +524,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "Sales page reads rep-coded field-sales events and shows scans, demos, trials, paid signal, and top rep/card/trade buckets.",
     acceptance: "Attribution uses marketing_events only and does not send outreach, order cards, create webhooks, launch campaigns, upload to ad platforms, spend, or change billing.",
   },
+  {
+    id: "Q-34",
+    phase: "Phase 3",
+    lane: "Field Sales",
+    title: "Add weekly AZ rep operating packet",
+    route: "/sales",
+    status: "complete",
+    approval: "none",
+    outcome: "Sales page turns CRM rows and attribution signal into a weekly rep packet with touch targets, cards to carry, priority rows, and daily cadence.",
+    acceptance: "The packet is read-only internal route planning and cannot send outreach, order cards, create webhooks, launch ads, upload to platforms, spend, change billing, or treat archetypes as contacted businesses.",
+  },
 ];
