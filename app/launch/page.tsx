@@ -1,7 +1,20 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect -- Launch gate loads checklist/status data after mount. */
+
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
+import {
+  buildLaunchUrl,
+  defaultLaunchAssetId,
+  getCurrentCampaignMonth,
+  launchAngles,
+  launchPlatforms,
+  type LaunchAngle,
+  type LaunchDestination,
+  type LaunchPlatform,
+} from "@/lib/launch-url-builder";
+import { productRouteInventory } from "@/lib/product-route-inventory";
 import { getTierTrades } from "@/lib/trade-utils";
 import type { CampaignStatusData, LaunchChecklistItem } from "@/lib/types";
 
@@ -21,10 +34,22 @@ const BLOCKERS_BEFORE_LAUNCH = [
   "Tracking pixels installed and verified",
 ];
 
+const LAUNCH_ROUTE_OPTIONS = productRouteInventory.filter((route) => route.status === "ready");
+
 export default function LaunchPage() {
   const [items, setItems] = useState<LaunchChecklistItem[]>([]);
   const [status, setStatus] = useState<CampaignStatusData | null>(null);
   const [saving, setSaving] = useState(false);
+  const [launchTrade, setLaunchTrade] = useState("pipe.city");
+  const [launchPlatform, setLaunchPlatform] = useState<LaunchPlatform>("linkedin");
+  const [launchAngle, setLaunchAngle] = useState<LaunchAngle>("missed-call");
+  const [launchDestination, setLaunchDestination] = useState<LaunchDestination>("landing");
+  const [launchAssetId, setLaunchAssetId] = useState(defaultLaunchAssetId("pipe.city", "missed-call"));
+  const [launchCampaignMonth, setLaunchCampaignMonth] = useState(getCurrentCampaignMonth());
+  const [launchCampaignName, setLaunchCampaignName] = useState("");
+  const [launchCreatorSlug, setLaunchCreatorSlug] = useState("");
+  const [launchCreatorId, setLaunchCreatorId] = useState("");
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   async function load() {
     const [checkRes, statusRes] = await Promise.all([
@@ -92,6 +117,38 @@ export default function LaunchPage() {
   const readyToGo = allChecked && status?.status === "pre-launch";
   const overallPct = items.length ? Math.round((complete / items.length) * 100) : 0;
   const tierOneLaunchOrder = getTierTrades(1).join("/");
+  const launchCampaignMonthIsValid = /^\d{4}-\d{2}$/.test(launchCampaignMonth);
+  const launchUrlResult = useMemo(() => buildLaunchUrl({
+    trade: launchTrade,
+    platform: launchPlatform,
+    angle: launchAngle,
+    assetId: launchAssetId,
+    campaignName: launchCampaignName,
+    campaignMonth: launchCampaignMonthIsValid ? launchCampaignMonth : getCurrentCampaignMonth(),
+    creatorSlug: launchCreatorSlug,
+    creatorId: launchCreatorId,
+    destination: launchDestination,
+  }), [
+    launchAngle,
+    launchAssetId,
+    launchCampaignMonth,
+    launchCampaignMonthIsValid,
+    launchCampaignName,
+    launchCreatorId,
+    launchCreatorSlug,
+    launchDestination,
+    launchPlatform,
+    launchTrade,
+  ]);
+
+  async function copyLaunchUrl() {
+    try {
+      await navigator.clipboard.writeText(launchUrlResult.url);
+      setCopyStatus("copied");
+    } catch {
+      setCopyStatus("failed");
+    }
+  }
 
   if (!status) {
     return <div className="flex h-64 items-center justify-center text-slate-400">Loading launch gate…</div>;
@@ -100,6 +157,183 @@ export default function LaunchPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Launch Gate</h1>
+
+      {/* Launch URL builder */}
+      <Card className="border-cyan-800/60 bg-slate-900/70">
+        <div className="mb-4 flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-cyan-300">Launch URL Builder</p>
+            <h2 className="mt-1 text-xl font-black text-white">{launchUrlResult.domain}</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Internal planning URL only. Nothing is uploaded, launched, sent, or billed from this panel.
+            </p>
+          </div>
+          <div className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-right text-xs text-slate-400">
+            <p className="font-semibold text-slate-200">{launchUrlResult.campaign}</p>
+            <p>{launchUrlResult.contentId}</p>
+          </div>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-4">
+          <label className="space-y-1 text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Trade</span>
+            <select
+              value={launchTrade}
+              onChange={(event) => {
+                setLaunchTrade(event.target.value);
+                setLaunchAssetId(defaultLaunchAssetId(event.target.value, launchAngle));
+                setCopyStatus("idle");
+              }}
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+            >
+              {LAUNCH_ROUTE_OPTIONS.map((route) => (
+                <option key={route.domain} value={route.domain}>
+                  {route.domain} - {route.tradeLabel}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1 text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Platform</span>
+            <select
+              value={launchPlatform}
+              onChange={(event) => {
+                setLaunchPlatform(event.target.value as LaunchPlatform);
+                setCopyStatus("idle");
+              }}
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+            >
+              {launchPlatforms.map((platform) => (
+                <option key={platform} value={platform}>{platform}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1 text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Angle</span>
+            <select
+              value={launchAngle}
+              onChange={(event) => {
+                const nextAngle = event.target.value as LaunchAngle;
+                setLaunchAngle(nextAngle);
+                setLaunchAssetId(defaultLaunchAssetId(launchTrade, nextAngle));
+                setCopyStatus("idle");
+              }}
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+            >
+              {launchAngles.map((angle) => (
+                <option key={angle} value={angle}>{angle}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1 text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Destination</span>
+            <select
+              value={launchDestination}
+              onChange={(event) => {
+                setLaunchDestination(event.target.value as LaunchDestination);
+                setCopyStatus("idle");
+              }}
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+            >
+              <option value="landing">domain root</option>
+              <option value="signup">signup path</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="mt-3 grid gap-3 lg:grid-cols-4">
+          <label className="space-y-1 text-sm lg:col-span-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Asset ID</span>
+            <input
+              value={launchAssetId}
+              onChange={(event) => {
+                setLaunchAssetId(event.target.value);
+                setCopyStatus("idle");
+              }}
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+            />
+          </label>
+
+          <label className="space-y-1 text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Month</span>
+            <input
+              value={launchCampaignMonth}
+              onChange={(event) => {
+                setLaunchCampaignMonth(event.target.value);
+                setCopyStatus("idle");
+              }}
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+            />
+            {!launchCampaignMonthIsValid && (
+              <span className="text-xs text-amber-300">Use YYYY-MM.</span>
+            )}
+          </label>
+
+          <label className="space-y-1 text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Campaign</span>
+            <input
+              value={launchCampaignName}
+              onChange={(event) => {
+                setLaunchCampaignName(event.target.value);
+                setCopyStatus("idle");
+              }}
+              placeholder={launchAngle}
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-600"
+            />
+          </label>
+
+          <label className="space-y-1 text-sm lg:col-span-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Creator</span>
+            <input
+              value={launchCreatorSlug}
+              onChange={(event) => {
+                setLaunchCreatorSlug(event.target.value);
+                setCopyStatus("idle");
+              }}
+              placeholder="optional"
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-600"
+            />
+          </label>
+        </div>
+
+        <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_160px]">
+          <label className="space-y-1 text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Creator ID</span>
+            <input
+              value={launchCreatorId}
+              onChange={(event) => {
+                setLaunchCreatorId(event.target.value);
+                setCopyStatus("idle");
+              }}
+              placeholder="optional"
+              className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-600"
+            />
+          </label>
+          <div className="flex items-end">
+            <GhostButton className="w-full" onClick={() => void copyLaunchUrl()}>
+              {copyStatus === "copied" ? "Copied" : "Copy URL"}
+            </GhostButton>
+          </div>
+        </div>
+
+        <textarea
+          readOnly
+          value={launchUrlResult.url}
+          className="mt-4 h-24 w-full rounded border border-slate-700 bg-slate-950 p-3 font-mono text-xs text-cyan-100"
+        />
+        {copyStatus === "failed" && (
+          <p className="mt-2 text-xs text-amber-300">Clipboard failed. The URL is selectable above.</p>
+        )}
+        <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-4">
+          <p><span className="font-semibold text-slate-300">Source:</span> {launchUrlResult.source}</p>
+          <p><span className="font-semibold text-slate-300">Medium:</span> {launchUrlResult.medium}</p>
+          <p><span className="font-semibold text-slate-300">Trade:</span> {launchUrlResult.route.tradeSlug}</p>
+          <p><span className="font-semibold text-slate-300">Demo:</span> {launchUrlResult.route.demoPhone}</p>
+        </div>
+      </Card>
 
       {/* Overall readiness */}
       <Card className={`border-2 ${allChecked ? "border-green-500" : "border-amber-600"}`}>

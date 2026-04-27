@@ -289,6 +289,12 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `answered.city/` is the broad trade directory, not the preferred destination for trade-specific paid clicks.
 - Route/message-match changes for sawcity-lite belong in handoff briefs only. Do not edit sawcity-lite from this repo.
 
+**Launch URL builder:**
+- `/launch` generates internal planning URLs only. It does not upload to ad platforms, launch ads, create webhooks, send outreach, or move money.
+- Paid-channel UTMs follow AGENTS format: `utm_campaign=4h_YYYY-MM_{campaign}`, `utm_source={platform}`, and `utm_medium=paid-social`.
+- Every generated URL should include trade, angle, asset, and optional creator metadata so scorecard attribution can connect click source to creative intent.
+- Use trade-specific `.city` domains for paid and creator traffic unless the campaign is intentionally broad directory traffic.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube

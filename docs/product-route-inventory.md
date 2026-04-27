@@ -25,7 +25,7 @@ This inventory is copied into 4H from read-only sawcity-lite reference files. It
 
 ## Planning Implications
 
-- Q-11 launch URL builder should create URLs against the domain root, not path variants, unless a future sawcity-lite handoff intentionally adds route-level message-match pages.
+- The Q-11 launch URL builder creates URLs against the domain root by default, not path variants, unless a future sawcity-lite handoff intentionally adds route-level message-match pages.
 - Q-12 message-match briefs should be handoff docs only. They can describe desired product/landing changes, but 4H must not apply them to sawcity-lite.
 - Creator briefs should keep using demo-call CTAs for beachhead trades because all five have confirmed phone numbers.
 - Broad Answered.City traffic can use `answered.city/`, but trade-specific paid clicks should use the relevant `.city` domain for message match.

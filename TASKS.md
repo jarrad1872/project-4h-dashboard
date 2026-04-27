@@ -121,7 +121,7 @@ Core offer rules:
 **Exit gate:** 4H can generate approved launch URLs and message-match briefs without editing sawcity-lite.
 
 - [x] Inventory the live trade domains and demo phone numbers from read-only sawcity-lite reference files.
-- [ ] Create 4H-owned launch URL builder with UTM and angle metadata.
+- [x] Create 4H-owned launch URL builder with UTM and angle metadata.
 - [ ] Create message-match briefs for each angle that Jarrad can hand to the sawcity-lite project later.
 - [ ] Do not edit sawcity-lite landing pages from this repo.
 - [ ] Add a launch-readiness check that blocks assets missing trade domain, price, trial, UTM, or approval.
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-10 complete; Q-07 is approval-gated; Q-11 is the next ready autonomous item.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-11 complete; Q-07 is approval-gated; Q-12 is the next ready autonomous item.
 
 ---
 

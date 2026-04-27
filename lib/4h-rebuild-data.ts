@@ -254,7 +254,7 @@ export const rebuildExecutionQueue = [
     lane: "Landing",
     title: "Create launch URL builder",
     route: "/launch",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Launch URLs can be generated from trade, platform, creator, asset, and angle.",
     acceptance: "UTM format matches AGENTS.md and tests cover key permutations.",
