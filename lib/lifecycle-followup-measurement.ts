@@ -29,7 +29,13 @@ export interface LifecycleFollowupMeasurement {
   evidence: string;
 }
 
-const FOLLOWUP_TIMINGS = ["day_1", "day_3", "day_7", "day_10", "day_13", "conversion", "post_conversion"] as const;
+const FOLLOWUP_TIMINGS = ["day_0", "day_1", "day_3", "day_7", "day_10", "day_13", "conversion", "post_conversion"] as const;
+
+function normalizeTiming(timing: string) {
+  const value = timing.trim().toLowerCase().replace(/\s+/g, "_").replace(/-/g, "_");
+  if (/^day\d+$/.test(value)) return value.replace("day", "day_");
+  return value;
+}
 
 function pct(from: number, to: number) {
   if (from <= 0) return null;
@@ -50,7 +56,9 @@ export function buildLifecycleFollowupMeasurement(
   const trialStarts = summary.byType.trial_started;
   const activations = summary.byType.activated;
   const paid = summary.byType.paid;
-  const followupMessages = messages.filter((message) => FOLLOWUP_TIMINGS.includes(message.timing as (typeof FOLLOWUP_TIMINGS)[number]));
+  const followupMessages = messages
+    .map((message) => ({ ...message, timing: normalizeTiming(message.timing) }))
+    .filter((message) => FOLLOWUP_TIMINGS.includes(message.timing as (typeof FOLLOWUP_TIMINGS)[number]));
   const activeMessages = followupMessages.filter((message) => message.status === "active").length;
   const pausedMessages = followupMessages.filter((message) => message.status === "paused").length;
   const coverage = FOLLOWUP_TIMINGS.map((timing) => {

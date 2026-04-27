@@ -68,4 +68,17 @@ describe("buildLifecycleFollowupMeasurement", () => {
     expect(result.nextAction).toContain("Log the first signup");
     expect(result.evidence).toContain("No marketing events");
   });
+
+  it("normalizes live DAY0 and DAY1 timing labels for coverage", () => {
+    const result = buildLifecycleFollowupMeasurement(
+      [
+        message("day0-email", "DAY0", "active", "email"),
+        message("day1-sms", "DAY1", "active", "sms"),
+      ],
+      summary({ signup: 1 }),
+    );
+
+    expect(result.measuredMessages).toBe(2);
+    expect(result.coverage.map((row) => row.timing)).toEqual(["day_0", "day_1"]);
+  });
 });
