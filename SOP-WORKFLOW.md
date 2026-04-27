@@ -282,6 +282,13 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Every brief must include a hook, shot list, creator talking points, CTA, `$39/mo`, `14-day free trial, no credit card required`, and tracking guidance.
 - Copying a packet is drafting support only. It does not approve outreach, send messages, publish assets, or launch ads.
 
+**Product route inventory:**
+- `/gtm` holds the 4H-owned inventory of live product routes copied from read-only sawcity-lite reference files.
+- Trade-specific paid and creator traffic should use the trade domain root, such as `pipe.city/`, with UTMs added by the 4H launch URL builder.
+- Beachhead demo call CTAs can use the confirmed demo lines for `pipe.city`, `duct.city`, `mow.city`, `pest.city`, and `coat.city`.
+- `answered.city/` is the broad trade directory, not the preferred destination for trade-specific paid clicks.
+- Route/message-match changes for sawcity-lite belong in handoff briefs only. Do not edit sawcity-lite from this repo.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube

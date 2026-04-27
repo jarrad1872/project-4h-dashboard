@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { getProjectState } from "@/lib/project-state-data";
+import {
+  getBeachheadProductRoutes,
+  productRouteInventory,
+  productRouteInventorySources,
+  summarizeProductRouteInventory,
+} from "@/lib/product-route-inventory";
 import { TRADE_MAP } from "@/lib/trade-utils";
 import type { Ad } from "@/lib/types";
 
@@ -18,6 +24,23 @@ interface ActionItem {
   owner: string;
   detail: string;
   link: string | null;
+}
+
+interface CampaignTrade {
+  domain: string;
+  slug: string;
+  appName: string;
+  tier: number;
+  tam?: string;
+  businesses?: string;
+  note?: string;
+  status?: string;
+  forwardsTo?: string;
+}
+
+interface CampaignStateWithTrades {
+  all_trades?: CampaignTrade[];
+  tier1_trades?: Array<{ domain: string; appName: string }>;
 }
 
 const STATUS_CONFIG = {
@@ -69,10 +92,8 @@ export default function GTMPage() {
 
   const doneCount = (items: ReadinessItem[]) => items.filter((i) => i.status === "done").length;
 
-  const allTrades = (state.campaign as any).all_trades as Array<{
-    domain: string; slug: string; appName: string; tier: number;
-    tam?: string; businesses?: string; note?: string; status?: string; forwardsTo?: string;
-  }> ?? [];
+  const campaign = state.campaign as CampaignStateWithTrades;
+  const allTrades = campaign.all_trades ?? [];
 
   // Summary counts
   const liveCount = allTrades.filter((t) => t.status === "live").length;
@@ -84,6 +105,8 @@ export default function GTMPage() {
   const totalAds = ads.length;
   const approvedAds = ads.filter((a) => a.status === "approved").length;
   const pendingAds = ads.filter((a) => a.status === "pending").length;
+  const routeSummary = summarizeProductRouteInventory();
+  const beachheadProductRoutes = getBeachheadProductRoutes();
 
   return (
     <div className="space-y-8">
@@ -123,7 +146,7 @@ export default function GTMPage() {
           </div>
           <div className="ml-auto hidden sm:block">
             <p className="text-right text-xs text-slate-400">Top TAM Trades</p>
-            {(state.campaign as any).tier1_trades?.map((t: { domain: string; appName: string }) => (
+            {campaign.tier1_trades?.map((t) => (
               <p key={t.domain} className="text-right text-sm font-medium text-green-300">{t.appName}</p>
             ))}
           </div>
@@ -173,6 +196,107 @@ export default function GTMPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Read-only Product Route Inventory */}
+      <section className="rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Read-only Product Route Inventory</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Copied from sawcity-lite reference files only. Trade domains resolve to the shared root landing route,
+              while demo calls use the public demo-line endpoint and demo app sessions use the demo auth route.
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full border border-cyan-500/30 bg-cyan-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-300">
+            sawcity-lite untouched
+          </span>
+        </div>
+
+        <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: "Inventory Routes", value: routeSummary.total, color: "text-white" },
+            { label: "Ready Trades", value: routeSummary.ready, color: "text-green-400" },
+            { label: "Demo Lines", value: routeSummary.demoLines, color: "text-cyan-300" },
+            { label: "Beachhead", value: routeSummary.beachhead, color: "text-amber-300" },
+          ].map((metric) => (
+            <div key={metric.label} className="rounded-lg border border-slate-700 bg-slate-800 p-3 text-center">
+              <div className={`text-lg font-bold ${metric.color}`}>{metric.value}</div>
+              <div className="text-xs text-slate-400">{metric.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-4 grid gap-3 lg:grid-cols-5">
+          {beachheadProductRoutes.map((route) => (
+            <div key={route.domain} className="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <a
+                  href={route.canonicalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-blue-300 hover:text-blue-200 hover:underline"
+                >
+                  {route.domain}
+                </a>
+                <span className="rounded-full border border-green-500/30 bg-green-500/15 px-2 py-0.5 text-[11px] font-semibold text-green-300">
+                  ready
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-slate-400">{route.tradeLabel}</p>
+              <p className="mt-2 text-sm font-medium text-white">{route.demoPhone}</p>
+              <p className="mt-1 text-xs text-slate-500">
+                {route.landingPath} to {route.signupPath}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-700 text-left text-xs uppercase tracking-wide text-slate-400">
+                <th className="pb-2 pr-3">Domain</th>
+                <th className="pb-2 pr-3">Trade</th>
+                <th className="pb-2 pr-3">Landing</th>
+                <th className="pb-2 pr-3">Demo</th>
+                <th className="pb-2 hidden lg:table-cell">Notes</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700/50">
+              {productRouteInventory.map((route) => (
+                <tr key={route.domain} className={route.campaignUse === "beachhead" ? "bg-cyan-500/5" : ""}>
+                  <td className="py-1.5 pr-3">
+                    <a
+                      href={route.canonicalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-blue-300 hover:text-blue-200 hover:underline"
+                    >
+                      {route.domain}
+                    </a>
+                  </td>
+                  <td className="py-1.5 pr-3 text-white">{route.tradeLabel}</td>
+                  <td className="py-1.5 pr-3 font-mono text-xs text-slate-300">{route.landingPath}</td>
+                  <td className="py-1.5 pr-3">
+                    {route.demoPhone ? (
+                      <span className="font-mono text-xs text-cyan-300">{route.demoPhone}</span>
+                    ) : (
+                      <span className="text-xs text-slate-500">directory only</span>
+                    )}
+                  </td>
+                  <td className="hidden max-w-xl truncate py-1.5 text-xs text-slate-500 lg:table-cell">
+                    {route.notes}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <p className="mt-4 text-xs text-slate-500">
+          Sources: {productRouteInventorySources.join(", ")}.
+        </p>
       </section>
 
       {/* Campaign Readiness */}

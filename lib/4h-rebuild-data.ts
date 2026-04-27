@@ -243,7 +243,7 @@ export const rebuildExecutionQueue = [
     lane: "Landing",
     title: "Inventory read-only product routes",
     route: "/gtm",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "4H has a registry of live trade domains, landing paths, and demo phone assumptions.",
     acceptance: "sawcity-lite is read only; findings are copied into 4H docs/data only.",

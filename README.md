@@ -78,7 +78,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Page | URL | Purpose |
 |------|-----|---------|
 | Overview | `/` | Plumbing-pilot growth command center: launch countdown, creative pipeline, influencer pipeline, metrics, budget |
-| GTM Board | `/gtm` | Full mission brief, product state, trade registry, action board |
+| GTM Board | `/gtm` | Full mission brief, product state, trade registry, product route inventory, action board |
 | Ads | `/ads` | All ads with status, images, pause/unpause |
 | Approval | `/approval` | Approve/Hold/Reject pending ads — Bulk Approve All per trade |
 | Creatives | `/creatives` | Generated ad creative thumbnails |
@@ -218,11 +218,13 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 ### Growth Command Center Notes (2026-03-31)
 
 - `/` now focuses on the live plumbing pilot (`pipe.city`) with launch countdown, influencer pipeline, creative pipeline, channel placeholders, and budget tracking
+- `/gtm` now includes a read-only product route inventory copied from sawcity-lite reference files: 21 routes, 20 live demo lines, and the five beachhead domains ready for creator/ad planning
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
 - `/influencer` now audits the creator shortlist into keep/maybe/remove/needs-research buckets; `remove` deprioritizes while preserving creator history
 - `/influencer` now ranks creators with a trade-owner scoring model: owner audience, trade fit, average views, sponsor openness, trust signals, and production value
 - `/influencer` now builds deterministic creator UTM/referral URLs and can save the generated URL/code back to each creator row without sending outreach
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
+- `docs/product-route-inventory.md` records the landing route and demo phone findings without touching sawcity-lite
 - `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state

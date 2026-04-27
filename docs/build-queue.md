@@ -23,6 +23,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-06 | Phase 3 | Creators | Upgrade creator scoring model | 2026-04-27 | `/influencer` renders owner audience, trade fit, average views, trust, sponsor, and production value scores. |
 | Q-08 | Phase 3 | Creators | Add creator UTM builder | 2026-04-27 | `/influencer` builds deterministic creator referral URLs with creator, trade, platform, campaign, and content IDs. |
 | Q-09 | Phase 3 | Creators | Build content brief templates | 2026-04-27 | `/templates` includes demo-call, founder assist, and screenshot-proof packets with hook, shots, CTA, offer, and tracking guidance. |
+| Q-10 | Phase 4 | Landing | Inventory read-only product routes | 2026-04-27 | `/gtm` shows 21 copied product routes, including five beachhead domains with landing root, signup path, and demo phone numbers. |
 
 ## Ready Queue
 
@@ -30,7 +31,6 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | --- | --- | --- | --- | --- | --- |
 | Q-01 | Phase 2 | Creative | Generate first beachhead image pack | None | In progress. Production desk, progress bar, copy packets, and per-card upload are ready. Finish by generating and uploading all 20 images. |
 | Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
-| Q-10 | Phase 4 | Landing | Inventory read-only product routes | None | Findings are copied into 4H docs/data only; sawcity-lite is untouched. |
 | Q-11 | Phase 4 | Landing | Create launch URL builder | None | UTM format matches AGENTS.md and tests cover key permutations. |
 | Q-12 | Phase 4 | Landing | Create message-match briefs | None | Briefs include angle, headline promise, $39/mo, trial, and trade domain. |
 | Q-13 | Phase 4 | Landing | Add launch readiness validator | None | Validator returns actionable blockers with unit tests. |
