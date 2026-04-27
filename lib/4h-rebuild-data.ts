@@ -331,7 +331,7 @@ export const rebuildExecutionQueue = [
     lane: "Learning",
     title: "Upgrade weekly report",
     route: "/scorecard",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Weekly report ranks trades, creators, images, and angles by funnel performance.",
     acceptance: "Zero-data states are honest and do not fabricate recommendations.",

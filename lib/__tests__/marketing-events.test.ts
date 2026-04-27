@@ -96,9 +96,31 @@ describe("validateMarketingEvents", () => {
 describe("summarizeMarketingEvents", () => {
   it("summarizes funnel counts and paid value", () => {
     const events = [
-      validateMarketingEvent({ event_type: "asset_view", trade_slug: "pipe", platform: "facebook" }, fixedNow).event!,
-      validateMarketingEvent({ event_type: "demo_call", trade_slug: "pipe", platform: "facebook" }, fixedNow).event!,
-      validateMarketingEvent({ event_type: "paid", trade_slug: "pipe", platform: "facebook", value_cents: 3900 }, fixedNow).event!,
+      validateMarketingEvent({
+        event_type: "asset_view",
+        trade_slug: "pipe",
+        platform: "facebook",
+        creator_id: "creator-1",
+        creative_asset_id: "asset-1",
+        angle: "missed-call",
+      }, fixedNow).event!,
+      validateMarketingEvent({
+        event_type: "demo_call",
+        trade_slug: "pipe",
+        platform: "facebook",
+        creator_id: "creator-1",
+        creative_asset_id: "asset-1",
+        angle: "missed-call",
+      }, fixedNow).event!,
+      validateMarketingEvent({
+        event_type: "paid",
+        trade_slug: "pipe",
+        platform: "facebook",
+        creator_id: "creator-1",
+        creative_asset_id: "asset-1",
+        angle: "missed-call",
+        value_cents: 3900,
+      }, fixedNow).event!,
     ];
 
     const summary = summarizeMarketingEvents(events);
@@ -110,5 +132,9 @@ describe("summarizeMarketingEvents", () => {
     expect(summary.byPlatform.facebook).toBe(3);
     expect(summary.byTrade.pipe).toBe(3);
     expect(summary.paidValueCents).toBe(3900);
+    expect(summary.dimensions.trades.pipe.paid).toBe(1);
+    expect(summary.dimensions.creators["creator-1"].demo_call).toBe(1);
+    expect(summary.dimensions.creativeAssets["asset-1"].total).toBe(3);
+    expect(summary.dimensions.angles["missed-call"].paidValueCents).toBe(3900);
   });
 });

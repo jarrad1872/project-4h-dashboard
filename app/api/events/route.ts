@@ -26,16 +26,23 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const summaryOnly = url.searchParams.get("summary") === "1";
     const limit = summaryOnly ? null : Math.min(1000, Math.max(1, Number(url.searchParams.get("limit") ?? 250)));
+    const from = url.searchParams.get("from");
+    const to = url.searchParams.get("to");
 
     let events: MarketingEvent[];
 
     if (!hasSupabase()) {
       events = readFallback<MarketingEvent[]>(DataFiles.marketingEvents, []).map(normalizeMarketingEvent);
+      if (from) events = events.filter((event) => event.event_at >= from);
+      if (to) events = events.filter((event) => event.event_at < to);
     } else {
-      const baseQuery = supabaseAdmin
+      let baseQuery = supabaseAdmin
         .from("marketing_events")
         .select("*")
         .order("event_at", { ascending: false });
+
+      if (from) baseQuery = baseQuery.gte("event_at", from);
+      if (to) baseQuery = baseQuery.lt("event_at", to);
 
       const query = limit ? baseQuery.limit(limit) : baseQuery;
       const { data, error } = await query;

@@ -277,8 +277,24 @@ export interface MarketingEventSummary {
   byPlatform: Record<string, number>;
   byTrade: Record<string, number>;
   byAngle: Record<string, number>;
+  dimensions: MarketingEventDimensions;
   paidValueCents: number;
 }
+
+export type MarketingEventDimension = "trades" | "creators" | "creativeAssets" | "angles";
+
+export interface MarketingEventFunnelCounts {
+  total: number;
+  asset_view: number;
+  demo_call: number;
+  signup: number;
+  trial_started: number;
+  activated: number;
+  paid: number;
+  paidValueCents: number;
+}
+
+export type MarketingEventDimensions = Record<MarketingEventDimension, Record<string, MarketingEventFunnelCounts>>;
 
 // ─── Compatibility Types used by existing UI components ───────────────────────
 

@@ -1,4 +1,10 @@
-import type { CreativeAssetPlatform, MarketingEvent, MarketingEventSummary, MarketingEventType } from "@/lib/types";
+import type {
+  CreativeAssetPlatform,
+  MarketingEvent,
+  MarketingEventFunnelCounts,
+  MarketingEventSummary,
+  MarketingEventType,
+} from "@/lib/types";
 
 export const MARKETING_EVENT_TYPES = [
   "asset_view",
@@ -43,6 +49,31 @@ function emptyTypeCounts(): Record<MarketingEventType, number> {
     activated: 0,
     paid: 0,
   };
+}
+
+function emptyFunnelCounts(): MarketingEventFunnelCounts {
+  return {
+    total: 0,
+    asset_view: 0,
+    demo_call: 0,
+    signup: 0,
+    trial_started: 0,
+    activated: 0,
+    paid: 0,
+    paidValueCents: 0,
+  };
+}
+
+function addDimensionEvent(
+  rows: Record<string, MarketingEventFunnelCounts>,
+  key: string | null,
+  event: MarketingEvent,
+) {
+  if (!key) return;
+  rows[key] ??= emptyFunnelCounts();
+  rows[key].total += 1;
+  rows[key][event.event_type] += 1;
+  if (event.event_type === "paid") rows[key].paidValueCents += event.value_cents;
 }
 
 function isUuid(value: string | null): value is string {
@@ -214,6 +245,12 @@ export function summarizeMarketingEvents(events: MarketingEvent[]): MarketingEve
     byPlatform: {},
     byTrade: {},
     byAngle: {},
+    dimensions: {
+      trades: {},
+      creators: {},
+      creativeAssets: {},
+      angles: {},
+    },
     paidValueCents: 0,
   };
 
@@ -223,6 +260,10 @@ export function summarizeMarketingEvents(events: MarketingEvent[]): MarketingEve
     if (event.trade_slug) summary.byTrade[event.trade_slug] = (summary.byTrade[event.trade_slug] ?? 0) + 1;
     if (event.angle) summary.byAngle[event.angle] = (summary.byAngle[event.angle] ?? 0) + 1;
     if (event.event_type === "paid") summary.paidValueCents += event.value_cents;
+    addDimensionEvent(summary.dimensions.trades, event.trade_slug, event);
+    addDimensionEvent(summary.dimensions.creators, event.creator_id, event);
+    addDimensionEvent(summary.dimensions.creativeAssets, event.creative_asset_id, event);
+    addDimensionEvent(summary.dimensions.angles, event.angle, event);
   }
 
   return summary;

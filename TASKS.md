@@ -146,7 +146,7 @@ Core offer rules:
 
 **Exit gate:** Weekly report recommends keep/kill/scale decisions from real data.
 
-- [ ] Update weekly report to rank trades, creators, images, and angles by paid conversion.
+- [x] Update weekly report to rank trades, creators, images, and angles by paid conversion.
 - [ ] Add experiment notes and decision status: keep, kill, iterate, scale.
 - [ ] Add creative fatigue and variant lineage tracking.
 - [ ] Add competitor/ad-library research only after Meta access is validated.
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-16 complete; Q-07 and Q-17 are approval-gated; Q-18 is the next ready autonomous item.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06, Q-08 through Q-16, and Q-18 complete; Q-07 and Q-17 are approval-gated; Q-19 is the next ready autonomous item.
 
 ---
 
@@ -201,6 +201,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [ ] Trade-level weekly target calculator.
 - [ ] Lifecycle follow-up measurement after signup.
 - [ ] Approval audit log for external launch decisions.
+- [x] Weekly learning report rankings for trades, creators, images, and angles.
 
 ---
 
