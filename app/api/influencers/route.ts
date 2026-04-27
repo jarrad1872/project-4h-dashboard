@@ -5,6 +5,7 @@ import {
   buildInfluencerPayload,
   isInfluencerSchemaMismatch,
   normalizeBusinessFocus,
+  normalizeAuditLabel,
   normalizeInfluencer,
   normalizeOutreachStage,
   normalizeSponsorOpenness,
@@ -74,6 +75,11 @@ export async function POST(request: Request) {
       return errorJson(`status must be one of: ${VALID_INFLUENCER_STATUSES.join(", ")}`, 400);
     }
 
+    const auditLabel = normalizeAuditLabel(body.audit_label);
+    if (body.audit_label !== undefined && body.audit_label !== null && !auditLabel) {
+      return errorJson("audit_label must be one of: keep, maybe, remove, needs-research", 400);
+    }
+
     const audienceSize = normalizeAudienceSize(
       typeof body.audience_size === "number" ? body.audience_size : null,
       body.estimated_reach ?? null,
@@ -97,6 +103,9 @@ export async function POST(request: Request) {
       average_views: typeof body.average_views === "number" ? body.average_views : null,
       engagement_rate: typeof body.engagement_rate === "number" ? body.engagement_rate : null,
       sponsor_openness: normalizeSponsorOpenness(body.sponsor_openness),
+      audit_label: auditLabel,
+      audit_reason: body.audit_reason || null,
+      audited_at: body.audited_at || null,
       outreach_stage: normalizeOutreachStage(body.outreach_stage),
       draft_status: body.draft_status ?? "not_started",
       draft_step: body.draft_step ?? "initial",

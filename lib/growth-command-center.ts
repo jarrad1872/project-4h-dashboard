@@ -4,6 +4,7 @@ import type {
   CreativeAssetAngle,
   CreativeAssetStatus,
   Influencer,
+  InfluencerAuditLabel,
   InfluencerBusinessFocus,
   InfluencerOutreachDraftStatus,
   InfluencerOutreachStage,
@@ -58,6 +59,13 @@ const SPONSOR_OPENNESS_LABELS: Record<InfluencerSponsorOpenness, string> = {
   low: "Low",
   medium: "Medium",
   high: "High",
+};
+
+const AUDIT_LABELS: Record<InfluencerAuditLabel, string> = {
+  keep: "Keep",
+  maybe: "Maybe",
+  remove: "Remove",
+  "needs-research": "Needs Research",
 };
 
 const OUTREACH_STAGE_LABELS: Record<InfluencerOutreachStage, string> = {
@@ -149,6 +157,10 @@ export function formatBusinessFocusLabel(value: InfluencerBusinessFocus): string
 
 export function formatSponsorOpennessLabel(value: InfluencerSponsorOpenness): string {
   return SPONSOR_OPENNESS_LABELS[value];
+}
+
+export function formatAuditLabel(value: InfluencerAuditLabel): string {
+  return AUDIT_LABELS[value];
 }
 
 export function formatOutreachStageLabel(value: InfluencerOutreachStage): string {

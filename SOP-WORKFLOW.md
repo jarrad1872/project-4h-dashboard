@@ -262,6 +262,11 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Existing shortlisted creators are matched deterministically (`channel_url` first, then creator/trade/platform) and only canonical identity fields are synced.
 - Active workflow fields (`status`, notes, outreach timing) are preserved on existing rows.
 
+**Creator audit labels:**
+- Audit the shortlist before drafting outreach. Buckets are `keep`, `maybe`, `needs-research`, and `remove`.
+- `remove` means deprioritize for this sprint, not delete the creator. Keep the row, notes, and history intact unless Jarrad explicitly asks for deletion.
+- `needs-research` means the creator may fit, but channel, average views, engagement, or audience evidence is incomplete.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube

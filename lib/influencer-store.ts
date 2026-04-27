@@ -3,6 +3,7 @@ import { formatAudienceSize, normalizeAudienceSize, normalizeInfluencerStatus } 
 import { readFallback } from "@/lib/server-utils";
 import type {
   Influencer,
+  InfluencerAuditLabel,
   InfluencerBusinessFocus,
   InfluencerOutreachDraftStatus,
   InfluencerOutreachDraftStep,
@@ -31,6 +32,13 @@ const SPONSOR_OPENNESS_MAP: Record<string, InfluencerSponsorOpenness> = {
   low: "low",
   medium: "medium",
   high: "high",
+};
+
+const AUDIT_LABEL_MAP: Record<string, InfluencerAuditLabel> = {
+  keep: "keep",
+  maybe: "maybe",
+  remove: "remove",
+  "needs-research": "needs-research",
 };
 
 const OUTREACH_STAGE_MAP: Record<string, InfluencerOutreachStage> = {
@@ -67,6 +75,11 @@ export function normalizeBusinessFocus(value: unknown): InfluencerBusinessFocus 
 export function normalizeSponsorOpenness(value: unknown): InfluencerSponsorOpenness {
   if (typeof value !== "string") return "medium";
   return SPONSOR_OPENNESS_MAP[value] ?? "medium";
+}
+
+export function normalizeAuditLabel(value: unknown): InfluencerAuditLabel | null {
+  if (typeof value !== "string") return null;
+  return AUDIT_LABEL_MAP[value] ?? null;
 }
 
 export function normalizeOutreachStage(value: unknown): InfluencerOutreachStage {
@@ -117,6 +130,9 @@ export function normalizeInfluencer(input: Record<string, unknown>): Influencer 
     average_views: numberOrNull(input.average_views),
     engagement_rate: numberOrNull(input.engagement_rate),
     sponsor_openness: normalizeSponsorOpenness(input.sponsor_openness),
+    audit_label: normalizeAuditLabel(input.audit_label),
+    audit_reason: stringOrNull(input.audit_reason),
+    audited_at: stringOrNull(input.audited_at),
     outreach_stage: normalizeOutreachStage(input.outreach_stage),
     draft_status: normalizeDraftStatus(input.draft_status),
     draft_step: normalizeDraftStep(input.draft_step),
@@ -153,6 +169,9 @@ export function isInfluencerSchemaMismatch(error: { code?: string; message?: str
         error.message?.includes("average_views") ||
         error.message?.includes("engagement_rate") ||
         error.message?.includes("sponsor_openness") ||
+        error.message?.includes("audit_label") ||
+        error.message?.includes("audit_reason") ||
+        error.message?.includes("audited_at") ||
         error.message?.includes("outreach_stage") ||
         error.message?.includes("draft_status") ||
         error.message?.includes("draft_step") ||
@@ -187,6 +206,9 @@ export function buildInfluencerPayload(row: Influencer): Record<string, unknown>
     average_views: row.average_views,
     engagement_rate: row.engagement_rate,
     sponsor_openness: row.sponsor_openness,
+    audit_label: row.audit_label,
+    audit_reason: row.audit_reason,
+    audited_at: row.audited_at,
     outreach_stage: row.outreach_stage,
     draft_status: row.draft_status,
     draft_step: row.draft_step,
@@ -210,6 +232,9 @@ export function stripModernInfluencerPayload(payload: Record<string, unknown>) {
   delete legacyPayload.average_views;
   delete legacyPayload.engagement_rate;
   delete legacyPayload.sponsor_openness;
+  delete legacyPayload.audit_label;
+  delete legacyPayload.audit_reason;
+  delete legacyPayload.audited_at;
   delete legacyPayload.outreach_stage;
   delete legacyPayload.draft_status;
   delete legacyPayload.draft_step;

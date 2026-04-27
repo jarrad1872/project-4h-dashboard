@@ -90,7 +90,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Launch | `/launch` | Pre-launch gate checklist |
 | Templates | `/templates` | Creative briefs + ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
-| Influencer | `/influencer` | Semi-autonomous creator outreach: scoring, approvals, ready-to-send, and follow-up drafting |
+| Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, approvals, ready-to-send, and follow-up drafting |
 | Settings | `/settings` | Campaign configuration |
 
 ---
@@ -219,6 +219,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 
 - `/` now focuses on the live plumbing pilot (`pipe.city`) with launch countdown, influencer pipeline, creative pipeline, channel placeholders, and budget tracking
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
+- `/influencer` now audits the creator shortlist into keep/maybe/remove/needs-research buckets; `remove` deprioritizes while preserving creator history
 - `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state
@@ -228,6 +229,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `supabase/migrations/010_influencer_outreach_agent.sql` adds the email-only outreach state model for human-gated creator approvals
 - `supabase/migrations/011_marketing_events_attribution.sql` adds asset-to-paid-customer attribution fields
 - `supabase/migrations/012_creative_asset_lineage.sql` self-heals `creative_assets` if needed and adds image lineage fields
+- `supabase/migrations/013_influencer_audit_labels.sql` adds creator audit labels, reasons, and audit timestamps
 
 ### Competitive Intelligence Foundation (2026-04-01)
 

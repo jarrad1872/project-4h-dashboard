@@ -2,6 +2,7 @@ import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
 import {
   isInfluencerSchemaMismatch,
+  normalizeAuditLabel,
   normalizeBusinessFocus,
   normalizeDraftStatus,
   normalizeDraftStep,
@@ -38,6 +39,11 @@ export async function PATCH(
       return errorJson(`status must be one of: ${VALID_INFLUENCER_STATUSES.join(", ")}`, 400);
     }
 
+    const auditLabel = normalizeAuditLabel(body.audit_label);
+    if (body.audit_label !== undefined && body.audit_label !== null && !auditLabel) {
+      return errorJson("audit_label must be one of: keep, maybe, remove, needs-research", 400);
+    }
+
     const update: Record<string, unknown> = {};
     if (body.status !== undefined) update.status = normalizeInfluencerStatus(body.status);
     if (body.notes !== undefined) update.notes = body.notes;
@@ -65,6 +71,9 @@ export async function PATCH(
     if (body.average_views !== undefined) update.average_views = body.average_views;
     if (body.engagement_rate !== undefined) update.engagement_rate = body.engagement_rate;
     if (body.sponsor_openness !== undefined) update.sponsor_openness = normalizeSponsorOpenness(body.sponsor_openness);
+    if (body.audit_label !== undefined) update.audit_label = auditLabel;
+    if (body.audit_reason !== undefined) update.audit_reason = body.audit_reason;
+    if (body.audited_at !== undefined) update.audited_at = body.audited_at;
     if (body.outreach_stage !== undefined) update.outreach_stage = normalizeOutreachStage(body.outreach_stage);
     if (body.draft_status !== undefined) update.draft_status = normalizeDraftStatus(body.draft_status);
     if (body.draft_step !== undefined) update.draft_step = normalizeDraftStep(body.draft_step);

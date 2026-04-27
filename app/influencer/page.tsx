@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import {
+  formatAuditLabel,
   formatAudienceSize,
   formatBusinessFocusLabel,
   formatDraftStatusLabel,
@@ -11,6 +12,7 @@ import {
   formatSponsorOpennessLabel,
   summarizeInfluencerPipeline,
 } from "@/lib/growth-command-center";
+import { auditCreator, summarizeCreatorAudit } from "@/lib/creator-audit";
 import {
   generateOutreachDraft,
   getNextDraftStep,
@@ -19,6 +21,7 @@ import {
 } from "@/lib/influencer-outreach-agent";
 import type {
   Influencer,
+  InfluencerAuditLabel,
   InfluencerBusinessFocus,
   InfluencerOutreachDraftStep,
   InfluencerSponsorOpenness,
@@ -37,6 +40,7 @@ const STATUS_OPTIONS: InfluencerStatus[] = [
 
 const BUSINESS_FOCUS_OPTIONS: InfluencerBusinessFocus[] = ["owners", "mixed", "consumer"];
 const SPONSOR_OPENNESS_OPTIONS: InfluencerSponsorOpenness[] = ["low", "medium", "high"];
+const AUDIT_LABEL_OPTIONS: InfluencerAuditLabel[] = ["keep", "maybe", "needs-research", "remove"];
 
 const EMPTY_FORM = {
   creator_name: "",
@@ -62,6 +66,13 @@ function draftButtonLabel(step: InfluencerOutreachDraftStep | null) {
   if (step === "follow_up_1") return "Draft follow-up 1";
   if (step === "follow_up_2") return "Draft follow-up 2";
   return "Draft outreach";
+}
+
+function auditLabelTone(label: InfluencerAuditLabel) {
+  if (label === "keep") return "border-emerald-800 text-emerald-300";
+  if (label === "maybe") return "border-amber-800 text-amber-300";
+  if (label === "remove") return "border-rose-800 text-rose-300";
+  return "border-sky-800 text-sky-300";
 }
 
 export default function InfluencerPage() {
@@ -118,6 +129,37 @@ export default function InfluencerPage() {
     });
     setSavingId(null);
     await load();
+  }
+
+  async function applyAuditLabels() {
+    setSavingId("audit-all");
+    const auditedAt = new Date().toISOString();
+    await Promise.all(
+      influencers
+        .filter((influencer) => !influencer.audit_label)
+        .map((influencer) => {
+          const audit = auditCreator(influencer);
+          return fetch(`/api/influencers/${influencer.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              audit_label: audit.label,
+              audit_reason: audit.reason,
+              audited_at: auditedAt,
+            }),
+          });
+        }),
+    );
+    setSavingId(null);
+    await load();
+  }
+
+  async function labelCreatorRemove(influencer: Influencer) {
+    await updateInfluencer(influencer.id, {
+      audit_label: "remove",
+      audit_reason: "Manually deprioritized for this sprint; history preserved for future review.",
+      audited_at: new Date().toISOString(),
+    });
   }
 
   async function generateDraft(id: string, step: InfluencerOutreachDraftStep) {
@@ -189,23 +231,17 @@ export default function InfluencerPage() {
     await load();
   }
 
-  async function deleteInfluencer(id: string) {
-    if (!window.confirm("Delete this creator from the outreach pipeline?")) return;
-    setSavingId(id);
-    await fetch(`/api/influencers/${id}`, { method: "DELETE" });
-    setSavingId(null);
-    await load();
-  }
-
   const ranked = influencers
     .map((influencer) => ({
       influencer,
       qualification: qualifyInfluencer(influencer),
+      audit: auditCreator(influencer),
       nextDraftStep: getNextDraftStep(influencer),
     }))
     .sort((a, b) => b.qualification.totalScore - a.qualification.totalScore);
 
-  const summary = summarizeInfluencerPipeline(influencers);
+  const statusSummary = summarizeInfluencerPipeline(influencers);
+  const auditSummary = summarizeCreatorAudit(influencers);
   const committedFees = influencers.reduce((sum, influencer) => sum + (influencer.flat_fee_amount ?? 0), 0);
   const pendingApproval = ranked.filter((entry) => entry.influencer.draft_status === "pending_approval");
   const readyToSend = ranked.filter((entry) => entry.influencer.draft_status === "approved");
@@ -222,16 +258,21 @@ export default function InfluencerPage() {
             outbound draft still requires approval before send.
           </p>
         </div>
-        <p className="text-sm text-slate-500">
-          {influencers.length} creators · {qualified.length} priority fits · {formatCurrency(committedFees)} in tracked flat fees
-        </p>
+        <div className="flex flex-col gap-2 sm:items-end">
+          <p className="text-sm text-slate-500">
+            {influencers.length} creators · {qualified.length} priority fits · {formatCurrency(committedFees)} in tracked flat fees
+          </p>
+          <GhostButton disabled={savingId === "audit-all" || influencers.length === 0} onClick={() => void applyAuditLabels()}>
+            {savingId === "audit-all" ? "Auditing..." : "Apply audit labels"}
+          </GhostButton>
+        </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
         {[
-          { label: "Researching", value: summary.researching, color: "text-slate-200" },
-          { label: "Contacted", value: summary.contacted, color: "text-sky-300" },
-          { label: "Negotiating", value: summary.negotiating, color: "text-amber-300" },
+          { label: "Researching", value: statusSummary.researching, color: "text-slate-200" },
+          { label: "Contacted", value: statusSummary.contacted, color: "text-sky-300" },
+          { label: "Negotiating", value: statusSummary.negotiating, color: "text-amber-300" },
           { label: "Approval Queue", value: pendingApproval.length, color: "text-rose-300" },
           { label: "Ready to Send", value: readyToSend.length, color: "text-emerald-300" },
           { label: "Follow-up Due", value: followUpDue.length, color: "text-cyan-300" },
@@ -239,6 +280,15 @@ export default function InfluencerPage() {
           <Card key={item.label}>
             <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
             <p className={`mt-2 text-2xl font-semibold ${item.color}`}>{item.value}</p>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-4">
+        {AUDIT_LABEL_OPTIONS.map((label) => (
+          <Card key={label}>
+            <p className="text-xs uppercase tracking-wide text-slate-500">{formatAuditLabel(label)}</p>
+            <p className={`mt-2 text-2xl font-semibold ${auditLabelTone(label).split(" ")[1]}`}>{auditSummary[label]}</p>
           </Card>
         ))}
       </div>
@@ -484,13 +534,14 @@ export default function InfluencerPage() {
           <div className="py-8 text-sm text-slate-500">No creators added yet.</div>
         ) : (
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[1450px] text-sm">
+            <table className="w-full min-w-[1680px] text-sm">
               <thead>
                 <tr className="border-b border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500">
                   <th className="pb-3 pr-3">Creator</th>
                   <th className="pb-3 pr-3">Contact</th>
                   <th className="pb-3 pr-3">Qualification</th>
                   <th className="pb-3 pr-3">Signals</th>
+                  <th className="pb-3 pr-3">Audit</th>
                   <th className="pb-3 pr-3">Pipeline</th>
                   <th className="pb-3 pr-3">Draft</th>
                   <th className="pb-3 pr-3">Fee</th>
@@ -499,8 +550,10 @@ export default function InfluencerPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
-                {ranked.map(({ influencer, qualification, nextDraftStep }) => {
+                {ranked.map(({ influencer, qualification, audit, nextDraftStep }) => {
                   const previewDraft = generateOutreachDraft(influencer, nextDraftStep ?? "initial");
+                  const displayedAuditLabel = influencer.audit_label ?? audit.label;
+                  const displayedAuditReason = influencer.audit_reason ?? audit.reason;
 
                   return (
                     <tr key={influencer.id} className="align-top">
@@ -588,6 +641,34 @@ export default function InfluencerPage() {
                         </div>
                       </td>
                       <td className="py-3 pr-3">
+                        <div className="space-y-2">
+                          <div className={`inline-flex rounded-full border px-2 py-1 text-xs ${auditLabelTone(displayedAuditLabel)}`}>
+                            {formatAuditLabel(displayedAuditLabel)}
+                          </div>
+                          <select
+                            value={displayedAuditLabel}
+                            onChange={(event) =>
+                              void updateInfluencer(influencer.id, {
+                                audit_label: event.target.value as InfluencerAuditLabel,
+                                audit_reason: displayedAuditReason,
+                                audited_at: new Date().toISOString(),
+                              })
+                            }
+                            className="w-40 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
+                          >
+                            {AUDIT_LABEL_OPTIONS.map((label) => (
+                              <option key={label} value={label}>
+                                {formatAuditLabel(label)}
+                              </option>
+                            ))}
+                          </select>
+                          <p className="max-w-[220px] text-xs text-slate-500">{displayedAuditReason}</p>
+                          {influencer.audited_at ? (
+                            <p className="text-xs text-slate-600">Audited {new Date(influencer.audited_at).toLocaleDateString()}</p>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td className="py-3 pr-3">
                         <select
                           value={influencer.status}
                           onChange={(event) =>
@@ -644,8 +725,8 @@ export default function InfluencerPage() {
                               Mark responded
                             </GhostButton>
                           ) : null}
-                          <GhostButton disabled={savingId === influencer.id} onClick={() => void deleteInfluencer(influencer.id)}>
-                            Remove
+                          <GhostButton disabled={savingId === influencer.id} onClick={() => void labelCreatorRemove(influencer)}>
+                            Label remove
                           </GhostButton>
                         </div>
                       </td>

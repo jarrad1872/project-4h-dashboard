@@ -188,7 +188,7 @@ export const rebuildExecutionQueue = [
     lane: "Creators",
     title: "Audit creator shortlist",
     route: "/influencer",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Creator list is split into keep, maybe, remove, and needs-research buckets.",
     acceptance: "Weak matches are not deleted; they are labeled or deprioritized.",

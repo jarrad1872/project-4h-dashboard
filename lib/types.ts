@@ -12,6 +12,7 @@ export type InfluencerStatus =
   | "declined";
 export type InfluencerBusinessFocus = "owners" | "mixed" | "consumer";
 export type InfluencerSponsorOpenness = "low" | "medium" | "high";
+export type InfluencerAuditLabel = "keep" | "maybe" | "remove" | "needs-research";
 export type InfluencerOutreachStage =
   | "discovery"
   | "qualified"
@@ -196,6 +197,9 @@ export interface Influencer {
   average_views: number | null;
   engagement_rate: number | null;
   sponsor_openness: InfluencerSponsorOpenness;
+  audit_label: InfluencerAuditLabel | null;
+  audit_reason: string | null;
+  audited_at: string | null;
   outreach_stage: InfluencerOutreachStage;
   draft_status: InfluencerOutreachDraftStatus;
   draft_step: InfluencerOutreachDraftStep;
