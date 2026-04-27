@@ -306,7 +306,13 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `/launch` runs an internal preflight validator on the selected launch candidate. It returns blockers and warnings only; it does not launch, upload, send, create webhooks, or spend money.
 - A candidate is blocked when the trade domain, UTM source/medium/campaign/content, `$39/mo` offer, `14-day free trial, no credit card required`, creative approval, copy approval, checklist, or Jarrad approval state is missing or wrong.
 - Every blocker must include an action and evidence so the next agent can resolve the exact gap before launch bundle review.
-- Until Q-15 creates real launch bundles, the validator should keep creative, copy, and Jarrad approval as explicit blockers instead of implying that a generated URL alone is launch-ready.
+- The validator should keep creative, copy, and Jarrad approval as explicit blockers instead of implying that a generated URL or draft bundle alone is launch-ready.
+
+**Launch bundle drafts:**
+- `/launch` renders a draft launch bundle from the selected trade, platform, angle, image asset ID, copy/offer/trial fields, launch URL, channel budget, readiness result, and approval states.
+- The bundle is an internal planning object only. It does not upload ads, launch campaigns, send outreach, create webhooks, or move money.
+- Bundle statuses are `blocked`, `draft`, `review-ready`, and `approved`; `approved` still means the bundle has internal approval state, not that any platform action has happened.
+- Q-16 can add experiment-level budget planning on top of the bundle model. Until then, the bundle only reads the current channel budget and suggested test amount.
 
 **Message-match briefs:**
 - `/templates` holds 4H-owned handoff briefs for future sawcity-lite landing work across the five beachhead domains and four creative angles.

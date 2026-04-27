@@ -298,7 +298,7 @@ export const rebuildExecutionQueue = [
     lane: "Launch",
     title: "Build launch bundle model",
     route: "/launch",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "A launch bundle connects trade, angle, image, copy, creator/proof, URL, budget, and approvals.",
     acceptance: "Bundles can be draft/review/approved but cannot launch externally.",

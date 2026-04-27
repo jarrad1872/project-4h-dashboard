@@ -5,7 +5,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { rebuildMission } from "@/lib/4h-rebuild-data";
-import { validateLaunchReadiness } from "@/lib/launch-readiness-validator";
+import { buildLaunchBundle } from "@/lib/launch-bundles";
+import { validateLaunchReadiness, type LaunchApprovalStatus } from "@/lib/launch-readiness-validator";
 import {
   buildLaunchUrl,
   defaultLaunchAssetId,
@@ -18,7 +19,7 @@ import {
 } from "@/lib/launch-url-builder";
 import { productRouteInventory } from "@/lib/product-route-inventory";
 import { getTierTrades } from "@/lib/trade-utils";
-import type { CampaignStatusData, LaunchChecklistItem } from "@/lib/types";
+import type { BudgetData, CampaignStatusData, CreativeAssetStatus, LaunchChecklistItem } from "@/lib/types";
 
 const GROUP_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
   linkedin: { label: "LinkedIn", icon: "in", color: "text-blue-400" },
@@ -37,10 +38,13 @@ const BLOCKERS_BEFORE_LAUNCH = [
 ];
 
 const LAUNCH_ROUTE_OPTIONS = productRouteInventory.filter((route) => route.status === "ready");
+const CREATIVE_APPROVAL_OPTIONS = ["missing", "draft", "review", "approved", "live"] as const;
+const APPROVAL_OPTIONS = ["missing", "pending", "approved", "rejected"] as const;
 
 export default function LaunchPage() {
   const [items, setItems] = useState<LaunchChecklistItem[]>([]);
   const [status, setStatus] = useState<CampaignStatusData | null>(null);
+  const [budget, setBudget] = useState<BudgetData | null>(null);
   const [saving, setSaving] = useState(false);
   const [launchTrade, setLaunchTrade] = useState("pipe.city");
   const [launchPlatform, setLaunchPlatform] = useState<LaunchPlatform>("linkedin");
@@ -51,15 +55,22 @@ export default function LaunchPage() {
   const [launchCampaignName, setLaunchCampaignName] = useState("");
   const [launchCreatorSlug, setLaunchCreatorSlug] = useState("");
   const [launchCreatorId, setLaunchCreatorId] = useState("");
+  const [bundleCreativeStatus, setBundleCreativeStatus] = useState<CreativeAssetStatus | "missing">("missing");
+  const [bundleCopyApproval, setBundleCopyApproval] = useState<LaunchApprovalStatus>("missing");
+  const [bundleJarradApproval, setBundleJarradApproval] = useState<LaunchApprovalStatus>("missing");
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   async function load() {
-    const [checkRes, statusRes] = await Promise.all([
+    const [checkRes, statusRes, budgetRes] = await Promise.all([
       fetch("/api/launch-checklist", { cache: "no-store" }),
       fetch("/api/campaign-status", { cache: "no-store" }),
+      fetch("/api/budget", { cache: "no-store" }),
     ]);
     setItems((await checkRes.json()) as LaunchChecklistItem[]);
     setStatus((await statusRes.json()) as CampaignStatusData);
+    if (budgetRes.ok) {
+      setBudget((await budgetRes.json()) as BudgetData);
+    }
   }
 
   useEffect(() => { void load(); }, []);
@@ -151,11 +162,39 @@ export default function LaunchPage() {
       campaignStatus: status,
       offerText: `${rebuildMission.price}. ${rebuildMission.trial}.`,
       trialText: rebuildMission.trial,
-      creativeStatus: "missing",
-      copyApprovalStatus: "missing",
-      jarradApprovalStatus: "missing",
+      creativeStatus: bundleCreativeStatus,
+      copyApprovalStatus: bundleCopyApproval,
+      jarradApprovalStatus: bundleJarradApproval,
     });
-  }, [items, launchUrlResult, status]);
+  }, [bundleCopyApproval, bundleCreativeStatus, bundleJarradApproval, items, launchUrlResult, status]);
+  const launchBundle = useMemo(() => {
+    if (!launchReadiness) return null;
+
+    return buildLaunchBundle({
+      launch: launchUrlResult,
+      readiness: launchReadiness,
+      budget,
+      creative: {
+        assetId: launchAssetId,
+        status: bundleCreativeStatus,
+        variantId: bundleCreativeStatus === "missing" ? null : launchAssetId,
+        imageUrl: null,
+      },
+      copy: {
+        headline: `${launchUrlResult.domain} ${launchAngle} launch candidate`,
+        primaryText: `${launchUrlResult.domain} launch copy must include ${rebuildMission.price} and ${rebuildMission.trial}.`,
+        cta: "Start free trial",
+        offer: rebuildMission.price,
+        trial: rebuildMission.trial,
+        approvalStatus: bundleCopyApproval,
+      },
+      approvals: {
+        creative: bundleCreativeStatus,
+        copy: bundleCopyApproval,
+        jarrad: bundleJarradApproval,
+      },
+    });
+  }, [budget, bundleCopyApproval, bundleCreativeStatus, bundleJarradApproval, launchAngle, launchAssetId, launchReadiness, launchUrlResult]);
   const readyToGo = basicLaunchGateReady && (launchReadiness?.ready ?? false);
 
   async function copyLaunchUrl() {
@@ -419,6 +458,127 @@ export default function LaunchPage() {
               ))}
             </div>
           )}
+        </Card>
+      )}
+
+      {launchBundle && (
+        <Card className="border-blue-900/60 bg-slate-900/70">
+          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-blue-300">Launch bundle draft</p>
+              <h2 className="mt-1 text-xl font-black text-white">{launchBundle.id}</h2>
+              <p className="mt-1 max-w-3xl text-sm text-slate-400">
+                Internal model only. This connects trade, angle, image, copy, URL, budget, and approvals without launching or uploading anything.
+              </p>
+            </div>
+            <span className={`rounded border px-3 py-2 text-xs font-bold uppercase ${
+              launchBundle.status === "approved"
+                ? "border-emerald-700/60 bg-emerald-950/30 text-emerald-200"
+                : launchBundle.status === "review-ready"
+                  ? "border-blue-700/60 bg-blue-950/30 text-blue-200"
+                  : launchBundle.status === "draft"
+                    ? "border-slate-700 bg-slate-950 text-slate-200"
+                    : "border-red-800/60 bg-red-950/25 text-red-200"
+            }`}>
+              {launchBundle.status}
+            </span>
+          </div>
+
+          <div className="mb-4 grid gap-3 md:grid-cols-3">
+            <label className="space-y-1 text-sm">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Creative approval</span>
+              <select
+                value={bundleCreativeStatus}
+                onChange={(event) => setBundleCreativeStatus(event.target.value as CreativeAssetStatus | "missing")}
+                className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+              >
+                {CREATIVE_APPROVAL_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Copy approval</span>
+              <select
+                value={bundleCopyApproval}
+                onChange={(event) => setBundleCopyApproval(event.target.value as LaunchApprovalStatus)}
+                className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+              >
+                {APPROVAL_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Jarrad approval</span>
+              <select
+                value={bundleJarradApproval}
+                onChange={(event) => setBundleJarradApproval(event.target.value as LaunchApprovalStatus)}
+                className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
+              >
+                {APPROVAL_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <p className="mb-4 rounded border border-amber-900/60 bg-amber-950/20 px-3 py-2 text-xs text-amber-100">
+            These selectors model internal approval state for bundle planning only. Changing them does not approve outreach,
+            upload an ad, launch a campaign, create a webhook, or move money.
+          </p>
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Trade + angle</p>
+              <p className="mt-1 text-sm font-semibold text-white">{launchBundle.tradeDomain}</p>
+              <p className="text-xs text-slate-400">{launchBundle.platform} · {launchBundle.angle}</p>
+            </div>
+            <div className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Image</p>
+              <p className="mt-1 text-sm font-semibold text-white">{launchBundle.creative.assetId}</p>
+              <p className="text-xs text-slate-400">Status: {launchBundle.creative.status}</p>
+            </div>
+            <div className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Copy</p>
+              <p className="mt-1 text-sm font-semibold text-white">{launchBundle.copy.cta}</p>
+              <p className="text-xs text-slate-400">{launchBundle.copy.offer} · {launchBundle.copy.trial}</p>
+            </div>
+            <div className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Budget</p>
+              <p className="mt-1 text-sm font-semibold text-white">${launchBundle.budget.suggestedTestBudget.toLocaleString()} suggested test</p>
+              <p className="text-xs text-slate-400">
+                ${launchBundle.budget.platformRemaining.toLocaleString()} remaining on {launchBundle.platform}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_1fr]">
+            <div className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">URL</p>
+              <p className="mt-1 break-all font-mono text-xs text-cyan-100">{launchBundle.url}</p>
+            </div>
+            <div className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Approvals</p>
+              <div className="mt-2 grid gap-2 text-xs text-slate-300 sm:grid-cols-3">
+                <p><span className="font-semibold text-slate-100">Creative:</span> {launchBundle.approvals.creative}</p>
+                <p><span className="font-semibold text-slate-100">Copy:</span> {launchBundle.approvals.copy}</p>
+                <p><span className="font-semibold text-slate-100">Jarrad:</span> {launchBundle.approvals.jarrad}</p>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                Readiness: {launchBundle.readiness.blockerCount} blockers · {launchBundle.readiness.warningCount} warnings
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 rounded border border-amber-900/60 bg-amber-950/20 px-3 py-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Safety notes</p>
+            <ul className="mt-2 space-y-1 text-sm text-slate-300">
+              {launchBundle.safetyNotes.map((note) => (
+                <li key={note}>- {note}</li>
+              ))}
+            </ul>
+          </div>
         </Card>
       )}
 

@@ -134,7 +134,7 @@ Core offer rules:
 **Exit gate:** First controlled paid tests are approved, launched manually, and tracked end to end.
 
 - [x] Archive or label historical ads so they cannot be mistaken for current launch candidates.
-- [ ] Create launch bundles: trade, angle, image, copy, creator/proof asset, URL, budget, approval.
+- [x] Create launch bundles: trade, angle, image, copy, creator/proof asset, URL, budget, approval.
 - [ ] Add budget allocation by experiment, not only by platform.
 - [ ] Add preflight checks for price, trial, domain, UTM, creative approval, and Jarrad approval.
 - [ ] Add import/export format for Meta, YouTube, LinkedIn, and Instagram upload sheets.
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-14 complete; Q-07 is approval-gated; Q-15 is the next ready autonomous item.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-15 complete; Q-07 is approval-gated; Q-16 is the next ready autonomous item.
 
 ---
 
