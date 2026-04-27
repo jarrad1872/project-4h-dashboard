@@ -368,6 +368,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Original-build routes such as `/ads`, `/generate`, `/gtm`, and `/settings` stay in the collapsed Reference Shelf until they are rebuilt, archived, redirected, or retired.
 - Direct-link support routes such as `/templates` and `/lifecycle` can stay available without taking primary sidebar space.
 - Q-36 legacy route banners must stay visible on `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` until each route is rebuilt, redirected, archived, or retired.
+- Q-37 support summaries on Command and Scorecard are the daily home for lifecycle and template status; `/lifecycle` and `/templates` remain detail pages reached from those active loops.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

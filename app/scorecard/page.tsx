@@ -1,7 +1,10 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect -- Scorecard hydrates persisted dashboard data after mount. */
+
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card } from "@/components/ui";
+import { buildActiveLoopSupportSummary, EMPTY_MARKETING_EVENT_SUMMARY } from "@/lib/active-loop-support-summaries";
 import { CHANNELS } from "@/lib/constants";
 import { buildCustomerPaceForecast, type CustomerPaceStatus } from "@/lib/customer-pace-forecast";
 import {
@@ -17,7 +20,7 @@ import {
 import { calcActivationRate, calcCpaPaid, calcCpaStart, calcCtr, signal } from "@/lib/metrics";
 import { buildTradeWeeklyTargetPlan, type TradeWeeklyTargetStatus } from "@/lib/trade-weekly-targets";
 import { buildWeeklyLearningReport, type LearningSignal } from "@/lib/weekly-learning-report";
-import type { ChannelMetrics, MarketingEventSummary, MetricsData, MetricsWeek } from "@/lib/types";
+import type { AdTemplate, ChannelMetrics, LifecycleMessage, MarketingEventSummary, MetricsData, MetricsWeek } from "@/lib/types";
 
 const emptyChannel: ChannelMetrics = {
   spend: 0,
@@ -66,28 +69,6 @@ const SIGNAL_LABEL: Record<string, string> = {
   scale: "Scale",
   watch: "Watch",
   kill: "Kill",
-};
-
-const EMPTY_MARKETING_SUMMARY: MarketingEventSummary = {
-  total: 0,
-  byType: {
-    asset_view: 0,
-    demo_call: 0,
-    signup: 0,
-    trial_started: 0,
-    activated: 0,
-    paid: 0,
-  },
-  byPlatform: {},
-  byTrade: {},
-  byAngle: {},
-  dimensions: {
-    trades: {},
-    creators: {},
-    creativeAssets: {},
-    angles: {},
-  },
-  paidValueCents: 0,
 };
 
 const LEARNING_SIGNAL_STYLE: Record<LearningSignal, string> = {
@@ -154,8 +135,10 @@ function weekEventParams(weekStart: string) {
 
 export default function ScorecardPage() {
   const [metrics, setMetrics] = useState<MetricsData>({ weeks: [] });
-  const [marketingSummary, setMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_SUMMARY);
-  const [allTimeMarketingSummary, setAllTimeMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_SUMMARY);
+  const [marketingSummary, setMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_EVENT_SUMMARY);
+  const [allTimeMarketingSummary, setAllTimeMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_EVENT_SUMMARY);
+  const [lifecycleMessages, setLifecycleMessages] = useState<LifecycleMessage[]>([]);
+  const [templates, setTemplates] = useState<AdTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState("");
   const [draft, setDraft] = useState<MetricsWeek | null>(null);
@@ -177,15 +160,21 @@ export default function ScorecardPage() {
     }
     if (!latest) {
       setDraft(null);
-      setMarketingSummary(EMPTY_MARKETING_SUMMARY);
+      setMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
     }
-    const allTimeEventsRes = await fetch("/api/events?summary=1", { cache: "no-store" }).catch(() => null);
+    const [allTimeEventsRes, lifecycleRes, templatesRes] = await Promise.all([
+      fetch("/api/events?summary=1", { cache: "no-store" }).catch(() => null),
+      fetch("/api/lifecycle", { cache: "no-store" }).catch(() => null),
+      fetch("/api/templates", { cache: "no-store" }).catch(() => null),
+    ]);
     if (allTimeEventsRes?.ok) {
       const allTimeEventsData = (await allTimeEventsRes.json()) as { summary?: MarketingEventSummary };
-      setAllTimeMarketingSummary(allTimeEventsData.summary ?? EMPTY_MARKETING_SUMMARY);
+      setAllTimeMarketingSummary(allTimeEventsData.summary ?? EMPTY_MARKETING_EVENT_SUMMARY);
     } else {
-      setAllTimeMarketingSummary(EMPTY_MARKETING_SUMMARY);
+      setAllTimeMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
     }
+    setLifecycleMessages(lifecycleRes?.ok ? ((await lifecycleRes.json()) as LifecycleMessage[]) : []);
+    setTemplates(templatesRes?.ok ? ((await templatesRes.json()) as AdTemplate[]) : []);
     setLoading(false);
   }
 
@@ -213,7 +202,7 @@ export default function ScorecardPage() {
     let cancelled = false;
 
     async function loadWeeklyEvents() {
-      setMarketingSummary(EMPTY_MARKETING_SUMMARY);
+      setMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
       const params = selectedWeek ? weekEventParams(selectedWeek) : null;
       if (!params) {
         return;
@@ -224,9 +213,9 @@ export default function ScorecardPage() {
       if (eventsRes?.ok) {
         const eventsData = (await eventsRes.json()) as { summary?: MarketingEventSummary };
         if (cancelled) return;
-        setMarketingSummary(eventsData.summary ?? EMPTY_MARKETING_SUMMARY);
+        setMarketingSummary(eventsData.summary ?? EMPTY_MARKETING_EVENT_SUMMARY);
       } else {
-        setMarketingSummary(EMPTY_MARKETING_SUMMARY);
+        setMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
       }
     }
 
@@ -249,6 +238,15 @@ export default function ScorecardPage() {
     [allTimeMarketingSummary, marketingSummary, paceForecast],
   );
   const learningReport = useMemo(() => buildWeeklyLearningReport(marketingSummary), [marketingSummary]);
+  const supportSummary = useMemo(
+    () =>
+      buildActiveLoopSupportSummary({
+        lifecycleMessages,
+        marketingSummary: allTimeMarketingSummary,
+        savedAdTemplates: templates.length,
+      }),
+    [allTimeMarketingSummary, lifecycleMessages, templates.length],
+  );
   const decisionTargets = useMemo(
     () => learningReport.reports.flatMap((report) =>
       report.items.map((item) => decisionTargetFromRankedItem(report.dimension, item)),
@@ -506,6 +504,80 @@ export default function ScorecardPage() {
               <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="border-cyan-900/60 bg-cyan-950/10" data-testid="scorecard-support-loop-summary">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Support Signals Folded Into Learning</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Lifecycle and template pages stay direct-link support routes; their useful status now lives in the active scorecard loop.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <a href="/lifecycle" className="font-semibold text-cyan-200 hover:underline">Lifecycle detail</a>
+            <span className="text-slate-600">/</span>
+            <a href="/templates" className="font-semibold text-cyan-200 hover:underline">Template detail</a>
+          </div>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-2">
+          <div className="rounded border border-slate-800 bg-slate-950/50 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-white">Lifecycle follow-up</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {supportSummary.lifecycle.activeMessages} active / {supportSummary.lifecycle.measuredMessages} measured messages
+                </p>
+              </div>
+              <span className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-300">
+                {supportSummary.lifecycle.paid.toLocaleString()} paid
+              </span>
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-2 text-xs">
+              {[
+                { label: "Signups", value: supportSummary.lifecycle.signups },
+                { label: "Trials", value: supportSummary.lifecycle.trialStarts },
+                { label: "Activated", value: supportSummary.lifecycle.activations },
+                { label: "Paused", value: supportSummary.lifecycle.pausedMessages },
+              ].map((item) => (
+                <div key={item.label}>
+                  <p className="text-base font-semibold text-slate-100">{item.value.toLocaleString()}</p>
+                  <p className="text-slate-500">{item.label}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-slate-400">{supportSummary.lifecycle.nextAction}</p>
+          </div>
+
+          <div className="rounded border border-slate-800 bg-slate-950/50 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-white">Brief and research library</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {supportSummary.templates.messageMatchDomains} domains covered by message-match handoffs
+                </p>
+              </div>
+              <span className="rounded border border-indigo-800/60 bg-indigo-950/30 px-2 py-1 text-xs font-semibold text-indigo-300">
+                {supportSummary.templates.competitorResearchStatus}
+              </span>
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-2 text-xs">
+              {[
+                { label: "Creator", value: supportSummary.templates.contentBriefs },
+                { label: "Message", value: supportSummary.templates.messageMatchBriefs },
+                { label: "Saved ads", value: supportSummary.templates.savedAdTemplates },
+                { label: "Domains", value: supportSummary.templates.messageMatchDomains },
+              ].map((item) => (
+                <div key={item.label}>
+                  <p className="text-base font-semibold text-slate-100">{item.value.toLocaleString()}</p>
+                  <p className="text-slate-500">{item.label}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-slate-400">{supportSummary.templates.evidence}</p>
+          </div>
         </div>
       </Card>
 

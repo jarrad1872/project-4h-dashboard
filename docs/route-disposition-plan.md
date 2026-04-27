@@ -31,14 +31,14 @@ These routes are not active operating lanes. They remain available from the coll
 | `/settings` | Legacy reference | Old source-doc/settings view; not part of weekly growth operation. |
 | `/creatives` | Direct-link archive | Original asset repository, superseded by `/assets`. |
 | `/workflow` | Direct-link archive | Old concept-to-live workflow, superseded by queue and launch governance. |
-| `/templates` | Support route | Still useful for handoff templates, but reached from active work loops. |
-| `/lifecycle` | Support route | Still useful for lifecycle measurement, but not a primary daily lane yet. |
+| `/templates` | Support route | Still useful for handoff templates; summarized from Command and Scorecard after Q-37. |
+| `/lifecycle` | Support route | Still useful for lifecycle measurement; summarized from Command and Scorecard after Q-37. |
 
 ## Cleanup Sequence
 
 1. Q-35: Move legacy routes out of primary nav and document disposition.
 2. Q-36: Add legacy banners to old pages so no one mistakes them for active lanes. Complete for `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow`.
-3. Q-37: Fold useful template/lifecycle summaries into Command or Scorecard.
-4. Q-38: Decide route-by-route: rebuild, redirect, archive, or delete.
+3. Q-37: Fold useful template/lifecycle summaries into Command or Scorecard. Complete for Command and Scorecard.
+4. Q-38: Decide route-by-route: rebuild, redirect, archive, or delete. Do not delete or redirect routes in the decision packet.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.

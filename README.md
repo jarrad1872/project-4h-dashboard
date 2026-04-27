@@ -252,6 +252,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/sales` now adds Q-34 weekly Arizona rep operating packets with touch targets, cards to carry, priority rows, daily cadence, and explicit no-external-action boundaries
 - Sidebar navigation now adds Q-35 route cleanup: active growth loops stay primary, original-build leftovers move into a collapsed Reference Shelf, and `docs/route-disposition-plan.md` records the route-by-route plan
 - Q-36 adds legacy route banners to `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` so direct-link visitors see the active replacement lane and no-external-action boundary
+- Q-37 folds `/lifecycle` and `/templates` support signals into Command and Scorecard so daily learning work can see follow-up coverage, message-match briefs, creator templates, saved ad templates, and manual competitor-research status without giving those support pages primary nav space
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -280,7 +281,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-36 legacy route banners | v4.4.5*
+*Last updated: 2026-04-27 Q-37 active loop support summaries | v4.4.6*
 
 ---
 

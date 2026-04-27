@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui";
+import { buildActiveLoopSupportSummary, EMPTY_MARKETING_EVENT_SUMMARY } from "@/lib/active-loop-support-summaries";
 import {
   beachheadTrades,
   customerMath,
@@ -13,12 +14,15 @@ import {
   rebuildMission,
 } from "@/lib/4h-rebuild-data";
 import { latestMetricsWeek } from "@/lib/growth-command-center";
-import type { Ad, CreativeAsset, Influencer, MetricsData } from "@/lib/types";
+import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
   ads: Ad[];
   influencers: Influencer[];
   creativeAssets: CreativeAsset[];
+  lifecycleMessages: LifecycleMessage[];
+  templates: AdTemplate[];
+  marketingSummary: MarketingEventSummary;
   metrics: MetricsData | null;
 }
 
@@ -26,6 +30,9 @@ const EMPTY_STATE: OverviewState = {
   ads: [],
   influencers: [],
   creativeAssets: [],
+  lifecycleMessages: [],
+  templates: [],
+  marketingSummary: EMPTY_MARKETING_EVENT_SUMMARY,
   metrics: null,
 };
 
@@ -58,7 +65,7 @@ export default function OverviewPage() {
 
   useEffect(() => {
     async function load() {
-      const [ads, influencers, creativeAssets, metrics] = await Promise.all([
+      const [ads, influencers, creativeAssets, lifecycleMessages, templates, marketingEvents, metrics] = await Promise.all([
         fetch("/api/ads", { cache: "no-store" })
           .then((response) => response.json())
           .catch(() => []),
@@ -68,6 +75,15 @@ export default function OverviewPage() {
         fetch("/api/creative-assets", { cache: "no-store" })
           .then((response) => response.json())
           .catch(() => []),
+        fetch("/api/lifecycle", { cache: "no-store" })
+          .then((response) => response.json())
+          .catch(() => []),
+        fetch("/api/templates", { cache: "no-store" })
+          .then((response) => response.json())
+          .catch(() => []),
+        fetch("/api/events?summary=1", { cache: "no-store" })
+          .then((response) => response.json())
+          .catch(() => null),
         fetch("/api/metrics", { cache: "no-store" })
           .then((response) => response.json())
           .catch(() => null),
@@ -77,6 +93,9 @@ export default function OverviewPage() {
         ads: Array.isArray(ads) ? ads : [],
         influencers: Array.isArray(influencers) ? influencers : [],
         creativeAssets: Array.isArray(creativeAssets) ? creativeAssets : [],
+        lifecycleMessages: Array.isArray(lifecycleMessages) ? lifecycleMessages : [],
+        templates: Array.isArray(templates) ? templates : [],
+        marketingSummary: marketingEvents?.summary ?? EMPTY_MARKETING_EVENT_SUMMARY,
         metrics,
       });
       setLoading(false);
@@ -116,6 +135,16 @@ export default function OverviewPage() {
       topReady: ready.slice(0, 8),
     };
   }, []);
+
+  const supportSummary = useMemo(
+    () =>
+      buildActiveLoopSupportSummary({
+        lifecycleMessages: state.lifecycleMessages,
+        marketingSummary: state.marketingSummary,
+        savedAdTemplates: state.templates.length,
+      }),
+    [state.lifecycleMessages, state.marketingSummary, state.templates.length],
+  );
 
   if (loading) {
     return <div className="flex h-64 items-center justify-center text-slate-400">Loading Project 4H...</div>;
@@ -238,6 +267,73 @@ export default function OverviewPage() {
               <p className="mt-2 text-sm leading-5 text-slate-400">{loop.nextMove}</p>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Support signals in active loops</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Lifecycle and templates stay reachable without daily sidebar space</h2>
+          </div>
+          <Link href="/scorecard" className="text-sm font-semibold text-emerald-300 hover:underline">
+            Review learning loop
+          </Link>
+        </div>
+        <div className="mt-3 grid gap-3 xl:grid-cols-2">
+          <Card data-testid="support-loop-summary-lifecycle" className="border-cyan-900/60 bg-cyan-950/10">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Lifecycle support</p>
+                <h3 className="mt-1 text-lg font-semibold text-white">Follow-up coverage and conversion movement</h3>
+              </div>
+              <Link href="/lifecycle" className="text-sm font-semibold text-cyan-200 hover:underline">
+                Open details
+              </Link>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-4">
+              {[
+                { label: "Active follow-ups", value: supportSummary.lifecycle.activeMessages },
+                { label: "Trial starts", value: supportSummary.lifecycle.trialStarts },
+                { label: "Activations", value: supportSummary.lifecycle.activations },
+                { label: "Paid", value: supportSummary.lifecycle.paid },
+              ].map((item) => (
+                <div key={item.label} className="rounded border border-slate-800 bg-slate-950/50 p-3">
+                  <p className="text-2xl font-semibold text-white">{formatNumber(item.value)}</p>
+                  <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-sm leading-5 text-slate-300">{supportSummary.lifecycle.nextAction}</p>
+            <p className="mt-2 text-xs text-slate-500">{supportSummary.lifecycle.evidence}</p>
+          </Card>
+
+          <Card data-testid="support-loop-summary-templates" className="border-indigo-900/60 bg-indigo-950/10">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-indigo-300">Template support</p>
+                <h3 className="mt-1 text-lg font-semibold text-white">Briefs and research context folded into launch work</h3>
+              </div>
+              <Link href="/templates" className="text-sm font-semibold text-indigo-200 hover:underline">
+                Open details
+              </Link>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-4">
+              {[
+                { label: "Creator briefs", value: supportSummary.templates.contentBriefs },
+                { label: "Message-match", value: supportSummary.templates.messageMatchBriefs },
+                { label: "Domains", value: supportSummary.templates.messageMatchDomains },
+                { label: "Saved ads", value: supportSummary.templates.savedAdTemplates },
+              ].map((item) => (
+                <div key={item.label} className="rounded border border-slate-800 bg-slate-950/50 p-3">
+                  <p className="text-2xl font-semibold text-white">{formatNumber(item.value)}</p>
+                  <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-sm leading-5 text-slate-300">{supportSummary.templates.nextAction}</p>
+            <p className="mt-2 text-xs text-slate-500">{supportSummary.templates.evidence}</p>
+          </Card>
         </div>
       </section>
 
