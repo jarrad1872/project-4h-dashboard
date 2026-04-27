@@ -295,6 +295,12 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Every generated URL should include trade, angle, asset, and optional creator metadata so scorecard attribution can connect click source to creative intent.
 - Use trade-specific `.city` domains for paid and creator traffic unless the campaign is intentionally broad directory traffic.
 
+**Message-match briefs:**
+- `/templates` holds 4H-owned handoff briefs for future sawcity-lite landing work across the five beachhead domains and four creative angles.
+- Every brief must include trade domain, angle, ad promise, landing headline promise, hero direction, supporting proof, `$39/mo`, and `14-day free trial, no credit card required`.
+- Message-match briefs are handoff artifacts only. They do not approve, edit, or deploy sawcity-lite changes.
+- Use the brief that matches the launch URL angle so the first screen answers the promise that made the buyer click.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube

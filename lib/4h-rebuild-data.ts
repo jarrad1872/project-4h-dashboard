@@ -265,7 +265,7 @@ export const rebuildExecutionQueue = [
     lane: "Landing",
     title: "Create message-match briefs",
     route: "/templates",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Each image/copy angle has a handoff brief for future sawcity-lite landing updates.",
     acceptance: "Briefs do not edit sawcity-lite and include $39/mo plus 14-day trial language.",
