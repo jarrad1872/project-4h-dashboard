@@ -552,7 +552,7 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     lane: "Navigation",
     title: "Add legacy banners to old pages",
     route: "/ads",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Legacy pages clearly state whether they are archive, reference, or superseded surfaces.",
     acceptance: "/ads, /generate, /gtm, /settings, /creatives, and /workflow have visible disposition banners and link back to the active replacement lane.",

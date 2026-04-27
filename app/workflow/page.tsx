@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { TRADE_MAP, tradeFromAd } from "@/lib/trade-utils";
 import type { Ad, WorkflowStage } from "@/lib/types";
@@ -45,7 +46,10 @@ export default function WorkflowPage() {
     setLoading(false);
   }
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- legacy workflow hydrates ad rows after mount.
+    void load();
+  }, []);
 
   const grouped = useMemo(() => {
     return STAGES.reduce<Record<WorkflowStage, Ad[]>>((acc, s) => {
@@ -96,11 +100,18 @@ export default function WorkflowPage() {
   const livePercent = totalAds ? ((totalLive / totalAds) * 100).toFixed(0) : 0;
 
   if (loading) {
-    return <div className="flex h-64 items-center justify-center text-slate-400">Loading pipeline…</div>;
+    return (
+      <div className="space-y-6">
+        <LegacyRouteBanner route="/workflow" />
+        <div className="flex h-64 items-center justify-center text-slate-400">Loading pipeline…</div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
+      <LegacyRouteBanner route="/workflow" />
+
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">Workflow Pipeline</h1>
@@ -228,7 +239,7 @@ export default function WorkflowPage() {
       <Card>
         <h2 className="mb-4 font-semibold">Trade Progress Overview</h2>
         <p className="mb-3 text-xs text-slate-500">
-          Shows which stage each trade's ads are in. All 65 trades × 16 ads.
+          Shows which stage each trade&apos;s ads are in. All 65 trades × 16 ads.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

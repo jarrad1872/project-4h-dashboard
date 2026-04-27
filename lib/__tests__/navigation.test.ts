@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   activeNavigationHrefs,
+  getLegacyRouteBanner,
+  legacyRouteBanners,
   legacyNavigationItems,
   legacyRouteAuditRows,
   navigationGroups,
@@ -31,5 +33,12 @@ describe("navigation IA", () => {
     expect(rows.find((row) => row.route === "/creatives")?.disposition).toBe("keep as direct-link archive until rebuilt or retired");
     expect(rows.find((row) => row.route === "/templates")?.disposition).toBe("support route, omit from primary nav");
     expect(navigationGroups).toHaveLength(2);
+  });
+
+  it("defines visible banners for the original-build legacy routes", () => {
+    expect(Object.keys(legacyRouteBanners).sort()).toEqual(["/ads", "/creatives", "/generate", "/gtm", "/settings", "/workflow"]);
+    expect(getLegacyRouteBanner("/generate")?.replacementHref).toBe("/assets");
+    expect(getLegacyRouteBanner("/workflow")?.replacementHref).toBe("/launch");
+    expect(getLegacyRouteBanner("/scorecard")).toBeNull();
   });
 });

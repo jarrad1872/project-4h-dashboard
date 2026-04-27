@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { Button, Card, GhostButton } from "@/components/ui";
 import {
   type CreativeFormat,
@@ -96,7 +97,7 @@ export default function GeneratePage() {
 
       if (!res.ok) throw new Error("Failed to save asset");
       setSavedNotice(`Successfully saved to ${selectedTrade.slug} ${targetSlot} slot.`);
-    } catch (err) {
+    } catch {
       setError("Failed to push to trade assets.");
     } finally {
       setLoading(false);
@@ -115,6 +116,8 @@ export default function GeneratePage() {
 
   return (
     <div className="space-y-6">
+      <LegacyRouteBanner route="/generate" />
+
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">AI Creative Studio</h1>

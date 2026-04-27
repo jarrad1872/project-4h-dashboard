@@ -367,6 +367,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - The primary sidebar is for active growth loops and launch governance only: Command, Creators, Sales, Creative Lab, Scorecard, Approval, Launch, and Budget.
 - Original-build routes such as `/ads`, `/generate`, `/gtm`, and `/settings` stay in the collapsed Reference Shelf until they are rebuilt, archived, redirected, or retired.
 - Direct-link support routes such as `/templates` and `/lifecycle` can stay available without taking primary sidebar space.
+- Q-36 legacy route banners must stay visible on `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` until each route is rebuilt, redirected, archived, or retired.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

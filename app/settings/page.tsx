@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { Button, Card } from "@/components/ui";
 import type { CampaignStatusData } from "@/lib/types";
 
@@ -22,6 +23,7 @@ export default function SettingsPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- legacy settings hydrate campaign status after mount.
     void load();
   }, []);
 
@@ -39,6 +41,8 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
+      <LegacyRouteBanner route="/settings" />
+
       <h1 className="text-2xl font-bold">Settings &amp; References</h1>
 
       <Card>

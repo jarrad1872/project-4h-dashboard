@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { getProjectState } from "@/lib/project-state-data";
 import {
   getBeachheadProductRoutes,
@@ -110,6 +111,8 @@ export default function GTMPage() {
 
   return (
     <div className="space-y-8">
+      <LegacyRouteBanner route="/gtm" />
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">GTM Action Board</h1>

@@ -195,6 +195,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-33 field-sales attribution measurement on `/sales`.
 - [x] Add Q-34 weekly Arizona rep operating packet on `/sales`.
 - [x] Add Q-35 primary nav cleanup and route disposition plan.
+- [x] Add Q-36 legacy/superseded banners to archived original-build routes.
 
 ---
 
@@ -229,7 +230,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Field-sales attribution panel for scans, demos, trials, and paid signal.
 - [x] Weekly field-sales operating packet for route planning and follow-up cadence.
 - [x] Primary nav cleanup with original-build routes moved to a Reference Shelf.
-- [ ] Add legacy/superseded banners to archived original-build routes.
+- [x] Add legacy/superseded banners to archived original-build routes.
 - [ ] Fold lifecycle/template summaries into active Command or Scorecard loops.
 
 ---

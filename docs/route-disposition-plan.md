@@ -37,7 +37,7 @@ These routes are not active operating lanes. They remain available from the coll
 ## Cleanup Sequence
 
 1. Q-35: Move legacy routes out of primary nav and document disposition.
-2. Q-36: Add legacy banners to old pages so no one mistakes them for active lanes.
+2. Q-36: Add legacy banners to old pages so no one mistakes them for active lanes. Complete for `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow`.
 3. Q-37: Fold useful template/lifecycle summaries into Command or Scorecard.
 4. Q-38: Decide route-by-route: rebuild, redirect, archive, or delete.
 

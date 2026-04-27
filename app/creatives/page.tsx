@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { getProjectState } from "@/lib/project-state-data";
 import { TRADE_MAP, getCreativeUrls } from "@/lib/trade-utils";
 
@@ -108,14 +109,19 @@ export default function CreativesPage() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center text-slate-400">
-        Loading master gallery…
+      <div className="space-y-10">
+        <LegacyRouteBanner route="/creatives" />
+        <div className="flex h-64 items-center justify-center text-slate-400">
+          Loading master gallery…
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-10">
+      <LegacyRouteBanner route="/creatives" />
+
       {/* Header */}
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-slate-800 pb-8">
         <div className="max-w-xl">

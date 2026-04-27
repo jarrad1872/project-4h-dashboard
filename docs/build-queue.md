@@ -51,12 +51,12 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-33 | Phase 3 | Field Sales | Add field-sales attribution measurement | 2026-04-27 | `/sales` reads `marketing_events` for rep-coded field-sales UTMs and card metadata, then shows scans, demos, trials, paid signal, and top rep/card/trade buckets without sending outreach or taking external action. |
 | Q-34 | Phase 3 | Field Sales | Add weekly AZ rep operating packet | 2026-04-27 | `/sales` turns CRM rows and field-sales attribution into a weekly rep packet with touch targets, cards to carry, priority rows, daily cadence, and explicit no-external-action boundaries. |
 | Q-35 | Governance | Navigation | Clean primary nav and route disposition plan | 2026-04-27 | Sidebar now shows active growth loops and launch governance first, moves original-build pages into a collapsed Reference Shelf, and documents route disposition in `docs/route-disposition-plan.md`. |
+| Q-36 | Governance | Navigation | Add legacy banners to old pages | 2026-04-27 | `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` now show a route disposition banner with active replacement links and no-external-action boundaries. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-36 | Governance | Navigation | Add legacy banners to old pages | none | `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` visibly say whether they are archive/reference/superseded surfaces. |
 | Q-37 | Phase 6 | Learning | Fold lifecycle/template summaries into active loops | none | Command/Scorecard expose the useful `/lifecycle` and `/templates` signals so they do not need daily sidebar space. |
 
 ## Stop Conditions

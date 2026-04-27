@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PlatformChip, StatusChip } from "@/components/chips";
+import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { getAdArchiveState, summarizeAdArchive } from "@/lib/ad-archive";
 import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
 import { AdPreviewModal } from "@/components/ad-preview-modal";
@@ -242,6 +243,8 @@ function AdsContent() {
 
   return (
     <div className="space-y-6">
+      <LegacyRouteBanner route="/ads" />
+
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold">Ad Library</h1>
         <Button
