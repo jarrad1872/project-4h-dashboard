@@ -33,6 +33,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-18 | Phase 6 | Learning | Upgrade weekly report | 2026-04-27 | `/scorecard` ranks trades, creators, images, and angles from attribution events, with explicit zero-data states when paid signal is missing. |
 | Q-19 | Phase 6 | Learning | Add keep/kill/iterate decisions | 2026-04-27 | `/scorecard` records local keep/kill/iterate decisions with timestamps, notes, undo, and visible history without external actions. |
 | Q-20 | Phase 6 | Learning | Add customer pace forecast | 2026-04-27 | `/scorecard` shows target range, logged paid customers, current pace, projected gap to 1,000/2,000, and a next bet based only on real paid rows. |
+| Q-21 | Phase 6 | Research | Validate Meta Ad Library access | 2026-04-27 | `/templates` shows official Meta API limits, assumptions to validate, and the manual-first competitor research path without scraping or scheduling collectors. |
 
 ## Ready Queue
 
@@ -41,7 +42,6 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-01 | Phase 2 | Creative | Generate first beachhead image pack | None | In progress. Production desk, progress bar, copy packets, and per-card upload are ready. Finish by generating and uploading all 20 images. |
 | Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
 | Q-17 | Phase 5 | Launch | Create platform upload sheets | Review required | Local/download exports only; no platform upload. |
-| Q-21 | Phase 6 | Research | Validate Meta Ad Library access | None | Report separates official API limits from assumptions. |
 | Q-22 | Phase 6 | Research | Create competitor research template | None | Template captures offers, hooks, visuals, platforms, evidence quality, and citation fields. |
 | Q-23 | Governance | Safety | Add approval audit log | None | Audit covers creative, outreach, launch bundle, and export approvals. |
 | Q-24 | Governance | Safety | Add external-action stop screen | None | UI explains exact approval needed and performs no external API action. |

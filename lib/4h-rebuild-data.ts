@@ -364,7 +364,7 @@ export const rebuildExecutionQueue = [
     lane: "Research",
     title: "Validate Meta Ad Library access",
     route: "/templates",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Competitive research path is validated before relying on automated ad-library collection.",
     acceptance: "Report distinguishes official API limits from assumptions.",

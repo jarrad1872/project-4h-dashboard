@@ -3,6 +3,7 @@ import {
   BASE_COMPETITIVE_KEYWORDS,
   buildCompetitiveAnalysisPrompt,
   buildCompetitiveWeeklyReport,
+  COMPETITIVE_RESEARCH_SOURCES,
   normalizeMetaAdSnapshot,
 } from "../competitive-ad-research-agent";
 
@@ -10,6 +11,14 @@ describe("competitive ad research foundation", () => {
   it("ships a direct competitor seed list", () => {
     expect(BASE_COMPETITIVE_KEYWORDS.some((seed) => seed.term === "smith.ai")).toBe(true);
     expect(BASE_COMPETITIVE_KEYWORDS.some((seed) => seed.category === "trade_saas")).toBe(true);
+  });
+
+  it("documents official source caveats for Meta access", () => {
+    const metaSource = COMPETITIVE_RESEARCH_SOURCES.find((source) => source.label === "Meta Ad Library API");
+
+    expect(metaSource?.url).toBe("https://www.facebook.com/ads/library/api/");
+    expect(metaSource?.note).toContain("UK/EU");
+    expect(metaSource?.note).toContain("web Ad Library");
   });
 
   it("normalizes a Meta ad payload into the shared snapshot shape", () => {

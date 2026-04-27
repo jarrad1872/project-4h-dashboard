@@ -350,12 +350,17 @@ This is read-only market intelligence for 4H creative strategy. It does not touc
 2. Treat analysis cost as low-but-non-zero when using Claude API directly.
 3. Reports must distinguish observed ad patterns from inference.
 4. Weekly output must include coverage notes so strategy decisions are not made on hidden blind spots.
+5. For US commercial competitors, treat the official Meta API as limited until a real token test proves useful non-political coverage. The manual public Ad Library web UI remains the default source for Q-22 evidence capture.
+6. Do not scrape reverse-engineered endpoints, schedule collectors, buy vendor access, or create external webhooks from this repo without explicit approval.
 
 ### Foundation Files
 
 - `docs/competitive-ad-research-agent.md`
+- `docs/meta-ad-library-access-validation.md`
 - `lib/competitive-ad-research-agent.ts`
+- `lib/meta-ad-library-access.ts`
 - `lib/__tests__/competitive-ad-research-agent.test.ts`
+- `lib/__tests__/meta-ad-library-access.test.ts`
 - `scripts/competitive-intel-meta.js`
 
 ### Build Sequence

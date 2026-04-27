@@ -11,6 +11,7 @@ import {
   type MessageMatchAngle,
   type MessageMatchBrief,
 } from "@/lib/message-match-briefs";
+import { META_AD_LIBRARY_ACCESS_REPORT } from "@/lib/meta-ad-library-access";
 import type { AdTemplate } from "@/lib/types";
 
 const MESSAGE_MATCH_BRIEFS = listMessageMatchBriefs();
@@ -108,6 +109,84 @@ export default function TemplatesPage() {
         </div>
         <p className="text-sm text-slate-400">{CONTENT_BRIEF_TEMPLATES.length} creator briefs · {templates.length} ad templates</p>
       </div>
+
+      <Card className="space-y-4 border-violet-900/60 bg-slate-900/70">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Meta Ad Library access validation</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-400">
+              {META_AD_LIBRARY_ACCESS_REPORT.verdict}
+            </p>
+          </div>
+          <span className="rounded border border-violet-800/60 bg-violet-950/30 px-3 py-2 text-xs font-semibold uppercase text-violet-200">
+            {META_AD_LIBRARY_ACCESS_REPORT.status}
+          </span>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1.1fr,0.9fr]">
+          <div className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Official limits</p>
+            <div className="mt-3 space-y-3">
+              {META_AD_LIBRARY_ACCESS_REPORT.officialFindings.map((finding) => (
+                <div key={finding.title} className="border-t border-slate-800 pt-3 first:border-t-0 first:pt-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`rounded border px-2 py-1 text-xs font-semibold uppercase ${
+                      finding.kind === "available"
+                        ? "border-emerald-700/50 bg-emerald-950/30 text-emerald-300"
+                        : "border-amber-700/50 bg-amber-950/30 text-amber-300"
+                    }`}>
+                      {finding.kind}
+                    </span>
+                    <p className="text-sm font-semibold text-white">{finding.title}</p>
+                  </div>
+                  <p className="mt-2 text-sm leading-5 text-slate-400">{finding.detail}</p>
+                  {finding.sourceUrl ? (
+                    <a
+                      href={finding.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex text-xs font-semibold text-violet-300 hover:underline"
+                    >
+                      {finding.sourceLabel}
+                    </a>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Assumptions to validate</p>
+              <ul className="mt-3 space-y-2 text-sm leading-5 text-slate-400">
+                {META_AD_LIBRARY_ACCESS_REPORT.assumptionsToValidate.map((finding) => (
+                  <li key={finding.title}>
+                    <span className="font-semibold text-slate-200">{finding.title}:</span> {finding.detail}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Recommended 4H path</p>
+              <ol className="mt-3 space-y-2 text-sm leading-5 text-slate-400">
+                {META_AD_LIBRARY_ACCESS_REPORT.recommendedPath.map((step, index) => (
+                  <li key={step}>{index + 1}. {step}</li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="rounded-lg border border-red-900/50 bg-red-950/20 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Blocked automation</p>
+              <ul className="mt-3 space-y-2 text-sm leading-5 text-slate-300">
+                {META_AD_LIBRARY_ACCESS_REPORT.blockedAutomation.map((item) => (
+                  <li key={item}>- {item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="space-y-4 border-cyan-900/60 bg-slate-900/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">

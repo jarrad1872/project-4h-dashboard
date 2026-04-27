@@ -129,14 +129,14 @@ export const BASE_COMPETITIVE_KEYWORDS: CompetitiveKeywordSeed[] = [
 
 export const COMPETITIVE_RESEARCH_SOURCES: CompetitiveResearchSource[] = [
   {
-    label: "Meta Ad Library overview",
-    url: "https://about.fb.com/wp-content/uploads/sites/10/2020/09/Facebook_Response_European_Democracy_Action_Plan_2020.09.15.pdf",
-    note: "Meta says Ad Library includes all currently active ads across Facebook apps and services.",
+    label: "Meta Ad Library API",
+    url: "https://www.facebook.com/ads/library/api/",
+    note: "Meta documents API scope as political/issue ads globally plus any-type ads delivered to the UK/EU; all currently running ads should be searched in the web Ad Library.",
   },
   {
-    label: "Meta Radlibrary setup",
-    url: "https://facebookresearch.github.io/Radlibrary/articles/Radlibrary.html",
-    note: "Meta's own research tooling docs require a developer account, token retrieval, and identity/location verification.",
+    label: "SOMAR Meta Content Library",
+    url: "https://www.icpsr.umich.edu/sites/somar/meta-content-library",
+    note: "Meta Content Library API is researcher-gated and runs through secure computing environments, not a ready commercial 4H workflow.",
   },
   {
     label: "Anthropic pricing",

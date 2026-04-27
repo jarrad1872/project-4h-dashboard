@@ -149,7 +149,7 @@ Core offer rules:
 - [x] Update weekly report to rank trades, creators, images, and angles by paid conversion.
 - [x] Add experiment notes and decision status: keep, kill, iterate.
 - [ ] Add creative fatigue and variant lineage tracking.
-- [ ] Add competitor/ad-library research only after Meta access is validated.
+- [x] Add competitor/ad-library research only after Meta access is validated.
 - [x] Add a simple forecast: customers needed this month, current pace, gap, and next bets.
 
 ---
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06, Q-08 through Q-16, and Q-18 through Q-20 complete; Q-07 and Q-17 are approval-gated; Q-21 is the next ready autonomous item.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06, Q-08 through Q-16, and Q-18 through Q-21 complete; Q-07 and Q-17 are approval-gated; Q-22 is the next ready autonomous item.
 
 ---
 
@@ -194,7 +194,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 ## Backlog
 
 - [x] Claude Design handoff packet for Creative Lab UI once data model is stable.
-- [ ] Competitive research agent using validated Meta Ad Library access.
+- [x] Competitive research agent using validated Meta Ad Library access.
 - [ ] Launch bundle exporter for platform upload sheets.
 - [x] Experiment-level budget planner for first paid tests.
 - [ ] Founder video asset tracker.

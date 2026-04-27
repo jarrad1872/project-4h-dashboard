@@ -8,17 +8,20 @@ Build a repeatable, read-only competitive-intelligence workflow that captures re
 
 ## Verified Constraints
 
-This foundation is based on official-source verification completed on 2026-04-01.
+This foundation was updated with official-source verification on 2026-04-27.
 
-- Meta states that Ad Library is a public, searchable collection of all currently active ads across Facebook apps and services, with political ads archived for seven years.
-- Meta's own `Radlibrary` documentation also states that programmatic access requires a Facebook developer account, an access token from Graph API Explorer, and identity/location verification.
-- Because Meta's surfaced documentation mixes public-library messaging with token-gated API setup guidance, do not assume that weekly automated commercial-ad collection is production-safe until we validate coverage using our own token and real search terms.
+- Meta documents the Ad Library API for social, election, or political ads delivered globally during the last seven years, plus ads of any type delivered to the UK or European Union during the past year.
+- Meta directs researchers who want all currently running ads across Meta technologies to use the public Ad Library web experience.
+- Meta says ads that did not reach any EU location only return through the API if they are social, election, or political ads. Do not assume US commercial competitor coverage from the official API.
+- API setup requires identity and location confirmation, a Meta for Developers account, an app, and an access token.
+- Spend and impression ranges are available for political and issue ads; UK/EU ads expose estimated reach/transparency fields. Do not infer exact commercial spend.
+- Meta Content Library API is researcher-gated through secure computing environments and is not a ready commercial growth workflow for 4H.
 - Anthropic API usage is metered. Claude can still be the analysis layer, but H-16 should not be described as guaranteed `$0/mo` unless analysis runs on an already-budgeted internal account and we accept that incremental API usage is non-zero.
 
 Official sources used:
 
-- Meta public Ad Library overview: https://about.fb.com/wp-content/uploads/sites/10/2020/09/Facebook_Response_European_Democracy_Action_Plan_2020.09.15.pdf
-- Meta `Radlibrary` setup and token requirements: https://facebookresearch.github.io/Radlibrary/articles/Radlibrary.html
+- Meta Ad Library API: https://www.facebook.com/ads/library/api/
+- SOMAR Meta Content Library: https://www.icpsr.umich.edu/sites/somar/meta-content-library
 - Anthropic pricing: https://platform.claude.com/docs/en/about-claude/pricing
 
 ## Architecture Decision
@@ -33,7 +36,7 @@ Implement the collector against a normalized internal schema with two provider m
 - Preferred path once we have a verified token and confirmed result coverage for our search set.
 
 2. `meta_public_library`
-- Fallback/manual validation path if the token route proves too narrow or too brittle for the target keywords.
+- Manual validation path for currently active commercial ads, especially US competitors that the official API may not return.
 
 ### Pipeline
 
