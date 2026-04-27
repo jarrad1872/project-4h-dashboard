@@ -23,6 +23,7 @@ import {
   type LaunchDestination,
   type LaunchPlatform,
 } from "@/lib/launch-url-builder";
+import { buildPlatformUploadSheets, type PlatformUploadSheet } from "@/lib/platform-upload-sheets";
 import { productRouteInventory } from "@/lib/product-route-inventory";
 import { getTierTrades } from "@/lib/trade-utils";
 import type { BudgetData, CampaignStatusData, CreativeAssetStatus, LaunchChecklistItem } from "@/lib/types";
@@ -67,6 +68,7 @@ export default function LaunchPage() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
   const [selectedStopAction, setSelectedStopAction] = useState<ExternalActionKind>("launch_campaign");
   const [stopCopyStatus, setStopCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [sheetCopyStatus, setSheetCopyStatus] = useState<string | null>(null);
 
   async function load() {
     const [checkRes, statusRes, budgetRes] = await Promise.all([
@@ -184,6 +186,10 @@ export default function LaunchPage() {
       },
     });
   }, [budget, bundleCopyApproval, bundleCreativeStatus, bundleJarradApproval, launchAngle, launchAssetId, launchReadiness, launchUrlResult]);
+  const platformUploadSheets = useMemo(() => {
+    if (!launchBundle) return [];
+    return buildPlatformUploadSheets(launchBundle);
+  }, [launchBundle]);
   const readyToGo = basicLaunchGateReady && (launchReadiness?.ready ?? false);
   const selectedStop = getExternalActionStop(selectedStopAction);
 
@@ -203,6 +209,29 @@ export default function LaunchPage() {
     } catch {
       setStopCopyStatus("failed");
     }
+  }
+
+  async function copyUploadSheet(sheet: PlatformUploadSheet) {
+    try {
+      await navigator.clipboard.writeText(sheet.csv);
+      setSheetCopyStatus(`${sheet.kind}:copied`);
+    } catch {
+      setSheetCopyStatus(`${sheet.kind}:failed`);
+    }
+  }
+
+  function downloadUploadSheet(sheet: PlatformUploadSheet) {
+    const blob = new Blob([sheet.csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = sheet.filename;
+    anchor.rel = "noopener";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    setSheetCopyStatus(`${sheet.kind}:downloaded`);
   }
 
   if (!status) {
@@ -641,6 +670,76 @@ export default function LaunchPage() {
                 <li key={note}>- {note}</li>
               ))}
             </ul>
+          </div>
+        </Card>
+      )}
+
+      {launchBundle && (
+        <Card className="border-violet-900/60 bg-slate-900/70">
+          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-violet-300">Q-17 platform upload sheets</p>
+              <h2 className="mt-1 text-xl font-black text-white">Local review exports only</h2>
+              <p className="mt-1 max-w-3xl text-sm text-slate-400">
+                CSV sheets generated from the selected internal launch bundle. These are local review/download packets only;
+                this panel does not upload to Meta, LinkedIn, YouTube, Instagram, create campaigns, send webhooks, or spend money.
+              </p>
+            </div>
+            <div className="rounded border border-violet-800/60 bg-slate-950 px-3 py-2 text-right text-xs text-violet-100">
+              <p className="font-semibold">{platformUploadSheets.length} sheet previews</p>
+              <p>No platform API calls</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-2">
+            {platformUploadSheets.map((sheet) => {
+              const copyState = sheetCopyStatus === `${sheet.kind}:copied`
+                ? "copied"
+                : sheetCopyStatus === `${sheet.kind}:failed`
+                  ? "failed"
+                  : sheetCopyStatus === `${sheet.kind}:downloaded`
+                    ? "downloaded"
+                    : "idle";
+
+              return (
+                <div key={sheet.kind} className="rounded border border-slate-800 bg-slate-950/70 p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-white">{sheet.label}</p>
+                      <p className="mt-1 text-xs text-slate-500">{sheet.filename}</p>
+                    </div>
+                    <span className="rounded-full border border-red-800/70 px-2 py-1 text-xs font-semibold uppercase text-red-200">
+                      review only
+                    </span>
+                  </div>
+                  <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-3">
+                    <p><span className="font-semibold text-slate-200">Rows:</span> {sheet.rows.length}</p>
+                    <p><span className="font-semibold text-slate-200">Status:</span> {sheet.rows[0]?.review_status}</p>
+                    <p><span className="font-semibold text-slate-200">Approval:</span> Jarrad required</p>
+                  </div>
+                  <textarea
+                    readOnly
+                    rows={8}
+                    value={sheet.csv}
+                    className="mt-3 w-full resize-y rounded border border-slate-800 bg-slate-950 p-3 font-mono text-xs text-violet-100 outline-none"
+                  />
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <GhostButton onClick={() => void copyUploadSheet(sheet)}>
+                      {copyState === "copied" ? "Copied CSV" : "Copy CSV"}
+                    </GhostButton>
+                    <GhostButton onClick={() => downloadUploadSheet(sheet)}>
+                      {copyState === "downloaded" ? "Downloaded" : "Download CSV"}
+                    </GhostButton>
+                    {copyState === "failed" && (
+                      <p className="text-xs text-amber-300">Clipboard failed. The CSV is selectable above.</p>
+                    )}
+                  </div>
+                  <p className="mt-3 rounded border border-red-900/60 bg-red-950/20 px-3 py-2 text-xs text-red-100">
+                    {sheet.safetyNote} External upload remains stopped until explicit Jarrad approval.
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </Card>
       )}

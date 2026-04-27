@@ -32,6 +32,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-14 | Phase 5 | Launch | Archive historical ad library | 2026-04-27 | `/ads` separates current candidates from historical archive rows, labels old NB2/imported/Saw.City ads, and preserves copy without deletion. |
 | Q-15 | Phase 5 | Launch | Build launch bundle model | 2026-04-27 | `/launch` shows an internal bundle draft tying trade, angle, image asset, copy, URL, budget, readiness, and approvals without launching. |
 | Q-16 | Phase 5 | Launch | Add experiment budget allocation | 2026-04-27 | `/budget` allocates local planning budgets by experiment, clamps to remaining channel budget, and does not update billing, ad accounts, webhooks, or stored spend. |
+| Q-17 | Phase 5 | Launch | Create platform upload sheets | 2026-04-27 | `/launch` generates local review-only CSV previews/downloads for the selected bundle, including Meta, LinkedIn, YouTube, and Instagram rows; no platform API upload happens. |
 | Q-18 | Phase 6 | Learning | Upgrade weekly report | 2026-04-27 | `/scorecard` ranks trades, creators, images, and angles from attribution events, with explicit zero-data states when paid signal is missing. |
 | Q-19 | Phase 6 | Learning | Add keep/kill/iterate decisions | 2026-04-27 | `/scorecard` records local keep/kill/iterate decisions with timestamps, notes, undo, and visible history without external actions. |
 | Q-20 | Phase 6 | Learning | Add customer pace forecast | 2026-04-27 | `/scorecard` shows target range, logged paid customers, current pace, projected gap to 1,000/2,000, and a next bet based only on real paid rows. |
@@ -44,7 +45,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-17 | Phase 5 | Launch | Create platform upload sheets | Review required | Local/download exports only; no platform upload. |
+| — | — | — | No ready queue items remain | — | Add the next first-principles build packet before continuing. |
 
 ## Stop Conditions
 

@@ -320,6 +320,13 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - The bundle is an internal planning object only. It does not upload ads, launch campaigns, send outreach, create webhooks, or move money.
 - Bundle statuses are `blocked`, `draft`, `review-ready`, and `approved`; `approved` still means the bundle has internal approval state, not that any platform action has happened.
 
+**Q-17 local upload sheets:**
+- `/launch` generates copyable/downloadable CSV previews from the selected launch bundle for platform review.
+- Sheets are stamped `REVIEW_ONLY_DO_NOT_UPLOAD` and `JARRAD_APPROVAL_REQUIRED_BEFORE_PLATFORM_UPLOAD`.
+- The Meta sheet includes Facebook and Instagram rows; platform-specific sheets include the selected platform, YouTube, and LinkedIn as needed for review.
+- These CSVs are local handoff artifacts only. Copying or downloading a sheet does not upload to Meta, LinkedIn, YouTube, Instagram, launch a campaign, create webhooks, move money, or change billing.
+- Do not use a Q-17 sheet outside 4H until the launch bundle, copy, creative, and Jarrad approval gates are explicitly satisfied.
+
 **External action stop screen:**
 - `/launch` stops campaign launch/edit, ad upload, creator outreach send, webhook creation, and spend/billing changes at a visible approval boundary.
 - Each stopped action must state the risk, the exact Jarrad approval needed, the blocked mechanism, and the next internal step.
@@ -330,7 +337,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `/budget` assigns the first paid-test planning budget by experiment, not only by channel.
 - Experiment requests are local UI planning state. Editing them does not update billing, ad accounts, Supabase budget rows, webhooks, uploads, campaigns, or spend.
 - Allocations are clamped to the current remaining channel budget so a launch plan cannot silently overcommit a platform.
-- Use the planner to decide what budget belongs in future Q-17 local upload sheets after review approval.
+- Use the planner to decide what budget belongs in Q-17 local upload sheet previews after review approval.
 
 **Message-match briefs:**
 - `/templates` holds 4H-owned handoff briefs for future sawcity-lite landing work across the five beachhead domains and four creative angles.

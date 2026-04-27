@@ -137,7 +137,7 @@ Core offer rules:
 - [x] Create launch bundles: trade, angle, image, copy, creator/proof asset, URL, budget, approval.
 - [x] Add budget allocation by experiment, not only by platform.
 - [ ] Add preflight checks for price, trial, domain, UTM, creative approval, and Jarrad approval.
-- [ ] Add import/export format for Meta, YouTube, LinkedIn, and Instagram upload sheets.
+- [x] Add import/export format for Meta, YouTube, LinkedIn, and Instagram upload sheets.
 - [ ] Keep ad account setup and spending outside automation until Jarrad approves.
 
 ### Phase 6 - Weekly Learning Loop
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [x] Work through Q-01 through Q-24 governance/build queue items except approval-gated exports. Current: Q-01 through Q-16 and Q-18 through Q-24 complete; Q-17 is approval-gated. No non-approval ready queue item remains.
+- [x] Work through Q-01 through Q-24 governance/build queue items. Current: Q-01 through Q-24 complete; no ready queue item remains.
 
 ---
 
@@ -196,7 +196,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Claude Design handoff packet for Creative Lab UI once data model is stable.
 - [x] Competitive research agent using validated Meta Ad Library access.
 - [x] Competitive research report template.
-- [ ] Launch bundle exporter for platform upload sheets.
+- [x] Launch bundle exporter for platform upload sheets.
 - [x] Experiment-level budget planner for first paid tests.
 - [ ] Founder video asset tracker.
 - [ ] Trade-level weekly target calculator.

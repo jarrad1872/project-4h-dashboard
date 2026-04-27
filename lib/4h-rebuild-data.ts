@@ -137,7 +137,22 @@ export const customerMath = [
   },
 ] as const;
 
-export const rebuildExecutionQueue = [
+export type RebuildQueueStatus = "ready" | "complete" | "blocked";
+export type RebuildQueueApproval = "none" | "review-required" | "jarrad-required";
+
+export interface RebuildQueueItem {
+  id: string;
+  phase: string;
+  lane: string;
+  title: string;
+  route: string;
+  status: RebuildQueueStatus;
+  approval: RebuildQueueApproval;
+  outcome: string;
+  acceptance: string;
+}
+
+export const rebuildExecutionQueue: RebuildQueueItem[] = [
   {
     id: "Q-01",
     phase: "Phase 2",
@@ -320,9 +335,9 @@ export const rebuildExecutionQueue = [
     lane: "Launch",
     title: "Create platform upload sheets",
     route: "/launch",
-    status: "ready",
+    status: "complete",
     approval: "review-required",
-    outcome: "Meta, LinkedIn, YouTube, and Instagram CSV exports can be generated for approved bundles.",
+    outcome: "Meta, LinkedIn, YouTube, and Instagram CSV previews can be copied or downloaded from the selected bundle.",
     acceptance: "Exporting is local/download-only and does not upload to ad accounts.",
   },
   {
@@ -402,4 +417,4 @@ export const rebuildExecutionQueue = [
     outcome: "Launch page stops launch, upload, outreach send, webhook, and spend actions with exact approval requirements.",
     acceptance: "UI copy explains the exact approval needed and no external API calls happen.",
   },
-] as const;
+];

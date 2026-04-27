@@ -122,7 +122,7 @@ export function buildLaunchBundle(input: LaunchBundleInput): LaunchBundle {
     safetyNotes: [
       "Planning bundle only; does not launch, upload, send, create webhooks, or spend money.",
       "Requires approved creative, approved copy, and explicit Jarrad launch approval before any external action.",
-      "Use as the source object for future Q-17 local upload sheets after review approval.",
+      "Use as the source object for Q-17 local review/download sheets; external platform upload remains manual and approval-gated.",
     ],
   };
 }
