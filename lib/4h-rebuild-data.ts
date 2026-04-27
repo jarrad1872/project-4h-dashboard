@@ -166,7 +166,7 @@ export const rebuildExecutionQueue = [
     lane: "Creative",
     title: "Add variant replacement workflow",
     route: "/assets",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "A generated image can spawn a v2/v3 prompt tied to the parent asset.",
     acceptance: "Parent/child lineage is visible and variant IDs remain stable.",

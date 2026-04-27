@@ -110,6 +110,7 @@ Image URL: points to `trade-heros/nb2/{slug}-hero-a.jpg`
 - Use **Create 20-prompt set** to seed the beachhead queue: `pipe`, `duct`, `mow`, `pest`, and `coat` across missed-call, demo-call, owner-agent, and ROI math.
 - Use the Creative Lab filters to narrow review by status, trade, angle, or generation state before copying packets or uploading generated images.
 - Use **Copy packet** on a prompt card, generate the image here with ChatGPT Pro, then upload the generated image back to the same asset card.
+- Use **Create v2/v3 prompt** when an image needs a replacement. The new prompt keeps the original `prompt_brief_id`, stores `parent_asset_id`, and assigns a deterministic variant ID such as `pipe-missed-call-multi-v2`.
 - Creative lineage is stored on `creative_assets`: provider, model, prompt brief, prompt text, negative prompt, dimensions, variant ID, parent asset, generation status, storage path, quality, moderation, and response metadata.
 - All concepts remain `draft` or `review` until Jarrad approves. No external publishing, upload, webhook, ad launch, or spend happens automatically.
 

@@ -1,6 +1,7 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
 import { DataFiles, isoNow, writeJsonFile } from "@/lib/file-db";
+import { buildReplacementPrompt, getNextCreativeVariantPlan } from "@/lib/creative-asset-variants";
 import {
   BEACHHEAD_IMAGE_TRADES,
   CHATGPT_IMAGE_MODEL,
@@ -46,8 +47,8 @@ function normalizeCreativeAsset(input: Record<string, unknown>): CreativeAsset {
     response_metadata: (input.response_metadata as Record<string, unknown> | null | undefined) ?? {},
     status: (input.status as CreativeAssetStatus | undefined) ?? "draft",
     target_platform: (input.target_platform as CreativeAssetPlatform | undefined) ?? "multi",
-    thumbnail_url: null,
-    asset_url: null,
+    thumbnail_url: (input.thumbnail_url as string | null | undefined) ?? null,
+    asset_url: (input.asset_url as string | null | undefined) ?? null,
     notes: (input.notes as string | null | undefined) ?? null,
     created_at: String(input.created_at ?? now),
     updated_at: String(input.updated_at ?? now),
@@ -74,7 +75,7 @@ function buildConceptFromBrief(input: {
   variant_id?: unknown;
 }) {
   const { brief } = input;
-  const variantId = String(input.variant_id ?? `${brief.id}-${Date.now()}`);
+  const variantId = String(input.variant_id ?? `${brief.id}-v1`);
 
   return normalizeCreativeAsset({
     id: crypto.randomUUID(),
@@ -97,6 +98,63 @@ function buildConceptFromBrief(input: {
     response_metadata: { production_mode: "manual_chatgpt_pro" },
     source_image_url: input.source_image_url ?? null,
     notes: input.notes ?? "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+  });
+}
+
+function assetsInVariantFamily(parent: CreativeAsset, assets: CreativeAsset[]) {
+  const rootId = parent.parent_asset_id ?? parent.id;
+
+  return assets.filter((asset) => {
+    const samePromptBrief = Boolean(parent.prompt_brief_id && asset.prompt_brief_id === parent.prompt_brief_id);
+    const root = asset.id === rootId;
+    const directChild = asset.parent_asset_id === parent.id;
+    const sameRoot = asset.parent_asset_id === rootId;
+    return asset.id === parent.id || root || samePromptBrief || directChild || sameRoot;
+  });
+}
+
+function buildReplacementConcept(input: {
+  parent: CreativeAsset;
+  family: CreativeAsset[];
+  revisionInstruction?: unknown;
+  title?: unknown;
+}) {
+  const revisionInstruction = String(input.revisionInstruction ?? "Improve this concept while preserving the trade proof strategy.");
+  const plan = getNextCreativeVariantPlan(input.parent, input.family);
+  const now = isoNow();
+
+  return normalizeCreativeAsset({
+    id: crypto.randomUUID(),
+    trade_slug: input.parent.trade_slug,
+    title: input.title ?? `${input.parent.title} v${plan.version}`,
+    angle: input.parent.angle,
+    target_platform: input.parent.target_platform,
+    tool_used: input.parent.tool_used || CHATGPT_IMAGE_MODEL,
+    provider: input.parent.provider ?? IMAGE_CREATIVE_PROVIDER,
+    model: input.parent.model ?? CHATGPT_IMAGE_MODEL,
+    prompt_brief_id: input.parent.prompt_brief_id,
+    prompt_text: buildReplacementPrompt(input.parent, revisionInstruction, plan.variantId),
+    negative_prompt: input.parent.negative_prompt,
+    dimensions: input.parent.dimensions,
+    variant_id: plan.variantId,
+    parent_asset_id: input.parent.id,
+    generation_status: "brief",
+    output_format: input.parent.output_format ?? "png",
+    quality: input.parent.quality ?? "medium",
+    moderation: input.parent.moderation ?? "auto",
+    response_metadata: {
+      ...input.parent.response_metadata,
+      production_mode: "manual_chatgpt_pro",
+      replacement_for: input.parent.id,
+      variant_base: plan.base,
+      variant_version: plan.version,
+      revision_instruction: revisionInstruction,
+    },
+    source_image_url: input.parent.asset_url ?? input.parent.thumbnail_url ?? input.parent.source_image_url,
+    notes: `Variant ${plan.version} replacement prompt. Direction: ${revisionInstruction}`,
+    status: "draft",
+    created_at: now,
+    updated_at: now,
   });
 }
 
@@ -125,12 +183,78 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Record<string, unknown>;
     const isBatch = body.batch === true;
+    const parentAssetId = body.parent_asset_id ? String(body.parent_asset_id) : null;
     const tradeSlug = String(body.trade_slug ?? "pipe");
     const angle = String(body.angle ?? "missed-call") as CreativeAssetAngle;
     const targetPlatform = String(body.target_platform ?? "multi") as CreativeAssetPlatform;
 
     if (!IMAGE_CREATIVE_PLATFORMS.includes(targetPlatform)) {
       return errorJson(`target_platform must be one of: ${IMAGE_CREATIVE_PLATFORMS.join(", ")}`, 400, undefined, request);
+    }
+
+    if (parentAssetId) {
+      if (!hasSupabase()) {
+        const assets = readFallbackAssets();
+        const parent = assets.find((asset) => asset.id === parentAssetId);
+        if (!parent) {
+          return errorJson("Parent creative asset not found", 404, undefined, request);
+        }
+
+        const replacement = buildReplacementConcept({
+          parent,
+          family: assetsInVariantFamily(parent, assets),
+          revisionInstruction: body.revision_instruction,
+          title: body.title,
+        });
+        writeFallbackAssets([replacement, ...assets]);
+        return okJson(replacement, 201, request);
+      }
+
+      const { data: parentData, error: parentError } = await supabaseAdmin
+        .from("creative_assets")
+        .select("*")
+        .eq("id", parentAssetId)
+        .single();
+
+      if (parentError || !parentData) {
+        return errorJson("Parent creative asset not found", 404, parentError?.message, request);
+      }
+
+      const parent = normalizeCreativeAsset(parentData as Record<string, unknown>);
+      let familyQuery = supabaseAdmin.from("creative_assets").select("*");
+      if (parent.prompt_brief_id) {
+        familyQuery = familyQuery.eq("prompt_brief_id", parent.prompt_brief_id);
+      } else {
+        const rootId = parent.parent_asset_id ?? parent.id;
+        familyQuery = familyQuery.or(`id.eq.${rootId},id.eq.${parent.id},parent_asset_id.eq.${rootId},parent_asset_id.eq.${parent.id}`);
+      }
+
+      const { data: familyData, error: familyError } = await familyQuery;
+      if (familyError) {
+        return errorJson("Failed to load creative variant family", 500, familyError.message, request);
+      }
+
+      const replacement = buildReplacementConcept({
+        parent,
+        family: (familyData ?? [parent]).map((row) => normalizeCreativeAsset(row as Record<string, unknown>)),
+        revisionInstruction: body.revision_instruction,
+        title: body.title,
+      });
+
+      const { data, error } = await supabaseAdmin.from("creative_assets").insert(replacement).select("*").single();
+      if (error) {
+        return errorJson("Failed to save image replacement concept", 500, error.message, request);
+      }
+
+      const saved = normalizeCreativeAsset((data ?? replacement) as Record<string, unknown>);
+      await logActivity({
+        entity_type: "creative_asset",
+        entity_id: saved.id,
+        action: "image_variant_created",
+        new_value: saved,
+      });
+
+      return okJson(saved, 201, request);
     }
 
     if (isBatch) {

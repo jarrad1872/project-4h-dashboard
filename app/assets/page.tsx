@@ -74,6 +74,8 @@ export default function AssetsPage() {
   const [conceptForm, setConceptForm] = useState(EMPTY_CONCEPT_FORM);
   const [assetFile, setAssetFile] = useState<File | null>(null);
   const [assetUploads, setAssetUploads] = useState<Record<string, File | null>>({});
+  const [variantDirections, setVariantDirections] = useState<Record<string, string>>({});
+  const [variantErrors, setVariantErrors] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState(DEFAULT_CREATIVE_ASSET_FILTERS);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -151,6 +153,37 @@ export default function AssetsPage() {
     await load();
   }
 
+  async function createReplacementVariant(asset: CreativeAsset) {
+    const savingKey = `variant-${asset.id}`;
+    const revisionInstruction =
+      variantDirections[asset.id]?.trim() ||
+      "Create a stronger replacement that keeps the same trade, offer, and visible proof while fixing the weakest visual issue.";
+
+    setSavingId(savingKey);
+    const response = await fetch("/api/image-concepts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        parent_asset_id: asset.id,
+        revision_instruction: revisionInstruction,
+      }),
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+      setVariantErrors((current) => ({
+        ...current,
+        [asset.id]: data?.error ?? "Failed to create replacement variant.",
+      }));
+      setSavingId(null);
+      return;
+    }
+
+    setVariantErrors((current) => ({ ...current, [asset.id]: "" }));
+    setVariantDirections((current) => ({ ...current, [asset.id]: "" }));
+    setSavingId(null);
+    await load();
+  }
+
   async function copyGenerationPacket(asset: CreativeAsset) {
     const packet = [
       `Model: ${asset.model ?? DEFAULT_CREATIVE_TOOL}`,
@@ -159,6 +192,7 @@ export default function AssetsPage() {
       `Angle: ${formatCreativeAssetAngleLabel(asset.angle)}`,
       `Platform: ${asset.target_platform}`,
       `Dimensions: ${asset.dimensions ?? "Use the platform crop from the prompt"}`,
+      asset.source_image_url ? `Source image: ${asset.source_image_url}` : null,
       "",
       "Prompt:",
       asset.prompt_text ?? "",
@@ -168,7 +202,9 @@ export default function AssetsPage() {
       "",
       "Output:",
       "Generate one paid-social image. Keep any text minimal and legible. Do not publish or launch the asset.",
-    ].join("\n");
+    ]
+      .filter((line): line is string => line !== null)
+      .join("\n");
 
     await navigator.clipboard.writeText(packet);
     setCopiedId(asset.id);
@@ -622,6 +658,15 @@ export default function AssetsPage() {
                         className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
                       />
                     </div>
+                    <div>
+                      <label className="mb-1 block text-xs uppercase tracking-wide text-slate-500">Parent</label>
+                      <input
+                        type="text"
+                        value={asset.parent_asset_id ?? "root concept"}
+                        readOnly
+                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-400"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -652,6 +697,21 @@ export default function AssetsPage() {
                         {savingId === asset.id ? "Uploading..." : "Upload result"}
                       </GhostButton>
                     </div>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+                    <label className="mb-2 block text-xs uppercase tracking-wide text-slate-500">Replacement variant</label>
+                    <textarea
+                      rows={2}
+                      value={variantDirections[asset.id] ?? ""}
+                      onChange={(event) => setVariantDirections((current) => ({ ...current, [asset.id]: event.target.value }))}
+                      placeholder="Describe what v2/v3 should fix or preserve"
+                      className="mb-2 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
+                    />
+                    <GhostButton disabled={savingId === `variant-${asset.id}`} onClick={() => void createReplacementVariant(asset)}>
+                      {savingId === `variant-${asset.id}` ? "Creating variant..." : "Create v2/v3 prompt"}
+                    </GhostButton>
+                    {variantErrors[asset.id] ? <p className="mt-2 text-xs text-rose-300">{variantErrors[asset.id]}</p> : null}
                   </div>
 
                   <div>
