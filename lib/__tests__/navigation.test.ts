@@ -6,6 +6,8 @@ import {
   legacyNavigationItems,
   legacyRouteAuditRows,
   navigationGroups,
+  routeDispositionDecisions,
+  routeDispositionSummary,
 } from "../navigation";
 
 describe("navigation IA", () => {
@@ -40,5 +42,26 @@ describe("navigation IA", () => {
     expect(getLegacyRouteBanner("/generate")?.replacementHref).toBe("/assets");
     expect(getLegacyRouteBanner("/workflow")?.replacementHref).toBe("/launch");
     expect(getLegacyRouteBanner("/scorecard")).toBeNull();
+  });
+
+  it("records a non-destructive retirement decision for every leftover support/archive route", () => {
+    expect(routeDispositionDecisions.map((row) => row.route)).toEqual([
+      "/ads",
+      "/generate",
+      "/gtm",
+      "/settings",
+      "/creatives",
+      "/workflow",
+      "/templates",
+      "/lifecycle",
+    ]);
+    expect(routeDispositionDecisions.every((row) => row.destructiveActionAllowed === false)).toBe(true);
+    expect(routeDispositionDecisions.find((row) => row.route === "/settings")?.recommendation).toBe("delete");
+    expect(routeDispositionDecisions.find((row) => row.route === "/templates")?.recommendation).toBe("rebuild");
+    expect(routeDispositionSummary()).toEqual({
+      total: 8,
+      counts: { rebuild: 2, redirect: 3, archive: 2, delete: 1 },
+      destructiveActionsAllowed: false,
+    });
   });
 });

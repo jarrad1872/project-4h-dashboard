@@ -1,4 +1,5 @@
 export type NavigationStatus = "active" | "support" | "legacy";
+export type RouteRetirementRecommendation = "rebuild" | "redirect" | "archive" | "delete";
 
 export interface NavigationItem {
   href: string;
@@ -19,6 +20,17 @@ export interface LegacyRouteBannerConfig {
 export interface NavigationGroup {
   label: string;
   items: NavigationItem[];
+}
+
+export interface RouteDispositionDecision {
+  route: string;
+  label: string;
+  currentDisposition: "reference shelf" | "direct-link archive" | "support route";
+  recommendation: RouteRetirementRecommendation;
+  replacementHref: string | null;
+  rationale: string;
+  nextStep: string;
+  destructiveActionAllowed: false;
 }
 
 export const navigationGroups: NavigationGroup[] = [
@@ -113,6 +125,97 @@ export const legacyRouteBanners: Record<string, LegacyRouteBannerConfig> = {
   },
 };
 
+export const routeDispositionDecisions: RouteDispositionDecision[] = [
+  {
+    route: "/ads",
+    label: "Ad Archive",
+    currentDisposition: "reference shelf",
+    recommendation: "archive",
+    replacementHref: "/launch",
+    rationale:
+      "Historical ad rows are still useful audit evidence, but none should be treated as current launch candidates without a launch bundle rebuild.",
+    nextStep: "Keep the archive banner and use Launch bundles for any future current-candidate rebuild.",
+    destructiveActionAllowed: false,
+  },
+  {
+    route: "/generate",
+    label: "AI Studio",
+    currentDisposition: "reference shelf",
+    recommendation: "redirect",
+    replacementHref: "/assets",
+    rationale:
+      "The legacy Gemini/NB2 generator is superseded by the ChatGPT Pro Creative Lab and should not remain a daily creative surface.",
+    nextStep: "After one more verification pass, redirect to Creative Lab while preserving any reusable prompt notes in docs.",
+    destructiveActionAllowed: false,
+  },
+  {
+    route: "/gtm",
+    label: "Legacy GTM",
+    currentDisposition: "reference shelf",
+    recommendation: "archive",
+    replacementHref: "/",
+    rationale:
+      "The route still holds historical GTM and product-route inventory context that can help future audits, but Command owns current execution.",
+    nextStep: "Keep direct-link/archive access until the product-route inventory is fully represented in active launch/support data.",
+    destructiveActionAllowed: false,
+  },
+  {
+    route: "/settings",
+    label: "Settings",
+    currentDisposition: "reference shelf",
+    recommendation: "delete",
+    replacementHref: "/approval",
+    rationale:
+      "The old settings/source-doc surface is not part of the rebuild and overlaps with docs plus approval/launch governance.",
+    nextStep: "Before deletion, verify no active link, API, or operator workflow depends on the page and move any unique notes into SOP/README.",
+    destructiveActionAllowed: false,
+  },
+  {
+    route: "/creatives",
+    label: "Creatives",
+    currentDisposition: "direct-link archive",
+    recommendation: "redirect",
+    replacementHref: "/assets",
+    rationale:
+      "The original master asset gallery is superseded by Creative Lab's prompt, upload, lineage, and fatigue workflow.",
+    nextStep: "Confirm every needed lookup exists in Creative Lab or docs, then redirect to `/assets`.",
+    destructiveActionAllowed: false,
+  },
+  {
+    route: "/workflow",
+    label: "Workflow",
+    currentDisposition: "direct-link archive",
+    recommendation: "redirect",
+    replacementHref: "/launch",
+    rationale:
+      "The old concept-to-live board is superseded by the build queue, Approval, Launch, and external-action stop screen.",
+    nextStep: "Confirm no launch-bundle or approval workflow links back to this route, then redirect to Launch.",
+    destructiveActionAllowed: false,
+  },
+  {
+    route: "/templates",
+    label: "Templates",
+    currentDisposition: "support route",
+    recommendation: "rebuild",
+    replacementHref: "/scorecard",
+    rationale:
+      "Message-match, creator brief, and competitor research templates remain useful, but should be treated as a support library reached from active loops.",
+    nextStep: "Keep as a support page while folding the highest-use brief actions into Launch, Creators, or Scorecard.",
+    destructiveActionAllowed: false,
+  },
+  {
+    route: "/lifecycle",
+    label: "Lifecycle",
+    currentDisposition: "support route",
+    recommendation: "rebuild",
+    replacementHref: "/scorecard",
+    rationale:
+      "Lifecycle follow-up measurement belongs inside the learning loop, but the detail page remains useful while the scorecard summary matures.",
+    nextStep: "Keep as a support page and gradually move decision-grade lifecycle summaries into Scorecard.",
+    destructiveActionAllowed: false,
+  },
+];
+
 export const allNavigationItems = [
   ...navigationGroups.flatMap((group) => group.items),
   ...legacyNavigationItems,
@@ -135,4 +238,20 @@ export function legacyRouteAuditRows() {
 
 export function getLegacyRouteBanner(route: string) {
   return legacyRouteBanners[route] ?? null;
+}
+
+export function routeDispositionSummary() {
+  const counts = routeDispositionDecisions.reduce<Record<RouteRetirementRecommendation, number>>(
+    (acc, row) => {
+      acc[row.recommendation] += 1;
+      return acc;
+    },
+    { rebuild: 0, redirect: 0, archive: 0, delete: 0 },
+  );
+
+  return {
+    total: routeDispositionDecisions.length,
+    counts,
+    destructiveActionsAllowed: routeDispositionDecisions.some((row) => row.destructiveActionAllowed),
+  };
 }

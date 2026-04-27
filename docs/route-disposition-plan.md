@@ -42,3 +42,18 @@ These routes are not active operating lanes. They remain available from the coll
 4. Q-38: Decide route-by-route: rebuild, redirect, archive, or delete. Do not delete or redirect routes in the decision packet.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
+
+## Q-38 Decision Matrix
+
+These are recommendations only. No redirect, deletion, route hiding, or file removal is authorized by this matrix.
+
+| Route | Recommendation | Replacement | Rationale | Next required step |
+| --- | --- | --- | --- | --- |
+| `/ads` | Archive | `/launch` | Historical ads are useful audit evidence, but not current launch candidates. | Keep archive banner; rebuild any future candidate as a Launch bundle. |
+| `/generate` | Redirect later | `/assets` | Legacy Gemini/NB2 generation is superseded by ChatGPT Pro Creative Lab. | Preserve reusable prompt notes, then redirect after a dependency check. |
+| `/gtm` | Archive | `/` | Historical GTM and product-route inventory context still helps audits. | Keep direct-link access until active launch/support data covers the inventory. |
+| `/settings` | Delete later | `/approval` | Old settings/source-doc surface overlaps docs and governance pages. | Move any unique notes into docs and verify no active dependency before deletion. |
+| `/creatives` | Redirect later | `/assets` | Original master gallery is superseded by Creative Lab. | Confirm needed lookups exist in Creative Lab or docs, then redirect. |
+| `/workflow` | Redirect later | `/launch` | Old concept-to-live board is superseded by queue, Approval, and Launch. | Confirm no launch/approval workflow depends on it, then redirect. |
+| `/templates` | Rebuild as support | `/scorecard` | Briefs and research templates remain useful but belong behind active loops. | Keep support route while folding high-use actions into Launch, Creators, or Scorecard. |
+| `/lifecycle` | Rebuild as support | `/scorecard` | Lifecycle measurement belongs in the learning loop, with detail available while summaries mature. | Keep support route while moving decision-grade lifecycle summaries into Scorecard. |

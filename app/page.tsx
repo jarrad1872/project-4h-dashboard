@@ -14,6 +14,7 @@ import {
   rebuildMission,
 } from "@/lib/4h-rebuild-data";
 import { latestMetricsWeek } from "@/lib/growth-command-center";
+import { routeDispositionDecisions, routeDispositionSummary } from "@/lib/navigation";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -135,6 +136,7 @@ export default function OverviewPage() {
       topReady: ready.slice(0, 8),
     };
   }, []);
+  const routeMatrixSummary = useMemo(() => routeDispositionSummary(), []);
 
   const supportSummary = useMemo(
     () =>
@@ -370,6 +372,53 @@ export default function OverviewPage() {
             ))}
           </div>
         </Card>
+      </section>
+
+      <section data-testid="route-retirement-matrix">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Route retirement matrix</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Recommendations only, no route changes yet</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{routeMatrixSummary.counts.rebuild} rebuild</StatusPill>
+            <StatusPill>{routeMatrixSummary.counts.redirect} redirect</StatusPill>
+            <StatusPill>{routeMatrixSummary.counts.archive} archive</StatusPill>
+            <StatusPill>{routeMatrixSummary.counts.delete} delete later</StatusPill>
+          </div>
+        </div>
+        <div className="mt-3 overflow-hidden rounded-lg border border-slate-700 bg-slate-800">
+          <div className="grid gap-px bg-slate-700 md:grid-cols-[0.7fr,0.8fr,0.8fr,1.5fr]">
+            {routeDispositionDecisions.map((row) => (
+              <div key={row.route} className="contents">
+                <div className="bg-slate-800 p-3">
+                  <p className="text-sm font-semibold text-white">{row.route}</p>
+                  <p className="mt-1 text-xs text-slate-500">{row.label}</p>
+                </div>
+                <div className="bg-slate-800 p-3">
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Recommendation</p>
+                  <p className="mt-1 text-sm font-semibold text-emerald-300">{row.recommendation}</p>
+                  <p className="mt-1 text-xs text-slate-500">{row.currentDisposition}</p>
+                </div>
+                <div className="bg-slate-800 p-3">
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Replacement</p>
+                  {row.replacementHref ? (
+                    <Link href={row.replacementHref} className="mt-1 inline-flex text-sm font-semibold text-slate-200 hover:underline">
+                      {row.replacementHref}
+                    </Link>
+                  ) : (
+                    <p className="mt-1 text-sm text-slate-500">None</p>
+                  )}
+                  <p className="mt-1 text-xs text-slate-500">No destructive action allowed</p>
+                </div>
+                <div className="bg-slate-800 p-3">
+                  <p className="text-sm leading-5 text-slate-300">{row.rationale}</p>
+                  <p className="mt-2 border-l border-slate-700 pl-3 text-xs leading-5 text-slate-500">{row.nextStep}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section>

@@ -53,12 +53,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-35 | Governance | Navigation | Clean primary nav and route disposition plan | 2026-04-27 | Sidebar now shows active growth loops and launch governance first, moves original-build pages into a collapsed Reference Shelf, and documents route disposition in `docs/route-disposition-plan.md`. |
 | Q-36 | Governance | Navigation | Add legacy banners to old pages | 2026-04-27 | `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` now show a route disposition banner with active replacement links and no-external-action boundaries. |
 | Q-37 | Phase 6 | Learning | Fold lifecycle/template summaries into active loops | 2026-04-27 | Command and Scorecard now expose lifecycle follow-up status plus template/message-match support signals, while `/lifecycle` and `/templates` remain direct-link support routes. |
+| Q-38 | Governance | Navigation | Create route retirement decision matrix | 2026-04-27 | Command and `docs/route-disposition-plan.md` now classify leftover routes as rebuild, redirect, archive, or delete-later recommendations with no destructive action allowed. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-38 | Governance | Navigation | Create route retirement decision matrix | none | Route disposition plan assigns each leftover support/archive route a rebuild, redirect, archive, or delete recommendation without deleting or redirecting anything yet. |
+| Q-39 | Governance | Navigation | Add route retirement dependency guard | none | Before any redirect/delete packet, active pages/docs/tests expose whether leftover routes are still linked or depended on. |
 
 ## Stop Conditions
 

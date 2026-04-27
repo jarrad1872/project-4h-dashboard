@@ -369,6 +369,8 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Direct-link support routes such as `/templates` and `/lifecycle` can stay available without taking primary sidebar space.
 - Q-36 legacy route banners must stay visible on `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` until each route is rebuilt, redirected, archived, or retired.
 - Q-37 support summaries on Command and Scorecard are the daily home for lifecycle and template status; `/lifecycle` and `/templates` remain detail pages reached from those active loops.
+- Q-38 route retirement matrix is advisory only. A recommendation of `redirect` or `delete` does not authorize changing routes, removing files, hiding links, or breaking direct links.
+- Before any future route retirement packet, run a dependency guard that checks active pages, docs, tests, and support workflows for links or data dependencies.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**
