@@ -97,7 +97,7 @@ Core offer rules:
 - [x] Add Creative Lab filters for status, trade, angle, and generation state.
 - [x] Add replacement variant workflow with parent/child lineage and stable v2/v3 IDs.
 - [x] Add Claude Design handoff packet for Creative Lab UX polish.
-- [ ] Generate and upload the first complete beachhead image set.
+- [x] Generate and upload the first complete beachhead image set.
 
 ### Phase 3 - Creator Demo Engine
 
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [x] Work through Q-01 through Q-24 governance/build queue items except the image pack and approval-gated drafts/exports. Current: Q-01 in progress; Q-02 through Q-06, Q-08 through Q-16, and Q-18 through Q-24 complete; Q-07 and Q-17 are approval-gated. Next autonomous item is Q-01 image completion.
+- [x] Work through Q-01 through Q-24 governance/build queue items except approval-gated drafts/exports. Current: Q-01 through Q-06, Q-08 through Q-16, and Q-18 through Q-24 complete; Q-07 and Q-17 are approval-gated. No non-approval ready queue item remains.
 
 ---
 

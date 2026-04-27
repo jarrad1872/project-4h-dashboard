@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
+import { summarizeBeachheadImagePack } from "@/lib/beachhead-image-pack";
 import {
   DEFAULT_CREATIVE_ASSET_FILTERS,
   filterCreativeAssets,
@@ -258,20 +259,7 @@ export default function AssetsPage() {
     [assets],
   );
   const summary = summarizeCreativePipeline(filteredAssets);
-  const imagePack = useMemo(() => {
-    const promptCards = assets.filter((asset) => asset.prompt_brief_id && asset.model === CHATGPT_IMAGE_MODEL);
-    const generated = promptCards.filter((asset) => asset.asset_url || asset.thumbnail_url || asset.generation_status === "generated");
-    const reviewReady = promptCards.filter((asset) => ["review", "approved", "live"].includes(asset.status));
-    const next = promptCards.find((asset) => !asset.asset_url && !asset.thumbnail_url && asset.generation_status !== "generated") ?? null;
-
-    return {
-      total: promptCards.length,
-      generated: generated.length,
-      reviewReady: reviewReady.length,
-      remaining: Math.max(0, promptCards.length - generated.length),
-      next,
-    };
-  }, [assets]);
+  const imagePack = useMemo(() => summarizeBeachheadImagePack(assets), [assets]);
 
   return (
     <div className="space-y-6">
@@ -365,23 +353,29 @@ export default function AssetsPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Q-01 image pack</p>
             <h2 className="mt-1 text-lg font-semibold text-white">
-              {imagePack.generated} / {imagePack.total || 20} generated, {imagePack.remaining || Math.max(0, 20 - imagePack.generated)} remaining
+              {imagePack.generated} / {imagePack.expectedTotal} generated, {imagePack.remaining} remaining
             </h2>
             <p className="mt-1 text-sm text-slate-400">
-              Copy a packet, generate the image here with ChatGPT Pro, upload it on the same card, then send it to review.
+              {imagePack.complete
+                ? "The first beachhead pack is uploaded and in review. Jarrad approval still gates live use."
+                : "Copy a packet, generate the image here with ChatGPT Pro, upload it on the same card, then send it to review."}
             </p>
           </div>
           <div className="grid min-w-64 gap-2 text-sm text-slate-300">
             <div className="h-2 overflow-hidden rounded-full bg-slate-800">
               <div
                 className="h-full rounded-full bg-cyan-300"
-                style={{ width: `${imagePack.total ? Math.round((imagePack.generated / imagePack.total) * 100) : 0}%` }}
+                style={{ width: `${Math.round((imagePack.generated / imagePack.expectedTotal) * 100)}%` }}
               />
             </div>
             <p>
-              Next:{" "}
+              {imagePack.complete ? "Status: " : "Next: "}
               <span className="font-semibold text-white">
-                {imagePack.next ? `${imagePack.next.title} (${formatCreativeAssetAngleLabel(imagePack.next.angle)})` : "image pack generated"}
+                {imagePack.complete
+                  ? "ready for review"
+                  : imagePack.next
+                    ? `${imagePack.next.title} (${formatCreativeAssetAngleLabel(imagePack.next.angle)})`
+                    : "image pack generated"}
               </span>
             </p>
           </div>

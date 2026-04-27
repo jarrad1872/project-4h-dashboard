@@ -16,6 +16,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 
 | ID | Phase | Lane | Work | Completed | Evidence |
 | --- | --- | --- | --- | --- | --- |
+| Q-01 | Phase 2 | Creative | Generate first beachhead image pack | 2026-04-27 | `/assets` shows 20/20 beachhead prompt cards generated and in review, with deployable Q-01 PNG assets for five trades x four angles. |
 | Q-02 | Phase 2 | Creative | Add Creative Lab filters | 2026-04-27 | `/assets` filters by status, trade, angle, and generation state without reload. |
 | Q-03 | Phase 2 | Creative | Add variant replacement workflow | 2026-04-27 | `/assets` can create v2/v3 replacement prompts with parent/child lineage and stable variant IDs. |
 | Q-04 | Phase 2 | Creative | Create Claude Design handoff packet | 2026-04-27 | `docs/claude-design-creative-lab-handoff.md` captures UX goals, data model, routes, screenshots, and constraints. |
@@ -42,7 +43,6 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-01 | Phase 2 | Creative | Generate first beachhead image pack | None | In progress. Production desk, progress bar, copy packets, and per-card upload are ready. Finish by generating and uploading all 20 images. |
 | Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
 | Q-17 | Phase 5 | Launch | Create platform upload sheets | Review required | Local/download exports only; no platform upload. |
 

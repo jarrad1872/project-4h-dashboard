@@ -14,22 +14,25 @@
     "variant_id": "pipe-missed-call-multi-1777264997586",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pipe-missed-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pipe-missed-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pipe-missed-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:06.185Z"
   },
   {
     "id": "206cd364-bb79-4f14-a2a5-1e071009cdfb",
@@ -46,22 +49,25 @@
     "variant_id": "pipe-demo-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pipe-demo-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pipe-demo-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pipe-demo-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:06.397Z"
   },
   {
     "id": "3fa31881-7540-482c-81d3-d450b3149d06",
@@ -78,22 +84,25 @@
     "variant_id": "pipe-owner-agent-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pipe-owner-agent-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pipe-owner-agent-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pipe-owner-agent-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:06.606Z"
   },
   {
     "id": "952b3ae4-958e-4929-bd51-115fb2d5d8c8",
@@ -110,22 +119,25 @@
     "variant_id": "pipe-roi-math-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pipe-roi-math-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pipe-roi-math-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pipe-roi-math-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:06.821Z"
   },
   {
     "id": "5ead0767-4689-4a19-bd79-314960911d12",
@@ -142,22 +154,25 @@
     "variant_id": "duct-missed-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/duct-missed-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/duct-missed-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/duct-missed-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:07.045Z"
   },
   {
     "id": "1ce15ebe-79da-422b-b1da-473cfe2080fb",
@@ -174,22 +189,25 @@
     "variant_id": "duct-demo-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/duct-demo-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/duct-demo-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/duct-demo-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:07.266Z"
   },
   {
     "id": "ae865bd9-7e47-4814-84c1-5acb9395c369",
@@ -206,22 +224,25 @@
     "variant_id": "duct-owner-agent-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/duct-owner-agent-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/duct-owner-agent-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/duct-owner-agent-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:07.475Z"
   },
   {
     "id": "bd45aa38-cf77-48cf-b791-7eadbf4e20de",
@@ -238,22 +259,25 @@
     "variant_id": "duct-roi-math-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/duct-roi-math-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/duct-roi-math-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/duct-roi-math-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:07.683Z"
   },
   {
     "id": "774805bb-d27f-4bca-b374-8bfed048cc4f",
@@ -270,22 +294,25 @@
     "variant_id": "mow-missed-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/mow-missed-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/mow-missed-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/mow-missed-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:07.887Z"
   },
   {
     "id": "263a2ef8-ebb7-497b-b86f-075449bec1af",
@@ -302,22 +329,25 @@
     "variant_id": "mow-demo-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/mow-demo-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/mow-demo-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/mow-demo-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:08.102Z"
   },
   {
     "id": "68bd0324-fd24-4c00-b46b-dc479a1454bd",
@@ -334,22 +364,25 @@
     "variant_id": "mow-owner-agent-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/mow-owner-agent-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/mow-owner-agent-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/mow-owner-agent-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:08.310Z"
   },
   {
     "id": "36b97ff3-5efe-4899-86d5-741c11a7376f",
@@ -366,22 +399,25 @@
     "variant_id": "mow-roi-math-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/mow-roi-math-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/mow-roi-math-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/mow-roi-math-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:08.520Z"
   },
   {
     "id": "1fde9510-2951-44b4-8c5d-9205143fabf4",
@@ -398,22 +434,25 @@
     "variant_id": "pest-missed-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pest-missed-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pest-missed-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pest-missed-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:08.740Z"
   },
   {
     "id": "15e6dfab-4ea0-441a-935a-70b3db08df64",
@@ -430,22 +469,25 @@
     "variant_id": "pest-demo-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pest-demo-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pest-demo-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pest-demo-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:09.009Z"
   },
   {
     "id": "08205528-b547-4dfa-a12c-2d1e479d5ca4",
@@ -462,22 +504,25 @@
     "variant_id": "pest-owner-agent-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pest-owner-agent-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pest-owner-agent-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pest-owner-agent-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:09.393Z"
   },
   {
     "id": "2a357e3d-0919-4119-812b-28808405425b",
@@ -494,22 +539,25 @@
     "variant_id": "pest-roi-math-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/pest-roi-math-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/pest-roi-math-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/pest-roi-math-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:09.722Z"
   },
   {
     "id": "c469d5ee-d4b4-4a69-986b-87f4dfb33807",
@@ -526,22 +574,25 @@
     "variant_id": "coat-missed-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/coat-missed-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/coat-missed-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/coat-missed-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:10.068Z"
   },
   {
     "id": "8d84fe03-5d2f-4a0d-beaf-b3fee45bd8f2",
@@ -558,22 +609,25 @@
     "variant_id": "coat-demo-call-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/coat-demo-call-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/coat-demo-call-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/coat-demo-call-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:10.417Z"
   },
   {
     "id": "b4ee5b9c-6d09-4151-9cda-997b3dbdc08a",
@@ -590,22 +644,25 @@
     "variant_id": "coat-owner-agent-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/coat-owner-agent-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/coat-owner-agent-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/coat-owner-agent-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:10.761Z"
   },
   {
     "id": "4b529ceb-16b6-4023-85b2-920f3bce3e35",
@@ -622,21 +679,24 @@
     "variant_id": "coat-roi-math-multi-1777264997588",
     "parent_asset_id": null,
     "negative_prompt": "No generic SaaS dashboards, stock-photo smiles, fake badges, brand confusion, distorted hands, unreadable tiny text, or Saw.City catch-all branding.",
-    "generation_status": "brief",
+    "generation_status": "generated",
     "generation_error": null,
-    "storage_path": null,
+    "storage_path": "public/creative-assets/q01-beachhead-pack/coat-roi-math-q01-review.png",
     "output_format": "png",
-    "quality": "medium",
+    "quality": "high",
     "moderation": "auto",
     "response_metadata": {
-      "production_mode": "manual_chatgpt_pro"
+      "production_mode": "manual_chatgpt_pro_review_pack",
+      "q01_pack": true,
+      "generated_by": "codex_local_raster_upload",
+      "model_target": "chatgpt-image-latest"
     },
-    "status": "draft",
+    "status": "review",
     "target_platform": "multi",
-    "thumbnail_url": null,
-    "asset_url": null,
-    "notes": "Draft image prompt for manual ChatGPT Pro generation. Upload the generated asset here after review.",
+    "thumbnail_url": "/creative-assets/q01-beachhead-pack/coat-roi-math-q01-review.png",
+    "asset_url": "/creative-assets/q01-beachhead-pack/coat-roi-math-q01-review.png",
+    "notes": "Q-01 review-pack image uploaded for Jarrad review. Uses the saved chatgpt-image-latest prompt brief and remains review-only; not approved, live, launched, or sent.",
     "created_at": "2026-04-27T04:43:17.588Z",
-    "updated_at": "2026-04-27T04:43:17.588Z"
+    "updated_at": "2026-04-27T13:02:11.116Z"
   }
 ]

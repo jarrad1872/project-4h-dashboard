@@ -178,7 +178,7 @@ utm_source={platform}&utm_medium=paid-social&utm_campaign=4h_2026-03_{theme}&utm
   - Campaign group: `nb2_d{1|2}_{platform}_{prefix}`
 
 ### Image Assets
-The active rebuild path uses ChatGPT Pro `chatgpt-image-latest` prompt concepts in `/assets` and `/api/image-concepts`. Phase 2 stores prompt/model/variant lineage on `creative_assets`; generated image files are uploaded back into 4H for review and approval. Creative Lab filters narrow the queue by status, trade, angle, and generation state without a reload, and replacement prompts create deterministic v2/v3 variant IDs with parent/child lineage. No OpenAI image API hookup is required.
+The active rebuild path uses ChatGPT Pro `chatgpt-image-latest` prompt concepts in `/assets` and `/api/image-concepts`. Phase 2 stores prompt/model/variant lineage on `creative_assets`; generated image files are uploaded back into 4H for review and approval. Creative Lab filters narrow the queue by status, trade, angle, and generation state without a reload, and replacement prompts create deterministic v2/v3 variant IDs with parent/child lineage. The first Q-01 beachhead review pack stores 20 generated PNG assets under `public/creative-assets/q01-beachhead-pack` for five trades x four angles; they remain review assets until Jarrad approves. No OpenAI image API hookup is required.
 
 Legacy NB2/Gemini images still exist for historical campaign assets:
 - **Hero A** (`hero_a`): `ad-creatives/trade-heros/nb2/{slug}-hero-a.jpg` — zoomed-in scene, for ads
@@ -243,6 +243,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `docs/product-route-inventory.md` records the landing route and demo phone findings without touching sawcity-lite
 - `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
+- `/assets` now has the first Q-01 beachhead image pack generated and in review: pipe, duct, mow, pest, and coat across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state
 - `/assets` can create replacement v2/v3 prompts while preserving parent/child creative lineage
 - `docs/claude-design-creative-lab-handoff.md` gives Claude Design the Creative Lab UX goals, data model, routes, screenshot checklist, and constraints

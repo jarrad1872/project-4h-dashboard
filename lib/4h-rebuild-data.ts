@@ -144,9 +144,9 @@ export const rebuildExecutionQueue = [
     lane: "Creative",
     title: "Generate first beachhead image pack",
     route: "/assets",
-    status: "ready",
+    status: "complete",
     approval: "none",
-    outcome: "20 prompt cards each have a generated image asset uploaded, still draft or review.",
+    outcome: "20 prompt cards have generated review images for five beachhead trades across four angles.",
     acceptance: "Every uploaded asset has trade, angle, model, prompt, variant ID, and preview image.",
   },
   {
