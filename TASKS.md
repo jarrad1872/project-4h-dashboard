@@ -186,6 +186,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-27 lifecycle follow-up measurement on `/lifecycle`.
 - [x] Add Q-28 creative fatigue and variant lineage tracking on `/assets`.
 - [x] Add Q-29 creator outreach state tracking on `/influencer`.
+- [x] Add Q-30 Codex browser flow hooks on `/influencer`.
 
 ---
 
@@ -214,6 +215,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Weekly learning report rankings for trades, creators, images, and angles.
 - [x] Local reversible keep/kill/iterate decision board.
 - [x] Creator outreach state tracker.
+- [x] Codex browser flow hooks for permanent creator testing.
 
 ---
 

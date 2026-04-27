@@ -298,6 +298,11 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - The tracker is an internal operating view only. It does not email creators, send follow-ups, publish content, create webhooks, move money, change billing, or authorize external outreach.
 - Prioritize follow-up due first, then approved manual-send candidates, replied conversations, and newly qualified creators.
 
+**Q-30 Codex browser flow testing:**
+- Permanent creator-flow tests should use the stable `data-testid` hooks on `/influencer`, including `creator-prospect-form`, `creator-form-*`, `creator-row-{id}`, `creator-draft-{id}`, and review-card/action hooks.
+- It is acceptable to create fake internal creator rows while testing local or preview flows. Do not commit generated fallback data unless Jarrad explicitly asks for seeded examples.
+- Browser tests may draft internal outreach and verify pending approval, but must not send emails, DMs, publish content, create webhooks, upload to ad platforms, launch campaigns, move money, or change billing.
+
 **Content brief templates:**
 - `/templates` holds the internal creator brief packets for demo-call video, founder assist, and screenshot-proof assets.
 - Every brief must include a hook, shot list, creator talking points, CTA, `$39/mo`, `14-day free trial, no credit card required`, and tracking guidance.

@@ -413,7 +413,7 @@ export default function InfluencerPage() {
         </div>
       </Card>
 
-      <Card className="space-y-4 border-violet-900/60 bg-violet-950/10">
+      <Card className="space-y-4 border-violet-900/60 bg-violet-950/10" data-testid="creator-outreach-pipeline">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Q-29 creator outreach pipeline</p>
@@ -478,7 +478,7 @@ export default function InfluencerPage() {
         <p className="text-xs text-slate-500">{outreachPipelineSummary.evidence}</p>
       </Card>
 
-      <Card className="space-y-4">
+      <Card className="space-y-4" data-testid="creator-prospect-form">
         <div>
           <h2 className="text-lg font-semibold text-white">Add creator prospect</h2>
           <p className="text-sm text-slate-500">
@@ -492,6 +492,7 @@ export default function InfluencerPage() {
             value={form.creator_name}
             onChange={(event) => setForm((current) => ({ ...current, creator_name: event.target.value }))}
             placeholder="Creator name"
+            data-testid="creator-form-name"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
           <input
@@ -499,6 +500,7 @@ export default function InfluencerPage() {
             value={form.trade}
             onChange={(event) => setForm((current) => ({ ...current, trade: event.target.value }))}
             placeholder="Trade domain"
+            data-testid="creator-form-trade"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
           <input
@@ -506,11 +508,13 @@ export default function InfluencerPage() {
             value={form.contact_email}
             onChange={(event) => setForm((current) => ({ ...current, contact_email: event.target.value }))}
             placeholder="Contact email"
+            data-testid="creator-form-email"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
           <select
             value={form.platform}
             onChange={(event) => setForm((current) => ({ ...current, platform: event.target.value }))}
+            data-testid="creator-form-platform"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           >
             <option value="youtube">YouTube</option>
@@ -525,6 +529,7 @@ export default function InfluencerPage() {
             value={form.audience_size}
             onChange={(event) => setForm((current) => ({ ...current, audience_size: event.target.value }))}
             placeholder="Audience size"
+            data-testid="creator-form-audience"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
           <input
@@ -533,6 +538,7 @@ export default function InfluencerPage() {
             value={form.average_views}
             onChange={(event) => setForm((current) => ({ ...current, average_views: event.target.value }))}
             placeholder="Average views"
+            data-testid="creator-form-average-views"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
           <input
@@ -542,6 +548,7 @@ export default function InfluencerPage() {
             value={form.engagement_rate}
             onChange={(event) => setForm((current) => ({ ...current, engagement_rate: event.target.value }))}
             placeholder="Engagement %"
+            data-testid="creator-form-engagement"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
           <input
@@ -551,11 +558,13 @@ export default function InfluencerPage() {
             value={form.flat_fee_amount}
             onChange={(event) => setForm((current) => ({ ...current, flat_fee_amount: event.target.value }))}
             placeholder="Flat fee"
+            data-testid="creator-form-flat-fee"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
           <select
             value={form.business_focus}
             onChange={(event) => setForm((current) => ({ ...current, business_focus: event.target.value as InfluencerBusinessFocus }))}
+            data-testid="creator-form-business-focus"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           >
             {BUSINESS_FOCUS_OPTIONS.map((option) => (
@@ -567,6 +576,7 @@ export default function InfluencerPage() {
           <select
             value={form.sponsor_openness}
             onChange={(event) => setForm((current) => ({ ...current, sponsor_openness: event.target.value as InfluencerSponsorOpenness }))}
+            data-testid="creator-form-sponsor-openness"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           >
             {SPONSOR_OPENNESS_OPTIONS.map((option) => (
@@ -580,6 +590,7 @@ export default function InfluencerPage() {
             value={form.channel_url}
             onChange={(event) => setForm((current) => ({ ...current, channel_url: event.target.value }))}
             placeholder="Channel URL"
+            data-testid="creator-form-channel-url"
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
           />
         </div>
@@ -587,11 +598,13 @@ export default function InfluencerPage() {
           value={form.notes}
           onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))}
           placeholder="Why this creator matters, owner-vs-DIY fit, sponsor history, or personalization notes"
+          aria-label="Creator notes"
+          data-testid="creator-form-notes"
           rows={3}
           className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
         />
         <div className="flex justify-end">
-          <Button disabled={savingId === "new" || !form.creator_name.trim()} onClick={createInfluencer}>
+          <Button data-testid="creator-form-submit" disabled={savingId === "new" || !form.creator_name.trim()} onClick={createInfluencer}>
             {savingId === "new" ? "Saving..." : "Add creator"}
           </Button>
         </div>
@@ -607,7 +620,12 @@ export default function InfluencerPage() {
             <p className="text-sm text-slate-500">No drafts awaiting approval.</p>
           ) : (
             pendingApproval.map(({ influencer, qualification }) => (
-              <div key={influencer.id} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <div
+                key={influencer.id}
+                className="rounded-xl border border-slate-800 bg-slate-950/60 p-4"
+                data-testid={`creator-approval-card-${influencer.id}`}
+                data-creator-name={influencer.creator_name}
+              >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white">{influencer.creator_name}</p>
@@ -624,10 +642,18 @@ export default function InfluencerPage() {
                   {influencer.draft_body || "No draft body"}
                 </pre>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button disabled={savingId === influencer.id} onClick={() => void reviewDraft(influencer.id, true)}>
+                  <Button
+                    data-testid={`creator-approve-${influencer.id}`}
+                    disabled={savingId === influencer.id}
+                    onClick={() => void reviewDraft(influencer.id, true)}
+                  >
                     Approve
                   </Button>
-                  <GhostButton disabled={savingId === influencer.id} onClick={() => void reviewDraft(influencer.id, false)}>
+                  <GhostButton
+                    data-testid={`creator-reject-${influencer.id}`}
+                    disabled={savingId === influencer.id}
+                    onClick={() => void reviewDraft(influencer.id, false)}
+                  >
                     Reject
                   </GhostButton>
                 </div>
@@ -645,7 +671,12 @@ export default function InfluencerPage() {
             <p className="text-sm text-slate-500">No approved drafts ready for dispatch.</p>
           ) : (
             readyToSend.map(({ influencer, qualification }) => (
-              <div key={influencer.id} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <div
+                key={influencer.id}
+                className="rounded-xl border border-slate-800 bg-slate-950/60 p-4"
+                data-testid={`creator-ready-card-${influencer.id}`}
+                data-creator-name={influencer.creator_name}
+              >
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white">{influencer.creator_name}</p>
@@ -659,10 +690,18 @@ export default function InfluencerPage() {
                 </div>
                 <p className="mt-3 text-xs uppercase tracking-wide text-slate-500">{influencer.draft_subject || "(no subject)"}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button disabled={savingId === influencer.id} onClick={() => void markSent(influencer)}>
+                  <Button
+                    data-testid={`creator-mark-sent-${influencer.id}`}
+                    disabled={savingId === influencer.id}
+                    onClick={() => void markSent(influencer)}
+                  >
                     Mark sent
                   </Button>
-                  <GhostButton disabled={savingId === influencer.id} onClick={() => void reviewDraft(influencer.id, false)}>
+                  <GhostButton
+                    data-testid={`creator-send-back-${influencer.id}`}
+                    disabled={savingId === influencer.id}
+                    onClick={() => void reviewDraft(influencer.id, false)}
+                  >
                     Send back
                   </GhostButton>
                 </div>
@@ -682,7 +721,12 @@ export default function InfluencerPage() {
         ) : (
           <div className="grid gap-3 xl:grid-cols-2">
             {followUpDue.map(({ influencer, nextDraftStep }) => (
-              <div key={influencer.id} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <div
+                key={influencer.id}
+                className="rounded-xl border border-slate-800 bg-slate-950/60 p-4"
+                data-testid={`creator-follow-up-card-${influencer.id}`}
+                data-creator-name={influencer.creator_name}
+              >
                 <p className="text-sm font-semibold text-white">{influencer.creator_name}</p>
                 <p className="mt-1 text-xs text-slate-500">
                   Last sent {influencer.sent_at ? new Date(influencer.sent_at).toLocaleString() : "unknown"} · next step{" "}
@@ -690,11 +734,19 @@ export default function InfluencerPage() {
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {nextDraftStep && (
-                    <Button disabled={savingId === influencer.id} onClick={() => void generateDraft(influencer.id, nextDraftStep)}>
+                    <Button
+                      data-testid={`creator-draft-follow-up-${influencer.id}`}
+                      disabled={savingId === influencer.id}
+                      onClick={() => void generateDraft(influencer.id, nextDraftStep)}
+                    >
                       {draftButtonLabel(nextDraftStep)}
                     </Button>
                   )}
-                  <GhostButton disabled={savingId === influencer.id} onClick={() => void markResponded(influencer)}>
+                  <GhostButton
+                    data-testid={`creator-mark-responded-${influencer.id}`}
+                    disabled={savingId === influencer.id}
+                    onClick={() => void markResponded(influencer)}
+                  >
                     Mark responded
                   </GhostButton>
                 </div>
@@ -743,7 +795,12 @@ export default function InfluencerPage() {
                   const tracking = buildCreatorUtmUrl(influencer);
 
                   return (
-                    <tr key={influencer.id} className="align-top">
+                    <tr
+                      key={influencer.id}
+                      className="align-top"
+                      data-testid={`creator-row-${influencer.id}`}
+                      data-creator-name={influencer.creator_name}
+                    >
                       <td className="py-3 pr-3">
                         <div>
                           <p className="font-medium text-white">{influencer.creator_name}</p>
@@ -761,6 +818,7 @@ export default function InfluencerPage() {
                           defaultValue={influencer.contact_email ?? ""}
                           onBlur={(event) => void updateInfluencer(influencer.id, { contact_email: event.target.value || null })}
                           placeholder="email@creator.com"
+                          data-testid={`creator-email-${influencer.id}`}
                           className="w-52 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                         />
                         <p className="mt-1 text-xs text-slate-500">{formatAudienceSize(influencer.audience_size)}</p>
@@ -789,6 +847,7 @@ export default function InfluencerPage() {
                             onChange={(event) =>
                               void updateInfluencer(influencer.id, { business_focus: event.target.value as InfluencerBusinessFocus })
                             }
+                            data-testid={`creator-business-focus-${influencer.id}`}
                             className="w-32 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                           >
                             {BUSINESS_FOCUS_OPTIONS.map((option) => (
@@ -808,6 +867,7 @@ export default function InfluencerPage() {
                                 })
                               }
                               placeholder="Eng %"
+                              data-testid={`creator-engagement-${influencer.id}`}
                               className="w-20 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                             />
                             <input
@@ -820,6 +880,7 @@ export default function InfluencerPage() {
                                 })
                               }
                               placeholder="Views"
+                              data-testid={`creator-average-views-${influencer.id}`}
                               className="w-24 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                             />
                           </div>
@@ -828,6 +889,7 @@ export default function InfluencerPage() {
                             onChange={(event) =>
                               void updateInfluencer(influencer.id, { sponsor_openness: event.target.value as InfluencerSponsorOpenness })
                             }
+                            data-testid={`creator-sponsor-openness-${influencer.id}`}
                             className="w-32 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                           >
                             {SPONSOR_OPENNESS_OPTIONS.map((option) => (
@@ -852,6 +914,7 @@ export default function InfluencerPage() {
                                 audited_at: new Date().toISOString(),
                               })
                             }
+                            data-testid={`creator-audit-label-${influencer.id}`}
                             className="w-40 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                           >
                             {AUDIT_LABEL_OPTIONS.map((label) => (
@@ -875,6 +938,7 @@ export default function InfluencerPage() {
                               last_contact_at: new Date().toISOString(),
                             })
                           }
+                          data-testid={`creator-status-${influencer.id}`}
                           className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                         >
                           {STATUS_OPTIONS.map((status) => (
@@ -899,16 +963,25 @@ export default function InfluencerPage() {
                             readOnly
                             rows={3}
                             value={tracking.url}
+                            data-testid={`creator-tracking-url-${influencer.id}`}
                             className="w-full min-w-[300px] resize-none rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-300 outline-none"
                           />
                           <p className="text-xs text-slate-600">
                             {tracking.campaign} · {tracking.contentId}
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            <GhostButton disabled={savingId === influencer.id} onClick={() => void copyCreatorUrl(influencer)}>
+                            <GhostButton
+                              data-testid={`creator-copy-url-${influencer.id}`}
+                              disabled={savingId === influencer.id}
+                              onClick={() => void copyCreatorUrl(influencer)}
+                            >
                               Copy URL
                             </GhostButton>
-                            <GhostButton disabled={savingId === influencer.id} onClick={() => void saveCreatorTracking(influencer)}>
+                            <GhostButton
+                              data-testid={`creator-save-tracking-${influencer.id}`}
+                              disabled={savingId === influencer.id}
+                              onClick={() => void saveCreatorTracking(influencer)}
+                            >
                               Save tracking
                             </GhostButton>
                           </div>
@@ -925,6 +998,7 @@ export default function InfluencerPage() {
                               flat_fee_amount: event.target.value ? Number(event.target.value) : null,
                             })
                           }
+                          data-testid={`creator-flat-fee-${influencer.id}`}
                           className="w-28 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                         />
                         <p className="mt-1 text-xs text-slate-500">{formatCurrency(influencer.flat_fee_amount)}</p>
@@ -934,21 +1008,35 @@ export default function InfluencerPage() {
                           rows={3}
                           defaultValue={influencer.notes ?? ""}
                           onBlur={(event) => void updateInfluencer(influencer.id, { notes: event.target.value })}
+                          aria-label={`${influencer.creator_name} notes`}
+                          data-testid={`creator-notes-${influencer.id}`}
                           className="w-full min-w-[260px] rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-white outline-none focus:border-cyan-500"
                         />
                       </td>
                       <td className="py-3 text-right">
                         <div className="flex justify-end gap-2">
                           {nextDraftStep ? (
-                            <Button disabled={savingId === influencer.id} onClick={() => void generateDraft(influencer.id, nextDraftStep)}>
+                            <Button
+                              data-testid={`creator-draft-${influencer.id}`}
+                              disabled={savingId === influencer.id}
+                              onClick={() => void generateDraft(influencer.id, nextDraftStep)}
+                            >
                               {draftButtonLabel(nextDraftStep)}
                             </Button>
                           ) : influencer.outreach_stage === "sent" ? (
-                            <GhostButton disabled={savingId === influencer.id} onClick={() => void markResponded(influencer)}>
+                            <GhostButton
+                              data-testid={`creator-row-mark-responded-${influencer.id}`}
+                              disabled={savingId === influencer.id}
+                              onClick={() => void markResponded(influencer)}
+                            >
                               Mark responded
                             </GhostButton>
                           ) : null}
-                          <GhostButton disabled={savingId === influencer.id} onClick={() => void labelCreatorRemove(influencer)}>
+                          <GhostButton
+                            data-testid={`creator-label-remove-${influencer.id}`}
+                            disabled={savingId === influencer.id}
+                            onClick={() => void labelCreatorRemove(influencer)}
+                          >
                             Label remove
                           </GhostButton>
                         </div>

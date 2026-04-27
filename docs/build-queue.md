@@ -45,6 +45,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-27 | Phase 6 | Learning | Add lifecycle follow-up measurement | 2026-04-27 | `/lifecycle` measures signup-to-trial, trial-to-activation, and activation-to-paid movement from attribution events with no send or webhook action. |
 | Q-28 | Phase 6 | Learning | Add creative fatigue and variant lineage tracking | 2026-04-27 | `/assets` groups image assets into prompt/variant families and flags high-view, low-signal creative fatigue from attribution events only. |
 | Q-29 | Phase 3 | Creators | Add creator outreach state tracker | 2026-04-27 | `/influencer` groups creators into qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid stages without sending messages or moving money. |
+| Q-30 | Governance | Testing | Add Codex browser flow test hooks | 2026-04-27 | `/influencer` exposes stable browser selectors for creator form fields, rows, cards, and draft actions so permanent flows can be tested by creating internal fake rows only. |
 
 ## Ready Queue
 

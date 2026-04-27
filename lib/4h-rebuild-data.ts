@@ -472,4 +472,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "Influencer page groups creator prospects into qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid stages.",
     acceptance: "Pipeline state is derived from 4H rows only and does not send messages, publish content, create webhooks, or move money.",
   },
+  {
+    id: "Q-30",
+    phase: "Governance",
+    lane: "Testing",
+    title: "Add Codex browser flow test hooks",
+    route: "/influencer",
+    status: "complete",
+    approval: "none",
+    outcome: "Influencer page exposes stable data-testid hooks for creator form fields, roster rows, review cards, tracking controls, and draft actions.",
+    acceptance: "Codex browser can create a fake internal creator, locate the exact row, draft outreach, and verify pending approval without external sends or brittle text matching.",
+  },
 ];
