@@ -33,6 +33,7 @@ export const DataFiles = {
   workflowStages: "workflow-stages.json",
   alerts: "alerts.json",
   influencers: "influencers.json",
+  salesLeads: "sales-leads.json",
   creativeAssets: "creative-assets.json",
   marketingEvents: "marketing-events.json",
 } as const;

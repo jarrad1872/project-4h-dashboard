@@ -502,4 +502,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "Sales page tracks the Arizona founding rep pilot, mini CRM stages, rep-coded field-sales URLs, and QR-backed business card exports.",
     acceptance: "Cards include $39/mo, 14-day free trial, no credit card required, print-safe dimensions, and do not order cards, send outreach, create webhooks, or spend money.",
   },
+  {
+    id: "Q-32",
+    phase: "Phase 3",
+    lane: "Field Sales",
+    title: "Persist sales CRM leads with archetype safeguards",
+    route: "/sales",
+    status: "complete",
+    approval: "none",
+    outcome: "Sales leads can be created and updated through guarded API routes with Supabase/file fallback and visible real-vs-archetype separation.",
+    acceptance: "Archetype rows cannot be marked visited, card-left, demo-booked, trial-started, activated, or paid; no outreach, card order, webhook, billing, or spend action is performed.",
+  },
 ];

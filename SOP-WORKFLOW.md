@@ -316,6 +316,10 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Business card exports use 3.75 x 2.25 inch bleed artwork at 300 DPI, with key text inside the safe area. The dashboard generates SVG/PNG assets only; it does not place a Vistaprint order or move money.
 - CRM stages are internal tracking states: prospect, qualified, visited, card-left, demo-booked, trial-started, activated, paid, and lost.
 - Placeholder lead rows are target archetypes unless a real owner is intentionally entered later. Do not represent them as contacted businesses, testers, or customers.
+- Q-32 persists sales leads through `/api/sales/leads` and `/api/sales/leads/{id}` with Supabase/file fallback. Real rows can move through contacted/demo/trial stages; archetype rows are blocked from visited, card-left, demo-booked, trial-started, activated, and paid stages.
+- Sales CRM writes are localhost or authenticated Bob/CLI only. Public dashboard access can read the board but must not be able to mutate CRM rows without the server token.
+- Do not reclassify an archetype into a real lead. Create a fresh real row when a real owner/business is intentionally being tracked.
+- When testing in the browser, use fake internal lead names only unless Jarrad explicitly authorizes entering real contact/business details into the destination system.
 - No external outreach, card ordering, webhooks, ad uploads, spend, billing, or customer claims are authorized by a CRM stage or card export alone.
 
 **Product route inventory:**

@@ -115,6 +115,7 @@ Core offer rules:
 - [x] Add creator-specific UTM/referral code generation.
 - [x] Add content brief templates for demo-call videos, founder-assisted creator posts, and screenshot-proof assets.
 - [x] Add Arizona human sales rep pilot with rep-coded cards, field-sales UTMs, and mini CRM stages.
+- [x] Persist human sales CRM rows with real-vs-archetype safeguards.
 - [ ] Verify that every live creator asset lands in the scorecard.
 
 ### Phase 4 - Landing And Trial Path Alignment
@@ -190,6 +191,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-29 creator outreach state tracking on `/influencer`.
 - [x] Add Q-30 Codex browser flow hooks on `/influencer`.
 - [x] Add Q-31 human sales rep pipeline and print-ready business cards on `/sales`.
+- [x] Add Q-32 persistent sales CRM lead creation/update on `/sales`.
 
 ---
 
@@ -220,6 +222,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Creator outreach state tracker.
 - [x] Codex browser flow hooks for permanent creator testing.
 - [x] Human sales rep pipeline and business card print assets.
+- [x] Persistent field-sales CRM with archetype safeguards.
 
 ---
 

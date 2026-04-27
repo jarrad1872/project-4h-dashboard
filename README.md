@@ -92,7 +92,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Templates | `/templates` | Meta Ad Library access validation, competitor research template, message-match handoff briefs, creator content packets, and ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
 | Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, pipeline state tracker, browser-test hooks, approvals, ready-to-send, and follow-up drafting |
-| Sales | `/sales` | Arizona human sales rep pilot, mini CRM stages, rep-coded field-sales URLs, and print-ready business card exports |
+| Sales | `/sales` | Arizona human sales rep pilot, persistent mini CRM stages, rep-coded field-sales URLs, and print-ready business card exports |
 | Settings | `/settings` | Campaign configuration |
 
 ---
@@ -245,6 +245,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/influencer` now tracks Q-29 creator outreach states from existing rows: qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid; this is internal state only and sends nothing
 - `/influencer` now exposes Q-30 Codex browser flow hooks so permanent tests can create a fake internal creator, locate the exact row, draft outreach, and verify pending approval without brittle text matching or external sends
 - `/sales` now adds the Q-31 human field sales pilot for Arizona: rep tracking, CRM stages, QR-backed business card exports, and field-sales UTMs without ordering cards or sending outreach
+- `/sales` now adds Q-32 persistent sales CRM rows with guarded create/update actions; archetype rows are separated from real leads and cannot be marked contacted, demo-booked, activated, or paid
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -263,6 +264,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `supabase/migrations/011_marketing_events_attribution.sql` adds asset-to-paid-customer attribution fields
 - `supabase/migrations/012_creative_asset_lineage.sql` self-heals `creative_assets` if needed and adds image lineage fields
 - `supabase/migrations/013_influencer_audit_labels.sql` adds creator audit labels, reasons, and audit timestamps
+- `supabase/migrations/014_sales_rep_pipeline.sql` adds persistent `sales_leads` rows for the Arizona field-sales CRM
 
 ### Competitive Intelligence Foundation (2026-04-01)
 
@@ -272,7 +274,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-31 human sales rep pipeline | v4.4.0*
+*Last updated: 2026-04-27 Q-32 persistent sales CRM | v4.4.1*
 
 ---
 

@@ -2,12 +2,38 @@ import { describe, expect, it } from "vitest";
 import {
   buildSalesTrackingUrl,
   businessCardPrintSpec,
+  canReclassifySalesLead,
   FIELD_SALES_UTM_MEDIUM,
   getPrimarySalesCard,
+  normalizeSalesLead,
   salesReps,
   summarizeSalesPipeline,
   validateSalesCardVariant,
+  type SalesLead,
+  type SalesStage,
 } from "../sales-rep-pipeline";
+
+function makeLead(overrides: Partial<SalesLead> = {}): SalesLead {
+  return {
+    id: "lead-1",
+    repId: salesReps[0].id,
+    businessName: "Test lead",
+    city: "Phoenix",
+    state: "AZ",
+    tradeDomain: "pipe.city",
+    stage: "prospect",
+    leadType: "real",
+    ownerProfile: "",
+    painSignal: "",
+    nextAction: "",
+    lastTouchedAt: null,
+    trackingCode: "AZ-T-001",
+    notes: null,
+    createdAt: "2026-04-27T00:00:00.000Z",
+    updatedAt: "2026-04-27T00:00:00.000Z",
+    ...overrides,
+  };
+}
 
 describe("buildSalesTrackingUrl", () => {
   it("builds field-sales attribution for the Arizona rep card", () => {
@@ -65,56 +91,48 @@ describe("validateSalesCardVariant", () => {
 
 describe("summarizeSalesPipeline", () => {
   it("summarizes active field-sales leads without treating lost rows as active", () => {
-    const rep = salesReps[0];
     const summary = summarizeSalesPipeline([
-      {
-        id: "a",
-        repId: rep.id,
-        businessName: "A",
-        city: "Phoenix",
-        state: "AZ",
-        tradeDomain: "pipe.city",
-        stage: "demo-booked",
-        ownerProfile: "",
-        painSignal: "",
-        nextAction: "",
-        lastTouchedAt: null,
-        trackingCode: "A",
-      },
-      {
-        id: "b",
-        repId: rep.id,
-        businessName: "B",
-        city: "Phoenix",
-        state: "AZ",
-        tradeDomain: "mow.city",
-        stage: "paid",
-        ownerProfile: "",
-        painSignal: "",
-        nextAction: "",
-        lastTouchedAt: null,
-        trackingCode: "B",
-      },
-      {
-        id: "c",
-        repId: rep.id,
-        businessName: "C",
-        city: "Phoenix",
-        state: "AZ",
-        tradeDomain: "duct.city",
-        stage: "lost",
-        ownerProfile: "",
-        painSignal: "",
-        nextAction: "",
-        lastTouchedAt: null,
-        trackingCode: "C",
-      },
+      makeLead({ id: "a", stage: "demo-booked", trackingCode: "A" }),
+      makeLead({ id: "b", stage: "paid", trackingCode: "B" }),
+      makeLead({ id: "c", stage: "lost", trackingCode: "C" }),
+      makeLead({ id: "d", stage: "qualified", leadType: "archetype", trackingCode: "D" }),
     ]);
 
-    expect(summary.totalLeads).toBe(3);
+    expect(summary.totalLeads).toBe(4);
+    expect(summary.realLeads).toBe(3);
+    expect(summary.archetypeLeads).toBe(1);
     expect(summary.activeLeads).toBe(1);
     expect(summary.bookedDemos).toBe(2);
     expect(summary.paidCustomers).toBe(1);
     expect(summary.byStage.lost).toBe(1);
+  });
+
+  it("does not count archetype rows as booked demos or paid customers", () => {
+    const summary = summarizeSalesPipeline([
+      makeLead({ id: "real-demo", stage: "demo-booked", leadType: "real" }),
+      makeLead({ id: "fake-paid", stage: "paid", leadType: "archetype" }),
+    ]);
+
+    expect(summary.bookedDemos).toBe(1);
+    expect(summary.paidCustomers).toBe(0);
+  });
+});
+
+describe("normalizeSalesLead", () => {
+  it("downgrades archetypes away from advanced stages", () => {
+    const lead = normalizeSalesLead({
+      businessName: "Archetype",
+      leadType: "archetype",
+      stage: "demo-booked" as SalesStage,
+    });
+
+    expect(lead.leadType).toBe("archetype");
+    expect(lead.stage).toBe("qualified");
+  });
+
+  it("does not allow archetypes to be reclassified into real leads", () => {
+    expect(canReclassifySalesLead("archetype", "real")).toBe(false);
+    expect(canReclassifySalesLead("real", "archetype")).toBe(true);
+    expect(canReclassifySalesLead("real", "real")).toBe(true);
   });
 });

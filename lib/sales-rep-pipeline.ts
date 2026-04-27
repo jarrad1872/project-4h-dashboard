@@ -29,11 +29,15 @@ export interface SalesLead {
   state: string;
   tradeDomain: string;
   stage: SalesStage;
+  leadType: "archetype" | "real";
   ownerProfile: string;
   painSignal: string;
   nextAction: string;
   lastTouchedAt: string | null;
   trackingCode: string;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SalesCardVariant {
@@ -72,6 +76,8 @@ export interface SalesTrackingUrlResult {
 
 export interface SalesPipelineSummary {
   totalLeads: number;
+  realLeads: number;
+  archetypeLeads: number;
   activeLeads: number;
   weeklyTouchTarget: number;
   bookedDemos: number;
@@ -81,6 +87,8 @@ export interface SalesPipelineSummary {
   nextAction: string;
   evidence: string;
 }
+
+export const advancedSalesStages: SalesStage[] = ["visited", "card-left", "demo-booked", "trial-started", "activated", "paid"];
 
 export const FIELD_SALES_UTM_MEDIUM = "field-sales";
 export const FIELD_SALES_CAMPAIGN = "4h_2026-04_az_field_sales";
@@ -146,11 +154,15 @@ export const salesLeads: SalesLead[] = [
     state: "AZ",
     tradeDomain: "pipe.city",
     stage: "qualified",
+    leadType: "archetype",
     ownerProfile: "2-8 truck plumbing shop with emergency and after-hours call leakage.",
     painSignal: "High-value calls hit while the owner or dispatcher is already on another job.",
     nextAction: "Visit during office hours, leave tester card, and invite a same-day demo call.",
     lastTouchedAt: null,
     trackingCode: "AZ-P-001",
+    notes: "Internal archetype. Replace with a real owner row before marking contacted.",
+    createdAt: "2026-04-27T00:00:00.000Z",
+    updatedAt: "2026-04-27T00:00:00.000Z",
   },
   {
     id: "az-hvac-owner-001",
@@ -160,11 +172,15 @@ export const salesLeads: SalesLead[] = [
     state: "AZ",
     tradeDomain: "duct.city",
     stage: "qualified",
+    leadType: "archetype",
     ownerProfile: "Seasonal HVAC operator with urgent no-cool demand and fast response pressure.",
     painSignal: "Peak-season callers keep shopping if nobody answers in the first minute.",
     nextAction: "Confirm owner name, then offer a live no-cool call simulation.",
     lastTouchedAt: null,
     trackingCode: "AZ-D-001",
+    notes: "Internal archetype. Replace with a real owner row before marking contacted.",
+    createdAt: "2026-04-27T00:00:00.000Z",
+    updatedAt: "2026-04-27T00:00:00.000Z",
   },
   {
     id: "az-lawn-owner-001",
@@ -174,11 +190,15 @@ export const salesLeads: SalesLead[] = [
     state: "AZ",
     tradeDomain: "mow.city",
     stage: "prospect",
+    leadType: "archetype",
     ownerProfile: "Owner-led crew that misses calls while crews are mowing or driving routes.",
     painSignal: "Estimate requests stack up during route hours, then go cold by evening.",
     nextAction: "Bring a card to the yard or trailer after the owner is confirmed.",
     lastTouchedAt: null,
     trackingCode: "AZ-M-001",
+    notes: "Internal archetype. Replace with a real owner row before marking contacted.",
+    createdAt: "2026-04-27T00:00:00.000Z",
+    updatedAt: "2026-04-27T00:00:00.000Z",
   },
   {
     id: "az-pest-owner-001",
@@ -188,11 +208,15 @@ export const salesLeads: SalesLead[] = [
     state: "AZ",
     tradeDomain: "pest.city",
     stage: "prospect",
+    leadType: "archetype",
     ownerProfile: "Small pest operator with urgent homeowner calls and tight routing windows.",
     painSignal: "Anxious homeowners call multiple pest companies when they see activity.",
     nextAction: "Confirm owner name, qualify route density, then plan a first card drop.",
     lastTouchedAt: null,
     trackingCode: "AZ-PE-001",
+    notes: "Internal archetype. Replace with a real owner row before marking contacted.",
+    createdAt: "2026-04-27T00:00:00.000Z",
+    updatedAt: "2026-04-27T00:00:00.000Z",
   },
   {
     id: "az-paint-owner-001",
@@ -202,11 +226,15 @@ export const salesLeads: SalesLead[] = [
     state: "AZ",
     tradeDomain: "coat.city",
     stage: "qualified",
+    leadType: "archetype",
     ownerProfile: "Estimate-heavy painter that needs clean intake before the owner calls back.",
     painSignal: "Slow follow-up turns estimate requests into ghosted leads.",
     nextAction: "Ask for one test estimate call and track whether a demo gets booked.",
     lastTouchedAt: null,
     trackingCode: "AZ-C-001",
+    notes: "Internal archetype. Replace with a real owner row before marking contacted.",
+    createdAt: "2026-04-27T00:00:00.000Z",
+    updatedAt: "2026-04-27T00:00:00.000Z",
   },
 ];
 
@@ -229,6 +257,91 @@ export function slugifySalesValue(value: string, fallback: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
   return slug || fallback;
+}
+
+export function isAdvancedSalesStage(stage: SalesStage) {
+  return advancedSalesStages.includes(stage);
+}
+
+export function canUseSalesStage(leadType: SalesLead["leadType"], stage: SalesStage) {
+  return leadType === "real" || !isAdvancedSalesStage(stage);
+}
+
+export function canReclassifySalesLead(previousType: SalesLead["leadType"], nextType: SalesLead["leadType"]) {
+  return previousType === nextType || previousType === "real";
+}
+
+export function normalizeSalesStage(value: unknown): SalesStage {
+  return salesStages.some((stage) => stage.id === value) ? (value as SalesStage) : "prospect";
+}
+
+export function normalizeSalesLead(input: Partial<SalesLead> & Record<string, unknown>): SalesLead {
+  const now = new Date().toISOString();
+  const leadType = input.leadType === "real" || input.lead_type === "real" ? "real" : "archetype";
+  const requestedStage = normalizeSalesStage(input.stage);
+  const stage = canUseSalesStage(leadType, requestedStage) ? requestedStage : "qualified";
+  const trackingSeed = String(input.trackingCode ?? input.tracking_code ?? input.id ?? crypto.randomUUID()).toUpperCase();
+
+  return {
+    id: String(input.id ?? crypto.randomUUID()),
+    repId: String(input.repId ?? input.rep_id ?? salesReps[0]?.id ?? "rep-az-founding"),
+    businessName: String(input.businessName ?? input.business_name ?? "Untitled sales lead"),
+    city: String(input.city ?? "Phoenix"),
+    state: String(input.state ?? "AZ").toUpperCase(),
+    tradeDomain: normalizeTradeDomain(String(input.tradeDomain ?? input.trade_domain ?? "pipe.city")) ?? "pipe.city",
+    stage,
+    leadType,
+    ownerProfile: String(input.ownerProfile ?? input.owner_profile ?? ""),
+    painSignal: String(input.painSignal ?? input.pain_signal ?? ""),
+    nextAction: String(input.nextAction ?? input.next_action ?? ""),
+    lastTouchedAt: (input.lastTouchedAt ?? input.last_touched_at ?? null) as string | null,
+    trackingCode: trackingSeed,
+    notes: (input.notes ?? null) as string | null,
+    createdAt: String(input.createdAt ?? input.created_at ?? now),
+    updatedAt: String(input.updatedAt ?? input.updated_at ?? now),
+  };
+}
+
+export function salesLeadToDb(lead: SalesLead) {
+  return {
+    id: lead.id,
+    rep_id: lead.repId,
+    business_name: lead.businessName,
+    city: lead.city,
+    state: lead.state,
+    trade_domain: lead.tradeDomain,
+    stage: lead.stage,
+    lead_type: lead.leadType,
+    owner_profile: lead.ownerProfile,
+    pain_signal: lead.painSignal,
+    next_action: lead.nextAction,
+    last_touched_at: lead.lastTouchedAt,
+    tracking_code: lead.trackingCode,
+    notes: lead.notes,
+    created_at: lead.createdAt,
+    updated_at: lead.updatedAt,
+  };
+}
+
+export function salesLeadToJson(lead: SalesLead) {
+  return {
+    id: lead.id,
+    repId: lead.repId,
+    businessName: lead.businessName,
+    city: lead.city,
+    state: lead.state,
+    tradeDomain: lead.tradeDomain,
+    stage: lead.stage,
+    leadType: lead.leadType,
+    ownerProfile: lead.ownerProfile,
+    painSignal: lead.painSignal,
+    nextAction: lead.nextAction,
+    lastTouchedAt: lead.lastTouchedAt,
+    trackingCode: lead.trackingCode,
+    notes: lead.notes,
+    createdAt: lead.createdAt,
+    updatedAt: lead.updatedAt,
+  };
 }
 
 function normalizeTradeDomain(value: string | null | undefined) {
@@ -317,16 +430,20 @@ export function summarizeSalesPipeline(leads: SalesLead[] = salesLeads, reps: Sa
     byStage[lead.stage] += 1;
   }
 
-  const activeLeads = leads.filter((lead) => lead.stage !== "lost" && lead.stage !== "paid").length;
+  const realLeads = leads.filter((lead) => lead.leadType === "real");
+  const archetypeLeads = leads.filter((lead) => lead.leadType === "archetype").length;
+  const activeLeads = realLeads.filter((lead) => lead.stage !== "lost" && lead.stage !== "paid").length;
   const weeklyTouchTarget = reps.reduce((sum, rep) => sum + rep.weeklyTouchTarget, 0);
-  const bookedDemos = byStage["demo-booked"] + byStage["trial-started"] + byStage.activated + byStage.paid;
-  const trialStarts = byStage["trial-started"] + byStage.activated + byStage.paid;
-  const paidCustomers = byStage.paid;
+  const bookedDemos = realLeads.filter((lead) => ["demo-booked", "trial-started", "activated", "paid"].includes(lead.stage)).length;
+  const trialStarts = realLeads.filter((lead) => ["trial-started", "activated", "paid"].includes(lead.stage)).length;
+  const paidCustomers = realLeads.filter((lead) => lead.stage === "paid").length;
   const nextBucket =
     salesStages.find((stage) => byStage[stage.id] > 0 && !["paid", "lost"].includes(stage.id)) ?? salesStages[0];
 
   return {
     totalLeads: leads.length,
+    realLeads: realLeads.length,
+    archetypeLeads,
     activeLeads,
     weeklyTouchTarget,
     bookedDemos,
@@ -337,6 +454,6 @@ export function summarizeSalesPipeline(leads: SalesLead[] = salesLeads, reps: Sa
       nextBucket.id === "prospect"
         ? "Qualify the next Arizona owner list, then hand cards only to trades with obvious missed-call pain."
         : `Work the ${nextBucket.label.toLowerCase()} bucket before adding more cold targets.`,
-    evidence: `${leads.length} internal AZ pilot leads, ${reps.length} field rep, ${weeklyTouchTarget} planned weekly touches, no external outreach sent by 4H.`,
+    evidence: `${realLeads.length} real AZ pilot leads, ${archetypeLeads} archetypes, ${reps.length} field rep, ${weeklyTouchTarget} planned weekly touches, no external outreach sent by 4H.`,
   };
 }
