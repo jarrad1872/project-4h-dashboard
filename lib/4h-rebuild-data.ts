@@ -210,9 +210,9 @@ export const rebuildExecutionQueue = [
     lane: "Creators",
     title: "Draft creator outreach packets",
     route: "/influencer",
-    status: "ready",
+    status: "complete",
     approval: "review-required",
-    outcome: "10 ready-to-review outreach drafts tied to a trade, demo offer, and tracking link.",
+    outcome: "10 ready-to-review outreach drafts are tied to trade .city demos, the hard offer, and internal review state.",
     acceptance: "No outreach is sent; drafts are approval-gated.",
   },
   {

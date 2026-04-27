@@ -22,6 +22,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-04 | Phase 2 | Creative | Create Claude Design handoff packet | 2026-04-27 | `docs/claude-design-creative-lab-handoff.md` captures UX goals, data model, routes, screenshots, and constraints. |
 | Q-05 | Phase 3 | Creators | Audit creator shortlist | 2026-04-27 | `/influencer` labels creators as keep/maybe/remove/needs-research without deleting history. |
 | Q-06 | Phase 3 | Creators | Upgrade creator scoring model | 2026-04-27 | `/influencer` renders owner audience, trade fit, average views, trust, sponsor, and production value scores. |
+| Q-07 | Phase 3 | Creators | Draft creator outreach packets | 2026-04-27 | `/influencer` shows the Q-07 outreach packet counter and 10 internal creator drafts queued for review; no email or external send action is performed. |
 | Q-08 | Phase 3 | Creators | Add creator UTM builder | 2026-04-27 | `/influencer` builds deterministic creator referral URLs with creator, trade, platform, campaign, and content IDs. |
 | Q-09 | Phase 3 | Creators | Build content brief templates | 2026-04-27 | `/templates` includes demo-call, founder assist, and screenshot-proof packets with hook, shots, CTA, offer, and tracking guidance. |
 | Q-10 | Phase 4 | Landing | Inventory read-only product routes | 2026-04-27 | `/gtm` shows 21 copied product routes, including five beachhead domains with landing root, signup path, and demo phone numbers. |
@@ -43,7 +44,6 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
 | Q-17 | Phase 5 | Launch | Create platform upload sheets | Review required | Local/download exports only; no platform upload. |
 
 ## Stop Conditions

@@ -15,10 +15,12 @@ import {
 import { auditCreator, summarizeCreatorAudit } from "@/lib/creator-audit";
 import { buildCreatorUtmUrl } from "@/lib/creator-utm-builder";
 import {
+  canGenerateOutreachDraft,
   generateOutreachDraft,
   getNextDraftStep,
   getNextFollowUpDate,
   qualifyInfluencer,
+  summarizeOutreachPackets,
 } from "@/lib/influencer-outreach-agent";
 import type {
   Influencer,
@@ -91,6 +93,18 @@ function ScoreLine({ label, value, max }: { label: string; value: number; max: n
       </span>
     </div>
   );
+}
+
+function previewOutreachDraft(influencer: Influencer, step: InfluencerOutreachDraftStep) {
+  try {
+    return generateOutreachDraft(influencer, step);
+  } catch {
+    return {
+      step,
+      subject: "Set trade .city domain before drafting",
+      body: "Internal blocker: this creator needs a canonical trade .city destination or saved deal page before 4H can generate review-ready outreach.",
+    };
+  }
 }
 
 export default function InfluencerPage() {
@@ -204,6 +218,22 @@ export default function InfluencerPage() {
     await load();
   }
 
+  async function generateDraftPacketBatch(
+    candidates: { influencer: Influencer; nextDraftStep: InfluencerOutreachDraftStep | null }[],
+  ) {
+    setSavingId("draft-pack");
+    for (const { influencer, nextDraftStep } of candidates) {
+      if (!nextDraftStep) continue;
+      await fetch(`/api/influencers/${influencer.id}/draft`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step: nextDraftStep }),
+      });
+    }
+    setSavingId(null);
+    await load();
+  }
+
   async function reviewDraft(id: string, approved: boolean) {
     setSavingId(id);
     await fetch(`/api/influencers/${id}`, {
@@ -278,6 +308,10 @@ export default function InfluencerPage() {
   const readyToSend = ranked.filter((entry) => entry.influencer.draft_status === "approved");
   const followUpDue = ranked.filter((entry) => entry.nextDraftStep && entry.influencer.draft_status === "sent");
   const qualified = ranked.filter((entry) => entry.qualification.totalScore >= 70);
+  const outreachPacketSummary = summarizeOutreachPackets(influencers);
+  const draftPackCandidates = ranked
+    .filter((entry) => entry.nextDraftStep && entry.influencer.audit_label !== "remove" && canGenerateOutreachDraft(entry.influencer))
+    .slice(0, outreachPacketSummary.remaining);
 
   return (
     <div className="space-y-6">
@@ -323,6 +357,45 @@ export default function InfluencerPage() {
           </Card>
         ))}
       </div>
+
+      <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/20">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-cyan-300">Q-07 outreach packets</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">
+              {outreachPacketSummary.drafted} / {outreachPacketSummary.target} drafts built
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Draft-only creator outreach packets for Jarrad review. Generating packets writes internal draft copy and
+              approval state only; it does not send email, contact creators, create webhooks, or move money.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full border border-rose-800 px-3 py-1 text-rose-300">
+              {outreachPacketSummary.pendingApproval} awaiting review
+            </span>
+            <span className="rounded-full border border-emerald-800 px-3 py-1 text-emerald-300">
+              {outreachPacketSummary.approved} approved
+            </span>
+            <span className="rounded-full border border-slate-700 px-3 py-1 text-slate-300">
+              {outreachPacketSummary.sent} sent
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-500">
+            {outreachPacketSummary.complete
+              ? "The first packet set is ready for review and still unsent."
+              : `${outreachPacketSummary.remaining} more drafts needed for the first packet set.`}
+          </p>
+          <Button
+            disabled={savingId === "draft-pack" || draftPackCandidates.length === 0 || outreachPacketSummary.complete}
+            onClick={() => void generateDraftPacketBatch(draftPackCandidates)}
+          >
+            {savingId === "draft-pack" ? "Drafting..." : "Draft packet set"}
+          </Button>
+        </div>
+      </Card>
 
       <Card className="space-y-4">
         <div>
@@ -583,7 +656,7 @@ export default function InfluencerPage() {
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {ranked.map(({ influencer, qualification, audit, nextDraftStep }) => {
-                  const previewDraft = generateOutreachDraft(influencer, nextDraftStep ?? "initial");
+                  const previewDraft = previewOutreachDraft(influencer, nextDraftStep ?? "initial");
                   const displayedAuditLabel = influencer.audit_label ?? audit.label;
                   const displayedAuditReason = influencer.audit_reason ?? audit.reason;
                   const tracking = buildCreatorUtmUrl(influencer);

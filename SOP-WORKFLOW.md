@@ -252,8 +252,8 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 **Deal structure:**
 - Creator promotes their trade's `.city` domain to their contractor audience
 - Unique referral code + co-branded landing page (e.g. `mow.city/ryanknorr`)
-- Commission: $10/mo per referred contractor × up to 24 months ($240 max per referral)
-- Optional closer for top-tier creators: lifetime uncapped + flat $15/signup bonus
+- Outreach drafts use a flat-fee-only creator ask unless Jarrad explicitly approves another structure
+- Customer offer in every creator packet: `$39/mo`, `14-day free trial, no credit card required`
 
 **Outreach tone:** Peer-to-peer, operator-to-operator. Never corporate.  
 > "We built this for guys like your audience" — not "we'd like to leverage your platform"
@@ -284,6 +284,12 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Creator URLs are deterministic and include `utm_source`, `utm_medium=creator`, `utm_campaign`, `utm_content`, `utm_term`, `creator`, `creator_id`, `trade`, and `ref`.
 - Saving a generated URL/code to `deal_page` and `referral_code` is internal 4H state only. It does not send outreach, launch a campaign, upload to an ad platform, or create an external webhook.
 - Use the tracking URL in outreach drafts only after the draft itself has passed Jarrad review.
+
+**Q-07 outreach packet workflow:**
+- `/influencer` shows the first outreach packet target, drafted count, approval count, approved count, and sent count.
+- The batch draft action creates internal draft copy only. It must never send email, DM creators, create external webhooks, launch ads, upload to ad platforms, move money, or change billing.
+- Draft bodies must name the trade `.city` destination and preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
+- Q-07 is complete only when 10 creator drafts exist and the sent count is zero.
 
 **Content brief templates:**
 - `/templates` holds the internal creator brief packets for demo-call video, founder assist, and screenshot-proof assets.

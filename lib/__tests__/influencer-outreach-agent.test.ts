@@ -5,6 +5,8 @@ import {
   getNextDraftStep,
   getNextFollowUpDate,
   qualifyInfluencer,
+  resolveInfluencerTradeDomain,
+  summarizeOutreachPackets,
 } from "../influencer-outreach-agent";
 import type { Influencer } from "../types";
 
@@ -98,13 +100,68 @@ describe("generateOutreachDraft", () => {
     const draft = generateOutreachDraft(makeInfluencer(), "initial");
     expect(draft.subject).toContain("Roger");
     expect(draft.body).toContain("flat-fee only ($500)");
+    expect(draft.body).toContain("pipe.city");
+    expect(draft.body).toContain("$39/mo");
     expect(draft.body).toContain("14-day free trial");
+    expect(draft.body).toContain("no credit card required");
   });
 
   it("builds the first follow-up variant", () => {
     const draft = generateOutreachDraft(makeInfluencer(), "follow_up_1");
     expect(draft.subject).toContain("checking in");
     expect(draft.body).toContain("Following up");
+    expect(draft.body).toContain("pipe.city");
+  });
+
+  it("resolves canonical domains for free-text trades", () => {
+    expect(resolveInfluencerTradeDomain(makeInfluencer({ trade: "Lawn Care" }))).toBe("mow.city");
+    expect(resolveInfluencerTradeDomain(makeInfluencer({ trade: "HVAC" }))).toBe("duct.city");
+    expect(resolveInfluencerTradeDomain(makeInfluencer({ trade: "Pressure Washing" }))).toBe("rinse.city");
+  });
+
+  it("blocks outreach drafts when no trade-specific .city domain can be resolved", () => {
+    const influencer = makeInfluencer({ trade: "Unknown Trade", deal_page: null });
+    expect(resolveInfluencerTradeDomain(influencer)).toBeNull();
+    expect(() => generateOutreachDraft(influencer, "initial")).toThrow(/trade-specific \.city domain/);
+  });
+});
+
+describe("summarizeOutreachPackets", () => {
+  it("counts a complete unsent first packet set", () => {
+    const influencers = Array.from({ length: 10 }, (_, index) =>
+      makeInfluencer({
+        id: `creator-${index}`,
+        draft_status: "pending_approval",
+        outreach_stage: "approval_pending",
+        draft_subject: `Creator ${index} x pipe.city`,
+        draft_body: "Draft body",
+      }),
+    );
+
+    expect(summarizeOutreachPackets(influencers)).toMatchObject({
+      target: 10,
+      drafted: 10,
+      pendingApproval: 10,
+      sent: 0,
+      remaining: 0,
+      complete: true,
+    });
+  });
+
+  it("does not treat sent outreach as an acceptable Q-07 packet state", () => {
+    const influencers = Array.from({ length: 10 }, (_, index) =>
+      makeInfluencer({
+        id: `creator-${index}`,
+        draft_status: index === 0 ? "sent" : "pending_approval",
+        outreach_stage: index === 0 ? "sent" : "approval_pending",
+        draft_subject: `Creator ${index} x pipe.city`,
+        draft_body: "Draft body",
+      }),
+    );
+
+    const summary = summarizeOutreachPackets(influencers);
+    expect(summary.sent).toBe(1);
+    expect(summary.complete).toBe(false);
   });
 });
 

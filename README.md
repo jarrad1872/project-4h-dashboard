@@ -232,6 +232,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/ads` now labels legacy NB2, imported, and generic Saw.City rows as historical archive entries so they stay visible without looking launch-ready
 - `/templates` now includes 20 message-match handoff briefs for the five beachhead domains across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
+- `/influencer` now shows the Q-07 outreach packet counter and can generate the first 10 internal creator drafts for review without sending outreach
 - `/influencer` now audits the creator shortlist into keep/maybe/remove/needs-research buckets; `remove` deprioritizes while preserving creator history
 - `/influencer` now ranks creators with a trade-owner scoring model: owner audience, trade fit, average views, sponsor openness, trust signals, and production value
 - `/influencer` now builds deterministic creator UTM/referral URLs and can save the generated URL/code back to each creator row without sending outreach
@@ -261,7 +262,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-05 influencer seed idempotency + competitive intelligence foundation | v4.3.1*
+*Last updated: 2026-04-27 Q-07 creator outreach packet review workflow | v4.3.2*
 
 ---
 

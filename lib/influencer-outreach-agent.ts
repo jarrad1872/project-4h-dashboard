@@ -4,6 +4,7 @@ import type {
   InfluencerOutreachDraftStep,
   InfluencerSponsorOpenness,
 } from "@/lib/types";
+import { TRADE_MAP } from "@/lib/trade-utils";
 
 export interface InfluencerQualification {
   totalScore: number;
@@ -26,6 +27,19 @@ export interface OutreachDraft {
   subject: string;
   body: string;
 }
+
+export interface OutreachPacketSummary {
+  target: number;
+  drafted: number;
+  pendingApproval: number;
+  approved: number;
+  sent: number;
+  remaining: number;
+  complete: boolean;
+}
+
+export const OUTREACH_PACKET_TARGET = 10;
+const OFFER_LINE = "$39/mo, 14-day free trial, no credit card required";
 
 const OWNER_AUDIENCE_SCORES: Record<InfluencerBusinessFocus, number> = {
   owners: 25,
@@ -58,6 +72,51 @@ function toDisplayTrade(trade: string) {
   if (!trade.trim()) return "trade";
   if (trade.includes(".city")) return trade;
   return trade;
+}
+
+function domainFromDealPage(dealPage: string | null | undefined) {
+  if (!dealPage) return null;
+  try {
+    const url = new URL(dealPage);
+    return url.hostname.endsWith(".city") ? url.hostname.toLowerCase() : null;
+  } catch {
+    const match = dealPage.toLowerCase().match(/[a-z0-9-]+\.city/);
+    return match?.[0] ?? null;
+  }
+}
+
+export function resolveInfluencerTradeDomain(
+  influencer: Pick<Influencer, "trade" | "deal_page">,
+): string | null {
+  const explicitDealDomain = domainFromDealPage(influencer.deal_page);
+  if (explicitDealDomain) return explicitDealDomain;
+
+  const trade = influencer.trade;
+  const normalized = safeLower(trade).replace(".city", "").replace(/[^a-z0-9]+/g, " ").trim();
+  const domainMap: Record<string, string> = {
+    plumbing: "pipe",
+    plumber: "pipe",
+    "lawn care": "mow",
+    lawn: "mow",
+    landscaping: "mow",
+    hvac: "duct",
+    painting: "coat",
+    painter: "coat",
+    roofing: "roofrepair",
+    roof: "roofrepair",
+    electrical: "electricians",
+    electrician: "electricians",
+    "pressure washing": "rinse",
+    wash: "rinse",
+  };
+
+  if (safeLower(trade).includes(".city")) return safeLower(trade);
+  const tradeKey = domainMap[normalized] ?? normalized.replace(/\s+/g, "");
+  return TRADE_MAP[tradeKey]?.domain ?? null;
+}
+
+export function canGenerateOutreachDraft(influencer: Pick<Influencer, "trade" | "deal_page">) {
+  return Boolean(resolveInfluencerTradeDomain(influencer));
 }
 
 function toFeeRange(influencer: Influencer) {
@@ -237,9 +296,30 @@ export function getNextFollowUpDate(step: InfluencerOutreachDraftStep, now = new
   return null;
 }
 
+export function summarizeOutreachPackets(influencers: Influencer[], target = OUTREACH_PACKET_TARGET): OutreachPacketSummary {
+  const drafted = influencers.filter((influencer) => Boolean(influencer.draft_subject && influencer.draft_body)).length;
+  const pendingApproval = influencers.filter((influencer) => influencer.draft_status === "pending_approval").length;
+  const approved = influencers.filter((influencer) => influencer.draft_status === "approved").length;
+  const sent = influencers.filter((influencer) => influencer.draft_status === "sent" || influencer.outreach_stage === "sent").length;
+
+  return {
+    target,
+    drafted,
+    pendingApproval,
+    approved,
+    sent,
+    remaining: Math.max(0, target - drafted),
+    complete: drafted >= target && sent === 0,
+  };
+}
+
 export function generateOutreachDraft(influencer: Influencer, step: InfluencerOutreachDraftStep): OutreachDraft {
   const creatorFirstName = firstName(influencer.creator_name);
   const tradeLabel = toDisplayTrade(influencer.trade);
+  const tradeDomain = resolveInfluencerTradeDomain(influencer);
+  if (!tradeDomain) {
+    throw new Error(`A trade-specific .city domain is required before drafting outreach for ${influencer.creator_name}`);
+  }
   const feeRange = toFeeRange(influencer);
   const noteSummary = summarizeNote(influencer.notes);
   const channel = safeLower(influencer.platform);
@@ -253,7 +333,7 @@ export function generateOutreachDraft(influencer: Influencer, step: InfluencerOu
         `Hi ${creatorFirstName},`,
         "",
         "Following up in case my first note got buried.",
-        `We still have room for one ${tradeLabel} creator partner in this launch wave. The structure is simple: flat fee only (${feeRange}), no rev-share, and a co-branded page with a 14-day free trial for your audience.`,
+        `We still have room for one ${tradeLabel} creator partner in this launch wave. The structure is simple: flat fee only (${feeRange}), no rev-share, and a ${tradeDomain} demo page with ${OFFER_LINE} for your audience.`,
         "If that is in range, reply and I'll send the one-page brief plus the exact talking points.",
         "",
         "Jarrad",
@@ -269,7 +349,7 @@ export function generateOutreachDraft(influencer: Influencer, step: InfluencerOu
         `Hi ${creatorFirstName},`,
         "",
         `Last follow-up from me. We are locking the first round of ${tradeLabel} creator partners this week.`,
-        `If you want me to hold a slot at the ${feeRange} flat-fee range, reply with a yes and I'll send the brief. If timing is off, no problem.`,
+        `If you want me to hold a slot at the ${feeRange} flat-fee range, reply with a yes and I'll send the ${tradeDomain} brief. The offer stays ${OFFER_LINE}. If timing is off, no problem.`,
         "",
         "Jarrad",
       ].join("\n"),
@@ -289,7 +369,7 @@ export function generateOutreachDraft(influencer: Influencer, step: InfluencerOu
       "",
       `I've been reviewing ${tradeLabel} creators for our launch list and wanted to reach out directly.`,
       introLine,
-      `We're building around trade-owner workflows, and I think there is a fit for a simple sponsored mention to your audience. The structure is flat-fee only (${feeRange}), no rev-share, with a co-branded page and a 14-day free trial for your audience.`,
+      `We're building around trade-owner workflows, and I think there is a fit for a simple sponsored mention to your audience. The structure is flat-fee only (${feeRange}), no rev-share, with a ${tradeDomain} demo page and ${OFFER_LINE}.`,
       "If you're open, I'll send the brief, launch timing, and the exact email-safe talking points before anything goes live.",
       "",
       "Jarrad",
