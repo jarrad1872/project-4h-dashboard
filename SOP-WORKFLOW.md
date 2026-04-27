@@ -331,7 +331,8 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - If no paid events exist, the report must say rankings are directional only. If no events exist, it must show empty states instead of recommendations.
 - Keep/kill/iterate decisions on `/scorecard` are selected-week local learning notes with timestamps, optional notes, undo, and visible history.
 - Decision entries do not pause campaigns, launch ads, upload sheets, send outreach, create webhooks, move money, or change billing.
-- Do not fabricate winners, customer pace, or creative fatigue from placeholder data. Those belong to later queue items after real signal is present.
+- The customer pace forecast uses logged weekly paid customer metrics only. It shows the 1,000-2,000 target range, weeks remaining to 2026-12-31, current weekly/monthly pace, required pace, projected gap, and the next internal bet.
+- If no paid customer metrics exist, the forecast must say no paid customer data is logged yet. Do not fabricate winners, customer pace, or creative fatigue from placeholder data.
 
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator

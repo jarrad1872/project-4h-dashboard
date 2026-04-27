@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { CHANNELS } from "@/lib/constants";
+import { buildCustomerPaceForecast, type CustomerPaceStatus } from "@/lib/customer-pace-forecast";
 import {
   addLearningDecision,
   currentLearningDecisions,
@@ -101,9 +102,27 @@ const DECISION_STYLE: Record<LearningDecisionAction, string> = {
   iterate: "border-amber-700/40 bg-amber-950/25 text-amber-300",
 };
 
+const PACE_STATUS_STYLE: Record<CustomerPaceStatus, string> = {
+  "no-data": "border-slate-700 bg-slate-800 text-slate-300",
+  behind: "border-red-700/40 bg-red-950/25 text-red-300",
+  "low-track": "border-amber-700/40 bg-amber-950/25 text-amber-300",
+  "high-track": "border-green-700/40 bg-green-950/25 text-green-300",
+};
+
+const PACE_STATUS_LABEL: Record<CustomerPaceStatus, string> = {
+  "no-data": "Waiting for paid signal",
+  behind: "Behind 1,000 pace",
+  "low-track": "On 1,000 pace",
+  "high-track": "On 2,000 pace",
+};
+
 function pct(value: number | null) {
   if (value === null) return "No view base";
   return `${(value * 100).toFixed(1)}%`;
+}
+
+function number(value: number) {
+  return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
 }
 
 function weekEventParams(weekStart: string) {
@@ -197,6 +216,7 @@ export default function ScorecardPage() {
   const weeks = useMemo(() => metrics.weeks.map((week) => week.weekStart), [metrics.weeks]);
   const campaignTotals = useMemo(() => sumChannels(metrics.weeks), [metrics.weeks]);
   const totalUsers = metrics.weeks.reduce((sum, week) => sum + CHANNELS.reduce((inner, channel) => inner + week[channel].paid, 0), 0);
+  const paceForecast = useMemo(() => buildCustomerPaceForecast(metrics.weeks), [metrics.weeks]);
   const learningReport = useMemo(() => buildWeeklyLearningReport(marketingSummary), [marketingSummary]);
   const decisionTargets = useMemo(
     () => learningReport.reports.flatMap((report) =>
@@ -317,6 +337,54 @@ export default function ScorecardPage() {
           />
         </div>
         {totalUsers === 0 && <p className="mt-2 text-xs text-slate-500">No paying users yet. Campaign pre-launch. Log weekly actuals here once ads go live.</p>}
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Customer Pace Forecast</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Target range: {paceForecast.targetLow.toLocaleString()}-{paceForecast.targetHigh.toLocaleString()} paying users by {paceForecast.deadline}.
+            </p>
+          </div>
+          <span className={`rounded border px-3 py-1 text-xs font-semibold ${PACE_STATUS_STYLE[paceForecast.status]}`}>
+            {PACE_STATUS_LABEL[paceForecast.status]}
+          </span>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: "Current paid", value: paceForecast.paidCustomers.toLocaleString(), detail: `${paceForecast.loggedWeeks} logged weeks` },
+            { label: "Current pace", value: `${number(paceForecast.currentWeeklyPace)}/wk`, detail: `${number(paceForecast.currentMonthlyPace)}/mo actualized` },
+            { label: "Needed this month", value: `${number(paceForecast.requiredMonthlyLow)}-${number(paceForecast.requiredMonthlyHigh)}`, detail: `${number(paceForecast.requiredWeeklyLow)}-${number(paceForecast.requiredWeeklyHigh)}/wk required` },
+            { label: "Projected finish", value: paceForecast.projectedCustomers.toLocaleString(), detail: `${paceForecast.weeksRemaining} weeks remaining` },
+          ].map((item) => (
+            <div key={item.label} className="rounded border border-slate-700 bg-slate-800 p-3">
+              <p className="text-2xl font-bold text-slate-100">{item.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+              <p className="mt-2 text-xs text-slate-400">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
+          <div className="rounded border border-slate-700 bg-slate-900/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Projected gap to 1,000</p>
+            <p className="mt-1 text-xl font-bold text-slate-100">{paceForecast.projectedLowGap.toLocaleString()}</p>
+            <p className="mt-1 text-xs text-slate-400">{paceForecast.remainingToLow.toLocaleString()} customers left before projection.</p>
+          </div>
+          <div className="rounded border border-slate-700 bg-slate-900/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Projected gap to 2,000</p>
+            <p className="mt-1 text-xl font-bold text-slate-100">{paceForecast.projectedHighGap.toLocaleString()}</p>
+            <p className="mt-1 text-xs text-slate-400">{paceForecast.remainingToHigh.toLocaleString()} customers left before projection.</p>
+          </div>
+          <div className="rounded border border-slate-700 bg-slate-900/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Next bet</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{paceForecast.nextBet}</p>
+          </div>
+        </div>
+
+        <p className="mt-3 text-xs text-slate-500">{paceForecast.evidence}</p>
       </Card>
 
       <Card>

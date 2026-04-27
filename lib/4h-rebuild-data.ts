@@ -353,7 +353,7 @@ export const rebuildExecutionQueue = [
     lane: "Learning",
     title: "Add customer pace forecast",
     route: "/scorecard",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Dashboard shows monthly customer target, actual pace, and gap to 1,000/2,000.",
     acceptance: "Uses real paid customer data when available and clear placeholders otherwise.",
