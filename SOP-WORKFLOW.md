@@ -277,6 +277,11 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Saving a generated URL/code to `deal_page` and `referral_code` is internal 4H state only. It does not send outreach, launch a campaign, upload to an ad platform, or create an external webhook.
 - Use the tracking URL in outreach drafts only after the draft itself has passed Jarrad review.
 
+**Content brief templates:**
+- `/templates` holds the internal creator brief packets for demo-call video, founder assist, and screenshot-proof assets.
+- Every brief must include a hook, shot list, creator talking points, CTA, `$39/mo`, `14-day free trial, no credit card required`, and tracking guidance.
+- Copying a packet is drafting support only. It does not approve outreach, send messages, publish assets, or launch ads.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube

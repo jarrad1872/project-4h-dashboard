@@ -88,7 +88,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Scorecard | `/scorecard` | Weekly performance metrics |
 | Budget | `/budget` | Spend allocation per platform |
 | Launch | `/launch` | Pre-launch gate checklist |
-| Templates | `/templates` | Creative briefs + ad template library |
+| Templates | `/templates` | Creator content brief packets + ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
 | Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, approvals, ready-to-send, and follow-up drafting |
 | Settings | `/settings` | Campaign configuration |
@@ -222,6 +222,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/influencer` now audits the creator shortlist into keep/maybe/remove/needs-research buckets; `remove` deprioritizes while preserving creator history
 - `/influencer` now ranks creators with a trade-owner scoring model: owner audience, trade fit, average views, sponsor openness, trust signals, and production value
 - `/influencer` now builds deterministic creator UTM/referral URLs and can save the generated URL/code back to each creator row without sending outreach
+- `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state

@@ -232,7 +232,7 @@ export const rebuildExecutionQueue = [
     lane: "Creators",
     title: "Build content brief templates",
     route: "/templates",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Demo-call video, founder assist, and screenshot-proof templates exist.",
     acceptance: "Templates include hook, shot list, CTA, offer, and tracking guidance.",

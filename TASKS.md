@@ -111,7 +111,7 @@ Core offer rules:
 - [ ] Add Jarrad approval controls for outreach copy.
 - [ ] Track outreach states: qualified, approved, sent, follow-up due, replied, contracted, content live, paid.
 - [x] Add creator-specific UTM/referral code generation.
-- [ ] Add content brief templates for demo-call videos and founder-assisted creator posts.
+- [x] Add content brief templates for demo-call videos, founder-assisted creator posts, and screenshot-proof assets.
 - [ ] Verify that every live creator asset lands in the scorecard.
 
 ### Phase 4 - Landing And Trial Path Alignment
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 complete; Q-07 is approval-gated; production desk is ready, images still need generation/upload.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-09 complete; Q-07 is approval-gated; production desk is ready, images still need generation/upload.
 
 ---
 
