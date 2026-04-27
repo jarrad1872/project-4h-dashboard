@@ -44,6 +44,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-26 | Phase 2 | Creative | Add founder video asset tracker | 2026-04-27 | `/assets` tracks 10 founder-shot proof clips for five beachhead domains across missed-call and demo-proof angles with copyable shoot packets and approval gates. |
 | Q-27 | Phase 6 | Learning | Add lifecycle follow-up measurement | 2026-04-27 | `/lifecycle` measures signup-to-trial, trial-to-activation, and activation-to-paid movement from attribution events with no send or webhook action. |
 | Q-28 | Phase 6 | Learning | Add creative fatigue and variant lineage tracking | 2026-04-27 | `/assets` groups image assets into prompt/variant families and flags high-view, low-signal creative fatigue from attribution events only. |
+| Q-29 | Phase 3 | Creators | Add creator outreach state tracker | 2026-04-27 | `/influencer` groups creators into qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid stages without sending messages or moving money. |
 
 ## Ready Queue
 

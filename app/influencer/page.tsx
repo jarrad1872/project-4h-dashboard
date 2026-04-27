@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import {
   formatAuditLabel,
@@ -13,6 +13,10 @@ import {
   summarizeInfluencerPipeline,
 } from "@/lib/growth-command-center";
 import { auditCreator, summarizeCreatorAudit } from "@/lib/creator-audit";
+import {
+  buildCreatorOutreachPipelineSummary,
+  type CreatorOutreachPipelineStage,
+} from "@/lib/creator-outreach-pipeline";
 import { buildCreatorUtmUrl } from "@/lib/creator-utm-builder";
 import {
   canGenerateOutreachDraft,
@@ -44,6 +48,17 @@ const STATUS_OPTIONS: InfluencerStatus[] = [
 const BUSINESS_FOCUS_OPTIONS: InfluencerBusinessFocus[] = ["owners", "mixed", "consumer"];
 const SPONSOR_OPENNESS_OPTIONS: InfluencerSponsorOpenness[] = ["low", "medium", "high"];
 const AUDIT_LABEL_OPTIONS: InfluencerAuditLabel[] = ["keep", "maybe", "needs-research", "remove"];
+
+const OUTREACH_PIPELINE_STYLE: Record<CreatorOutreachPipelineStage, string> = {
+  qualified: "border-sky-800 bg-sky-950/30 text-sky-300",
+  approved: "border-emerald-800 bg-emerald-950/30 text-emerald-300",
+  sent: "border-cyan-800 bg-cyan-950/30 text-cyan-300",
+  follow_up_due: "border-amber-800 bg-amber-950/30 text-amber-300",
+  replied: "border-violet-800 bg-violet-950/30 text-violet-300",
+  contracted: "border-fuchsia-800 bg-fuchsia-950/30 text-fuchsia-300",
+  content_live: "border-lime-800 bg-lime-950/30 text-lime-300",
+  paid: "border-teal-800 bg-teal-950/30 text-teal-300",
+};
 
 const EMPTY_FORM = {
   creator_name: "",
@@ -309,6 +324,7 @@ export default function InfluencerPage() {
   const followUpDue = ranked.filter((entry) => entry.nextDraftStep && entry.influencer.draft_status === "sent");
   const qualified = ranked.filter((entry) => entry.qualification.totalScore >= 70);
   const outreachPacketSummary = summarizeOutreachPackets(influencers);
+  const outreachPipelineSummary = useMemo(() => buildCreatorOutreachPipelineSummary(influencers), [influencers]);
   const draftPackCandidates = ranked
     .filter((entry) => entry.nextDraftStep && entry.influencer.audit_label !== "remove" && canGenerateOutreachDraft(entry.influencer))
     .slice(0, outreachPacketSummary.remaining);
@@ -395,6 +411,71 @@ export default function InfluencerPage() {
             {savingId === "draft-pack" ? "Drafting..." : "Draft packet set"}
           </Button>
         </div>
+      </Card>
+
+      <Card className="space-y-4 border-violet-900/60 bg-violet-950/10">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Q-29 creator outreach pipeline</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">
+              {outreachPipelineSummary.totalTracked} creators tracked across the outreach path
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Tracks qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid creator states from
+              existing 4H rows. This is internal planning only and does not send messages, publish content, create webhooks, or move money.
+            </p>
+          </div>
+          <div className="rounded-lg border border-violet-900/50 bg-slate-950/50 p-3 xl:w-96">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Next creator move</p>
+            <p className="mt-2 text-sm text-slate-300">
+              {outreachPipelineSummary.nextBucket
+                ? outreachPipelineSummary.nextBucket.nextAction
+                : "Add qualified creator prospects or approve draft packets before the next manual send window."}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            { label: "Approval ready", value: outreachPipelineSummary.readyForApproval },
+            { label: "Active conversations", value: outreachPipelineSummary.activeConversations },
+            { label: "Live or paid", value: outreachPipelineSummary.liveOrPaid },
+          ].map((item) => (
+            <div key={item.label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-2xl font-semibold text-white">{item.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-4">
+          {outreachPipelineSummary.buckets.map((bucket) => (
+            <div key={bucket.stage} className={`rounded-lg border p-3 ${OUTREACH_PIPELINE_STYLE[bucket.stage]}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide opacity-80">{bucket.label}</p>
+                  <p className="mt-1 text-2xl font-semibold">{bucket.count}</p>
+                </div>
+                <span className="rounded-full border border-current px-2 py-1 text-xs">{bucket.count ? "Active" : "Empty"}</span>
+              </div>
+              <div className="mt-3 min-h-16 space-y-2">
+                {bucket.creators.slice(0, 3).map((creator) => (
+                  <div key={creator.id} className="rounded border border-current/30 bg-slate-950/40 px-2 py-1">
+                    <p className="truncate text-xs font-semibold text-white">{creator.creator_name}</p>
+                    <p className="truncate text-xs text-slate-400">
+                      {creator.trade} - {creator.platform}
+                    </p>
+                  </div>
+                ))}
+                {bucket.count > 3 ? <p className="text-xs opacity-80">+{bucket.count - 3} more</p> : null}
+                {bucket.count === 0 ? <p className="text-xs opacity-70">No creators here yet.</p> : null}
+              </div>
+              <p className="mt-3 text-xs text-slate-300">{bucket.nextAction}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-slate-500">{outreachPipelineSummary.evidence}</p>
       </Card>
 
       <Card className="space-y-4">

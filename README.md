@@ -90,7 +90,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Launch | `/launch` | Launch URL builder, bundle draft model, Q-17 local upload-sheet exports, readiness validator, external-action stop screen, and pre-launch gate checklist |
 | Templates | `/templates` | Meta Ad Library access validation, competitor research template, message-match handoff briefs, creator content packets, and ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
-| Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, approvals, ready-to-send, and follow-up drafting |
+| Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, pipeline state tracker, approvals, ready-to-send, and follow-up drafting |
 | Settings | `/settings` | Campaign configuration |
 
 ---
@@ -240,6 +240,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/influencer` now audits the creator shortlist into keep/maybe/remove/needs-research buckets; `remove` deprioritizes while preserving creator history
 - `/influencer` now ranks creators with a trade-owner scoring model: owner audience, trade fit, average views, sponsor openness, trust signals, and production value
 - `/influencer` now builds deterministic creator UTM/referral URLs and can save the generated URL/code back to each creator row without sending outreach
+- `/influencer` now tracks Q-29 creator outreach states from existing rows: qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid; this is internal state only and sends nothing
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -267,7 +268,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-28 creative fatigue and variant lineage tracking | v4.3.7*
+*Last updated: 2026-04-27 Q-29 creator outreach state tracker | v4.3.8*
 
 ---
 

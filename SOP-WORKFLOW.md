@@ -293,6 +293,11 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Draft bodies must name the trade `.city` destination and preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
 - Q-07 is complete only when 10 creator drafts exist and the sent count is zero.
 
+**Q-29 creator outreach state tracker:**
+- `/influencer` groups creators into qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid stages from existing 4H fields.
+- The tracker is an internal operating view only. It does not email creators, send follow-ups, publish content, create webhooks, move money, change billing, or authorize external outreach.
+- Prioritize follow-up due first, then approved manual-send candidates, replied conversations, and newly qualified creators.
+
 **Content brief templates:**
 - `/templates` holds the internal creator brief packets for demo-call video, founder assist, and screenshot-proof assets.
 - Every brief must include a hook, shot list, creator talking points, CTA, `$39/mo`, `14-day free trial, no credit card required`, and tracking guidance.

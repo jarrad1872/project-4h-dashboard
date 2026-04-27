@@ -461,4 +461,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "Creative Lab groups assets into prompt/variant families and flags high-view, low-signal creative fatigue.",
     acceptance: "Signals use creative-asset attribution only and do not pause, launch, upload, spend, or change billing.",
   },
+  {
+    id: "Q-29",
+    phase: "Phase 3",
+    lane: "Creators",
+    title: "Add creator outreach state tracker",
+    route: "/influencer",
+    status: "complete",
+    approval: "none",
+    outcome: "Influencer page groups creator prospects into qualified, approved, sent, follow-up due, replied, contracted, content-live, and paid stages.",
+    acceptance: "Pipeline state is derived from 4H rows only and does not send messages, publish content, create webhooks, or move money.",
+  },
 ];

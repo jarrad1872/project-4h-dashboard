@@ -110,7 +110,7 @@ Core offer rules:
 - [x] Add creator scoring fields that matter for trades: owner audience, average views, sponsor openness, trust level, trade fit, and production value.
 - [x] Generate outreach drafts tied to a specific trade demo and offer.
 - [x] Add Jarrad approval controls for outreach copy.
-- [ ] Track outreach states: qualified, approved, sent, follow-up due, replied, contracted, content live, paid.
+- [x] Track outreach states: qualified, approved, sent, follow-up due, replied, contracted, content live, paid.
 - [x] Add creator-specific UTM/referral code generation.
 - [x] Add content brief templates for demo-call videos, founder-assisted creator posts, and screenshot-proof assets.
 - [ ] Verify that every live creator asset lands in the scorecard.
@@ -185,6 +185,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-26 founder video asset tracking on `/assets`.
 - [x] Add Q-27 lifecycle follow-up measurement on `/lifecycle`.
 - [x] Add Q-28 creative fatigue and variant lineage tracking on `/assets`.
+- [x] Add Q-29 creator outreach state tracking on `/influencer`.
 
 ---
 
@@ -212,6 +213,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] External-action stop screen for launch, upload, outreach send, webhook, and spend actions.
 - [x] Weekly learning report rankings for trades, creators, images, and angles.
 - [x] Local reversible keep/kill/iterate decision board.
+- [x] Creator outreach state tracker.
 
 ---
 
