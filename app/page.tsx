@@ -33,6 +33,11 @@ import {
   settingsSourceDocs,
   settingsSourceNoteSummary,
 } from "@/lib/settings-source-notes";
+import {
+  getBeachheadProductRoutes,
+  productRouteInventorySources,
+  productRouteRetirementDependencySummary,
+} from "@/lib/product-route-inventory";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -160,6 +165,8 @@ export default function OverviewPage() {
   const workflowHistorySummary = useMemo(() => workflowHistoryDependencySummary(), []);
   const workflowTransitions = useMemo(() => workflowTransitionPairs(), []);
   const settingsSummary = useMemo(() => settingsSourceNoteSummary(), []);
+  const gtmRouteSummary = useMemo(() => productRouteRetirementDependencySummary(), []);
+  const gtmBeachheadRoutes = useMemo(() => getBeachheadProductRoutes(), []);
   const publicCreativeRows = useMemo(
     () =>
       publicCreativeUrlDependencies.reduce<Array<{ prefix: string; domain: string; urls: string[]; placements: string[] }>>(
@@ -649,6 +656,49 @@ export default function OverviewPage() {
                   <li key={dependency.id}>
                     <span className="font-semibold text-white">{dependency.surface}:</span> {dependency.preserves}
                   </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      <section data-testid="gtm-product-route-map">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Legacy GTM product-route inventory</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Product route context is preserved outside the old GTM board</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{gtmRouteSummary.inventoryCount} routes</StatusPill>
+            <StatusPill>{gtmRouteSummary.beachheadRoutes} beachhead</StatusPill>
+            <StatusPill>{gtmRouteSummary.demoLines} demo lines</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-sky-900/50 bg-sky-950/10">
+          <p className="text-sm leading-6 text-slate-300">{gtmRouteSummary.preservationRule}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Route: {gtmRouteSummary.route}; source count: {gtmRouteSummary.sourceCount}; reference:{" "}
+            {gtmRouteSummary.readOnlyReference}
+          </p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-[1fr,0.8fr]">
+            <div className="grid gap-2 md:grid-cols-5">
+              {gtmBeachheadRoutes.map((route) => (
+                <div key={route.domain} className="rounded border border-slate-700 bg-slate-900/60 p-3">
+                  <p className="text-sm font-semibold text-white">{route.domain}</p>
+                  <p className="mt-1 text-xs text-slate-500">{route.tradeLabel}</p>
+                  <p className="mt-2 text-xs font-semibold text-sky-200">{route.demoPhone}</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {route.landingPath} to {route.signupPath}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">Read-only evidence</p>
+              <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                {productRouteInventorySources.map((source) => (
+                  <li key={source}>- {source}</li>
                 ))}
               </ul>
             </div>

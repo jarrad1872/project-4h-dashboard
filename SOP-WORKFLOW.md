@@ -376,6 +376,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-41 separates static `/creatives/*.jpg` asset URLs from the legacy `/creatives` page route. Future `/creatives` redirects must prove those 24 JPEG URLs still return static images.
 - Q-42 separates workflow-stage history from the legacy `/workflow` page route. Future `/workflow` redirects must preserve or migrate the six stages, five bulk transitions, local fallback overrides, bulk API contract, and trade breakdown logic.
 - Q-43 separates setup/source notes from the legacy `/settings` page route. Future `/settings` delete packets must preserve platform setup pointers, read-only sawcity-lite source doc paths, campaign-status context, placeholder credential handling, and doc-update reminders.
+- Q-44 separates product-route inventory from the legacy `/gtm` page route. Future `/gtm` archive-only packets must preserve the 21-route inventory, beachhead demo-line context, launch URL assumptions, and read-only sawcity-lite evidence paths.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

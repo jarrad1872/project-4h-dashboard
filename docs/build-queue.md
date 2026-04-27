@@ -59,12 +59,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-41 | Governance | Navigation | Preserve public creative URL dependency map | 2026-04-27 | Command now shows the 24 static `/creatives/*.jpg` URL dependencies separately from the legacy `/creatives` page route, with tests confirming the files still exist. |
 | Q-42 | Governance | Navigation | Preserve bulk workflow history before redirect work | 2026-04-27 | Command now shows the six-stage `/workflow` history map, five bulk transitions, API/fallback dependencies, and no-external-action boundaries before any redirect work. |
 | Q-43 | Governance | Navigation | Extract legacy settings source notes | 2026-04-27 | Command now shows `/settings` setup notes, read-only source doc paths, campaign-status context, and doc-update reminders outside the legacy page before delete-later work. |
+| Q-44 | Governance | Navigation | Preserve legacy GTM product-route inventory | 2026-04-27 | Command now shows `/gtm` product-route inventory context, beachhead demo lines, and read-only sawcity-lite evidence outside the legacy GTM board. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-44 | Governance | Navigation | Preserve legacy GTM product-route inventory | none | Legacy `/gtm` product-route inventory context is represented in active docs/data before archive-only treatment. |
+| Q-45 | Governance | Navigation | Preserve historical ad archive audit map | none | Historical `/ads` archive context is represented in active docs/data before archive-only treatment. |
 
 ## Stop Conditions
 

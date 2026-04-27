@@ -277,3 +277,19 @@ export function summarizeProductRouteInventory(routes = productRouteInventory) {
     demoLines,
   };
 }
+
+export function productRouteRetirementDependencySummary() {
+  const summary = summarizeProductRouteInventory();
+
+  return {
+    route: "/gtm",
+    inventoryCount: summary.total,
+    readyRoutes: summary.ready,
+    beachheadRoutes: summary.beachhead,
+    demoLines: summary.demoLines,
+    sourceCount: productRouteInventorySources.length,
+    readOnlyReference: "sawcity-lite",
+    preservationRule:
+      "Preserve domain, landing, signup, demo-line, demo-auth, hero, and read-only source evidence before any /gtm archive-only work.",
+  };
+}

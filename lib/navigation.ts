@@ -248,12 +248,12 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   },
   {
     route: "/gtm",
-    status: "blocked",
-    readyForRedirectOrDelete: false,
+    status: "clear",
+    readyForRedirectOrDelete: true,
     activeReferences: ["Reference Shelf", "legacy banner only"],
-    dataDependencies: ["Product-route inventory and historical GTM context still live on the page"],
-    docOrTestReferences: ["README", "SOP-WORKFLOW", "product-route-inventory docs", "navigation.test"],
-    guardrail: "Keep archived until product-route inventory is fully represented in active launch/support data.",
+    dataDependencies: ["Product-route inventory preserved in product-route-inventory"],
+    docOrTestReferences: ["README", "SOP-WORKFLOW", "product-route-inventory docs", "navigation.test", "Command GTM product-route map"],
+    guardrail: "Candidate for future archive-only packet after confirming Command/docs cover the legacy GTM inventory.",
   },
   {
     route: "/settings",

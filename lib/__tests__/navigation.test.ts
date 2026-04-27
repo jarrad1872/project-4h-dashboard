@@ -73,6 +73,9 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.find((row) => row.route === "/settings")?.dataDependencies).toContain(
       "Setup/source notes inventoried in settings-source-notes",
     );
+    expect(routeDependencyGuards.find((row) => row.route === "/gtm")?.dataDependencies).toContain(
+      "Product-route inventory preserved in product-route-inventory",
+    );
     expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.dataDependencies).toContain(
       "24 static public /creatives/*.jpg URLs inventoried in trade-utils",
     );
@@ -82,8 +85,8 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.find((row) => row.route === "/templates")?.status).toBe("support");
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
-      counts: { clear: 2, blocked: 4, support: 2 },
-      readyForRedirectOrDelete: 2,
+      counts: { clear: 3, blocked: 3, support: 2 },
+      readyForRedirectOrDelete: 3,
     });
   });
 });

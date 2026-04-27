@@ -45,6 +45,7 @@ These routes are not active operating lanes. They remain available from the coll
 7. Q-41: Inventory static `/creatives/*.jpg` URLs separately from the `/creatives` page route. Complete; no redirects, deletions, or asset moves.
 8. Q-42: Inventory legacy `/workflow` bulk history separately from the `/workflow` page route. Complete; no redirects, deletions, or external actions.
 9. Q-43: Extract legacy `/settings` source/setup notes into active data/docs. Complete; no redirects, deletions, campaign-status changes, or external actions.
+10. Q-44: Preserve legacy `/gtm` product-route inventory in active data/docs. Complete; no redirects, deletions, or sawcity-lite writes.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -69,17 +70,16 @@ The Command page now shows a route dependency guard with these current statuses:
 
 | Status | Count | Meaning |
 | --- | ---: | --- |
-| Blocked | 4 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
+| Blocked | 3 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
 | Support | 2 | Keep as detail/support routes reached from active loops. |
-| Clear | 2 | Candidate for a future redirect/delete packet after preserving useful notes. |
+| Clear | 3 | Candidate for a future redirect/delete packet after preserving useful notes. |
 
-Current clear routes: `/generate`, `/settings`.
+Current clear routes: `/generate`, `/settings`, `/gtm`.
 
 Current blockers to resolve first:
 
 - `/creatives`: 24 static `/creatives/*.jpg` URLs are inventoried; any redirect packet still needs explicit 200-check preservation.
 - `/workflow`: six-stage workflow history is inventoried; any redirect packet still needs Launch/Approval migration or explicit preservation.
-- `/gtm`: product-route inventory context still needs active-loop coverage before archive-only treatment.
 - `/ads`: historical ad archive remains useful audit evidence.
 
 ## Q-40 Campaign Flow Link Migration
@@ -130,3 +130,16 @@ The `/settings` page route and the setup/source notes it displayed are separate 
 | Settings dependencies | 4 | Preserve campaign-status context, placeholder credential handling, source doc links, and doc-update reminders. |
 
 Q-43 did not delete `/settings`, redirect it, change campaign status, write to sawcity-lite, expose a real secret, or change external systems. The route is now a candidate for a future delete packet after one more explicit cleanup decision.
+
+## Q-44 GTM Product Route Inventory Preservation
+
+The `/gtm` page route and the product-route inventory it displayed are separate dependencies. Q-44 preserves the route inventory in `lib/product-route-inventory.ts`, `docs/product-route-inventory.md`, and Command before any future archive-only packet.
+
+| Source | Count | Preservation rule |
+| --- | ---: | --- |
+| Product routes | 21 | Preserve domain, landing, signup, demo-line, demo-auth, hero, and campaign-use context. |
+| Ready routes | 20 | Preserve confirmed trade route assumptions without writing to sawcity-lite. |
+| Beachhead routes | 5 | Preserve pipe, duct, mow, pest, and coat landing/demo-line context for Launch and creator work. |
+| Read-only source files | 7 | Preserve sawcity-lite evidence paths as reference only. |
+
+Q-44 did not redirect `/gtm`, delete the old page, change launch URLs, change product code, write to sawcity-lite, or change external systems. The route is now a candidate for future archive-only treatment after one more explicit cleanup decision.

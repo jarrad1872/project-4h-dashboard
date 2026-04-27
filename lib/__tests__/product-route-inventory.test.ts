@@ -3,6 +3,7 @@ import {
   getBeachheadProductRoutes,
   productRouteInventory,
   productRouteInventorySources,
+  productRouteRetirementDependencySummary,
   summarizeProductRouteInventory,
 } from "../product-route-inventory";
 
@@ -53,5 +54,19 @@ describe("product route inventory", () => {
     expect(summary.beachhead).toBe(5);
     expect(summary.demoLines).toBe(20);
     expect(productRouteInventorySources.every((source) => source.startsWith("sawcity-lite/"))).toBe(true);
+  });
+
+  it("summarizes GTM route-retirement dependencies separately from the legacy page", () => {
+    expect(productRouteRetirementDependencySummary()).toEqual({
+      route: "/gtm",
+      inventoryCount: 21,
+      readyRoutes: 20,
+      beachheadRoutes: 5,
+      demoLines: 20,
+      sourceCount: 7,
+      readOnlyReference: "sawcity-lite",
+      preservationRule:
+        "Preserve domain, landing, signup, demo-line, demo-auth, hero, and read-only source evidence before any /gtm archive-only work.",
+    });
   });
 });

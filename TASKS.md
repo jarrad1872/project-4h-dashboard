@@ -203,7 +203,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-41 public creative URL dependency map before `/creatives` redirect work.
 - [x] Add Q-42 bulk workflow history dependency map before `/workflow` redirect work.
 - [x] Add Q-43 legacy settings source-note extraction before `/settings` delete work.
-- [ ] Add Q-44 legacy GTM product-route inventory preservation before `/gtm` archive-only work.
+- [x] Add Q-44 legacy GTM product-route inventory preservation before `/gtm` archive-only work.
+- [ ] Add Q-45 historical ad archive audit map before `/ads` archive-only work.
 
 ---
 
@@ -246,7 +247,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Preserve public `/creatives/*.jpg` URL dependency map before route retirement.
 - [x] Preserve bulk `/workflow` history dependencies before route retirement.
 - [x] Preserve unique `/settings` source notes before route retirement.
-- [ ] Preserve legacy `/gtm` product-route inventory context before route retirement.
+- [x] Preserve legacy `/gtm` product-route inventory context before route retirement.
+- [ ] Preserve historical `/ads` audit context before route retirement.
 
 ---
 
