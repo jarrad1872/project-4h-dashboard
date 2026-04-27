@@ -177,7 +177,7 @@ export const rebuildExecutionQueue = [
     lane: "Creative",
     title: "Create Claude Design handoff packet",
     route: "/assets",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "A concise handoff file describes the Creative Lab UX, data model, and visual polish requests.",
     acceptance: "Packet is specific enough for a design pass without touching product strategy.",

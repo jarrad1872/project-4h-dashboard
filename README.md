@@ -198,6 +198,7 @@ Legacy NB2/Gemini images still exist for historical campaign assets:
 See **[AGENTS.md](./AGENTS.md)** for full operating instructions, credentials, and constraints.  
 See **[TASKS.md](./TASKS.md)** for active tasks and backlog.  
 See **[SOP-WORKFLOW.md](./SOP-WORKFLOW.md)** for the campaign operating SOP.
+See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative-lab-handoff.md)** for the Creative Lab design handoff packet.
 
 ---
 
@@ -222,6 +223,7 @@ See **[SOP-WORKFLOW.md](./SOP-WORKFLOW.md)** for the campaign operating SOP.
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state
 - `/assets` can create replacement v2/v3 prompts while preserving parent/child creative lineage
+- `docs/claude-design-creative-lab-handoff.md` gives Claude Design the Creative Lab UX goals, data model, routes, screenshot checklist, and constraints
 - `supabase/migrations/009_growth_command_center.sql` adds `creative_assets` plus richer influencer fields for persistent production storage
 - `supabase/migrations/010_influencer_outreach_agent.sql` adds the email-only outreach state model for human-gated creator approvals
 - `supabase/migrations/011_marketing_events_attribution.sql` adds asset-to-paid-customer attribution fields
