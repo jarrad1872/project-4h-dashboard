@@ -6,7 +6,8 @@
 import { optionsResponse, okJson, errorJson } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
-import { hasSupabase } from "@/lib/server-utils";
+import { approvalAuditNote } from "@/lib/approval-audit-log";
+import { hasSupabase, logActivity } from "@/lib/server-utils";
 import type { AdStatus, WorkflowStage } from "@/lib/types";
 
 interface BulkRequest {
@@ -58,13 +59,32 @@ export async function POST(request: Request) {
       }
     }
 
-    const { error, count } = await query.select("id");
+    const { data, error } = await query.select("id");
 
     if (error) {
       return errorJson("Bulk update failed", 500, error.message);
     }
 
-    return okJson({ updated: count ?? "unknown", status: body.newStatus, stage: body.newWorkflowStage });
+    const updated = data?.length ?? 0;
+    await logActivity({
+      entity_type: "ad_bulk",
+      entity_id: body.ids?.length ? body.ids.join(",") : body.campaignGroupContains ?? "bulk-target",
+      action: body.newStatus ? "bulk_status_changed" : "bulk_workflow_changed",
+      old_value: {
+        status: body.fromStatus ?? null,
+        workflow_stage: body.fromWorkflowStage ?? null,
+        campaign_group_contains: body.campaignGroupContains ?? null,
+        ids: body.ids ?? null,
+      },
+      new_value: {
+        status: body.newStatus ?? null,
+        workflow_stage: body.newWorkflowStage ?? null,
+        updated,
+      },
+      note: approvalAuditNote("ad_copy", body.newStatus ?? body.newWorkflowStage ?? "updated", "bulk approval queue decision"),
+    });
+
+    return okJson({ updated, status: body.newStatus, stage: body.newWorkflowStage });
   } catch (err) {
     return errorJson("Bulk status update failed", 500, String(err));
   }

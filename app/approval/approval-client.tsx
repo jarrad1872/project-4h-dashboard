@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { StatusChip } from "@/components/chips";
 import { AdPreview } from "@/components/ad-preview/index";
 import { TRADE_MAP, tradeFromAd } from "@/lib/trade-utils";
+import type { ApprovalAuditSummary } from "@/lib/approval-audit-log";
 import type { Ad, AdStatus } from "@/lib/types";
 
 type TradeFilter = "all" | string;
@@ -24,6 +25,17 @@ function splitAds(allData: Ad[]) {
   };
 }
 
+function formatAuditDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export function ApprovalClient({ initialAds }: { initialAds: Ad[] }) {
   const initialSplit = splitAds(initialAds);
   const [pending, setPending] = useState<Ad[]>(initialSplit.pending);
@@ -34,6 +46,24 @@ export function ApprovalClient({ initialAds }: { initialAds: Ad[] }) {
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("all");
   const [search, setSearch] = useState("");
   const [approveAllLoading, setApproveAllLoading] = useState(false);
+  const [audit, setAudit] = useState<ApprovalAuditSummary | null>(null);
+  const [auditLoading, setAuditLoading] = useState(false);
+
+  async function loadAudit() {
+    setAuditLoading(true);
+    try {
+      const res = await fetch("/api/approval-audit", { cache: "no-store" });
+      if (res.ok) {
+        setAudit((await res.json()) as ApprovalAuditSummary);
+      }
+    } finally {
+      setAuditLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadAudit();
+  }, []);
 
   async function load() {
     setLoading(true);
@@ -51,7 +81,8 @@ export function ApprovalClient({ initialAds }: { initialAds: Ad[] }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
-    void load();
+    await load();
+    void loadAudit();
   }
 
   async function bulkDecide(trade: string, status: AdStatus) {
@@ -62,7 +93,8 @@ export function ApprovalClient({ initialAds }: { initialAds: Ad[] }) {
       body: JSON.stringify({ newStatus: status, fromStatus: "pending", campaignGroupContains: `_${trade}` }),
     });
     setBulkLoading((prev) => ({ ...prev, [trade]: false }));
-    void load();
+    await load();
+    void loadAudit();
   }
 
   async function approveAllPending() {
@@ -74,7 +106,8 @@ export function ApprovalClient({ initialAds }: { initialAds: Ad[] }) {
       body: JSON.stringify({ newStatus: "approved", fromStatus: "pending" }),
     });
     setApproveAllLoading(false);
-    void load();
+    await load();
+    void loadAudit();
   }
 
   const trades = useMemo(() => {
@@ -187,6 +220,79 @@ export function ApprovalClient({ initialAds }: { initialAds: Ad[] }) {
               {platform === "all" ? "All Platforms" : platform[0].toUpperCase() + platform.slice(1)}
             </GhostButton>
           ))}
+        </div>
+      </Card>
+
+      <Card className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Approval Audit Log</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Internal who/when/what/why trail for approvals. The audit view is metadata only; it does not send outreach, take ad-platform action, launch, create webhooks, spend, or change billing.
+            </p>
+          </div>
+          <GhostButton disabled={auditLoading} onClick={() => void loadAudit()}>
+            {auditLoading ? "Refreshing..." : "Refresh audit"}
+          </GhostButton>
+        </div>
+
+        <div className="grid gap-2 md:grid-cols-5">
+          {(audit?.coverage ?? []).map((item) => (
+            <div key={item.area} className="rounded-md border border-slate-700 bg-slate-900/50 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                <span className={item.covered ? "text-xs font-semibold text-green-300" : "text-xs font-semibold text-slate-500"}>
+                  {item.records}
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">{item.route}</p>
+              <p className="mt-2 text-xs text-slate-400">{item.requirement}</p>
+            </div>
+          ))}
+          {!audit && (
+            <div className="rounded-md border border-slate-700 bg-slate-900/50 p-3 text-sm text-slate-400 md:col-span-5">
+              {auditLoading ? "Loading audit coverage..." : "Audit coverage will appear here."}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-slate-300">Recent Decisions</p>
+            {audit && (
+              <p className="text-xs text-slate-500">
+                Source: {audit.source} - Updated {formatAuditDate(audit.generatedAt)}
+              </p>
+            )}
+          </div>
+          {audit?.entries.length ? (
+            <div className="max-h-72 space-y-2 overflow-y-auto">
+              {audit.entries.map((entry) => (
+                <div key={entry.id} className="rounded-md border border-slate-700 px-3 py-2 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-medium text-slate-100">
+                      {entry.areaLabel} - {entry.action}
+                    </p>
+                    <p className="text-xs text-slate-500">{formatAuditDate(entry.decidedAt)}</p>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {entry.actor} - {entry.entityType}:{entry.entityId}
+                    {(entry.oldStatus || entry.newStatus) && (
+                      <span>
+                        {" "}
+                        - {entry.oldStatus ?? "unknown"} to {entry.newStatus ?? "unknown"}
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-300">{entry.note}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-md border border-slate-700 px-3 py-2 text-sm text-slate-400">
+              No approval activity has been logged yet. The five approval surfaces above are ready to classify future creative, outreach, launch bundle, export, and ad copy decisions.
+            </p>
+          )}
         </div>
       </Card>
 

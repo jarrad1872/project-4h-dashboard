@@ -396,6 +396,12 @@ This is read-only market intelligence for 4H creative strategy. It does not touc
 3. Bulk Approve All per trade group — or individually reject problem ads
 4. Approved ads move to workflow_stage: approved
 
+### Approval Audit Log (pumpcans.com/approval)
+- `/approval` shows internal audit coverage for ad copy, creative, outreach, launch bundle, and export approvals.
+- Individual and bulk ad copy approval decisions write an `activity_log` note with what changed and why.
+- Audit records are internal governance metadata only. The audit view does not send outreach, take ad-platform action, launch campaigns, create webhooks, move money, or change billing.
+- Missing rows mean no approval activity has been logged yet, not that an external action is authorized.
+
 ### Nothing Goes Live Until:
 - [ ] Trade assets approved (pumpcans.com/assets)
 - [ ] Ad copy approved (pumpcans.com/approval)

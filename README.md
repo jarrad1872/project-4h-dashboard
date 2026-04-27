@@ -80,7 +80,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Overview | `/` | Plumbing-pilot growth command center: launch countdown, creative pipeline, influencer pipeline, metrics, budget |
 | GTM Board | `/gtm` | Full mission brief, product state, trade registry, product route inventory, action board |
 | Ads | `/ads` | Current ad candidates plus historical archive labels for old generated ads |
-| Approval | `/approval` | Approve/Hold/Reject pending ads — Bulk Approve All per trade |
+| Approval | `/approval` | Approve/Hold/Reject pending ads and review the internal approval audit trail |
 | Creatives | `/creatives` | Generated ad creative thumbnails |
 | Assets | `/assets` | AI UGC creative asset tracking with draft/review/approved/live workflow |
 | Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
@@ -227,6 +227,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/scorecard` now includes a weekly learning report that ranks trades, creators, images, and angles from attribution events while clearly labeling zero-data and no-paid-signal states
 - `/scorecard` now includes local keep/kill/iterate decisions with notes, timestamps, undo, and visible history; this does not pause, launch, upload, or spend
 - `/scorecard` now includes a customer pace forecast that shows logged paid customers, current weekly/monthly pace, projected gap to 1,000/2,000 by 2026-12-31, and an evidence-based next bet
+- `/approval` now includes an internal audit view that classifies approval activity across ad copy, creative, outreach, launch bundle, and export gates; the audit view is metadata only and does not send outreach, take ad-platform action, launch, create webhooks, spend, or change billing
 - `/ads` now labels legacy NB2, imported, and generic Saw.City rows as historical archive entries so they stay visible without looking launch-ready
 - `/templates` now includes 20 message-match handoff briefs for the five beachhead domains across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting

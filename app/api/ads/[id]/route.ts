@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { adToLegacyJson, hasSupabase, logActivity, normalizeAd, readFallback, statusToWorkflowStage } from "@/lib/server-utils";
 import type { Ad, AdStatus, WorkflowStage } from "@/lib/types";
 import { backupCsvToDrive, isDriveConfigured } from "@/lib/drive-backup";
+import { approvalAuditNote } from "@/lib/approval-audit-log";
 
 /** Fire-and-forget: export all approved ads to Drive as CSV */
 function triggerApprovedExport() {
@@ -153,12 +154,13 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       });
 
       if (payload.status && payload.status !== previous.status) {
+        const note = approvalAuditNote("ad_copy", payload.status, "individual approval queue decision");
         next.statusHistory = [
           ...(previous.statusHistory ?? []),
           {
             status: payload.status as AdStatus,
             at: isoNow(),
-            note: payload.status === "approved" ? "Approved from detail view" : "Status changed",
+            note,
           },
         ];
       }
@@ -172,6 +174,10 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
         action: "updated",
         old_value: previous,
         new_value: next,
+        note:
+          payload.status && payload.status !== previous.status
+            ? approvalAuditNote("ad_copy", payload.status, "individual approval queue decision")
+            : null,
       });
 
       return okJson(next);
@@ -257,10 +263,11 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     }
 
     if (payload.status && payload.status !== current.status) {
+      const note = approvalAuditNote("ad_copy", payload.status, "individual approval queue decision");
       await supabaseAdmin.from("ad_status_history").insert({
         ad_id: id,
         status: payload.status,
-        note: payload.status === "approved" ? "Approved from detail view" : "Status changed",
+        note,
       });
     }
 
@@ -286,6 +293,10 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       action: payload.status && payload.status !== current.status ? "status_changed" : "updated",
       old_value: current,
       new_value: updated,
+      note:
+        payload.status && payload.status !== current.status
+          ? approvalAuditNote("ad_copy", payload.status, "individual approval queue decision")
+          : null,
     });
 
     // Auto-backup approved ads snapshot to Drive (fire-and-forget)

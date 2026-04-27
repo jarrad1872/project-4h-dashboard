@@ -386,9 +386,9 @@ export const rebuildExecutionQueue = [
     lane: "Safety",
     title: "Add approval audit log",
     route: "/approval",
-    status: "ready",
+    status: "complete",
     approval: "none",
-    outcome: "Major approval actions have who/when/what/why metadata.",
+    outcome: "Approval queue shows audit coverage and recent internal decisions for copy, creative, outreach, launch bundle, and export gates.",
     acceptance: "Audit log covers creative, outreach, launch bundle, and export approvals.",
   },
   {
