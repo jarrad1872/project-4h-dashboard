@@ -240,11 +240,11 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   {
     route: "/generate",
     status: "clear",
-    readyForRedirectOrDelete: true,
-    activeReferences: ["Reference Shelf", "legacy banner only"],
-    dataDependencies: ["No active page depends on the /generate UI route"],
-    docOrTestReferences: ["README legacy note", "route-disposition-plan", "navigation.test"],
-    guardrail: "Candidate for future redirect to /assets after preserving any useful prompt notes.",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Reference Shelf link now lands on /assets"],
+    dataDependencies: ["Internal /generate page route redirects to /assets", "Legacy generation API routes remain unchanged"],
+    docOrTestReferences: ["README legacy note", "route-disposition-plan", "navigation.test", "route-cleanup-packet.test"],
+    guardrail: "Implemented in Q-47. Keep the redirect internal and preserve legacy API routes unless a separate cleanup packet says otherwise.",
   },
   {
     route: "/gtm",

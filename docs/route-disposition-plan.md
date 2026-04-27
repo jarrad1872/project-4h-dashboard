@@ -48,6 +48,7 @@ These routes are not active operating lanes. They remain available from the coll
 10. Q-44: Preserve legacy `/gtm` product-route inventory in active data/docs. Complete; no redirects, deletions, or sawcity-lite writes.
 11. Q-45: Preserve historical `/ads` archive signals and dependencies in active data/docs. Complete; no redirects, deletions, uploads, launches, or external actions.
 12. Q-46: Draft the clear-route cleanup packet for `/ads`, `/generate`, `/gtm`, and `/settings`. Complete; no redirects, deletions, uploads, launches, or external actions.
+13. Q-47: Apply the legacy AI Studio redirect packet. Complete; `/generate` redirects internally to `/assets` and legacy API routes remain untouched.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -74,9 +75,9 @@ The Command page now shows a route dependency guard with these current statuses:
 | --- | ---: | --- |
 | Blocked | 2 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
 | Support | 2 | Keep as detail/support routes reached from active loops. |
-| Clear | 4 | Candidate for a future redirect/delete/archive-only packet after preserving useful notes. |
+| Clear | 4 | Candidate or already-applied route cleanup after preserving useful notes. |
 
-Current clear routes: `/generate`, `/settings`, `/gtm`, `/ads`.
+Current pending clear routes: `/settings`, `/gtm`, `/ads`. Applied clear route: `/generate`.
 
 Current blockers to resolve first:
 
@@ -169,3 +170,9 @@ Q-46 groups only clear route candidates into an explicit packet before implement
 | `/settings` | Delete later | `/approval` | Source-note map and setup-doc references. |
 
 Q-46 did not redirect a route, delete a page, edit ads, upload to ad platforms, launch campaigns, create webhooks, spend money, or change external systems. The first implementation candidate is Q-47: internally redirect `/generate` to `/assets` while preserving the legacy API and docs.
+
+## Q-47 Legacy AI Studio Redirect Packet
+
+Q-47 applies the first clear-route cleanup packet: the `/generate` page route now redirects internally to `/assets`. This only changes the page route. The legacy `/api/generate`, `/api/ai-creative`, and related data routes remain available until a separate API cleanup packet exists.
+
+Q-47 did not generate copy or images, remove API routes, delete files outside the page route, upload to ad platforms, launch campaigns, create webhooks, spend money, change billing, or touch sawcity-lite. Browser verification must confirm `/generate` lands on `/assets` and Creative Lab loads.

@@ -69,7 +69,9 @@ describe("navigation IA", () => {
 
   it("guards future redirect/delete work with dependency status for every leftover route", () => {
     expect(routeDependencyGuards.map((row) => row.route)).toEqual(routeDispositionDecisions.map((row) => row.route));
-    expect(routeDependencyGuards.find((row) => row.route === "/generate")?.readyForRedirectOrDelete).toBe(true);
+    expect(routeDependencyGuards.find((row) => row.route === "/generate")?.dataDependencies).toContain(
+      "Internal /generate page route redirects to /assets",
+    );
     expect(routeDependencyGuards.find((row) => row.route === "/ads")?.dataDependencies).toContain(
       "Historical ad archive audit map preserved in ad-archive",
     );
@@ -89,7 +91,7 @@ describe("navigation IA", () => {
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
       counts: { clear: 4, blocked: 2, support: 2 },
-      readyForRedirectOrDelete: 4,
+      readyForRedirectOrDelete: 3,
     });
   });
 });

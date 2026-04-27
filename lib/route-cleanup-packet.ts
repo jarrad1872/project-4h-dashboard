@@ -16,6 +16,24 @@ export interface ClearRouteCleanupEntry {
   implementationAllowed: false;
 }
 
+export interface AppliedRouteCleanupEntry {
+  route: string;
+  appliedIn: string;
+  outcome: string;
+  verification: string[];
+  externalActionAllowed: false;
+}
+
+export const appliedRouteCleanupPackets: AppliedRouteCleanupEntry[] = [
+  {
+    route: "/generate",
+    appliedIn: "Q-47",
+    outcome: "Internal page route redirects to /assets while legacy generation API routes remain unchanged.",
+    verification: ["/generate redirects to /assets", "/assets loads Creative Lab", "/api/generate is not removed"],
+    externalActionAllowed: false,
+  },
+];
+
 function intentForRecommendation(recommendation: RouteRetirementRecommendation) {
   switch (recommendation) {
     case "archive":
@@ -71,7 +89,9 @@ export function clearRouteCleanupPacketSummary() {
   return {
     total: clearRouteCleanupPacket.length,
     routes: clearRouteCleanupPacket.map((entry) => entry.route),
+    appliedRoutes: appliedRouteCleanupPackets.map((entry) => entry.route),
     counts,
+    appliedCount: appliedRouteCleanupPackets.length,
     implementationAllowed: clearRouteCleanupPacket.some((entry) => entry.implementationAllowed),
     blockedActions: ["route redirect", "route deletion", "ad upload", "campaign launch", "webhook creation", "spend change"],
     preservationRule:

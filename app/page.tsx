@@ -355,6 +355,7 @@ export default function OverviewPage() {
             <StatusPill>{cleanupPacketSummary.counts.redirect} redirect</StatusPill>
             <StatusPill>{cleanupPacketSummary.counts.archive} archive</StatusPill>
             <StatusPill>{cleanupPacketSummary.counts.delete} delete-later</StatusPill>
+            <StatusPill>{cleanupPacketSummary.appliedCount} applied</StatusPill>
           </div>
         </div>
         <Card className="mt-3 border-emerald-900/50 bg-emerald-950/10">
@@ -382,6 +383,9 @@ export default function OverviewPage() {
               </div>
             ))}
           </div>
+          <p className="mt-4 text-xs text-slate-500">
+            Applied packets: {cleanupPacketSummary.appliedRoutes.length > 0 ? cleanupPacketSummary.appliedRoutes.join(", ") : "none"}
+          </p>
         </Card>
       </section>
 
