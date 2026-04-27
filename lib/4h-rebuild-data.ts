@@ -397,9 +397,9 @@ export const rebuildExecutionQueue = [
     lane: "Safety",
     title: "Add external-action stop screen",
     route: "/launch",
-    status: "ready",
+    status: "complete",
     approval: "none",
-    outcome: "Any action that could launch, send, upload, or spend clearly stops for Jarrad.",
+    outcome: "Launch page stops launch, upload, outreach send, webhook, and spend actions with exact approval requirements.",
     acceptance: "UI copy explains the exact approval needed and no external API calls happen.",
   },
 ] as const;

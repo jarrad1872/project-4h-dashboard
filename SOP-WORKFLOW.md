@@ -313,6 +313,12 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - The bundle is an internal planning object only. It does not upload ads, launch campaigns, send outreach, create webhooks, or move money.
 - Bundle statuses are `blocked`, `draft`, `review-ready`, and `approved`; `approved` still means the bundle has internal approval state, not that any platform action has happened.
 
+**External action stop screen:**
+- `/launch` stops campaign launch/edit, ad upload, creator outreach send, webhook creation, and spend/billing changes at a visible approval boundary.
+- Each stopped action must state the risk, the exact Jarrad approval needed, the blocked mechanism, and the next internal step.
+- The stop screen is a planning surface only. It does not call ad-platform APIs, send messages, upload sheets, create webhooks, change billing, or move money.
+- The former launch-status action is not an external launch control. Any real campaign launch remains manual or separately approved by Jarrad.
+
 **Experiment budget planner:**
 - `/budget` assigns the first paid-test planning budget by experiment, not only by channel.
 - Experiment requests are local UI planning state. Editing them does not update billing, ad accounts, Supabase budget rows, webhooks, uploads, campaigns, or spend.

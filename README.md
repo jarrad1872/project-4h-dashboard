@@ -87,7 +87,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences |
 | Scorecard | `/scorecard` | Weekly performance metrics, learning rankings, local keep/kill/iterate decisions, and customer pace forecast |
 | Budget | `/budget` | Spend allocation per platform plus local experiment-level budget planning |
-| Launch | `/launch` | Launch URL builder, bundle draft model, readiness validator, and pre-launch gate checklist |
+| Launch | `/launch` | Launch URL builder, bundle draft model, readiness validator, external-action stop screen, and pre-launch gate checklist |
 | Templates | `/templates` | Meta Ad Library access validation, competitor research template, message-match handoff briefs, creator content packets, and ad template library |
 | Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
 | Influencer | `/influencer` | Semi-autonomous creator outreach: audit labels, scoring, approvals, ready-to-send, and follow-up drafting |
@@ -223,6 +223,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/launch` now builds deterministic trade-domain launch URLs with AGENTS-format paid-social UTMs, angle, asset, and optional creator metadata
 - `/launch` now runs an internal readiness validator that returns actionable blockers for domain, UTM, offer, trial, checklist, creative approval, copy approval, and Jarrad approval state
 - `/launch` now renders an internal launch bundle draft that connects trade, angle, image asset, copy, URL, budget, readiness, and approvals without any external action
+- `/launch` now shows an external-action stop screen for campaign launch/edit, ad upload, creator outreach send, webhook creation, and spend changes; it explains the exact approval needed and performs no external API action
 - `/budget` now includes an experiment-level budget planner for the first paid tests; it is local planning state only and cannot change billing or platform spend
 - `/scorecard` now includes a weekly learning report that ranks trades, creators, images, and angles from attribution events while clearly labeling zero-data and no-paid-signal states
 - `/scorecard` now includes local keep/kill/iterate decisions with notes, timestamps, undo, and visible history; this does not pause, launch, upload, or spend

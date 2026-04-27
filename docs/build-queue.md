@@ -36,6 +36,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-21 | Phase 6 | Research | Validate Meta Ad Library access | 2026-04-27 | `/templates` shows official Meta API limits, assumptions to validate, and the manual-first competitor research path without scraping or scheduling collectors. |
 | Q-22 | Phase 6 | Research | Create competitor research template | 2026-04-27 | `/templates` includes a copyable manual-first competitor research template with offers, hooks, visuals, platforms, evidence quality, citations, and blocked overclaim rules. |
 | Q-23 | Governance | Safety | Add approval audit log | 2026-04-27 | `/approval` shows internal audit coverage for ad copy, creative, outreach, launch bundle, and export approvals with recent who/when/what/why activity. |
+| Q-24 | Governance | Safety | Add external-action stop screen | 2026-04-27 | `/launch` shows a stop screen for launch, upload, outreach send, webhook, and spend actions with exact approval requirements and no external API action. |
 
 ## Ready Queue
 
@@ -44,7 +45,6 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-01 | Phase 2 | Creative | Generate first beachhead image pack | None | In progress. Production desk, progress bar, copy packets, and per-card upload are ready. Finish by generating and uploading all 20 images. |
 | Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
 | Q-17 | Phase 5 | Launch | Create platform upload sheets | Review required | Local/download exports only; no platform upload. |
-| Q-24 | Governance | Safety | Add external-action stop screen | None | UI explains exact approval needed and performs no external API action. |
 
 ## Stop Conditions
 

@@ -5,6 +5,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { rebuildMission } from "@/lib/4h-rebuild-data";
+import {
+  externalActionStops,
+  externalActionStopSummary,
+  getExternalActionStop,
+  type ExternalActionKind,
+} from "@/lib/external-action-stop-screen";
 import { buildLaunchBundle } from "@/lib/launch-bundles";
 import { validateLaunchReadiness, type LaunchApprovalStatus } from "@/lib/launch-readiness-validator";
 import {
@@ -59,6 +65,8 @@ export default function LaunchPage() {
   const [bundleCopyApproval, setBundleCopyApproval] = useState<LaunchApprovalStatus>("missing");
   const [bundleJarradApproval, setBundleJarradApproval] = useState<LaunchApprovalStatus>("missing");
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [selectedStopAction, setSelectedStopAction] = useState<ExternalActionKind>("launch_campaign");
+  const [stopCopyStatus, setStopCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   async function load() {
     const [checkRes, statusRes, budgetRes] = await Promise.all([
@@ -91,25 +99,6 @@ export default function LaunchPage() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ markAll: true }),
-    });
-    setSaving(false);
-    void load();
-  }
-
-  async function goLive() {
-    if (!confirm("This will set campaign status to LIVE. Confirm only when ad accounts are active and all checklist items are truly ready.")) return;
-    setSaving(true);
-    await fetch("/api/campaign-status", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        status: "live",
-        startDate: new Date().toISOString(),
-        linkedinStatus: "live",
-        youtubeStatus: "live",
-        facebookStatus: "live",
-        instagramStatus: "live",
-      }),
     });
     setSaving(false);
     void load();
@@ -196,6 +185,7 @@ export default function LaunchPage() {
     });
   }, [budget, bundleCopyApproval, bundleCreativeStatus, bundleJarradApproval, launchAngle, launchAssetId, launchReadiness, launchUrlResult]);
   const readyToGo = basicLaunchGateReady && (launchReadiness?.ready ?? false);
+  const selectedStop = getExternalActionStop(selectedStopAction);
 
   async function copyLaunchUrl() {
     try {
@@ -203,6 +193,15 @@ export default function LaunchPage() {
       setCopyStatus("copied");
     } catch {
       setCopyStatus("failed");
+    }
+  }
+
+  async function copyStopSummary() {
+    try {
+      await navigator.clipboard.writeText(externalActionStopSummary(selectedStop));
+      setStopCopyStatus("copied");
+    } catch {
+      setStopCopyStatus("failed");
     }
   }
 
@@ -388,6 +387,70 @@ export default function LaunchPage() {
           <p><span className="font-semibold text-slate-300">Medium:</span> {launchUrlResult.medium}</p>
           <p><span className="font-semibold text-slate-300">Trade:</span> {launchUrlResult.route.tradeSlug}</p>
           <p><span className="font-semibold text-slate-300">Demo:</span> {launchUrlResult.route.demoPhone}</p>
+        </div>
+      </Card>
+
+      <Card className="border-2 border-red-900/70 bg-red-950/20">
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-red-300">External Action Stop Screen</p>
+            <h2 className="mt-1 text-xl font-black text-white">Stopped: {selectedStop.label}</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-300">
+              This is the boundary between internal planning and anything external. Select an action below to see the exact approval needed before a third-party account is touched.
+            </p>
+          </div>
+          <div className="rounded border border-red-800/60 bg-slate-950 px-3 py-2 text-right text-xs text-red-100">
+            <p className="font-semibold">No external API action</p>
+            <p>Planning surface only</p>
+          </div>
+        </div>
+
+        <div className="mb-4 grid gap-2 sm:grid-cols-5">
+          {externalActionStops.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => {
+                setSelectedStopAction(item.id);
+                setStopCopyStatus("idle");
+              }}
+              className={`rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors ${
+                selectedStopAction === item.id
+                  ? "border-red-500 bg-red-900/50 text-white"
+                  : "border-slate-700 bg-slate-950 text-slate-300 hover:border-red-700"
+              }`}
+            >
+              {item.shortLabel}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-2">
+          <div className="rounded-md border border-red-900/60 bg-slate-950 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Risk</p>
+            <p className="mt-1 text-sm text-slate-200">{selectedStop.risk}</p>
+          </div>
+          <div className="rounded-md border border-red-900/60 bg-slate-950 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Exact Approval Needed</p>
+            <p className="mt-1 text-sm text-slate-200">{selectedStop.exactApprovalNeeded}</p>
+          </div>
+          <div className="rounded-md border border-red-900/60 bg-slate-950 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Blocked Mechanism</p>
+            <p className="mt-1 text-sm text-slate-200">{selectedStop.blockedMechanism}</p>
+          </div>
+          <div className="rounded-md border border-red-900/60 bg-slate-950 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Next Internal Step</p>
+            <p className="mt-1 text-sm text-slate-200">{selectedStop.nextInternalStep}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <GhostButton className="border-red-700 text-red-100 hover:bg-red-900/40" onClick={() => void copyStopSummary()}>
+            {stopCopyStatus === "copied" ? "Stop Summary Copied" : "Copy Stop Summary"}
+          </GhostButton>
+          {stopCopyStatus === "failed" && (
+            <p className="text-xs text-amber-300">Clipboard failed. The stop summary is visible above.</p>
+          )}
         </div>
       </Card>
 
@@ -596,11 +659,14 @@ export default function LaunchPage() {
               {saving ? "Saving…" : "Mark All Ready"}
             </GhostButton>
             <Button
-              className={`${readyToGo ? "bg-emerald-600 hover:bg-emerald-500" : "opacity-50 cursor-not-allowed"} font-bold text-white`}
-              disabled={!readyToGo || saving}
-              onClick={goLive}
+              className={`${readyToGo ? "bg-red-700 hover:bg-red-600" : "bg-red-900/80 hover:bg-red-800"} font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-600`}
+              disabled={saving}
+              onClick={() => {
+                setSelectedStopAction("launch_campaign");
+                setStopCopyStatus("idle");
+              }}
             >
-              🚀 GO LIVE
+              Launch Requires Approval
             </Button>
           </div>
         </div>
