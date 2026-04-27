@@ -230,12 +230,12 @@ export const routeDispositionDecisions: RouteDispositionDecision[] = [
 export const routeDependencyGuards: RouteDependencyGuard[] = [
   {
     route: "/ads",
-    status: "blocked",
-    readyForRedirectOrDelete: false,
+    status: "clear",
+    readyForRedirectOrDelete: true,
     activeReferences: ["Reference Shelf", "/ads/[id] detail links"],
-    dataDependencies: ["Historical ad archive view", "Approval/GTM/workflow pages still consume /api/ads data"],
-    docOrTestReferences: ["README route table", "route-disposition-plan", "navigation.test"],
-    guardrail: "Keep as archive. Do not redirect or delete while ad history remains useful audit evidence.",
+    dataDependencies: ["Historical ad archive audit map preserved in ad-archive"],
+    docOrTestReferences: ["README route table", "route-disposition-plan", "ad-archive.test", "navigation.test", "Command ad archive audit map"],
+    guardrail: "Candidate for future archive-only packet after confirming approval and launch still read /api/ads directly.",
   },
   {
     route: "/generate",

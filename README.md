@@ -254,12 +254,13 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-36 adds legacy route banners to `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` so direct-link visitors see the active replacement lane and no-external-action boundary
 - Q-37 folds `/lifecycle` and `/templates` support signals into Command and Scorecard so daily learning work can see follow-up coverage, message-match briefs, creator templates, saved ad templates, and manual competitor-research status without giving those support pages primary nav space
 - Q-38 adds a route retirement decision matrix on Command and in `docs/route-disposition-plan.md`; it recommends rebuild, redirect, archive, or delete-later outcomes but authorizes no route deletion, redirect, hiding, or file removal
-- Q-39 adds a route dependency guard on Command so future route cleanup can see active refs, data dependencies, docs/tests, and guardrails before any redirect/delete packet; current status is 5 blocked, 2 support, 1 clear
+- Q-39 adds a route dependency guard on Command so future route cleanup can see active refs, data dependencies, docs/tests, and guardrails before any redirect/delete packet; current status is 2 blocked, 2 support, 4 clear after Q-45 preservation work
 - Q-40 migrates creator campaign-flow links away from legacy `/creatives` and `/workflow` and into active `/assets`, `/approval`, `/launch`, and `/scorecard` lanes without redirecting or deleting legacy pages
 - Q-41 preserves the public `/creatives/*.jpg` URL contract as a Command-visible dependency map: 24 static JPEG URLs across `saw`, `rinse`, `mow`, and `rooter`, separate from the legacy `/creatives` page route
 - Q-42 preserves the legacy `/workflow` bulk history contract as a Command-visible dependency map: six stages, five transitions, `ads.workflow_stage`, `data/workflow-stages.json`, `/api/ads/bulk-status`, and trade breakdown logic before redirect work
 - Q-43 extracts `/settings` setup/source notes into a Command-visible source-note map: platform setup pointers, four read-only sawcity-lite source docs, campaign-status context, placeholder credential handling, and doc-update reminders before delete-later work
 - Q-44 preserves `/gtm` product-route inventory as a Command-visible map: 21 product routes, 20 ready routes, five beachhead domains, 20 demo lines, and seven read-only sawcity-lite evidence paths before archive-only work
+- Q-45 preserves `/ads` historical archive context as a Command-visible audit map: four classifier signals, archive dependencies, current/historical row counts, and no-external-action boundaries before archive-only work
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -288,7 +289,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-40 campaign-flow link migration | v4.4.9*
+*Last updated: 2026-04-27 Q-45 historical ad archive audit map | v4.4.14*
 
 ---
 

@@ -38,6 +38,11 @@ import {
   productRouteInventorySources,
   productRouteRetirementDependencySummary,
 } from "@/lib/product-route-inventory";
+import {
+  adArchiveAuditDependencySummary,
+  adArchiveDependencies,
+  adArchiveHistoricalSignals,
+} from "@/lib/ad-archive";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -167,6 +172,7 @@ export default function OverviewPage() {
   const settingsSummary = useMemo(() => settingsSourceNoteSummary(), []);
   const gtmRouteSummary = useMemo(() => productRouteRetirementDependencySummary(), []);
   const gtmBeachheadRoutes = useMemo(() => getBeachheadProductRoutes(), []);
+  const adArchiveSummary = useMemo(() => adArchiveAuditDependencySummary(state.ads), [state.ads]);
   const publicCreativeRows = useMemo(
     () =>
       publicCreativeUrlDependencies.reduce<Array<{ prefix: string; domain: string; urls: string[]; placements: string[] }>>(
@@ -287,6 +293,51 @@ export default function OverviewPage() {
             <StatusPill>demo proof</StatusPill>
             <StatusPill>creator frames</StatusPill>
             <StatusPill>trade-specific visuals</StatusPill>
+          </div>
+        </Card>
+      </section>
+
+      <section data-testid="ad-archive-audit-map">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Historical ad archive audit map</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Archive context is preserved before route cleanup</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{formatNumber(adArchiveSummary.totalRows)} rows</StatusPill>
+            <StatusPill>{formatNumber(adArchiveSummary.historicalRows)} historical</StatusPill>
+            <StatusPill>{adArchiveSummary.signalCount} signals</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-amber-900/50 bg-amber-950/10">
+          <p className="text-sm leading-6 text-slate-300">{adArchiveSummary.preservationRule}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Route: {adArchiveSummary.route}; replacement lane: {adArchiveSummary.replacement}; external actions allowed:{" "}
+            {adArchiveSummary.externalActionsAllowed ? "yes" : "no"}
+          </p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-[0.8fr,1fr]">
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Historical signals</p>
+              <ul className="mt-2 space-y-2 text-xs leading-5 text-slate-300">
+                {adArchiveHistoricalSignals.map((signal) => (
+                  <li key={signal.id}>
+                    <span className="font-semibold text-white">{signal.label}:</span> {signal.detector}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="grid gap-2">
+              {adArchiveDependencies.map((dependency) => (
+                <div key={dependency.id} className="rounded border border-slate-700 bg-slate-900/60 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-white">{dependency.surface}</p>
+                    <StatusPill>internal only</StatusPill>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-300">{dependency.preserves}</p>
+                  <p className="mt-2 text-xs text-slate-500">Active home: {dependency.activeHome}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </Card>
       </section>

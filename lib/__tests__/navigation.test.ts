@@ -70,6 +70,9 @@ describe("navigation IA", () => {
   it("guards future redirect/delete work with dependency status for every leftover route", () => {
     expect(routeDependencyGuards.map((row) => row.route)).toEqual(routeDispositionDecisions.map((row) => row.route));
     expect(routeDependencyGuards.find((row) => row.route === "/generate")?.readyForRedirectOrDelete).toBe(true);
+    expect(routeDependencyGuards.find((row) => row.route === "/ads")?.dataDependencies).toContain(
+      "Historical ad archive audit map preserved in ad-archive",
+    );
     expect(routeDependencyGuards.find((row) => row.route === "/settings")?.dataDependencies).toContain(
       "Setup/source notes inventoried in settings-source-notes",
     );
@@ -85,8 +88,8 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.find((row) => row.route === "/templates")?.status).toBe("support");
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
-      counts: { clear: 3, blocked: 3, support: 2 },
-      readyForRedirectOrDelete: 3,
+      counts: { clear: 4, blocked: 2, support: 2 },
+      readyForRedirectOrDelete: 4,
     });
   });
 });

@@ -46,6 +46,7 @@ These routes are not active operating lanes. They remain available from the coll
 8. Q-42: Inventory legacy `/workflow` bulk history separately from the `/workflow` page route. Complete; no redirects, deletions, or external actions.
 9. Q-43: Extract legacy `/settings` source/setup notes into active data/docs. Complete; no redirects, deletions, campaign-status changes, or external actions.
 10. Q-44: Preserve legacy `/gtm` product-route inventory in active data/docs. Complete; no redirects, deletions, or sawcity-lite writes.
+11. Q-45: Preserve historical `/ads` archive signals and dependencies in active data/docs. Complete; no redirects, deletions, uploads, launches, or external actions.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -70,17 +71,16 @@ The Command page now shows a route dependency guard with these current statuses:
 
 | Status | Count | Meaning |
 | --- | ---: | --- |
-| Blocked | 3 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
+| Blocked | 2 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
 | Support | 2 | Keep as detail/support routes reached from active loops. |
-| Clear | 3 | Candidate for a future redirect/delete packet after preserving useful notes. |
+| Clear | 4 | Candidate for a future redirect/delete/archive-only packet after preserving useful notes. |
 
-Current clear routes: `/generate`, `/settings`, `/gtm`.
+Current clear routes: `/generate`, `/settings`, `/gtm`, `/ads`.
 
 Current blockers to resolve first:
 
 - `/creatives`: 24 static `/creatives/*.jpg` URLs are inventoried; any redirect packet still needs explicit 200-check preservation.
 - `/workflow`: six-stage workflow history is inventoried; any redirect packet still needs Launch/Approval migration or explicit preservation.
-- `/ads`: historical ad archive remains useful audit evidence.
 
 ## Q-40 Campaign Flow Link Migration
 
@@ -143,3 +143,15 @@ The `/gtm` page route and the product-route inventory it displayed are separate 
 | Read-only source files | 7 | Preserve sawcity-lite evidence paths as reference only. |
 
 Q-44 did not redirect `/gtm`, delete the old page, change launch URLs, change product code, write to sawcity-lite, or change external systems. The route is now a candidate for future archive-only treatment after one more explicit cleanup decision.
+
+## Q-45 Historical Ad Archive Audit Map
+
+The `/ads` page route and the historical archive classifier it uses are separate dependencies. Q-45 preserves the classifier signals and archive dependencies in `lib/ad-archive.ts` and surfaces them on Command before any future archive-only packet.
+
+| Source | Count | Preservation rule |
+| --- | ---: | --- |
+| Historical signals | 4 | Preserve NB2, legacy platform path, imported upload-sheet, and generic Saw.City copy detection. |
+| Archive dependencies | 4 | Preserve classifier behavior, `/api/ads` history rows, archive filters, and no-launch guidance. |
+| Route status | 1 | `/ads` is now clear for a future archive-only packet, not for deletion of history. |
+
+Q-45 did not redirect `/ads`, delete the old page, edit ads, upload to ad platforms, launch campaigns, create webhooks, spend money, or change external systems. Any future archive-only packet must keep historical rows readable and prove Launch/Approval still own current-candidate action.

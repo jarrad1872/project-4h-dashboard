@@ -204,7 +204,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-42 bulk workflow history dependency map before `/workflow` redirect work.
 - [x] Add Q-43 legacy settings source-note extraction before `/settings` delete work.
 - [x] Add Q-44 legacy GTM product-route inventory preservation before `/gtm` archive-only work.
-- [ ] Add Q-45 historical ad archive audit map before `/ads` archive-only work.
+- [x] Add Q-45 historical ad archive audit map before `/ads` archive-only work.
+- [ ] Add Q-46 clear-route cleanup packet before any redirect/delete/archive-only implementation.
 
 ---
 
@@ -248,7 +249,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Preserve bulk `/workflow` history dependencies before route retirement.
 - [x] Preserve unique `/settings` source notes before route retirement.
 - [x] Preserve legacy `/gtm` product-route inventory context before route retirement.
-- [ ] Preserve historical `/ads` audit context before route retirement.
+- [x] Preserve historical `/ads` audit context before route retirement.
+- [ ] Draft clear-route cleanup packet for legacy route candidates.
 
 ---
 

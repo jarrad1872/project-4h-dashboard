@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getAdArchiveState, summarizeAdArchive } from "../ad-archive";
+import {
+  adArchiveAuditDependencySummary,
+  adArchiveDependencies,
+  adArchiveHistoricalSignals,
+  getAdArchiveState,
+  summarizeAdArchive,
+} from "../ad-archive";
 import type { Ad } from "../types";
 
 function ad(overrides: Partial<Ad> = {}): Ad {
@@ -111,6 +117,36 @@ describe("summarizeAdArchive", () => {
       total: 3,
       current: 1,
       historical: 2,
+    });
+  });
+});
+
+describe("adArchiveAuditDependencySummary", () => {
+  it("preserves the historical signal and dependency map for route cleanup work", () => {
+    const summary = adArchiveAuditDependencySummary([
+      ad(),
+      ad({ id: "LI-R1", landing_path: "/li", landingPath: "/li" }),
+      ad({ id: "NB2-D1-FB-PIPEAW" }),
+    ]);
+
+    expect(adArchiveHistoricalSignals.map((signal) => signal.label)).toEqual([
+      "NB2 historical creative/copy run",
+      "legacy saw.city platform landing path",
+      "imported upload-sheet record",
+      "generic Saw.City brand copy",
+    ]);
+    expect(adArchiveDependencies.every((dependency) => dependency.externalActionAllowed === false)).toBe(true);
+    expect(summary).toEqual({
+      route: "/ads",
+      totalRows: 3,
+      currentRows: 1,
+      historicalRows: 2,
+      signalCount: 4,
+      dependencyCount: 4,
+      externalActionsAllowed: false,
+      replacement: "/launch",
+      preservationRule:
+        "Preserve archive classification, reason labels, filters, and read-only ad history before any /ads archive-only route treatment.",
     });
   });
 });

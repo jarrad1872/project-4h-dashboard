@@ -60,12 +60,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-42 | Governance | Navigation | Preserve bulk workflow history before redirect work | 2026-04-27 | Command now shows the six-stage `/workflow` history map, five bulk transitions, API/fallback dependencies, and no-external-action boundaries before any redirect work. |
 | Q-43 | Governance | Navigation | Extract legacy settings source notes | 2026-04-27 | Command now shows `/settings` setup notes, read-only source doc paths, campaign-status context, and doc-update reminders outside the legacy page before delete-later work. |
 | Q-44 | Governance | Navigation | Preserve legacy GTM product-route inventory | 2026-04-27 | Command now shows `/gtm` product-route inventory context, beachhead demo lines, and read-only sawcity-lite evidence outside the legacy GTM board. |
+| Q-45 | Governance | Navigation | Preserve historical ad archive audit map | 2026-04-27 | Command now shows `/ads` archive classifier signals, current/historical row counts, dependencies, and no-external-action boundaries before archive-only work. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-45 | Governance | Navigation | Preserve historical ad archive audit map | none | Historical `/ads` archive context is represented in active docs/data before archive-only treatment. |
+| Q-46 | Governance | Navigation | Draft clear-route cleanup packet | none | Clear legacy-route candidates are grouped into an explicit cleanup packet without redirecting, deleting, launching, uploading, or taking external action. |
 
 ## Stop Conditions
 
