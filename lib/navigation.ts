@@ -1,5 +1,6 @@
 export type NavigationStatus = "active" | "support" | "legacy";
 export type RouteRetirementRecommendation = "rebuild" | "redirect" | "archive" | "delete";
+export type RouteDependencyStatus = "clear" | "blocked" | "support";
 
 export interface NavigationItem {
   href: string;
@@ -31,6 +32,16 @@ export interface RouteDispositionDecision {
   rationale: string;
   nextStep: string;
   destructiveActionAllowed: false;
+}
+
+export interface RouteDependencyGuard {
+  route: string;
+  status: RouteDependencyStatus;
+  readyForRedirectOrDelete: boolean;
+  activeReferences: string[];
+  dataDependencies: string[];
+  docOrTestReferences: string[];
+  guardrail: string;
 }
 
 export const navigationGroups: NavigationGroup[] = [
@@ -216,6 +227,81 @@ export const routeDispositionDecisions: RouteDispositionDecision[] = [
   },
 ];
 
+export const routeDependencyGuards: RouteDependencyGuard[] = [
+  {
+    route: "/ads",
+    status: "blocked",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Reference Shelf", "/ads/[id] detail links"],
+    dataDependencies: ["Historical ad archive view", "Approval/GTM/workflow pages still consume /api/ads data"],
+    docOrTestReferences: ["README route table", "route-disposition-plan", "navigation.test"],
+    guardrail: "Keep as archive. Do not redirect or delete while ad history remains useful audit evidence.",
+  },
+  {
+    route: "/generate",
+    status: "clear",
+    readyForRedirectOrDelete: true,
+    activeReferences: ["Reference Shelf", "legacy banner only"],
+    dataDependencies: ["No active page depends on the /generate UI route"],
+    docOrTestReferences: ["README legacy note", "route-disposition-plan", "navigation.test"],
+    guardrail: "Candidate for future redirect to /assets after preserving any useful prompt notes.",
+  },
+  {
+    route: "/gtm",
+    status: "blocked",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Reference Shelf", "legacy banner only"],
+    dataDependencies: ["Product-route inventory and historical GTM context still live on the page"],
+    docOrTestReferences: ["README", "SOP-WORKFLOW", "product-route-inventory docs", "navigation.test"],
+    guardrail: "Keep archived until product-route inventory is fully represented in active launch/support data.",
+  },
+  {
+    route: "/settings",
+    status: "blocked",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Reference Shelf", "legacy banner only"],
+    dataDependencies: ["Old setup/source references have not been fully extracted into docs"],
+    docOrTestReferences: ["README route table", "route-disposition-plan", "navigation.test"],
+    guardrail: "Do not delete until unique notes are moved into README/SOP and active references are rechecked.",
+  },
+  {
+    route: "/creatives",
+    status: "blocked",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Direct-link archive", "legacy banner only"],
+    dataDependencies: ["public/creatives asset URL convention from trade-utils", "old influencer campaign flow link"],
+    docOrTestReferences: ["README route table", "influencer campaign implementation docs", "trade-utils tests"],
+    guardrail: "Do not redirect until public asset URLs and old campaign flow references are migrated or explicitly preserved.",
+  },
+  {
+    route: "/workflow",
+    status: "blocked",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Direct-link archive", "legacy banner only"],
+    dataDependencies: ["old influencer campaign flow link", "bulk ad workflow history"],
+    docOrTestReferences: ["README route table", "influencer campaign implementation docs", "navigation.test"],
+    guardrail: "Do not redirect until old campaign flow references are moved to Launch or Approval.",
+  },
+  {
+    route: "/templates",
+    status: "support",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Command support summary link", "Scorecard support summary link"],
+    dataDependencies: ["Command and Scorecard fetch /api/templates counts", "template detail page holds copy actions"],
+    docOrTestReferences: ["README", "SOP-WORKFLOW", "content/template tests", "navigation.test"],
+    guardrail: "Keep as a support route while high-use actions are folded into active loops.",
+  },
+  {
+    route: "/lifecycle",
+    status: "support",
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Command support summary link", "Scorecard support summary link"],
+    dataDependencies: ["Command and Scorecard fetch /api/lifecycle rows", "lifecycle detail page edits follow-up rows"],
+    docOrTestReferences: ["README", "SOP-WORKFLOW", "lifecycle measurement tests", "navigation.test"],
+    guardrail: "Keep as a support route while decision-grade lifecycle summaries mature inside Scorecard.",
+  },
+];
+
 export const allNavigationItems = [
   ...navigationGroups.flatMap((group) => group.items),
   ...legacyNavigationItems,
@@ -253,5 +339,21 @@ export function routeDispositionSummary() {
     total: routeDispositionDecisions.length,
     counts,
     destructiveActionsAllowed: routeDispositionDecisions.some((row) => row.destructiveActionAllowed),
+  };
+}
+
+export function routeDependencyGuardSummary() {
+  const counts = routeDependencyGuards.reduce<Record<RouteDependencyStatus, number>>(
+    (acc, row) => {
+      acc[row.status] += 1;
+      return acc;
+    },
+    { clear: 0, blocked: 0, support: 0 },
+  );
+
+  return {
+    total: routeDependencyGuards.length,
+    counts,
+    readyForRedirectOrDelete: routeDependencyGuards.filter((row) => row.readyForRedirectOrDelete).length,
   };
 }

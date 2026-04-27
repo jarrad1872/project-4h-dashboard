@@ -6,6 +6,8 @@ import {
   legacyNavigationItems,
   legacyRouteAuditRows,
   navigationGroups,
+  routeDependencyGuards,
+  routeDependencyGuardSummary,
   routeDispositionDecisions,
   routeDispositionSummary,
 } from "../navigation";
@@ -62,6 +64,20 @@ describe("navigation IA", () => {
       total: 8,
       counts: { rebuild: 2, redirect: 3, archive: 2, delete: 1 },
       destructiveActionsAllowed: false,
+    });
+  });
+
+  it("guards future redirect/delete work with dependency status for every leftover route", () => {
+    expect(routeDependencyGuards.map((row) => row.route)).toEqual(routeDispositionDecisions.map((row) => row.route));
+    expect(routeDependencyGuards.find((row) => row.route === "/generate")?.readyForRedirectOrDelete).toBe(true);
+    expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.dataDependencies).toContain(
+      "public/creatives asset URL convention from trade-utils",
+    );
+    expect(routeDependencyGuards.find((row) => row.route === "/templates")?.status).toBe("support");
+    expect(routeDependencyGuardSummary()).toEqual({
+      total: 8,
+      counts: { clear: 1, blocked: 5, support: 2 },
+      readyForRedirectOrDelete: 1,
     });
   });
 });

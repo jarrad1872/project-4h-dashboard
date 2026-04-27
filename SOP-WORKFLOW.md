@@ -371,6 +371,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-37 support summaries on Command and Scorecard are the daily home for lifecycle and template status; `/lifecycle` and `/templates` remain detail pages reached from those active loops.
 - Q-38 route retirement matrix is advisory only. A recommendation of `redirect` or `delete` does not authorize changing routes, removing files, hiding links, or breaking direct links.
 - Before any future route retirement packet, run a dependency guard that checks active pages, docs, tests, and support workflows for links or data dependencies.
+- Q-39 dependency guard on Command is the current source of truth for route retirement readiness. A route marked `blocked` or `support` must not be redirected or deleted.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

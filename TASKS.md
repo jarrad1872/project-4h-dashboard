@@ -198,7 +198,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-36 legacy/superseded banners to archived original-build routes.
 - [x] Add Q-37 lifecycle/template support summaries to Command and Scorecard.
 - [x] Add Q-38 route retirement decision matrix before any route deletion or redirect.
-- [ ] Add Q-39 route retirement dependency guard before any redirect/delete packet.
+- [x] Add Q-39 route retirement dependency guard before any redirect/delete packet.
+- [ ] Add Q-40 campaign-flow link migration off `/creatives` and `/workflow`.
 
 ---
 
@@ -236,7 +237,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add legacy/superseded banners to archived original-build routes.
 - [x] Fold lifecycle/template summaries into active Command or Scorecard loops.
 - [x] Create route retirement decision matrix for remaining archive/support routes.
-- [ ] Add route dependency guard for future redirect/delete decisions.
+- [x] Add route dependency guard for future redirect/delete decisions.
+- [ ] Migrate stale campaign-flow links from legacy routes to active lanes.
 
 ---
 

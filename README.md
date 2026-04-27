@@ -254,6 +254,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-36 adds legacy route banners to `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` so direct-link visitors see the active replacement lane and no-external-action boundary
 - Q-37 folds `/lifecycle` and `/templates` support signals into Command and Scorecard so daily learning work can see follow-up coverage, message-match briefs, creator templates, saved ad templates, and manual competitor-research status without giving those support pages primary nav space
 - Q-38 adds a route retirement decision matrix on Command and in `docs/route-disposition-plan.md`; it recommends rebuild, redirect, archive, or delete-later outcomes but authorizes no route deletion, redirect, hiding, or file removal
+- Q-39 adds a route dependency guard on Command so future route cleanup can see active refs, data dependencies, docs/tests, and guardrails before any redirect/delete packet; current status is 5 blocked, 2 support, 1 clear
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -282,7 +283,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-38 route retirement matrix | v4.4.7*
+*Last updated: 2026-04-27 Q-39 route dependency guard | v4.4.8*
 
 ---
 

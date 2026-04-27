@@ -14,7 +14,12 @@ import {
   rebuildMission,
 } from "@/lib/4h-rebuild-data";
 import { latestMetricsWeek } from "@/lib/growth-command-center";
-import { routeDispositionDecisions, routeDispositionSummary } from "@/lib/navigation";
+import {
+  routeDependencyGuards,
+  routeDependencyGuardSummary,
+  routeDispositionDecisions,
+  routeDispositionSummary,
+} from "@/lib/navigation";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -137,6 +142,7 @@ export default function OverviewPage() {
     };
   }, []);
   const routeMatrixSummary = useMemo(() => routeDispositionSummary(), []);
+  const routeGuardSummary = useMemo(() => routeDependencyGuardSummary(), []);
 
   const supportSummary = useMemo(
     () =>
@@ -418,6 +424,63 @@ export default function OverviewPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section data-testid="route-dependency-guard">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Route dependency guard</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">What blocks redirect/delete work</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{routeGuardSummary.counts.blocked} blocked</StatusPill>
+            <StatusPill>{routeGuardSummary.counts.support} support</StatusPill>
+            <StatusPill>{routeGuardSummary.readyForRedirectOrDelete} clear</StatusPill>
+          </div>
+        </div>
+        <div className="mt-3 grid gap-3 xl:grid-cols-2">
+          {routeDependencyGuards.map((row) => (
+            <Card key={row.route} className="bg-slate-800/80" data-testid={`route-dependency-${row.route.replace("/", "")}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-base font-semibold text-white">{row.route}</p>
+                  <p className="mt-1 text-xs text-slate-500">{row.guardrail}</p>
+                </div>
+                <span
+                  className={`rounded border px-2 py-1 text-xs font-semibold uppercase ${
+                    row.status === "clear"
+                      ? "border-emerald-700/40 bg-emerald-950/25 text-emerald-300"
+                      : row.status === "support"
+                        ? "border-cyan-700/40 bg-cyan-950/25 text-cyan-300"
+                        : "border-amber-700/40 bg-amber-950/25 text-amber-300"
+                  }`}
+                >
+                  {row.status}
+                </span>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Active refs</p>
+                  <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                    {row.activeReferences.map((item) => <li key={item}>- {item}</li>)}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Data deps</p>
+                  <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                    {row.dataDependencies.map((item) => <li key={item}>- {item}</li>)}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Docs/tests</p>
+                  <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                    {row.docOrTestReferences.map((item) => <li key={item}>- {item}</li>)}
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
 

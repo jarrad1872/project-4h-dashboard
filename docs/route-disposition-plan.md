@@ -40,6 +40,7 @@ These routes are not active operating lanes. They remain available from the coll
 2. Q-36: Add legacy banners to old pages so no one mistakes them for active lanes. Complete for `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow`.
 3. Q-37: Fold useful template/lifecycle summaries into Command or Scorecard. Complete for Command and Scorecard.
 4. Q-38: Decide route-by-route: rebuild, redirect, archive, or delete. Do not delete or redirect routes in the decision packet.
+5. Q-39: Add dependency guard before any route retirement packet. Complete on Command with active refs, data deps, docs/tests, and guardrails.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -57,3 +58,23 @@ These are recommendations only. No redirect, deletion, route hiding, or file rem
 | `/workflow` | Redirect later | `/launch` | Old concept-to-live board is superseded by queue, Approval, and Launch. | Confirm no launch/approval workflow depends on it, then redirect. |
 | `/templates` | Rebuild as support | `/scorecard` | Briefs and research templates remain useful but belong behind active loops. | Keep support route while folding high-use actions into Launch, Creators, or Scorecard. |
 | `/lifecycle` | Rebuild as support | `/scorecard` | Lifecycle measurement belongs in the learning loop, with detail available while summaries mature. | Keep support route while moving decision-grade lifecycle summaries into Scorecard. |
+
+## Q-39 Dependency Guard
+
+The Command page now shows a route dependency guard with these current statuses:
+
+| Status | Count | Meaning |
+| --- | ---: | --- |
+| Blocked | 5 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
+| Support | 2 | Keep as detail/support routes reached from active loops. |
+| Clear | 1 | Candidate for a future redirect/delete packet after preserving useful notes. |
+
+Current clear route: `/generate`.
+
+Current blockers to resolve first:
+
+- `/creatives`: `public/creatives` asset URL convention and old influencer campaign-flow links.
+- `/workflow`: old influencer campaign-flow link and bulk ad workflow history.
+- `/settings`: old setup/source notes need extraction into docs before deletion.
+- `/gtm`: product-route inventory context still needs active-loop coverage before archive-only treatment.
+- `/ads`: historical ad archive remains useful audit evidence.
