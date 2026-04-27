@@ -149,7 +149,7 @@ Core offer rules:
 
 - [x] Update weekly report to rank trades, creators, images, and angles by paid conversion.
 - [x] Add experiment notes and decision status: keep, kill, iterate.
-- [ ] Add creative fatigue and variant lineage tracking.
+- [x] Add creative fatigue and variant lineage tracking.
 - [x] Add competitor/ad-library research only after Meta access is validated.
 - [x] Add a simple forecast: customers needed this month, current pace, gap, and next bets.
 - [x] Add trade-level weekly target calculator for the five beachhead domains.
@@ -184,6 +184,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Start the next first-principles queue with Q-25 trade weekly targets on `/scorecard`.
 - [x] Add Q-26 founder video asset tracking on `/assets`.
 - [x] Add Q-27 lifecycle follow-up measurement on `/lifecycle`.
+- [x] Add Q-28 creative fatigue and variant lineage tracking on `/assets`.
 
 ---
 

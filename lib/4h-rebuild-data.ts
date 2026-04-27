@@ -450,4 +450,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "Lifecycle page measures signup-to-trial, trial-to-activation, and activation-to-paid movement from attribution events.",
     acceptance: "Measurement uses marketing_events only and does not send email, SMS, push, webhooks, or external actions.",
   },
+  {
+    id: "Q-28",
+    phase: "Phase 6",
+    lane: "Learning",
+    title: "Add creative fatigue and variant lineage tracking",
+    route: "/assets",
+    status: "complete",
+    approval: "none",
+    outcome: "Creative Lab groups assets into prompt/variant families and flags high-view, low-signal creative fatigue.",
+    acceptance: "Signals use creative-asset attribution only and do not pause, launch, upload, spend, or change billing.",
+  },
 ];

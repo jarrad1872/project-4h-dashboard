@@ -15,6 +15,10 @@ import {
   summarizeCreativePipeline,
 } from "@/lib/growth-command-center";
 import {
+  buildCreativeFatigueSummary,
+  type CreativeFatigueStatus,
+} from "@/lib/creative-fatigue-lineage";
+import {
   buildFounderVideoPacket,
   founderVideoAssets,
   summarizeFounderVideoAssets,
@@ -27,7 +31,13 @@ import {
   IMAGE_CREATIVE_ANGLES,
   IMAGE_CREATIVE_PLATFORMS,
 } from "@/lib/image-creative-briefs";
-import type { CreativeAsset, CreativeAssetAngle, CreativeAssetPlatform, CreativeAssetStatus } from "@/lib/types";
+import type {
+  CreativeAsset,
+  CreativeAssetAngle,
+  CreativeAssetPlatform,
+  CreativeAssetStatus,
+  MarketingEventSummary,
+} from "@/lib/types";
 
 const STATUS_OPTIONS: CreativeAssetStatus[] = ["draft", "review", "approved"];
 const FILTER_STATUS_OPTIONS: CreativeAssetStatus[] = ["draft", "review", "approved", "live"];
@@ -55,6 +65,42 @@ const FOUNDER_VIDEO_STATUS_LABEL: Record<FounderVideoStatus, string> = {
   filmed: "Filmed",
   edited: "Edited",
   approved: "Approved",
+};
+
+const FATIGUE_STATUS_STYLE: Record<CreativeFatigueStatus, string> = {
+  waiting: "border-slate-700 bg-slate-900 text-slate-300",
+  healthy: "border-emerald-800 bg-emerald-950/30 text-emerald-300",
+  watch: "border-amber-800 bg-amber-950/30 text-amber-300",
+  "needs-variant": "border-rose-800 bg-rose-950/30 text-rose-300",
+};
+
+const FATIGUE_STATUS_LABEL: Record<CreativeFatigueStatus, string> = {
+  waiting: "Waiting",
+  healthy: "Healthy",
+  watch: "Watch",
+  "needs-variant": "Needs variant",
+};
+
+const EMPTY_MARKETING_SUMMARY: MarketingEventSummary = {
+  total: 0,
+  byType: {
+    asset_view: 0,
+    demo_call: 0,
+    signup: 0,
+    trial_started: 0,
+    activated: 0,
+    paid: 0,
+  },
+  byPlatform: {},
+  byTrade: {},
+  byAngle: {},
+  dimensions: {
+    trades: {},
+    creators: {},
+    creativeAssets: {},
+    angles: {},
+  },
+  paidValueCents: 0,
 };
 
 const EMPTY_FORM = {
@@ -101,6 +147,7 @@ export default function AssetsPage() {
   const [variantDirections, setVariantDirections] = useState<Record<string, string>>({});
   const [variantErrors, setVariantErrors] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState(DEFAULT_CREATIVE_ASSET_FILTERS);
+  const [marketingSummary, setMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_SUMMARY);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -111,6 +158,13 @@ export default function AssetsPage() {
     const response = await fetch("/api/creative-assets", { cache: "no-store" });
     const data = await response.json();
     setAssets(Array.isArray(data) ? data : []);
+    const eventsResponse = await fetch("/api/events?summary=1", { cache: "no-store" }).catch(() => null);
+    if (eventsResponse?.ok) {
+      const eventsData = (await eventsResponse.json()) as { summary?: MarketingEventSummary };
+      setMarketingSummary(eventsData.summary ?? EMPTY_MARKETING_SUMMARY);
+    } else {
+      setMarketingSummary(EMPTY_MARKETING_SUMMARY);
+    }
     setLoading(false);
   }
 
@@ -290,6 +344,7 @@ export default function AssetsPage() {
   const summary = summarizeCreativePipeline(filteredAssets);
   const imagePack = useMemo(() => summarizeBeachheadImagePack(assets), [assets]);
   const founderVideoSummary = useMemo(() => summarizeFounderVideoAssets(), []);
+  const fatigueSummary = useMemo(() => buildCreativeFatigueSummary(assets, marketingSummary), [assets, marketingSummary]);
 
   return (
     <div className="space-y-6">
@@ -485,6 +540,91 @@ export default function AssetsPage() {
             </div>
           ))}
         </div>
+      </Card>
+
+      <Card className="space-y-4 border-rose-900/60 bg-rose-950/10">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-rose-300">Q-28 creative fatigue + lineage</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">
+              {fatigueSummary.totalFamilies} variant families tracked, {fatigueSummary.needsVariant} need replacement
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Groups image assets by prompt/variant family and reads creative-asset attribution to catch high-view,
+              low-signal fatigue before more traffic is added. This is planning state only and cannot pause, launch, upload, or spend.
+            </p>
+          </div>
+          <div className="rounded-lg border border-rose-900/50 bg-slate-950/50 p-3 xl:w-96">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Next variant bet</p>
+            <p className="mt-2 text-sm text-slate-300">
+              {fatigueSummary.nextFamily ? fatigueSummary.nextFamily.nextAction : "Wait for creative-asset view signal before replacing variants."}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          {[
+            { label: "Families", value: fatigueSummary.totalFamilies },
+            { label: "Needs variant", value: fatigueSummary.needsVariant },
+            { label: "Watch", value: fatigueSummary.watch },
+            { label: "Healthy", value: fatigueSummary.healthy },
+            { label: "Waiting", value: fatigueSummary.waiting },
+          ].map((item) => (
+            <div key={item.label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-2xl font-semibold text-white">{item.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {fatigueSummary.families.length === 0 ? (
+          <p className="text-sm text-slate-500">No creative families are tracked yet.</p>
+        ) : (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {fatigueSummary.families.slice(0, 8).map((family) => (
+              <div key={family.base} className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-white">{family.base}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">
+                      {family.tradeSlug}.city - {formatCreativeAssetAngleLabel(family.angle as CreativeAssetAngle)} - {family.targetPlatform}
+                    </p>
+                  </div>
+                  <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${FATIGUE_STATUS_STYLE[family.fatigueStatus]}`}>
+                    {FATIGUE_STATUS_LABEL[family.fatigueStatus]}
+                  </span>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <div>
+                    <p className="text-lg font-semibold text-white">{family.totalViews.toLocaleString()}</p>
+                    <p className="text-slate-500">Views</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-white">{family.downstreamEvents.toLocaleString()}</p>
+                    <p className="text-slate-500">Downstream</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-white">
+                      {family.conversionRate === null ? "Waiting" : `${(family.conversionRate * 100).toFixed(1)}%`}
+                    </p>
+                    <p className="text-slate-500">Paid/view</p>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs text-slate-500">{family.evidence}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {family.variantIds.map((variantId) => (
+                    <span key={variantId} className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-400">
+                      {variantId}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs text-slate-400">{family.nextAction}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <p className="text-xs text-slate-500">{fatigueSummary.evidence}</p>
       </Card>
 
       <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10">
