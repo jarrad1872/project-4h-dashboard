@@ -269,9 +269,9 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
     status: "blocked",
     readyForRedirectOrDelete: false,
     activeReferences: ["Direct-link archive", "legacy banner only"],
-    dataDependencies: ["public/creatives asset URL convention from trade-utils"],
-    docOrTestReferences: ["README route table", "influencer campaign implementation docs", "trade-utils tests"],
-    guardrail: "Do not redirect until public asset URLs are migrated or explicitly preserved.",
+    dataDependencies: ["24 static public /creatives/*.jpg URLs inventoried in trade-utils"],
+    docOrTestReferences: ["README route table", "influencer campaign implementation docs", "trade-utils tests", "Command dependency map"],
+    guardrail: "Do not redirect the page route until static /creatives/*.jpg responses are preserved or migrated with 200 checks.",
   },
   {
     route: "/workflow",

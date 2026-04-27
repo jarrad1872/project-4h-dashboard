@@ -71,7 +71,7 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.map((row) => row.route)).toEqual(routeDispositionDecisions.map((row) => row.route));
     expect(routeDependencyGuards.find((row) => row.route === "/generate")?.readyForRedirectOrDelete).toBe(true);
     expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.dataDependencies).toContain(
-      "public/creatives asset URL convention from trade-utils",
+      "24 static public /creatives/*.jpg URLs inventoried in trade-utils",
     );
     expect(routeDependencyGuards.find((row) => row.route === "/templates")?.status).toBe("support");
     expect(routeDependencyGuardSummary()).toEqual({

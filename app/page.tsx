@@ -20,6 +20,7 @@ import {
   routeDispositionDecisions,
   routeDispositionSummary,
 } from "@/lib/navigation";
+import { publicCreativeUrlDependencies, publicCreativeUrlDependencySummary } from "@/lib/trade-utils";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -143,6 +144,24 @@ export default function OverviewPage() {
   }, []);
   const routeMatrixSummary = useMemo(() => routeDispositionSummary(), []);
   const routeGuardSummary = useMemo(() => routeDependencyGuardSummary(), []);
+  const publicCreativeSummary = useMemo(() => publicCreativeUrlDependencySummary(), []);
+  const publicCreativeRows = useMemo(
+    () =>
+      publicCreativeUrlDependencies.reduce<Array<{ prefix: string; domain: string; urls: string[]; placements: string[] }>>(
+        (rows, asset) => {
+          let row = rows.find((item) => item.prefix === asset.prefix);
+          if (!row) {
+            row = { prefix: asset.prefix, domain: asset.domain, urls: [], placements: [] };
+            rows.push(row);
+          }
+          row.urls.push(asset.url);
+          row.placements.push(`${asset.platform}:${asset.placement}`);
+          return rows;
+        },
+        [],
+      ),
+    [],
+  );
 
   const supportSummary = useMemo(
     () =>
@@ -482,6 +501,42 @@ export default function OverviewPage() {
             </Card>
           ))}
         </div>
+      </section>
+
+      <section data-testid="public-creative-url-map">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Public creative URL map</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Static asset URLs are separate from the legacy page route</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{publicCreativeSummary.assetCount} URLs</StatusPill>
+            <StatusPill>{publicCreativeSummary.tradeCount} trades</StatusPill>
+            <StatusPill>{publicCreativeSummary.formatCount} formats</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-amber-900/50 bg-amber-950/10">
+          <p className="text-sm leading-6 text-slate-300">{publicCreativeSummary.preservationRule}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Directory: {publicCreativeSummary.assetDirectory}; URL prefix: {publicCreativeSummary.urlPrefix}; legacy page route:{" "}
+            {publicCreativeSummary.legacyPageRoute}
+          </p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-4">
+            {publicCreativeRows.map((row) => (
+              <div key={row.prefix} className="rounded border border-slate-700 bg-slate-900/60 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-white">{row.domain}</p>
+                    <p className="mt-1 text-xs text-slate-500">{row.urls.length} preserved static URLs</p>
+                  </div>
+                  <StatusPill>{row.prefix}</StatusPill>
+                </div>
+                <p className="mt-3 text-xs leading-5 text-slate-300">{row.placements.join(", ")}</p>
+                <p className="mt-2 break-all text-xs text-slate-500">{row.urls[0]}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
       </section>
 
       <section>

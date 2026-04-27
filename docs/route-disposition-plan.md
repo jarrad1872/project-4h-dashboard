@@ -42,6 +42,7 @@ These routes are not active operating lanes. They remain available from the coll
 4. Q-38: Decide route-by-route: rebuild, redirect, archive, or delete. Do not delete or redirect routes in the decision packet.
 5. Q-39: Add dependency guard before any route retirement packet. Complete on Command with active refs, data deps, docs/tests, and guardrails.
 6. Q-40: Migrate stale creator campaign-flow links off `/creatives` and `/workflow`. Complete; no redirects or deletions.
+7. Q-41: Inventory static `/creatives/*.jpg` URLs separately from the `/creatives` page route. Complete; no redirects, deletions, or asset moves.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -74,7 +75,7 @@ Current clear route: `/generate`.
 
 Current blockers to resolve first:
 
-- `/creatives`: `public/creatives` asset URL convention.
+- `/creatives`: 24 static `/creatives/*.jpg` URLs are inventoried; any redirect packet still needs explicit 200-check preservation.
 - `/workflow`: bulk ad workflow history.
 - `/settings`: old setup/source notes need extraction into docs before deletion.
 - `/gtm`: product-route inventory context still needs active-loop coverage before archive-only treatment.
@@ -92,3 +93,15 @@ Creator campaign-flow links now point only at active operating lanes:
 | Learning loop | `/scorecard` |
 
 Legacy `/creatives` and `/workflow` pages remain reachable by direct link and still carry their disposition banners. Q-40 only changed the internal campaign-flow data; it did not redirect, delete, hide, or break either route.
+
+## Q-41 Public Creative URL Map
+
+The `/creatives` page route and static `/creatives/*.jpg` asset URLs are separate dependencies. Q-41 preserves the static URL contract in `lib/trade-utils.ts` and surfaces the map on Command before any future redirect packet.
+
+| Source | Count | Preservation rule |
+| --- | ---: | --- |
+| `public/creatives/*.jpg` | 24 | Must continue returning static images even if the legacy page route is later redirected. |
+| Trade prefixes | 4 | `saw`, `rinse`, `mow`, and `rooter` are the only prefixes with local rendered images today. |
+| Platform formats | 6 | Facebook feed, Instagram square, Instagram story/reel, LinkedIn feed, LinkedIn square alt, YouTube in-stream. |
+
+Q-41 did not redirect `/creatives`, move files, delete assets, alter image URLs, or change external systems. Any future redirect packet must prove the static URLs still return 200 responses.

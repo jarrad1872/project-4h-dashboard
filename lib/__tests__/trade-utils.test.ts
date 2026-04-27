@@ -1,5 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { TRADE_MAP, tradeFromAd, tradeBadge, getCreativeUrl, getCreativeUrls } from "../trade-utils";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import {
+  TRADE_MAP,
+  tradeFromAd,
+  tradeBadge,
+  getCreativeUrl,
+  getCreativeUrls,
+  publicCreativeUrlDependencies,
+  publicCreativeUrlDependencySummary,
+} from "../trade-utils";
 import type { Ad } from "../types";
 
 function makeAd(overrides: Partial<Ad> = {}): Ad {
@@ -49,7 +59,7 @@ describe("TRADE_MAP", () => {
   });
 
   it("every trade has required fields", () => {
-    for (const [key, trade] of Object.entries(TRADE_MAP)) {
+    for (const trade of Object.values(TRADE_MAP)) {
       expect(trade.label).toBeTruthy();
       expect(trade.color).toBeTruthy();
       expect(trade.bg).toBeTruthy();
@@ -140,6 +150,41 @@ describe("getCreativeUrl", () => {
 
   it("handles instagram default (square)", () => {
     expect(getCreativeUrl("saw.city", "instagram")).toBe("/creatives/saw-1080x1080-meta.jpg");
+  });
+});
+
+describe("publicCreativeUrlDependencies", () => {
+  it("inventories every static public creative URL separately from the legacy page route", () => {
+    const summary = publicCreativeUrlDependencySummary();
+
+    expect(summary).toMatchObject({
+      assetCount: 24,
+      tradeCount: 4,
+      formatCount: 6,
+      assetDirectory: "public/creatives",
+      urlPrefix: "/creatives/",
+      legacyPageRoute: "/creatives",
+    });
+    expect(publicCreativeUrlDependencies).toHaveLength(summary.assetCount);
+    expect(new Set(publicCreativeUrlDependencies.map((asset) => asset.url)).size).toBe(summary.assetCount);
+    expect(publicCreativeUrlDependencies.every((asset) => asset.url.startsWith("/creatives/"))).toBe(true);
+    expect(publicCreativeUrlDependencies.every((asset) => asset.filePath.startsWith("public/creatives/"))).toBe(true);
+    expect(publicCreativeUrlDependencies.every((asset) => asset.legacyPageRoute === "/creatives")).toBe(true);
+    expect(publicCreativeUrlDependencies.map((asset) => asset.url)).toContain("/creatives/mow-1200x1200-linkedin-sq.jpg");
+  });
+
+  it("maps inventoried URLs to files that exist in public/creatives", () => {
+    for (const asset of publicCreativeUrlDependencies) {
+      expect(existsSync(join(process.cwd(), asset.filePath))).toBe(true);
+    }
+  });
+
+  it("keeps getCreativeUrl outputs inside the public creative URL inventory", () => {
+    const urls = new Set(publicCreativeUrlDependencies.map((asset) => asset.url));
+
+    expect(urls.has(getCreativeUrl("saw.city", "facebook") ?? "")).toBe(true);
+    expect(urls.has(getCreativeUrl("rinse.city", "instagram", "story") ?? "")).toBe(true);
+    expect(urls.has(getCreativeUrl("rooter.city", "youtube") ?? "")).toBe(true);
   });
 });
 

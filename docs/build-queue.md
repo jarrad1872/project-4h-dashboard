@@ -56,12 +56,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-38 | Governance | Navigation | Create route retirement decision matrix | 2026-04-27 | Command and `docs/route-disposition-plan.md` now classify leftover routes as rebuild, redirect, archive, or delete-later recommendations with no destructive action allowed. |
 | Q-39 | Governance | Navigation | Add route retirement dependency guard | 2026-04-27 | Command now shows dependency status for each leftover route: 5 blocked, 2 support, 1 clear, with active refs, data deps, docs/tests, and guardrails before any redirect/delete packet. |
 | Q-40 | Governance | Navigation | Migrate stale campaign-flow links off legacy routes | 2026-04-27 | Creator campaign-flow data now points to `/assets`, `/approval`, `/launch`, and `/scorecard` instead of legacy `/creatives` and `/workflow`, without redirecting or deleting those pages. |
+| Q-41 | Governance | Navigation | Preserve public creative URL dependency map | 2026-04-27 | Command now shows the 24 static `/creatives/*.jpg` URL dependencies separately from the legacy `/creatives` page route, with tests confirming the files still exist. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-41 | Governance | Navigation | Preserve public creative URL dependency map | none | Public `/creatives/*.jpg` asset URLs are inventoried and separated from the legacy `/creatives` page before any future redirect work. |
+| Q-42 | Governance | Navigation | Preserve bulk workflow history before redirect work | none | Legacy `/workflow` history dependencies are inventoried and separated from the old page route before any future redirect work. |
 
 ## Stop Conditions
 

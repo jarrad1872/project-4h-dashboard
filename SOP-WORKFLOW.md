@@ -373,6 +373,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Before any future route retirement packet, run a dependency guard that checks active pages, docs, tests, and support workflows for links or data dependencies.
 - Q-39 dependency guard on Command is the current source of truth for route retirement readiness. A route marked `blocked` or `support` must not be redirected or deleted.
 - Q-40 moved creator campaign-flow links off legacy `/creatives` and `/workflow`; future creator guidance should use `/assets`, `/approval`, `/launch`, and `/scorecard`.
+- Q-41 separates static `/creatives/*.jpg` asset URLs from the legacy `/creatives` page route. Future `/creatives` redirects must prove those 24 JPEG URLs still return static images.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

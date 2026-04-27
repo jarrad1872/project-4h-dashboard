@@ -144,8 +144,65 @@ export function getTierLabel(tier: number) {
 
 // ─── Local rendered creative images (public/creatives/) ─────────────────────
 
+export interface PublicCreativeUrlDependency {
+  prefix: string;
+  domain: string;
+  platform: "facebook" | "instagram" | "linkedin" | "youtube";
+  placement: string;
+  dimensions: string;
+  filename: string;
+  url: string;
+  filePath: string;
+  assetDirectory: "public/creatives";
+  legacyPageRoute: "/creatives";
+}
+
+const PUBLIC_CREATIVE_PREFIXES = ["saw", "rinse", "mow", "rooter"] as const;
+
+const PUBLIC_CREATIVE_FORMATS = [
+  { platform: "facebook", placement: "feed", dimensions: "1200x628", suffix: "1200x628-facebook" },
+  { platform: "instagram", placement: "feed-square", dimensions: "1080x1080", suffix: "1080x1080-meta" },
+  { platform: "instagram", placement: "story-reel", dimensions: "1080x1920", suffix: "1080x1920-instagram" },
+  { platform: "linkedin", placement: "feed", dimensions: "1200x1200", suffix: "1200x1200-linkedin" },
+  { platform: "linkedin", placement: "feed-square-alt", dimensions: "1200x1200", suffix: "1200x1200-linkedin-sq" },
+  { platform: "youtube", placement: "in-stream", dimensions: "1280x720", suffix: "1280x720-youtube" },
+] as const;
+
+/** Static asset URLs that must survive any future /creatives page-route redirect. */
+export const publicCreativeUrlDependencies: PublicCreativeUrlDependency[] = PUBLIC_CREATIVE_PREFIXES.flatMap((prefix) =>
+  PUBLIC_CREATIVE_FORMATS.map((format) => {
+    const filename = `${prefix}-${format.suffix}.jpg`;
+
+    return {
+      prefix,
+      domain: `${prefix}.city`,
+      platform: format.platform,
+      placement: format.placement,
+      dimensions: format.dimensions,
+      filename,
+      url: `/creatives/${filename}`,
+      filePath: `public/creatives/${filename}`,
+      assetDirectory: "public/creatives",
+      legacyPageRoute: "/creatives",
+    };
+  }),
+);
+
 /** Prefixes that have locally rendered creative images in public/creatives/ */
-const CREATIVE_PREFIXES = new Set(["saw", "rinse", "mow", "rooter"]);
+const CREATIVE_PREFIXES: ReadonlySet<string> = new Set(PUBLIC_CREATIVE_PREFIXES);
+
+export function publicCreativeUrlDependencySummary() {
+  return {
+    assetCount: publicCreativeUrlDependencies.length,
+    tradeCount: PUBLIC_CREATIVE_PREFIXES.length,
+    formatCount: PUBLIC_CREATIVE_FORMATS.length,
+    assetDirectory: "public/creatives",
+    urlPrefix: "/creatives/",
+    legacyPageRoute: "/creatives",
+    preservationRule:
+      "Preserve static /creatives/*.jpg responses separately from the legacy /creatives page route before any redirect work.",
+  };
+}
 
 /**
  * Maps (domain, platform, format) → a local /creatives/{filename}.jpg URL.
