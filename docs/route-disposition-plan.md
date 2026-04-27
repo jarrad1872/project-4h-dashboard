@@ -41,6 +41,7 @@ These routes are not active operating lanes. They remain available from the coll
 3. Q-37: Fold useful template/lifecycle summaries into Command or Scorecard. Complete for Command and Scorecard.
 4. Q-38: Decide route-by-route: rebuild, redirect, archive, or delete. Do not delete or redirect routes in the decision packet.
 5. Q-39: Add dependency guard before any route retirement packet. Complete on Command with active refs, data deps, docs/tests, and guardrails.
+6. Q-40: Migrate stale creator campaign-flow links off `/creatives` and `/workflow`. Complete; no redirects or deletions.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -73,8 +74,21 @@ Current clear route: `/generate`.
 
 Current blockers to resolve first:
 
-- `/creatives`: `public/creatives` asset URL convention and old influencer campaign-flow links.
-- `/workflow`: old influencer campaign-flow link and bulk ad workflow history.
+- `/creatives`: `public/creatives` asset URL convention.
+- `/workflow`: bulk ad workflow history.
 - `/settings`: old setup/source notes need extraction into docs before deletion.
 - `/gtm`: product-route inventory context still needs active-loop coverage before archive-only treatment.
 - `/ads`: historical ad archive remains useful audit evidence.
+
+## Q-40 Campaign Flow Link Migration
+
+Creator campaign-flow links now point only at active operating lanes:
+
+| Flow | Route |
+| --- | --- |
+| Creative Lab | `/assets` |
+| Approval | `/approval` |
+| Launch readiness | `/launch` |
+| Learning loop | `/scorecard` |
+
+Legacy `/creatives` and `/workflow` pages remain reachable by direct link and still carry their disposition banners. Q-40 only changed the internal campaign-flow data; it did not redirect, delete, hide, or break either route.

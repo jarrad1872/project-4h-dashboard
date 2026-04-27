@@ -55,12 +55,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-37 | Phase 6 | Learning | Fold lifecycle/template summaries into active loops | 2026-04-27 | Command and Scorecard now expose lifecycle follow-up status plus template/message-match support signals, while `/lifecycle` and `/templates` remain direct-link support routes. |
 | Q-38 | Governance | Navigation | Create route retirement decision matrix | 2026-04-27 | Command and `docs/route-disposition-plan.md` now classify leftover routes as rebuild, redirect, archive, or delete-later recommendations with no destructive action allowed. |
 | Q-39 | Governance | Navigation | Add route retirement dependency guard | 2026-04-27 | Command now shows dependency status for each leftover route: 5 blocked, 2 support, 1 clear, with active refs, data deps, docs/tests, and guardrails before any redirect/delete packet. |
+| Q-40 | Governance | Navigation | Migrate stale campaign-flow links off legacy routes | 2026-04-27 | Creator campaign-flow data now points to `/assets`, `/approval`, `/launch`, and `/scorecard` instead of legacy `/creatives` and `/workflow`, without redirecting or deleting those pages. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-40 | Governance | Navigation | Migrate stale campaign-flow links off legacy routes | none | Old campaign flow references to `/creatives` and `/workflow` point to active `/assets`, `/approval`, or `/launch` lanes without redirecting/deleting the legacy pages. |
+| Q-41 | Governance | Navigation | Preserve public creative URL dependency map | none | Public `/creatives/*.jpg` asset URLs are inventoried and separated from the legacy `/creatives` page before any future redirect work. |
 
 ## Stop Conditions
 

@@ -172,8 +172,8 @@ export const outreachChecklist: ChecklistItem[] = [
 ];
 
 export const campaignFlowLinks: ChecklistItem[] = [
-  { id: "creatives", text: "Reuse approved campaign visuals and exportable assets.", href: "/creatives" },
+  { id: "creative-lab", text: "Reuse approved campaign visuals and exportable assets from Creative Lab.", href: "/assets" },
   { id: "approval", text: "Queue influencer-facing copy or page edits for approval.", href: "/approval" },
-  { id: "assets", text: "Validate trade asset readiness before creator launch.", href: "/assets" },
-  { id: "workflow", text: "Track influencer campaign tasks through workflow stages.", href: "/workflow" },
+  { id: "launch", text: "Track creator campaign readiness through launch bundles and guardrails.", href: "/launch" },
+  { id: "scorecard", text: "Measure creator traffic and downstream conversion in the learning loop.", href: "/scorecard" },
 ];
