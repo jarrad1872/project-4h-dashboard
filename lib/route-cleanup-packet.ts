@@ -39,6 +39,13 @@ export const appliedRouteCleanupPackets: AppliedRouteCleanupEntry[] = [
     verification: ["/gtm redirects to /", "Command loads product-route inventory map", "sawcity-lite remains read-only"],
     externalActionAllowed: false,
   },
+  {
+    route: "/settings",
+    appliedIn: "Q-49",
+    outcome: "Internal page route redirects to Approval while setup/source notes remain preserved in Command/docs.",
+    verification: ["/settings redirects to /approval", "Approval route loads", "placeholder credentials are not rendered"],
+    externalActionAllowed: false,
+  },
 ];
 
 function intentForRecommendation(recommendation: RouteRetirementRecommendation) {

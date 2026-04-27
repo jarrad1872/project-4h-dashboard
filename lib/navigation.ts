@@ -258,11 +258,11 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   {
     route: "/settings",
     status: "clear",
-    readyForRedirectOrDelete: true,
-    activeReferences: ["Reference Shelf", "legacy banner only"],
-    dataDependencies: ["Setup/source notes inventoried in settings-source-notes"],
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Reference Shelf link now lands on Approval"],
+    dataDependencies: ["Internal /settings page route redirects to /approval", "Setup/source notes inventoried in settings-source-notes"],
     docOrTestReferences: ["README route table", "route-disposition-plan", "navigation.test", "Command settings source-note map"],
-    guardrail: "Candidate for future delete packet after confirming the source-note map covers the old page.",
+    guardrail: "Implemented in Q-49. Keep setup/source notes on Command/docs and do not expose placeholder credentials.",
   },
   {
     route: "/creatives",

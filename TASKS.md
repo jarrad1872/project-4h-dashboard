@@ -208,7 +208,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-46 clear-route cleanup packet before any redirect/delete/archive-only implementation.
 - [x] Add Q-47 legacy AI Studio redirect packet from `/generate` to `/assets`.
 - [x] Add Q-48 legacy GTM archive-only packet.
-- [ ] Add Q-49 legacy Settings cleanup packet.
+- [x] Add Q-49 legacy Settings cleanup packet.
+- [ ] Add Q-50 Ad Archive read-only hardening.
 
 ---
 
@@ -256,7 +257,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Draft clear-route cleanup packet for legacy route candidates.
 - [x] Apply first clear-route cleanup packet for `/generate`.
 - [x] Apply archive-only cleanup packet for `/gtm`.
-- [ ] Apply cleanup packet for `/settings`.
+- [x] Apply cleanup packet for `/settings`.
+- [ ] Harden `/ads` as archive-only reference.
 
 ---
 

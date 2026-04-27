@@ -7,10 +7,11 @@ import {
 
 describe("clearRouteCleanupPacket", () => {
   it("groups only clear route candidates without authorizing implementation", () => {
-    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/ads", "/settings"]);
+    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/ads"]);
     expect(clearRouteCleanupPacket.every((entry) => entry.implementationAllowed === false)).toBe(true);
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/generate")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/gtm")).toBeUndefined();
+    expect(clearRouteCleanupPacket.find((entry) => entry.route === "/settings")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/creatives")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/workflow")).toBeUndefined();
   });
@@ -28,11 +29,11 @@ describe("clearRouteCleanupPacket", () => {
 
   it("summarizes packet counts and blocked actions", () => {
     expect(clearRouteCleanupPacketSummary()).toEqual({
-      total: 2,
-      routes: ["/ads", "/settings"],
-      appliedRoutes: ["/generate", "/gtm"],
-      counts: { rebuild: 0, redirect: 0, archive: 1, delete: 1 },
-      appliedCount: 2,
+      total: 1,
+      routes: ["/ads"],
+      appliedRoutes: ["/generate", "/gtm", "/settings"],
+      counts: { rebuild: 0, redirect: 0, archive: 1, delete: 0 },
+      appliedCount: 3,
       implementationAllowed: false,
       blockedActions: ["route redirect", "route deletion", "ad upload", "campaign launch", "webhook creation", "spend change"],
       preservationRule:
@@ -54,6 +55,13 @@ describe("clearRouteCleanupPacket", () => {
         appliedIn: "Q-48",
         outcome: "Internal page route redirects to Command while product-route inventory remains preserved in Command/docs.",
         verification: ["/gtm redirects to /", "Command loads product-route inventory map", "sawcity-lite remains read-only"],
+        externalActionAllowed: false,
+      },
+      {
+        route: "/settings",
+        appliedIn: "Q-49",
+        outcome: "Internal page route redirects to Approval while setup/source notes remain preserved in Command/docs.",
+        verification: ["/settings redirects to /approval", "Approval route loads", "placeholder credentials are not rendered"],
         externalActionAllowed: false,
       },
     ]);

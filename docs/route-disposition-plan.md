@@ -50,6 +50,7 @@ These routes are not active operating lanes. They remain available from the coll
 12. Q-46: Draft the clear-route cleanup packet for `/ads`, `/generate`, `/gtm`, and `/settings`. Complete; no redirects, deletions, uploads, launches, or external actions.
 13. Q-47: Apply the legacy AI Studio redirect packet. Complete; `/generate` redirects internally to `/assets` and legacy API routes remain untouched.
 14. Q-48: Apply the legacy GTM archive-only packet. Complete; `/gtm` redirects internally to Command and product-route inventory remains preserved in Command/docs.
+15. Q-49: Apply the legacy Settings cleanup packet. Complete; `/settings` redirects internally to Approval and setup/source notes remain preserved in Command/docs.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -78,7 +79,7 @@ The Command page now shows a route dependency guard with these current statuses:
 | Support | 2 | Keep as detail/support routes reached from active loops. |
 | Clear | 4 | Candidate or already-applied route cleanup after preserving useful notes. |
 
-Current pending clear routes: `/settings`, `/ads`. Applied clear routes: `/generate`, `/gtm`.
+Current pending clear route: `/ads`. Applied clear routes: `/generate`, `/gtm`, `/settings`.
 
 Current blockers to resolve first:
 
@@ -183,3 +184,9 @@ Q-47 did not generate copy or images, remove API routes, delete files outside th
 Q-48 applies the second clear-route cleanup packet: the `/gtm` page route now redirects internally to Command. Product-route inventory remains preserved in `lib/product-route-inventory.ts`, `docs/product-route-inventory.md`, and the Command GTM product-route map.
 
 Q-48 did not change launch URLs, remove product-route data, edit sawcity-lite, upload to ad platforms, launch campaigns, create webhooks, spend money, or change billing. Browser verification must confirm `/gtm` lands on `/` and the Command GTM product-route map still loads.
+
+## Q-49 Legacy Settings Cleanup Packet
+
+Q-49 applies the third clear-route cleanup packet: the `/settings` page route now redirects internally to `/approval`. Setup/source notes remain preserved in `lib/settings-source-notes.ts`, Command, SOP, and this route disposition plan.
+
+Q-49 did not expose credentials, change campaign status, remove source-note data, create webhooks, upload to ad platforms, launch campaigns, spend money, change billing, or touch sawcity-lite. Browser verification must confirm `/settings` lands on `/approval` and Approval loads.

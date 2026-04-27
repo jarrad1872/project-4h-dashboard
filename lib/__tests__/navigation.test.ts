@@ -76,6 +76,9 @@ describe("navigation IA", () => {
       "Historical ad archive audit map preserved in ad-archive",
     );
     expect(routeDependencyGuards.find((row) => row.route === "/settings")?.dataDependencies).toContain(
+      "Internal /settings page route redirects to /approval",
+    );
+    expect(routeDependencyGuards.find((row) => row.route === "/settings")?.dataDependencies).toContain(
       "Setup/source notes inventoried in settings-source-notes",
     );
     expect(routeDependencyGuards.find((row) => row.route === "/gtm")?.dataDependencies).toContain(
@@ -94,7 +97,7 @@ describe("navigation IA", () => {
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
       counts: { clear: 4, blocked: 2, support: 2 },
-      readyForRedirectOrDelete: 2,
+      readyForRedirectOrDelete: 1,
     });
   });
 });
