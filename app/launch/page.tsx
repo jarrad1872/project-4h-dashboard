@@ -4,6 +4,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
+import { rebuildMission } from "@/lib/4h-rebuild-data";
+import { validateLaunchReadiness } from "@/lib/launch-readiness-validator";
 import {
   buildLaunchUrl,
   defaultLaunchAssetId,
@@ -114,7 +116,7 @@ export default function LaunchPage() {
 
   const complete = items.filter((i) => i.checked).length;
   const allChecked = items.length > 0 && complete === items.length;
-  const readyToGo = allChecked && status?.status === "pre-launch";
+  const basicLaunchGateReady = allChecked && status?.status === "pre-launch";
   const overallPct = items.length ? Math.round((complete / items.length) * 100) : 0;
   const tierOneLaunchOrder = getTierTrades(1).join("/");
   const launchCampaignMonthIsValid = /^\d{4}-\d{2}$/.test(launchCampaignMonth);
@@ -140,6 +142,21 @@ export default function LaunchPage() {
     launchPlatform,
     launchTrade,
   ]);
+  const launchReadiness = useMemo(() => {
+    if (!status) return null;
+
+    return validateLaunchReadiness({
+      launch: launchUrlResult,
+      checklistItems: items,
+      campaignStatus: status,
+      offerText: `${rebuildMission.price}. ${rebuildMission.trial}.`,
+      trialText: rebuildMission.trial,
+      creativeStatus: "missing",
+      copyApprovalStatus: "missing",
+      jarradApprovalStatus: "missing",
+    });
+  }, [items, launchUrlResult, status]);
+  const readyToGo = basicLaunchGateReady && (launchReadiness?.ready ?? false);
 
   async function copyLaunchUrl() {
     try {
@@ -334,6 +351,76 @@ export default function LaunchPage() {
           <p><span className="font-semibold text-slate-300">Demo:</span> {launchUrlResult.route.demoPhone}</p>
         </div>
       </Card>
+
+      {launchReadiness && (
+        <Card className={`border-2 ${launchReadiness.ready ? "border-emerald-600" : "border-red-800/70"} bg-slate-900/70`}>
+          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-red-300">Launch readiness validator</p>
+              <h2 className="mt-1 text-xl font-black text-white">
+                {launchReadiness.ready ? "Ready for launch bundle review" : `${launchReadiness.blockerCount} blocker${launchReadiness.blockerCount === 1 ? "" : "s"} before launch review`}
+              </h2>
+              <p className="mt-1 max-w-3xl text-sm text-slate-400">
+                Internal preflight only. This checks the selected URL, offer, trial language, approvals, and checklist state;
+                it does not launch, upload, send, create webhooks, or spend money.
+              </p>
+            </div>
+            <div className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-right text-xs text-slate-400">
+              <p><span className="font-semibold text-slate-200">{launchReadiness.blockerCount}</span> blockers</p>
+              <p><span className="font-semibold text-slate-200">{launchReadiness.warningCount}</span> warnings</p>
+            </div>
+          </div>
+
+          <div className="mb-4 grid gap-2 text-xs text-slate-400 md:grid-cols-3">
+            <p className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <span className="font-semibold text-slate-300">Domain checked:</span> {launchUrlResult.domain}
+            </p>
+            <p className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <span className="font-semibold text-slate-300">Offer checked:</span> {rebuildMission.price}
+            </p>
+            <p className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+              <span className="font-semibold text-slate-300">Trial checked:</span> {rebuildMission.trial}
+            </p>
+          </div>
+
+          {launchReadiness.issues.length === 0 ? (
+            <div className="rounded border border-emerald-800/60 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-200">
+              No readiness issues detected for the selected internal launch candidate.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {launchReadiness.issues.map((item) => (
+                <div
+                  key={item.id}
+                  className={`rounded border px-3 py-2 ${
+                    item.severity === "blocker"
+                      ? "border-red-800/60 bg-red-950/25"
+                      : "border-amber-800/60 bg-amber-950/25"
+                  }`}
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className={`text-sm font-semibold ${item.severity === "blocker" ? "text-red-200" : "text-amber-200"}`}>
+                        {item.label}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-300">{item.detail}</p>
+                    </div>
+                    <span className={`rounded border px-2 py-1 text-xs font-semibold uppercase ${
+                      item.severity === "blocker"
+                        ? "border-red-700/60 text-red-200"
+                        : "border-amber-700/60 text-amber-200"
+                    }`}>
+                      {item.severity}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-400"><span className="font-semibold text-slate-300">Action:</span> {item.action}</p>
+                  <p className="mt-1 text-xs text-slate-500"><span className="font-semibold text-slate-400">Evidence:</span> {item.evidence}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* Overall readiness */}
       <Card className={`border-2 ${allChecked ? "border-green-500" : "border-amber-600"}`}>

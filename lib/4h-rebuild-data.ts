@@ -276,7 +276,7 @@ export const rebuildExecutionQueue = [
     lane: "Landing",
     title: "Add launch readiness validator",
     route: "/launch",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Assets fail preflight if missing domain, offer, UTM, creative approval, or Jarrad approval.",
     acceptance: "Validator returns actionable reasons and has unit tests.",

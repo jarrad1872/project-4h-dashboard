@@ -124,8 +124,8 @@ Core offer rules:
 - [x] Create 4H-owned launch URL builder with UTM and angle metadata.
 - [x] Create message-match briefs for each angle that Jarrad can hand to the sawcity-lite project later.
 - [ ] Do not edit sawcity-lite landing pages from this repo.
-- [ ] Add a launch-readiness check that blocks assets missing trade domain, price, trial, UTM, or approval.
-- [ ] Add tests for URL generation and hard-rule validation.
+- [x] Add a launch-readiness check that blocks assets missing trade domain, price, trial, UTM, or approval.
+- [x] Add tests for URL generation and hard-rule validation.
 
 ### Phase 5 - Paid Channel Launch System
 
@@ -177,7 +177,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-12 complete; Q-07 is approval-gated; Q-13 is the next ready autonomous item.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 through Q-06 and Q-08 through Q-13 complete; Q-07 is approval-gated; Q-14 is the next ready autonomous item.
 
 ---
 

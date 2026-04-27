@@ -295,6 +295,12 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Every generated URL should include trade, angle, asset, and optional creator metadata so scorecard attribution can connect click source to creative intent.
 - Use trade-specific `.city` domains for paid and creator traffic unless the campaign is intentionally broad directory traffic.
 
+**Launch readiness validator:**
+- `/launch` runs an internal preflight validator on the selected launch candidate. It returns blockers and warnings only; it does not launch, upload, send, create webhooks, or spend money.
+- A candidate is blocked when the trade domain, UTM source/medium/campaign/content, `$39/mo` offer, `14-day free trial, no credit card required`, creative approval, copy approval, checklist, or Jarrad approval state is missing or wrong.
+- Every blocker must include an action and evidence so the next agent can resolve the exact gap before launch bundle review.
+- Until Q-15 creates real launch bundles, the validator should keep creative, copy, and Jarrad approval as explicit blockers instead of implying that a generated URL alone is launch-ready.
+
 **Message-match briefs:**
 - `/templates` holds 4H-owned handoff briefs for future sawcity-lite landing work across the five beachhead domains and four creative angles.
 - Every brief must include trade domain, angle, ad promise, landing headline promise, hero direction, supporting proof, `$39/mo`, and `14-day free trial, no credit card required`.
