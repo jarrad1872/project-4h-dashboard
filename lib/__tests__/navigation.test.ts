@@ -73,6 +73,9 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.dataDependencies).toContain(
       "24 static public /creatives/*.jpg URLs inventoried in trade-utils",
     );
+    expect(routeDependencyGuards.find((row) => row.route === "/workflow")?.dataDependencies).toContain(
+      "6-stage bulk workflow history inventory in workflow-history",
+    );
     expect(routeDependencyGuards.find((row) => row.route === "/templates")?.status).toBe("support");
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,

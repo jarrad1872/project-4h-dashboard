@@ -201,7 +201,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-39 route retirement dependency guard before any redirect/delete packet.
 - [x] Add Q-40 campaign-flow link migration off `/creatives` and `/workflow`.
 - [x] Add Q-41 public creative URL dependency map before `/creatives` redirect work.
-- [ ] Add Q-42 bulk workflow history dependency map before `/workflow` redirect work.
+- [x] Add Q-42 bulk workflow history dependency map before `/workflow` redirect work.
+- [ ] Add Q-43 legacy settings source-note extraction before `/settings` delete work.
 
 ---
 
@@ -242,7 +243,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add route dependency guard for future redirect/delete decisions.
 - [x] Migrate stale campaign-flow links from legacy routes to active lanes.
 - [x] Preserve public `/creatives/*.jpg` URL dependency map before route retirement.
-- [ ] Preserve bulk `/workflow` history dependencies before route retirement.
+- [x] Preserve bulk `/workflow` history dependencies before route retirement.
+- [ ] Preserve unique `/settings` source notes before route retirement.
 
 ---
 

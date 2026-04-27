@@ -5,16 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { LegacyRouteBanner } from "@/components/route-disposition-banner";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { TRADE_MAP, tradeFromAd } from "@/lib/trade-utils";
+import { bulkWorkflowNextStage, bulkWorkflowStages } from "@/lib/workflow-history";
 import type { Ad, WorkflowStage } from "@/lib/types";
-
-const STAGES: Array<{ key: WorkflowStage; label: string; desc: string }> = [
-  { key: "concept", label: "Concept", desc: "Idea only — no copy yet" },
-  { key: "copy-ready", label: "Copy Ready", desc: "Copy written, awaiting approval" },
-  { key: "approved", label: "Approved", desc: "Signed off, needs creative brief" },
-  { key: "creative-brief", label: "Creative Brief", desc: "Brief written, creative pending" },
-  { key: "uploaded", label: "Uploaded", desc: "Uploaded to ad platform" },
-  { key: "live", label: "Live", desc: "Running in market" },
-];
 
 const STAGE_COLORS: Record<WorkflowStage, string> = {
   concept: "bg-slate-700 text-slate-300",
@@ -25,12 +17,13 @@ const STAGE_COLORS: Record<WorkflowStage, string> = {
   live: "bg-green-900/60 text-green-300",
 };
 
-const STAGE_NEXT: Partial<Record<WorkflowStage, WorkflowStage>> = {
-  concept: "copy-ready",
-  "copy-ready": "approved",
-  approved: "creative-brief",
-  "creative-brief": "uploaded",
-  uploaded: "live",
+const EMPTY_GROUPED: Record<WorkflowStage, Ad[]> = {
+  concept: [],
+  "copy-ready": [],
+  approved: [],
+  "creative-brief": [],
+  uploaded: [],
+  live: [],
 };
 
 export default function WorkflowPage() {
@@ -52,13 +45,10 @@ export default function WorkflowPage() {
   }, []);
 
   const grouped = useMemo(() => {
-    return STAGES.reduce<Record<WorkflowStage, Ad[]>>((acc, s) => {
-      acc[s.key] = ads.filter((ad) => (ad.workflowStage ?? ad.workflow_stage) === s.key);
+    return bulkWorkflowStages.reduce<Record<WorkflowStage, Ad[]>>((acc, stage) => {
+      acc[stage.key] = ads.filter((ad) => (ad.workflowStage ?? ad.workflow_stage) === stage.key);
       return acc;
-    }, {
-      concept: [], "copy-ready": [], approved: [],
-      "creative-brief": [], uploaded: [], live: [],
-    });
+    }, { ...EMPTY_GROUPED });
   }, [ads]);
 
   const tradeBreakdown = useMemo(() => {
@@ -66,28 +56,28 @@ export default function WorkflowPage() {
     const stageAds = grouped[expandedStage];
     const byTrade: Record<string, Ad[]> = {};
     for (const ad of stageAds) {
-      const t = tradeFromAd(ad);
-      if (!byTrade[t]) byTrade[t] = [];
-      byTrade[t].push(ad);
+      const trade = tradeFromAd(ad);
+      if (!byTrade[trade]) byTrade[trade] = [];
+      byTrade[trade].push(ad);
     }
     return byTrade;
   }, [expandedStage, grouped]);
 
   async function bulkAdvance(fromStage: WorkflowStage) {
-    const nextStage = STAGE_NEXT[fromStage];
+    const nextStage = bulkWorkflowNextStage[fromStage];
     if (!nextStage) return;
     const stageAds = grouped[fromStage];
     if (!stageAds.length) return;
-    if (!confirm(`Move all ${stageAds.length} ads from "${fromStage}" → "${nextStage}"?`)) return;
+    if (!confirm(`Move all ${stageAds.length} ads from "${fromStage}" to "${nextStage}"?`)) return;
 
     setBulkMoving(fromStage);
-    
+
     await fetch("/api/ads/bulk-status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        newWorkflowStage: nextStage, 
-        fromWorkflowStage: fromStage 
+      body: JSON.stringify({
+        newWorkflowStage: nextStage,
+        fromWorkflowStage: fromStage,
       }),
     });
 
@@ -103,7 +93,7 @@ export default function WorkflowPage() {
     return (
       <div className="space-y-6">
         <LegacyRouteBanner route="/workflow" />
-        <div className="flex h-64 items-center justify-center text-slate-400">Loading pipeline…</div>
+        <div className="flex h-64 items-center justify-center text-slate-400">Loading pipeline...</div>
       </div>
     );
   }
@@ -116,47 +106,50 @@ export default function WorkflowPage() {
         <div>
           <h1 className="text-2xl font-bold">Workflow Pipeline</h1>
           <p className="mt-1 text-sm text-slate-400">
-            {totalAds} total ads · {totalLive} live ({livePercent}%) · Click a stage to see per-trade breakdown
+            {totalAds} total ads / {totalLive} live ({livePercent}%) / Click a stage to see per-trade breakdown
           </p>
         </div>
         <Link href="/approval">
-          <GhostButton>Go to Approval →</GhostButton>
+          <GhostButton>Go to Approval</GhostButton>
         </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        {STAGES.map((stage, idx) => {
+        {bulkWorkflowStages.map((stage, idx) => {
           const count = grouped[stage.key].length;
           const isExpanded = expandedStage === stage.key;
-          const nextStage = STAGE_NEXT[stage.key];
+          const nextStage = bulkWorkflowNextStage[stage.key];
           const isBulkMoving = bulkMoving === stage.key;
           const pct = totalAds ? Math.round((count / totalAds) * 100) : 0;
 
           return (
-            <div key={stage.key}
-                 onClick={() => setExpandedStage(isExpanded ? null : stage.key)}
-                 className={`cursor-pointer rounded border p-4 transition-all ${
-                   isExpanded
-                     ? "border-blue-500 bg-blue-900/20"
-                     : "border-slate-700 bg-slate-800/60 hover:border-slate-500"
-                 }`}>
-              <div className="flex items-center justify-between mb-1">
+            <div
+              key={stage.key}
+              onClick={() => setExpandedStage(isExpanded ? null : stage.key)}
+              className={`cursor-pointer rounded border p-4 transition-all ${
+                isExpanded ? "border-blue-500 bg-blue-900/20" : "border-slate-700 bg-slate-800/60 hover:border-slate-500"
+              }`}
+            >
+              <div className="mb-1 flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  {idx + 1}/{STAGES.length}
+                  {idx + 1}/{bulkWorkflowStages.length}
                 </span>
                 {count > 0 && nextStage && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); void bulkAdvance(stage.key); }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      void bulkAdvance(stage.key);
+                    }}
                     disabled={!!bulkMoving}
-                    className="rounded bg-slate-700 px-1.5 py-0.5 text-xs text-slate-300 hover:bg-slate-600 transition-colors"
-                    title={`Advance all → ${nextStage}`}
+                    className="rounded bg-slate-700 px-1.5 py-0.5 text-xs text-slate-300 transition-colors hover:bg-slate-600"
+                    title={`Advance all to ${nextStage}`}
                   >
-                    {isBulkMoving ? "…" : "→"}
+                    {isBulkMoving ? "..." : ">"}
                   </button>
                 )}
               </div>
               <p className="text-3xl font-black text-white">{count}</p>
-              <p className={`mt-1 text-xs font-semibold rounded px-1.5 py-0.5 inline-block ${STAGE_COLORS[stage.key]}`}>
+              <p className={`mt-1 inline-block rounded px-1.5 py-0.5 text-xs font-semibold ${STAGE_COLORS[stage.key]}`}>
                 {stage.label}
               </p>
               <p className="mt-2 text-xs text-slate-500">{stage.desc}</p>
@@ -165,7 +158,7 @@ export default function WorkflowPage() {
                   <div className="h-1 rounded-full bg-blue-500" style={{ width: `${pct}%` }} />
                 </div>
               )}
-              {isExpanded && <p className="mt-2 text-xs text-blue-400 font-semibold">▼ Expanded below</p>}
+              {isExpanded && <p className="mt-2 text-xs font-semibold text-blue-400">Expanded below</p>}
             </div>
           );
         })}
@@ -173,37 +166,36 @@ export default function WorkflowPage() {
 
       <Card>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          {STAGES.map((s, i) => (
-            <span key={s.key} className="flex items-center gap-2">
-              <span className={`rounded px-2 py-1 text-xs font-semibold ${STAGE_COLORS[s.key]}`}>
-                {s.label} ({grouped[s.key].length})
+          {bulkWorkflowStages.map((stage, index) => (
+            <span key={stage.key} className="flex items-center gap-2">
+              <span className={`rounded px-2 py-1 text-xs font-semibold ${STAGE_COLORS[stage.key]}`}>
+                {stage.label} ({grouped[stage.key].length})
               </span>
-              {i < STAGES.length - 1 && <span className="text-slate-600">→</span>}
+              {index < bulkWorkflowStages.length - 1 && <span className="text-slate-600">&gt;</span>}
             </span>
           ))}
         </div>
         <p className="mt-2 text-xs text-slate-500">
-          Click the <span className="text-slate-300">→</span> button on any stage to bulk-advance all ads to the next stage using a single server-side query.
+          Click the <span className="text-slate-300">&gt;</span> button on any stage to bulk-advance all ads to the next
+          stage using a single server-side query.
         </p>
       </Card>
 
       {expandedStage && (
         <Card>
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold">
-              <span className={`rounded px-2 py-1 text-xs font-semibold mr-2 ${STAGE_COLORS[expandedStage]}`}>
+              <span className={`mr-2 rounded px-2 py-1 text-xs font-semibold ${STAGE_COLORS[expandedStage]}`}>
                 {expandedStage}
               </span>
-              — {grouped[expandedStage].length} ads by trade
+              - {grouped[expandedStage].length} ads by trade
             </h2>
-            {STAGE_NEXT[expandedStage] && (
+            {bulkWorkflowNextStage[expandedStage] && (
               <Button
                 onClick={() => bulkAdvance(expandedStage)}
                 disabled={!!bulkMoving || grouped[expandedStage].length === 0}
               >
-                {bulkMoving === expandedStage
-                  ? "Moving…"
-                  : `Advance All → ${STAGE_NEXT[expandedStage]}`}
+                {bulkMoving === expandedStage ? "Moving..." : `Advance All to ${bulkWorkflowNextStage[expandedStage]}`}
               </Button>
             )}
           </div>
@@ -220,10 +212,10 @@ export default function WorkflowPage() {
                 })
                 .map(([trade, tradeAds]) => {
                   const info = TRADE_MAP[trade] ?? TRADE_MAP.saw;
-                  const platforms = [...new Set(tradeAds.map((a) => a.platform))];
+                  const platforms = [...new Set(tradeAds.map((ad) => ad.platform))];
                   return (
                     <div key={trade} className="rounded border border-slate-700 bg-slate-800 p-3">
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="mb-1 flex items-center justify-between">
                         <span className={`text-sm font-semibold ${info.color}`}>{info.label}</span>
                         <span className="rounded bg-slate-700 px-2 py-0.5 text-xs font-bold">{tradeAds.length}</span>
                       </div>
@@ -239,7 +231,7 @@ export default function WorkflowPage() {
       <Card>
         <h2 className="mb-4 font-semibold">Trade Progress Overview</h2>
         <p className="mb-3 text-xs text-slate-500">
-          Shows which stage each trade&apos;s ads are in. All 65 trades × 16 ads.
+          Shows which stage each trade&apos;s ads are in. All 65 trades x 16 ads.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -259,12 +251,15 @@ export default function WorkflowPage() {
               {(() => {
                 const tradeStage: Record<string, Record<WorkflowStage, number>> = {};
                 for (const ad of ads) {
-                  const t = tradeFromAd(ad);
+                  const trade = tradeFromAd(ad);
                   const stage = (ad.workflowStage ?? ad.workflow_stage ?? "copy-ready") as WorkflowStage;
-                  if (!tradeStage[t]) {
-                    tradeStage[t] = { concept: 0, "copy-ready": 0, approved: 0, "creative-brief": 0, uploaded: 0, live: 0 };
+                  if (!tradeStage[trade]) {
+                    tradeStage[trade] = { ...Object.fromEntries(bulkWorkflowStages.map((item) => [item.key, 0])) } as Record<
+                      WorkflowStage,
+                      number
+                    >;
                   }
-                  tradeStage[t][stage]++;
+                  tradeStage[trade][stage]++;
                 }
 
                 return Object.entries(tradeStage)
@@ -281,18 +276,30 @@ export default function WorkflowPage() {
                           <span className={`text-xs font-semibold ${info.color}`}>{info.label}</span>
                         </td>
                         <td className="py-1.5 pr-3">
-                          <span className={`text-xs rounded px-1 ${info.tier === 1 ? "text-green-400" : info.tier === 2 ? "text-yellow-400" : "text-slate-500"}`}>
+                          <span
+                            className={`rounded px-1 text-xs ${
+                              info.tier === 1 ? "text-green-400" : info.tier === 2 ? "text-yellow-400" : "text-slate-500"
+                            }`}
+                          >
                             T{info.tier}
                           </span>
                         </td>
-                        {STAGES.map((s) => (
-                          <td key={s.key} className="py-1.5 pr-3 text-center">
-                            {stages[s.key] > 0 ? (
-                              <span className={`text-xs font-bold ${s.key === "live" ? "text-green-400" : s.key === "approved" ? "text-blue-400" : "text-slate-300"}`}>
-                                {stages[s.key]}
+                        {bulkWorkflowStages.map((stage) => (
+                          <td key={stage.key} className="py-1.5 pr-3 text-center">
+                            {stages[stage.key] > 0 ? (
+                              <span
+                                className={`text-xs font-bold ${
+                                  stage.key === "live"
+                                    ? "text-green-400"
+                                    : stage.key === "approved"
+                                      ? "text-blue-400"
+                                      : "text-slate-300"
+                                }`}
+                              >
+                                {stages[stage.key]}
                               </span>
                             ) : (
-                              <span className="text-xs text-slate-700">—</span>
+                              <span className="text-xs text-slate-700">-</span>
                             )}
                           </td>
                         ))}

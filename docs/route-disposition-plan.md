@@ -43,6 +43,7 @@ These routes are not active operating lanes. They remain available from the coll
 5. Q-39: Add dependency guard before any route retirement packet. Complete on Command with active refs, data deps, docs/tests, and guardrails.
 6. Q-40: Migrate stale creator campaign-flow links off `/creatives` and `/workflow`. Complete; no redirects or deletions.
 7. Q-41: Inventory static `/creatives/*.jpg` URLs separately from the `/creatives` page route. Complete; no redirects, deletions, or asset moves.
+8. Q-42: Inventory legacy `/workflow` bulk history separately from the `/workflow` page route. Complete; no redirects, deletions, or external actions.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -76,7 +77,7 @@ Current clear route: `/generate`.
 Current blockers to resolve first:
 
 - `/creatives`: 24 static `/creatives/*.jpg` URLs are inventoried; any redirect packet still needs explicit 200-check preservation.
-- `/workflow`: bulk ad workflow history.
+- `/workflow`: six-stage workflow history is inventoried; any redirect packet still needs Launch/Approval migration or explicit preservation.
 - `/settings`: old setup/source notes need extraction into docs before deletion.
 - `/gtm`: product-route inventory context still needs active-loop coverage before archive-only treatment.
 - `/ads`: historical ad archive remains useful audit evidence.
@@ -105,3 +106,15 @@ The `/creatives` page route and static `/creatives/*.jpg` asset URLs are separat
 | Platform formats | 6 | Facebook feed, Instagram square, Instagram story/reel, LinkedIn feed, LinkedIn square alt, YouTube in-stream. |
 
 Q-41 did not redirect `/creatives`, move files, delete assets, alter image URLs, or change external systems. Any future redirect packet must prove the static URLs still return 200 responses.
+
+## Q-42 Bulk Workflow History Map
+
+The `/workflow` page route and the workflow data it displays are separate dependencies. Q-42 preserves the workflow-stage contract in `lib/workflow-history.ts` and surfaces the map on Command before any future redirect packet.
+
+| Source | Count | Preservation rule |
+| --- | ---: | --- |
+| Workflow stages | 6 | Preserve `concept`, `copy-ready`, `approved`, `creative-brief`, `uploaded`, and `live` stage meanings. |
+| Bulk transitions | 5 | Preserve concept-to-copy-ready through uploaded-to-live movement before removing the old UI. |
+| Dependencies | 5 | Preserve `ads.workflow_stage`, `data/workflow-stages.json`, `/api/ads/bulk-status`, `/workflow`, and trade breakdown logic. |
+
+Q-42 did not redirect `/workflow`, delete the old page, bulk-move ads, call the bulk API, upload to ad platforms, or change external systems. Any future redirect packet must prove this history is moved into Launch/Approval or intentionally preserved.

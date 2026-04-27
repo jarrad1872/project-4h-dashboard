@@ -21,6 +21,12 @@ import {
   routeDispositionSummary,
 } from "@/lib/navigation";
 import { publicCreativeUrlDependencies, publicCreativeUrlDependencySummary } from "@/lib/trade-utils";
+import {
+  bulkWorkflowStages,
+  workflowHistoryDependencies,
+  workflowHistoryDependencySummary,
+  workflowTransitionPairs,
+} from "@/lib/workflow-history";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -145,6 +151,8 @@ export default function OverviewPage() {
   const routeMatrixSummary = useMemo(() => routeDispositionSummary(), []);
   const routeGuardSummary = useMemo(() => routeDependencyGuardSummary(), []);
   const publicCreativeSummary = useMemo(() => publicCreativeUrlDependencySummary(), []);
+  const workflowHistorySummary = useMemo(() => workflowHistoryDependencySummary(), []);
+  const workflowTransitions = useMemo(() => workflowTransitionPairs(), []);
   const publicCreativeRows = useMemo(
     () =>
       publicCreativeUrlDependencies.reduce<Array<{ prefix: string; domain: string; urls: string[]; placements: string[] }>>(
@@ -535,6 +543,55 @@ export default function OverviewPage() {
                 <p className="mt-2 break-all text-xs text-slate-500">{row.urls[0]}</p>
               </div>
             ))}
+          </div>
+        </Card>
+      </section>
+
+      <section data-testid="workflow-history-map">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bulk workflow history map</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Legacy workflow behavior is preserved before redirect work</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{workflowHistorySummary.stageCount} stages</StatusPill>
+            <StatusPill>{workflowHistorySummary.transitionCount} transitions</StatusPill>
+            <StatusPill>{workflowHistorySummary.dependencyCount} deps</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-cyan-900/50 bg-cyan-950/10">
+          <p className="text-sm leading-6 text-slate-300">{workflowHistorySummary.preservationRule}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Route: {workflowHistorySummary.route}; API: {workflowHistorySummary.apiRoute}; fallback file:{" "}
+            {workflowHistorySummary.fallbackFile}
+          </p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-[0.8fr,1fr]">
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Stage order</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                {bulkWorkflowStages.map((stage, index) => (
+                  <span key={stage.key} className="flex items-center gap-2">
+                    <span className="rounded bg-slate-800 px-2 py-1 font-semibold">{stage.label}</span>
+                    {index < bulkWorkflowStages.length - 1 && <span className="text-slate-600">&gt;</span>}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-slate-500">
+                Bulk transitions: {workflowTransitions.map((transition) => `${transition.from}->${transition.to}`).join(", ")}
+              </p>
+            </div>
+            <div className="grid gap-2">
+              {workflowHistoryDependencies.map((dependency) => (
+                <div key={dependency.id} className="rounded border border-slate-700 bg-slate-900/60 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-white">{dependency.surface}</p>
+                    <StatusPill>internal only</StatusPill>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-300">{dependency.preserves}</p>
+                  <p className="mt-1 text-xs text-slate-500">{dependency.source}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </Card>
       </section>

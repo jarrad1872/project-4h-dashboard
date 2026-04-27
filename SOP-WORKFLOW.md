@@ -374,6 +374,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-39 dependency guard on Command is the current source of truth for route retirement readiness. A route marked `blocked` or `support` must not be redirected or deleted.
 - Q-40 moved creator campaign-flow links off legacy `/creatives` and `/workflow`; future creator guidance should use `/assets`, `/approval`, `/launch`, and `/scorecard`.
 - Q-41 separates static `/creatives/*.jpg` asset URLs from the legacy `/creatives` page route. Future `/creatives` redirects must prove those 24 JPEG URLs still return static images.
+- Q-42 separates workflow-stage history from the legacy `/workflow` page route. Future `/workflow` redirects must preserve or migrate the six stages, five bulk transitions, local fallback overrides, bulk API contract, and trade breakdown logic.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

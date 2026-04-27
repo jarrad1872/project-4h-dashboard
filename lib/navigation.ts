@@ -278,9 +278,9 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
     status: "blocked",
     readyForRedirectOrDelete: false,
     activeReferences: ["Direct-link archive", "legacy banner only"],
-    dataDependencies: ["bulk ad workflow history"],
-    docOrTestReferences: ["README route table", "influencer campaign implementation docs", "navigation.test"],
-    guardrail: "Do not redirect until bulk workflow history is preserved or moved to Launch/Approval.",
+    dataDependencies: ["6-stage bulk workflow history inventory in workflow-history"],
+    docOrTestReferences: ["README route table", "influencer campaign implementation docs", "navigation.test", "Command workflow history map"],
+    guardrail: "Do not redirect until stage history, fallback overrides, and bulk transition behavior are preserved or moved to Launch/Approval.",
   },
   {
     route: "/templates",

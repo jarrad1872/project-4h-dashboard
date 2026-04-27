@@ -257,6 +257,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-39 adds a route dependency guard on Command so future route cleanup can see active refs, data dependencies, docs/tests, and guardrails before any redirect/delete packet; current status is 5 blocked, 2 support, 1 clear
 - Q-40 migrates creator campaign-flow links away from legacy `/creatives` and `/workflow` and into active `/assets`, `/approval`, `/launch`, and `/scorecard` lanes without redirecting or deleting legacy pages
 - Q-41 preserves the public `/creatives/*.jpg` URL contract as a Command-visible dependency map: 24 static JPEG URLs across `saw`, `rinse`, `mow`, and `rooter`, separate from the legacy `/creatives` page route
+- Q-42 preserves the legacy `/workflow` bulk history contract as a Command-visible dependency map: six stages, five transitions, `ads.workflow_stage`, `data/workflow-stages.json`, `/api/ads/bulk-status`, and trade breakdown logic before redirect work
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
