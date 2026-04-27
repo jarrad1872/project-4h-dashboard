@@ -2,16 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  Activity,
+  BadgeDollarSign,
+  BarChart3,
   Download,
   MapPin,
+  PhoneCall,
   Printer,
   QrCode,
   Route,
+  ScanLine,
   ShieldCheck,
   Users,
 } from "lucide-react";
 import Image from "next/image";
 import { Button, Card } from "@/components/ui";
+import { summarizeFieldSalesAttribution, type FieldSalesAttributionBucket } from "@/lib/field-sales-attribution";
 import {
   buildSalesTrackingUrl,
   businessCardPrintSpec,
@@ -24,6 +30,7 @@ import {
   type SalesLead,
   type SalesStage,
 } from "@/lib/sales-rep-pipeline";
+import type { MarketingEvent } from "@/lib/types";
 
 const STAGE_STYLE: Record<SalesStage, string> = {
   prospect: "border-slate-700 bg-slate-950/50 text-slate-300",
@@ -63,6 +70,35 @@ function DownloadLink({ href, children }: { href: string; children: React.ReactN
   );
 }
 
+function formatCurrency(cents: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(cents / 100);
+}
+
+function AttributionBucketRows({ title, rows }: { title: string; rows: FieldSalesAttributionBucket[] }) {
+  return (
+    <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+      <p className="text-xs uppercase tracking-wide text-slate-500">{title}</p>
+      <div className="mt-3 space-y-2">
+        {rows.length ? rows.map((row) => (
+          <div key={row.key} className="flex items-center justify-between gap-3 rounded border border-slate-800 bg-slate-900/50 px-3 py-2">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-white">{row.label}</p>
+              <p className="text-xs text-slate-500">
+                {row.asset_view} scans / {row.demo_call} demos / {row.trial_started} trials / {row.paid} paid
+              </p>
+            </div>
+            <p className="shrink-0 text-xs font-semibold text-emerald-300">{formatCurrency(row.paidValueCents)}</p>
+          </div>
+        )) : (
+          <p className="rounded border border-dashed border-slate-800 px-3 py-2 text-xs text-slate-500">
+            No attributed rows yet.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function SalesPageClient() {
   const rep = salesReps[0];
   const cardVariant = getPrimarySalesCard();
@@ -72,6 +108,8 @@ export default function SalesPageClient() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [attributionEvents, setAttributionEvents] = useState<MarketingEvent[]>([]);
+  const [attributionLoading, setAttributionLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
 
   async function loadLeads() {
@@ -81,9 +119,22 @@ export default function SalesPageClient() {
     setLoading(false);
   }
 
+  async function loadAttribution() {
+    const response = await fetch("/api/events?field_sales=1&limit=1000", { cache: "no-store" });
+    if (!response.ok) {
+      setAttributionEvents([]);
+      setAttributionLoading(false);
+      return;
+    }
+    const data = (await response.json()) as { events?: MarketingEvent[] };
+    setAttributionEvents(Array.isArray(data.events) ? data.events : []);
+    setAttributionLoading(false);
+  }
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial API hydration happens after fetch resolves.
     void loadLeads();
+    void loadAttribution();
   }, []);
 
   async function createLead() {
@@ -130,6 +181,7 @@ export default function SalesPageClient() {
   }
 
   const summary = useMemo(() => summarizeSalesPipeline(leads), [leads]);
+  const attribution = useMemo(() => summarizeFieldSalesAttribution(attributionEvents), [attributionEvents]);
   const leadsByStage = useMemo(
     () =>
       Object.fromEntries(salesStages.map((stage) => [stage.id, leads.filter((lead) => lead.stage === stage.id)])) as Record<
@@ -172,6 +224,58 @@ export default function SalesPageClient() {
           </Card>
         ))}
       </div>
+
+      <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10" data-testid="sales-attribution-panel">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-emerald-300">Q-33 field-sales attribution</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">Card scans to paid signal</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Reads marketing_events for rep-coded field-sales UTMs and card metadata. This is measurement only: no outreach, card order, webhook, launch, billing action, or spend.
+            </p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-400">
+            {attributionLoading ? "Loading attribution..." : attribution.evidence}
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+          {[
+            { label: "Card scans", value: attribution.cardScans, detail: "asset_view", icon: ScanLine, testId: "sales-attribution-card-scans" },
+            { label: "Demo calls", value: attribution.demoCalls, detail: "demo_call", icon: PhoneCall, testId: "sales-attribution-demo-calls" },
+            { label: "Signups", value: attribution.signups, detail: "signup", icon: Activity, testId: "sales-attribution-signups" },
+            { label: "Trials", value: attribution.trialStarts, detail: "trial_started", icon: Route, testId: "sales-attribution-trials" },
+            { label: "Activated", value: attribution.activations, detail: "activated", icon: BarChart3, testId: "sales-attribution-activated" },
+            { label: "Paid", value: attribution.paidCustomers, detail: formatCurrency(attribution.paidValueCents), icon: BadgeDollarSign, testId: "sales-attribution-paid" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3" data-testid={item.testId}>
+                <Icon className="h-4 w-4 text-emerald-300" aria-hidden="true" />
+                <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+                <p className="mt-1 text-2xl font-semibold text-white">{item.value.toLocaleString()}</p>
+                <p className="mt-1 text-xs text-slate-400">{item.detail}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {attribution.fieldSalesEvents === 0 && !attributionLoading ? (
+          <div className="rounded-lg border border-dashed border-amber-800 bg-amber-950/20 px-4 py-3 text-sm text-amber-200" data-testid="sales-attribution-zero-state">
+            No field-sales events are logged yet. The next useful check is a QR scan that arrives with utm_medium=field-sales and a rep/card ID before any real outreach is counted.
+          </div>
+        ) : null}
+
+        <div className="grid gap-3 xl:grid-cols-[1fr_1fr_1fr_1.2fr]">
+          <AttributionBucketRows title="Top reps" rows={attribution.topReps} />
+          <AttributionBucketRows title="Top cards" rows={attribution.topCards} />
+          <AttributionBucketRows title="Top trades" rows={attribution.topTrades} />
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Next measurement move</p>
+            <p className="mt-3 text-sm text-slate-300">{attribution.nextAction}</p>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid gap-4 xl:grid-cols-[1fr_1.4fr]">
         <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/10" data-testid="sales-rep-card-az-founding">

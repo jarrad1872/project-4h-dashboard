@@ -192,6 +192,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-30 Codex browser flow hooks on `/influencer`.
 - [x] Add Q-31 human sales rep pipeline and print-ready business cards on `/sales`.
 - [x] Add Q-32 persistent sales CRM lead creation/update on `/sales`.
+- [x] Add Q-33 field-sales attribution measurement on `/sales`.
 
 ---
 
@@ -223,6 +224,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Codex browser flow hooks for permanent creator testing.
 - [x] Human sales rep pipeline and business card print assets.
 - [x] Persistent field-sales CRM with archetype safeguards.
+- [x] Field-sales attribution panel for scans, demos, trials, and paid signal.
 
 ---
 

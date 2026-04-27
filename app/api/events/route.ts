@@ -1,5 +1,6 @@
 import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
+import { isFieldSalesEvent } from "@/lib/field-sales-attribution";
 import { DataFiles, writeJsonFile } from "@/lib/file-db";
 import {
   marketingEventToDb,
@@ -25,6 +26,7 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const summaryOnly = url.searchParams.get("summary") === "1";
+    const fieldSalesOnly = url.searchParams.get("field_sales") === "1";
     const limit = summaryOnly ? null : Math.min(1000, Math.max(1, Number(url.searchParams.get("limit") ?? 250)));
     const from = url.searchParams.get("from");
     const to = url.searchParams.get("to");
@@ -33,6 +35,7 @@ export async function GET(request: Request) {
 
     if (!hasSupabase()) {
       events = readFallback<MarketingEvent[]>(DataFiles.marketingEvents, []).map(normalizeMarketingEvent);
+      if (fieldSalesOnly) events = events.filter(isFieldSalesEvent);
       if (from) events = events.filter((event) => event.event_at >= from);
       if (to) events = events.filter((event) => event.event_at < to);
     } else {
@@ -43,6 +46,9 @@ export async function GET(request: Request) {
 
       if (from) baseQuery = baseQuery.gte("event_at", from);
       if (to) baseQuery = baseQuery.lt("event_at", to);
+      if (fieldSalesOnly) {
+        baseQuery = baseQuery.or("utm_medium.eq.field-sales,utm_campaign.ilike.%field_sales%,utm_source.ilike.az%");
+      }
 
       const query = limit ? baseQuery.limit(limit) : baseQuery;
       const { data, error } = await query;
@@ -52,6 +58,7 @@ export async function GET(request: Request) {
       }
 
       events = (data ?? []).map(normalizeMarketingEvent);
+      if (fieldSalesOnly) events = events.filter(isFieldSalesEvent);
     }
 
     const summary = summarizeMarketingEvents(events);

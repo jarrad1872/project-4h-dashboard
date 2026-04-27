@@ -513,4 +513,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "Sales leads can be created and updated through guarded API routes with Supabase/file fallback and visible real-vs-archetype separation.",
     acceptance: "Archetype rows cannot be marked visited, card-left, demo-booked, trial-started, activated, or paid; no outreach, card order, webhook, billing, or spend action is performed.",
   },
+  {
+    id: "Q-33",
+    phase: "Phase 3",
+    lane: "Field Sales",
+    title: "Add field-sales attribution measurement",
+    route: "/sales",
+    status: "complete",
+    approval: "none",
+    outcome: "Sales page reads rep-coded field-sales events and shows scans, demos, trials, paid signal, and top rep/card/trade buckets.",
+    acceptance: "Attribution uses marketing_events only and does not send outreach, order cards, create webhooks, launch campaigns, upload to ad platforms, spend, or change billing.",
+  },
 ];

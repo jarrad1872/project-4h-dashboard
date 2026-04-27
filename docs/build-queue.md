@@ -48,6 +48,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-30 | Governance | Testing | Add Codex browser flow test hooks | 2026-04-27 | `/influencer` exposes stable browser selectors for creator form fields, rows, cards, and draft actions so permanent flows can be tested by creating internal fake rows only. |
 | Q-31 | Phase 3 | Field Sales | Add human sales rep pipeline and print-ready cards | 2026-04-27 | `/sales` shows the Arizona founding rep pilot, CRM stages, rep-coded field-sales URLs, and QR-backed SVG/PNG business card exports without ordering cards or sending outreach. |
 | Q-32 | Phase 3 | Field Sales | Persist sales CRM leads with archetype safeguards | 2026-04-27 | `/sales` can create/update internal sales leads through guarded API routes; archetypes are visibly separated and cannot be marked contacted, demo-booked, activated, or paid. |
+| Q-33 | Phase 3 | Field Sales | Add field-sales attribution measurement | 2026-04-27 | `/sales` reads `marketing_events` for rep-coded field-sales UTMs and card metadata, then shows scans, demos, trials, paid signal, and top rep/card/trade buckets without sending outreach or taking external action. |
 
 ## Ready Queue
 
