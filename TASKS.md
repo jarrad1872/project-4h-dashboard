@@ -94,6 +94,7 @@ Core offer rules:
 - [x] Add and seed the 20-prompt beachhead set: 5 trades x 4 angles, platform `multi`.
 - [x] Add copy-ready generation packets for manual ChatGPT Pro image runs.
 - [x] Add Q-01 image-pack progress bar and per-card generated image upload workflow.
+- [x] Add Creative Lab filters for status, trade, angle, and generation state.
 - [ ] Generate and upload the first complete beachhead image set.
 
 ### Phase 3 - Creator Demo Engine
@@ -174,7 +175,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Queue phases 2-6 as ordered work packets.
 - [x] Mark approval-gated items so agents stop before external actions.
 - [x] Surface the next ready work on `/`.
-- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; production desk is ready, images still need generation/upload.
+- [ ] Work through Q-01 through Q-24. Current: Q-01 in progress; Q-02 complete; production desk is ready, images still need generation/upload.
 
 ---
 

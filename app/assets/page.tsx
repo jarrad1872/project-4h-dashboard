@@ -3,6 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import {
+  DEFAULT_CREATIVE_ASSET_FILTERS,
+  filterCreativeAssets,
+  type CreativeAssetGenerationFilter,
+} from "@/lib/creative-asset-filters";
+import {
   DEFAULT_CREATIVE_TOOL,
   formatCreativeAssetAngleLabel,
   formatCreativeAssetStatusLabel,
@@ -17,8 +22,16 @@ import {
 import type { CreativeAsset, CreativeAssetAngle, CreativeAssetPlatform, CreativeAssetStatus } from "@/lib/types";
 
 const STATUS_OPTIONS: CreativeAssetStatus[] = ["draft", "review", "approved"];
+const FILTER_STATUS_OPTIONS: CreativeAssetStatus[] = ["draft", "review", "approved", "live"];
 const ANGLE_OPTIONS: CreativeAssetAngle[] = ["missed-call", "demo-call", "owner-agent", "roi-math", "voice-boss", "demo", "math"];
 const PLATFORM_OPTIONS: CreativeAssetPlatform[] = ["multi", "youtube", "instagram", "facebook", "linkedin"];
+const GENERATION_OPTIONS: { value: CreativeAssetGenerationFilter; label: string }[] = [
+  { value: "all", label: "All generation" },
+  { value: "brief", label: "Prompt brief" },
+  { value: "needs-generation", label: "Needs image" },
+  { value: "generated", label: "Generated" },
+  { value: "review-ready", label: "Review-ready" },
+];
 
 const EMPTY_FORM = {
   title: "",
@@ -61,6 +74,7 @@ export default function AssetsPage() {
   const [conceptForm, setConceptForm] = useState(EMPTY_CONCEPT_FORM);
   const [assetFile, setAssetFile] = useState<File | null>(null);
   const [assetUploads, setAssetUploads] = useState<Record<string, File | null>>({});
+  const [filters, setFilters] = useState(DEFAULT_CREATIVE_ASSET_FILTERS);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -202,7 +216,12 @@ export default function AssetsPage() {
     await load();
   }
 
-  const summary = summarizeCreativePipeline(assets);
+  const filteredAssets = useMemo(() => filterCreativeAssets(assets, filters), [assets, filters]);
+  const tradeOptions = useMemo(
+    () => Array.from(new Set(assets.map((asset) => asset.trade_slug))).sort((a, b) => a.localeCompare(b)),
+    [assets],
+  );
+  const summary = summarizeCreativePipeline(filteredAssets);
   const imagePack = useMemo(() => {
     const promptCards = assets.filter((asset) => asset.prompt_brief_id && asset.model === CHATGPT_IMAGE_MODEL);
     const generated = promptCards.filter((asset) => asset.asset_url || asset.thumbnail_url || asset.generation_status === "generated");
@@ -227,8 +246,69 @@ export default function AssetsPage() {
             ChatGPT Pro image prompts, generated assets, and approval tracking. Jarrad approval still gates anything marked live.
           </p>
         </div>
-        <p className="text-sm text-slate-500">{assets.length} assets tracked</p>
+        <p className="text-sm text-slate-500">
+          {filteredAssets.length} shown / {assets.length} assets tracked
+        </p>
       </div>
+
+      <Card className="space-y-3">
+        <div className="grid gap-3 md:grid-cols-5">
+          <select
+            value={filters.status}
+            onChange={(event) =>
+              setFilters((current) => ({ ...current, status: event.target.value as CreativeAssetStatus | "all" }))
+            }
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
+          >
+            <option value="all">All status</option>
+            {FILTER_STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {formatCreativeAssetStatusLabel(status)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.trade_slug}
+            onChange={(event) => setFilters((current) => ({ ...current, trade_slug: event.target.value }))}
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
+          >
+            <option value="all">All trades</option>
+            {tradeOptions.map((trade) => (
+              <option key={trade} value={trade}>
+                {trade}.city
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.angle}
+            onChange={(event) =>
+              setFilters((current) => ({ ...current, angle: event.target.value as CreativeAssetAngle | "all" }))
+            }
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
+          >
+            <option value="all">All angles</option>
+            {ANGLE_OPTIONS.map((angle) => (
+              <option key={angle} value={angle}>
+                {formatCreativeAssetAngleLabel(angle)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.generation}
+            onChange={(event) =>
+              setFilters((current) => ({ ...current, generation: event.target.value as CreativeAssetGenerationFilter }))
+            }
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500"
+          >
+            {GENERATION_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <GhostButton onClick={() => setFilters(DEFAULT_CREATIVE_ASSET_FILTERS)}>Clear filters</GhostButton>
+        </div>
+      </Card>
 
       <div className="grid gap-3 md:grid-cols-4">
         {[
@@ -447,8 +527,10 @@ export default function AssetsPage() {
           <Card>Loading creative assets...</Card>
         ) : assets.length === 0 ? (
           <Card>No creative assets saved yet.</Card>
+        ) : filteredAssets.length === 0 ? (
+          <Card>No creative assets match the current filters.</Card>
         ) : (
-          assets.map((asset) => (
+          filteredAssets.map((asset) => (
             <Card key={asset.id} className="space-y-4">
               {(() => {
                 const previewUrl = asset.thumbnail_url ?? asset.asset_url;

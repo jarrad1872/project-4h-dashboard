@@ -108,6 +108,7 @@ Image URL: points to `trade-heros/nb2/{slug}-hero-a.jpg`
 - Active concept API: `GET/POST /api/image-concepts`.
 - Prompt briefs live in `lib/image-creative-briefs.ts`.
 - Use **Create 20-prompt set** to seed the beachhead queue: `pipe`, `duct`, `mow`, `pest`, and `coat` across missed-call, demo-call, owner-agent, and ROI math.
+- Use the Creative Lab filters to narrow review by status, trade, angle, or generation state before copying packets or uploading generated images.
 - Use **Copy packet** on a prompt card, generate the image here with ChatGPT Pro, then upload the generated image back to the same asset card.
 - Creative lineage is stored on `creative_assets`: provider, model, prompt brief, prompt text, negative prompt, dimensions, variant ID, parent asset, generation status, storage path, quality, moderation, and response metadata.
 - All concepts remain `draft` or `review` until Jarrad approves. No external publishing, upload, webhook, ad launch, or spend happens automatically.

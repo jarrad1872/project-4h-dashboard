@@ -155,7 +155,7 @@ export const rebuildExecutionQueue = [
     lane: "Creative",
     title: "Add creative review filters",
     route: "/assets",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "Creative Lab can filter by status, trade, angle, and generation state.",
     acceptance: "Filters work without page reload and empty states are clear.",
