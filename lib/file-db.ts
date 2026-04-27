@@ -34,4 +34,5 @@ export const DataFiles = {
   alerts: "alerts.json",
   influencers: "influencers.json",
   creativeAssets: "creative-assets.json",
+  marketingEvents: "marketing-events.json",
 } as const;

@@ -19,7 +19,7 @@ export const PILOT_LABEL = "Plumbing Pilot";
 export const PILOT_LAUNCH_DATE = "2026-04-14T00:00:00.000Z";
 export const MONTHLY_BUDGET_FLOOR = 5000;
 export const MONTHLY_BUDGET_CEILING = 10000;
-export const DEFAULT_CREATIVE_TOOL = "gemini-3.1-flash-image-preview";
+export const DEFAULT_CREATIVE_TOOL = "chatgpt-image-latest";
 
 export const INFLUENCER_STATUS_ORDER: InfluencerStatus[] = [
   "researching",
@@ -89,6 +89,9 @@ const CREATIVE_ASSET_STATUS_LABELS: Record<CreativeAssetStatus, string> = {
 
 const CREATIVE_ASSET_ANGLE_LABELS: Record<CreativeAssetAngle, string> = {
   "missed-call": "Missed Call",
+  "demo-call": "Demo Call",
+  "owner-agent": "Owner Agent",
+  "roi-math": "ROI Math",
   "voice-boss": "Voice Boss",
   demo: "Demo",
   math: "Math",

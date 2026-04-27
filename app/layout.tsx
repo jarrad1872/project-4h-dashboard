@@ -3,8 +3,8 @@ import "./globals.css";
 import { SidebarShell } from "@/components/sidebar-shell";
 
 export const metadata: Metadata = {
-  title: "Project 4H Dashboard",
-  description: "Saw.City Campaign Command Dashboard",
+  title: "Project 4H Growth OS",
+  description: "Answered.City acquisition command center",
 };
 
 export default function RootLayout({

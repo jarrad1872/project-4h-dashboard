@@ -1,75 +1,83 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { Button, Card, GhostButton } from "@/components/ui";
+import { useEffect, useMemo, useState } from "react";
+import { Card } from "@/components/ui";
 import {
-  formatCreativeAssetAngleLabel,
-  formatCreativeAssetStatusLabel,
-  formatInfluencerStatusLabel,
-  MONTHLY_BUDGET_CEILING,
-  MONTHLY_BUDGET_FLOOR,
-  PILOT_DOMAIN,
-  PILOT_LABEL,
-  PILOT_LAUNCH_DATE,
-  latestMetricsWeek,
-  summarizeBudget,
-  summarizeCreativePipeline,
-  summarizeInfluencerPipeline,
-  getCountdownDays,
-} from "@/lib/growth-command-center";
-import type { BudgetData, CampaignStatusData, CreativeAsset, Influencer, MetricsData } from "@/lib/types";
-
-const PLATFORM_LABELS = {
-  linkedin: "LinkedIn",
-  youtube: "YouTube",
-  facebook: "Facebook",
-  instagram: "Instagram",
-} as const;
-
-const PLATFORM_COLORS = {
-  linkedin: "text-blue-300",
-  youtube: "text-red-300",
-  facebook: "text-sky-300",
-  instagram: "text-pink-300",
-} as const;
+  beachheadTrades,
+  customerMath,
+  imageDriver,
+  nextFourteenDays,
+  operatingLoops,
+  rebuildExecutionQueue,
+  rebuildMission,
+} from "@/lib/4h-rebuild-data";
+import { latestMetricsWeek } from "@/lib/growth-command-center";
+import type { Ad, CreativeAsset, Influencer, MetricsData } from "@/lib/types";
 
 interface OverviewState {
-  campaign: CampaignStatusData | null;
-  budget: BudgetData | null;
-  metrics: MetricsData | null;
+  ads: Ad[];
   influencers: Influencer[];
   creativeAssets: CreativeAsset[];
+  metrics: MetricsData | null;
 }
 
-const EMPTY_OVERVIEW: OverviewState = {
-  campaign: null,
-  budget: null,
-  metrics: null,
+const EMPTY_STATE: OverviewState = {
+  ads: [],
   influencers: [],
   creativeAssets: [],
+  metrics: null,
 };
 
+function formatNumber(value: number) {
+  return value.toLocaleString("en-US");
+}
+
+function StatusPill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs font-semibold uppercase text-slate-300">
+      {children}
+    </span>
+  );
+}
+
+function ActionLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center rounded-md bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+    >
+      {children}
+    </Link>
+  );
+}
+
 export default function OverviewPage() {
-  const [state, setState] = useState<OverviewState>(EMPTY_OVERVIEW);
+  const [state, setState] = useState<OverviewState>(EMPTY_STATE);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [campaign, budget, metrics, influencers, creativeAssets] = await Promise.all([
-        fetch("/api/campaign-status", { cache: "no-store" }).then((response) => response.json()),
-        fetch("/api/budget", { cache: "no-store" }).then((response) => response.json()),
-        fetch("/api/metrics", { cache: "no-store" }).then((response) => response.json()),
-        fetch("/api/influencers", { cache: "no-store" }).then((response) => response.json()).catch(() => []),
-        fetch("/api/creative-assets", { cache: "no-store" }).then((response) => response.json()).catch(() => []),
+      const [ads, influencers, creativeAssets, metrics] = await Promise.all([
+        fetch("/api/ads", { cache: "no-store" })
+          .then((response) => response.json())
+          .catch(() => []),
+        fetch("/api/influencers", { cache: "no-store" })
+          .then((response) => response.json())
+          .catch(() => []),
+        fetch("/api/creative-assets", { cache: "no-store" })
+          .then((response) => response.json())
+          .catch(() => []),
+        fetch("/api/metrics", { cache: "no-store" })
+          .then((response) => response.json())
+          .catch(() => null),
       ]);
 
       setState({
-        campaign,
-        budget,
-        metrics,
+        ads: Array.isArray(ads) ? ads : [],
         influencers: Array.isArray(influencers) ? influencers : [],
         creativeAssets: Array.isArray(creativeAssets) ? creativeAssets : [],
+        metrics,
       });
       setLoading(false);
     }
@@ -77,281 +85,227 @@ export default function OverviewPage() {
     void load();
   }, []);
 
-  if (loading) {
-    return <div className="flex h-64 items-center justify-center text-slate-400">Loading growth command center...</div>;
-  }
+  const summary = useMemo(() => {
+    const approvedAds = state.ads.filter((ad) => ad.status === "approved").length;
+    const pendingAds = state.ads.filter((ad) => ad.status === "pending").length;
+    const creatorsReady = state.influencers.filter((creator) =>
+      ["approved", "sent", "follow_up_due", "responded"].includes(creator.outreach_stage),
+    ).length;
+    const approvedAssets = state.creativeAssets.filter((asset) => ["approved", "live"].includes(asset.status)).length;
+    const latestWeek = latestMetricsWeek(state.metrics);
+    const paidCustomers = latestWeek
+      ? latestWeek.linkedin.paid + latestWeek.youtube.paid + latestWeek.facebook.paid + latestWeek.instagram.paid
+      : 0;
 
-  const countdownDays = getCountdownDays(PILOT_LAUNCH_DATE);
-  const creativeSummary = summarizeCreativePipeline(state.creativeAssets);
-  const influencerSummary = summarizeInfluencerPipeline(state.influencers);
-  const budgetSummary = summarizeBudget(state.budget);
-  const latestWeek = latestMetricsWeek(state.metrics);
-  const hasLiveMetrics = Boolean(
-    latestWeek &&
-      Object.values(PLATFORM_LABELS).some((_, index) => {
-        const platform = Object.keys(PLATFORM_LABELS)[index] as keyof typeof PLATFORM_LABELS;
-        return latestWeek[platform].impressions > 0 || latestWeek[platform].clicks > 0 || latestWeek[platform].signups > 0;
-      }),
-  );
-  const recentInfluencers = [...state.influencers]
-    .sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""))
-    .slice(0, 4);
-  const recentAssets = [...state.creativeAssets]
-    .sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""))
-    .slice(0, 4);
+    return {
+      approvedAds,
+      pendingAds,
+      creatorsReady,
+      approvedAssets,
+      paidCustomers,
+    };
+  }, [state]);
+
+  const queueSummary = useMemo(() => {
+    const ready = rebuildExecutionQueue.filter((item) => item.status === "ready");
+    const reviewRequired = rebuildExecutionQueue.filter((item) => item.approval === "review-required");
+
+    return {
+      ready,
+      reviewRequired,
+      topReady: ready.slice(0, 8),
+    };
+  }, []);
+
+  if (loading) {
+    return <div className="flex h-64 items-center justify-center text-slate-400">Loading Project 4H...</div>;
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">Project 4H</p>
-          <h1 className="mt-2 text-3xl font-bold text-white">Growth Command Center</h1>
-          <p className="mt-2 max-w-3xl text-sm text-slate-400">
-            Live focus is the {PILOT_LABEL.toLowerCase()} for <span className="font-semibold text-slate-200">{PILOT_DOMAIN}</span>:
-            influencer outreach, AI UGC production, channel readiness, and spend discipline for the first launch window.
-          </p>
+      <section className="rounded-lg border border-emerald-900/60 bg-slate-800 p-5">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Project 4H rebuild</p>
+            <h1 className="mt-2 max-w-4xl text-3xl font-bold text-white">
+              Acquisition OS for {rebuildMission.productName}
+            </h1>
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
+              Goal: {formatNumber(rebuildMission.customerTargetLow)}-{formatNumber(rebuildMission.customerTargetHigh)} customers
+              by December 31, 2026. The product reference is read-only {rebuildMission.referenceProduct}; the 4H surface is where
+              we rebuild creator outreach, image-led creative, approvals, and measurement.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <ActionLink href="/influencer">Open creators</ActionLink>
+            <Link
+              href="/assets"
+              className="inline-flex items-center rounded-md border border-slate-600 px-3 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-700"
+            >
+              Open creative lab
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/influencer">
-            <Button>Influencer Pipeline</Button>
-          </Link>
-          <Link href="/assets">
-            <GhostButton>Creative Assets</GhostButton>
-          </Link>
-        </div>
-      </div>
+      </section>
 
-      <div className="grid gap-4 xl:grid-cols-[1.3fr,1fr]">
-        <Card className="border-cyan-900/40 bg-cyan-950/10">
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {customerMath.map((item) => (
+          <Card key={item.label} className="min-h-36">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.label}</p>
+            <p className="mt-3 text-3xl font-bold text-white">{item.value}</p>
+            <p className="mt-2 text-sm leading-5 text-slate-400">{item.detail}</p>
+          </Card>
+        ))}
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-[1fr,1.05fr]">
+        <Card>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Active Pilot Status</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">{PILOT_LABEL}</h2>
-              <p className="mt-1 text-sm text-slate-300">Plumbing owners on {PILOT_DOMAIN}. Countdown is tracking the first two-week launch window.</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Current production signal</p>
+              <h2 className="mt-1 text-xl font-semibold text-white">Useful assets, no customer signal yet</h2>
             </div>
-            <span className="rounded-full border border-cyan-700/50 bg-cyan-900/40 px-3 py-1 text-xs font-semibold uppercase text-cyan-200">
-              {state.campaign?.status ?? "pre-launch"}
-            </span>
+            <StatusPill>pre-launch</StatusPill>
           </div>
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Launch target</p>
-              <p className="mt-2 text-xl font-semibold text-white">Apr 14</p>
-              <p className="text-xs text-slate-500">2026 launch checkpoint</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="border-t border-slate-700 pt-3">
+              <p className="text-2xl font-semibold text-white">{formatNumber(state.ads.length)}</p>
+              <p className="text-sm text-slate-400">ads in the archive</p>
             </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Countdown</p>
-              <p className="mt-2 text-xl font-semibold text-white">{countdownDays} days</p>
-              <p className="text-xs text-slate-500">Two-week pilot runway</p>
+            <div className="border-t border-slate-700 pt-3">
+              <p className="text-2xl font-semibold text-white">{formatNumber(summary.approvedAds)}</p>
+              <p className="text-sm text-slate-400">ads approved</p>
             </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Budget window</p>
-              <p className="mt-2 text-xl font-semibold text-white">${MONTHLY_BUDGET_FLOOR.toLocaleString()}-${MONTHLY_BUDGET_CEILING.toLocaleString()}</p>
-              <p className="text-xs text-slate-500">Target monthly test range</p>
+            <div className="border-t border-slate-700 pt-3">
+              <p className="text-2xl font-semibold text-white">{formatNumber(summary.pendingAds)}</p>
+              <p className="text-sm text-slate-400">ads pending approval</p>
+            </div>
+            <div className="border-t border-slate-700 pt-3">
+              <p className="text-2xl font-semibold text-white">
+                {formatNumber(summary.creatorsReady)} / {formatNumber(state.influencers.length)}
+              </p>
+              <p className="text-sm text-slate-400">creators ready or in motion</p>
+            </div>
+            <div className="border-t border-slate-700 pt-3">
+              <p className="text-2xl font-semibold text-white">{formatNumber(summary.approvedAssets)}</p>
+              <p className="text-sm text-slate-400">creative assets approved/live</p>
+            </div>
+            <div className="border-t border-slate-700 pt-3">
+              <p className="text-2xl font-semibold text-white">{formatNumber(summary.paidCustomers)}</p>
+              <p className="text-sm text-slate-400">paid customers attributed in metrics</p>
             </div>
           </div>
         </Card>
 
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quick Actions</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Link href="/influencer" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
-              <p className="text-sm font-semibold text-white">Manage creator outreach</p>
-              <p className="mt-1 text-xs text-slate-500">Track researching to paid across the pilot roster.</p>
-            </Link>
-            <Link href="/assets" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
-              <p className="text-sm font-semibold text-white">Review AI UGC assets</p>
-              <p className="mt-1 text-xs text-slate-500">Keep draft, review, approved, and live assets visible.</p>
-            </Link>
-            <Link href="/approval" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
-              <p className="text-sm font-semibold text-white">Approval queue</p>
-              <p className="mt-1 text-xs text-slate-500">CEO and CMO signoff still gates what goes live.</p>
-            </Link>
-            <Link href="/launch" className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-cyan-600/40">
-              <p className="text-sm font-semibold text-white">Launch checklist</p>
-              <p className="mt-1 text-xs text-slate-500">Track readiness beyond the pilot metrics surface.</p>
-            </Link>
+        <Card className="border-emerald-900/60 bg-emerald-950/10">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Main creative driver</p>
+          <h2 className="mt-1 text-xl font-semibold text-white">
+            {imageDriver.provider} {imageDriver.model}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-slate-300">{imageDriver.role}</p>
+          <p className="mt-3 border-l border-emerald-600 pl-3 text-sm leading-6 text-slate-300">{imageDriver.operatingRule}</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
+            <StatusPill>missed-call scenes</StatusPill>
+            <StatusPill>demo proof</StatusPill>
+            <StatusPill>creator frames</StatusPill>
+            <StatusPill>trade-specific visuals</StatusPill>
           </div>
         </Card>
-      </div>
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Creative Pipeline</p>
-              <h2 className="mt-1 text-lg font-semibold text-white">{creativeSummary.total} AI UGC assets tracked</h2>
-            </div>
-            <Link href="/assets" className="text-xs text-cyan-300 hover:underline">
-              Open assets
-            </Link>
+      <section>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Operating loops</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">What 4H should run every week</h2>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-4">
-            {[
-              { label: "Draft", value: creativeSummary.draft, color: "text-slate-200" },
-              { label: "Review", value: creativeSummary.review, color: "text-amber-300" },
-              { label: "Approved", value: creativeSummary.approved, color: "text-emerald-300" },
-              { label: "Live", value: creativeSummary.live, color: "text-cyan-300" },
-            ].map((item) => (
-              <div key={item.label} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
-                <p className={`mt-2 text-2xl font-semibold ${item.color}`}>{item.value}</p>
+          <Link href="/scorecard" className="text-sm font-semibold text-emerald-300 hover:underline">
+            Open scorecard
+          </Link>
+        </div>
+        <div className="mt-3 grid gap-3 xl:grid-cols-4">
+          {operatingLoops.map((loop) => (
+            <Link
+              key={loop.name}
+              href={loop.route}
+              className="rounded-lg border border-slate-700 bg-slate-800 p-4 transition hover:border-emerald-600/70"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="text-base font-semibold text-white">{loop.name}</h3>
+                <StatusPill>{loop.status}</StatusPill>
+              </div>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{loop.metric}</p>
+              <p className="mt-2 text-sm leading-5 text-slate-400">{loop.nextMove}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-[0.9fr,1.1fr]">
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Beachhead trades</p>
+          <h2 className="mt-1 text-xl font-semibold text-white">Start where the missed-call pain is obvious</h2>
+          <div className="mt-4 space-y-3">
+            {beachheadTrades.map((trade) => (
+              <div key={trade.domain} className="border-t border-slate-700 pt-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-semibold text-white">{trade.domain}</p>
+                  <span className="text-xs text-slate-500">{trade.trade}</span>
+                </div>
+                <p className="mt-1 text-sm leading-5 text-slate-400">{trade.reason}</p>
+                <p className="mt-1 text-sm leading-5 text-emerald-200">{trade.firstOffer}</p>
               </div>
             ))}
           </div>
-          <div className="mt-4 space-y-2">
-            {recentAssets.length ? (
-              recentAssets.map((asset) => (
-                <div key={asset.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2">
-                  <div>
-                    <p className="text-sm font-medium text-white">{asset.title}</p>
-                    <p className="text-xs text-slate-500">{formatCreativeAssetAngleLabel(asset.angle)} · {asset.tool_used}</p>
-                  </div>
-                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs uppercase text-slate-300">
-                    {formatCreativeAssetStatusLabel(asset.status)}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-dashed border-slate-700 p-4 text-sm text-slate-500">
-                No pilot assets saved yet. Use /assets to add the first missed-call, voice-boss, demo, or math creative.
-              </div>
-            )}
-          </div>
         </Card>
 
         <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Influencer Pipeline</p>
-              <h2 className="mt-1 text-lg font-semibold text-white">{state.influencers.length} creator prospects in play</h2>
-            </div>
-            <Link href="/influencer" className="text-xs text-cyan-300 hover:underline">
-              Open pipeline
-            </Link>
-          </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[
-              { label: "Contacted", value: influencerSummary.contacted, color: "text-sky-300" },
-              { label: "Negotiating", value: influencerSummary.negotiating, color: "text-amber-300" },
-              { label: "Contracted", value: influencerSummary.contracted, color: "text-emerald-300" },
-              { label: "Content Live", value: influencerSummary.content_live, color: "text-cyan-300" },
-              { label: "Paid", value: influencerSummary.paid, color: "text-violet-300" },
-              { label: "Researching", value: influencerSummary.researching, color: "text-slate-200" },
-            ].map((item) => (
-              <div key={item.label} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
-                <p className={`mt-2 text-2xl font-semibold ${item.color}`}>{item.value}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Next 14 days</p>
+          <h2 className="mt-1 text-xl font-semibold text-white">Turn the dashboard into a customer machine</h2>
+          <div className="mt-4 space-y-3">
+            {nextFourteenDays.map((item) => (
+              <div key={item.day} className="grid gap-2 border-t border-slate-700 pt-3 sm:grid-cols-[84px,1fr]">
+                <p className="text-sm font-semibold text-emerald-300">{item.day}</p>
+                <div>
+                  <p className="font-semibold text-white">{item.target}</p>
+                  <p className="mt-1 text-sm leading-5 text-slate-400">{item.outcome}</p>
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-4 space-y-2">
-            {recentInfluencers.length ? (
-              recentInfluencers.map((influencer) => (
-                <div key={influencer.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2">
-                  <div>
-                    <p className="text-sm font-medium text-white">{influencer.creator_name}</p>
-                    <p className="text-xs text-slate-500">{influencer.trade} · {influencer.platform}</p>
-                  </div>
-                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs uppercase text-slate-300">
-                    {formatInfluencerStatusLabel(influencer.status)}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-dashed border-slate-700 p-4 text-sm text-slate-500">
-                No influencer records yet. Seed or add pilot creators on /influencer.
-              </div>
-            )}
-          </div>
         </Card>
-      </div>
+      </section>
 
-      <Card>
+      <section>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Channel Metrics</p>
-            <h2 className="mt-1 text-lg font-semibold text-white">
-              {hasLiveMetrics ? `Latest week: ${latestWeek?.weekStart}` : "Placeholder metrics until launch"}
-            </h2>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Autonomous build queue</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Next work is queued so agents can keep moving</h2>
           </div>
-          <p className="text-xs text-slate-500">Impressions, clicks, signups, and CAC by channel will populate from weekly_metrics.</p>
-        </div>
-        <div className="mt-4 grid gap-3 xl:grid-cols-4">
-          {(Object.keys(PLATFORM_LABELS) as Array<keyof typeof PLATFORM_LABELS>).map((platform) => {
-            const metrics = latestWeek?.[platform] ?? { spend: 0, impressions: 0, clicks: 0, signups: 0, activations: 0, paid: 0 };
-            const cac = metrics.signups > 0 ? metrics.spend / metrics.signups : null;
-
-            return (
-              <div key={platform} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-                <p className={`text-sm font-semibold ${PLATFORM_COLORS[platform]}`}>{PLATFORM_LABELS[platform]}</p>
-                <div className="mt-3 space-y-2 text-sm text-slate-300">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Impressions</span>
-                    <span>{metrics.impressions ? metrics.impressions.toLocaleString() : "--"}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Clicks</span>
-                    <span>{metrics.clicks ? metrics.clicks.toLocaleString() : "--"}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Signups</span>
-                    <span>{metrics.signups ? metrics.signups.toLocaleString() : "--"}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">CAC</span>
-                    <span>{cac !== null ? `$${cac.toFixed(2)}` : "--"}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      <Card>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Budget Tracker</p>
-            <h2 className="mt-1 text-lg font-semibold text-white">${budgetSummary.spent.toLocaleString()} spent so far</h2>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{queueSummary.ready.length} ready</StatusPill>
+            <StatusPill>{queueSummary.reviewRequired.length} review gates</StatusPill>
           </div>
-          <p className="text-xs text-slate-500">
-            Target spend band is ${budgetSummary.floor.toLocaleString()}-${budgetSummary.ceiling.toLocaleString()} for the monthly pilot.
-          </p>
         </div>
-        <div className="mt-4 h-3 w-full rounded-full bg-slate-800">
-          <div
-            className="h-3 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500"
-            style={{ width: `${Math.min(100, (budgetSummary.spent / budgetSummary.ceiling) * 100)}%` }}
-          />
-        </div>
-        <div className="mt-2 flex justify-between text-xs text-slate-500">
-          <span>$0</span>
-          <span>${budgetSummary.floor.toLocaleString()} floor</span>
-          <span>${budgetSummary.ceiling.toLocaleString()} ceiling</span>
-        </div>
-        <div className="mt-4 grid gap-3 xl:grid-cols-4">
-          {(Object.keys(PLATFORM_LABELS) as Array<keyof typeof PLATFORM_LABELS>).map((platform) => {
-            const channel = state.budget?.channels[platform] ?? { allocated: 0, spent: 0 };
-            const percent = channel.allocated > 0 ? Math.min(100, (channel.spent / channel.allocated) * 100) : 0;
-
-            return (
-              <div key={platform} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-                <div className="flex items-center justify-between">
-                  <p className={`text-sm font-semibold ${PLATFORM_COLORS[platform]}`}>{PLATFORM_LABELS[platform]}</p>
-                  <span className="text-xs text-slate-500">{percent.toFixed(0)}%</span>
-                </div>
-                <p className="mt-3 text-sm text-slate-300">
-                  ${channel.spent.toLocaleString()} / ${channel.allocated.toLocaleString()}
-                </p>
-                <div className="mt-2 h-2 w-full rounded-full bg-slate-800">
-                  <div className="h-2 rounded-full bg-slate-400" style={{ width: `${percent}%` }} />
-                </div>
+        <div className="mt-3 grid gap-3 xl:grid-cols-4">
+          {queueSummary.topReady.map((item) => (
+            <Link
+              key={item.id}
+              href={item.route}
+              className="rounded-lg border border-slate-700 bg-slate-800 p-4 transition hover:border-emerald-600/70"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-semibold uppercase text-emerald-300">{item.id}</span>
+                <StatusPill>{item.lane}</StatusPill>
               </div>
-            );
-          })}
+              <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{item.phase}</p>
+              <p className="mt-2 text-sm leading-5 text-slate-400">{item.outcome}</p>
+              <p className="mt-3 border-l border-slate-700 pl-3 text-xs leading-5 text-slate-500">{item.acceptance}</p>
+            </Link>
+          ))}
         </div>
-      </Card>
+      </section>
     </div>
   );
 }

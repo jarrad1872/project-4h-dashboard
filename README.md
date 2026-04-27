@@ -8,6 +8,18 @@
 
 ## The Mission
 
+### Rebuild Direction (2026-04-27)
+
+4H is now being rebuilt as the **Answered.City acquisition OS**. The product reference is `sawcity-lite`, and that repo is read-only. The dashboard is the working surface for creator outreach, ChatGPT Pro `chatgpt-image-latest` creative production, approvals, and customer attribution.
+
+The year-end target is **1,000-2,000 paying customers by 2026-12-31**. That means 125-250 net new customers per month for the next eight months, so the dashboard must make weekly customer-producing loops visible instead of only storing generated ads.
+
+Primary loops:
+- Creator demo loop: trade creators call live demo lines and show the result.
+- Image creative loop: ChatGPT Pro `chatgpt-image-latest` generates trade-specific proof visuals and platform variants.
+- Demo funnel loop: every asset tracks trade, creator, image variant, UTM, demo call, signup, activation, and paid conversion.
+- Approval loop: nothing external goes live without Jarrad approval.
+
 > **2,000 users on Saw.City LITE. Not 1,000. Not "customers." 2,000 users.**
 
 Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook, Instagram) targeting owner-operators across **65 trade communities** — each marketed independently under its own `.city` domain. $20,000 total budget. No demos. Fully self-serve.
@@ -77,7 +89,7 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | Budget | `/budget` | Spend allocation per platform |
 | Launch | `/launch` | Pre-launch gate checklist |
 | Templates | `/templates` | Creative briefs + ad template library |
-| Generate | `/generate` | AI copy + creative generation (Gemini) |
+| Generate | `/generate` | Legacy AI copy + creative generation (Gemini) |
 | Influencer | `/influencer` | Semi-autonomous creator outreach: scoring, approvals, ready-to-send, and follow-up drafting |
 | Settings | `/settings` | Campaign configuration |
 
@@ -165,8 +177,10 @@ utm_source={platform}&utm_medium=paid-social&utm_campaign=4h_2026-03_{theme}&utm
   - D1 = pain/urgency direction; D2 = aspiration/social proof direction
   - Campaign group: `nb2_d{1|2}_{platform}_{prefix}`
 
-### Image Assets (NB2 Standard)
-All images via Gemini 3.1 Flash Image (`gemini-3.1-flash-image-preview` = Nano Banana 2):
+### Image Assets
+The active rebuild path uses ChatGPT Pro `chatgpt-image-latest` prompt concepts in `/assets` and `/api/image-concepts`. Phase 2 stores prompt/model/variant lineage on `creative_assets`; generated image files are uploaded back into 4H for review and approval. No OpenAI image API hookup is required.
+
+Legacy NB2/Gemini images still exist for historical campaign assets:
 - **Hero A** (`hero_a`): `ad-creatives/trade-heros/nb2/{slug}-hero-a.jpg` — zoomed-in scene, for ads
 - **Hero B** (`hero_b`): `ad-creatives/trade-heros/nb2/{slug}-hero-b.jpg` — wide top-down, for landing pages
 - **OG** (`og_nb2`): `ad-creatives/trade-ogs/nb2/{slug}-og.jpg` — link preview banner
@@ -204,18 +218,22 @@ See **[SOP-WORKFLOW.md](./SOP-WORKFLOW.md)** for the campaign operating SOP.
 
 - `/` now focuses on the live plumbing pilot (`pipe.city`) with launch countdown, influencer pipeline, creative pipeline, channel placeholders, and budget tracking
 - `/influencer` now supports the semi-autonomous outreach agent workflow: qualification scoring, pending-approval drafts, ready-to-send review, and day-3/day-7 follow-up drafting
-- `/assets` now tracks AI UGC creative assets instead of the older trade-image staging flow
+- `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
+- `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
 - `supabase/migrations/009_growth_command_center.sql` adds `creative_assets` plus richer influencer fields for persistent production storage
 - `supabase/migrations/010_influencer_outreach_agent.sql` adds the email-only outreach state model for human-gated creator approvals
+- `supabase/migrations/011_marketing_events_attribution.sql` adds asset-to-paid-customer attribution fields
+- `supabase/migrations/012_creative_asset_lineage.sql` self-heals `creative_assets` if needed and adds image lineage fields
 
 ### Competitive Intelligence Foundation (2026-04-01)
 
 - `docs/competitive-ad-research-agent.md` documents the corrected architecture for H-16 after verifying Meta access assumptions against official sources
 - `lib/competitive-ad-research-agent.ts` provides provider-agnostic keyword seeds, Meta payload normalization, Claude prompt generation, and weekly markdown report generation
 - `lib/__tests__/competitive-ad-research-agent.test.ts` locks the shared snapshot/report contract before any live Meta collector is wired in
+- `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-01 competitive intelligence foundation | v4.3.0*
+*Last updated: 2026-04-05 influencer seed idempotency + competitive intelligence foundation | v4.3.1*
 
 ---
 
@@ -239,6 +257,8 @@ node scripts/4h-cli.js ads approve --all
 node scripts/4h-cli.js campaign status
 node scripts/4h-cli.js creative gen --trade saw --format hero_a --style pain-point --push
 node scripts/4h-cli.js alerts list
+META_ACCESS_TOKEN=... node scripts/4h-cli.js competitive-intel validate-meta --out data/competitive-intel/meta-validation.md
+npm run cli -- influencer seed
 
 # Via npm:
 npm run cli -- report daily

@@ -1,11 +1,11 @@
 # SOP: Project 4H Dashboard — Operating Model
 
-**Last updated:** 2026-04-01  
+**Last updated:** 2026-04-27
 **Dashboard:** https://pumpcans.com  
 **Repo:** `jarrad1872/project-4h-dashboard`
 
-> **⚠️ THE MISSION: 2,000 USERS ON SAW.CITY LITE.**  
-> Not 1,000. Not "customers." 2,000 users. This number never changes without Jarrad explicitly saying so.  
+> **THE MISSION: ANSWERED.CITY / SAW.CITY LITE CUSTOMER GROWTH.**
+> Target: 1,000-2,000 paying customers by 2026-12-31. The dashboard exists to make weekly customer-producing loops visible.
 > **65 trades, each marketed under its own `.city` domain independently.**
 
 ---
@@ -98,6 +98,22 @@ Image URL: points to `trade-heros/nb2/{slug}-hero-a.jpg`
 ---
 
 ## IMAGE GENERATION SOPs
+
+### Active Model: ChatGPT Pro `chatgpt-image-latest`
+- `chatgpt-image-latest` is the rebuild's default image creative driver because assets are generated manually here with the Pro plan.
+- The app saves prompt concepts, generated image uploads, and lineage metadata only. It does not call the OpenAI image API.
+- If an API path is ever revisited, official OpenAI docs currently identify `gpt-image-1.5` as the latest API image model.
+- No OpenAI image API env vars are required for this workflow.
+- Active UI: `/assets` Creative Lab.
+- Active concept API: `GET/POST /api/image-concepts`.
+- Prompt briefs live in `lib/image-creative-briefs.ts`.
+- Use **Create 20-prompt set** to seed the beachhead queue: `pipe`, `duct`, `mow`, `pest`, and `coat` across missed-call, demo-call, owner-agent, and ROI math.
+- Use **Copy packet** on a prompt card, generate the image here with ChatGPT Pro, then upload the generated image back to the same asset card.
+- Creative lineage is stored on `creative_assets`: provider, model, prompt brief, prompt text, negative prompt, dimensions, variant ID, parent asset, generation status, storage path, quality, moderation, and response metadata.
+- All concepts remain `draft` or `review` until Jarrad approves. No external publishing, upload, webhook, ad launch, or spend happens automatically.
+
+### Legacy Model: Nano Banana 2 (NB2)
+NB2/Gemini assets remain historical and may be referenced, but they are not the default creative strategy for the 4H rebuild.
 
 ### Model: Nano Banana 2 (NB2)
 - **Model ID:** `gemini-3.1-flash-image-preview`
@@ -238,6 +254,11 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 
 **Start small:** Lawn care + HVAC first. Learn. Then expand to other trades.
 
+**Seed command behavior (`4h influencer seed`):**
+- Safe to rerun in production. The command is idempotent: it creates only missing shortlist creators.
+- Existing shortlisted creators are matched deterministically (`channel_url` first, then creator/trade/platform) and only canonical identity fields are synced.
+- Active workflow fields (`status`, notes, outreach timing) are preserved on existing rows.
+
 **Weak YouTube verticals** (use podcasts/trade media instead):
 - Pest control — no dominant 100K+ contractor creator
 - Painting — thin on YouTube
@@ -260,10 +281,11 @@ This is read-only market intelligence for 4H creative strategy. It does not touc
 - `docs/competitive-ad-research-agent.md`
 - `lib/competitive-ad-research-agent.ts`
 - `lib/__tests__/competitive-ad-research-agent.test.ts`
+- `scripts/competitive-intel-meta.js`
 
 ### Build Sequence
 
-1. Validate Meta token coverage against real search terms (`ai receptionist`, `plumber software`, direct competitor brands).
+1. Validate Meta token coverage against real search terms (`ai receptionist`, `plumber software`, direct competitor brands) with `META_ACCESS_TOKEN=... npm run cli -- competitive-intel validate-meta`.
 2. Normalize collected snapshots into the shared internal schema.
 3. Run Claude analysis on normalized snapshots only.
 4. Generate markdown report for Paperclip and Telegram delivery.

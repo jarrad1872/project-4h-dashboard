@@ -12,7 +12,7 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 
 **Live URL:** https://pumpcans.com  
 **GitHub:** `jarrad1872/project-4h-dashboard`  
-**Stack:** Next.js 16, TypeScript, Tailwind 4, Supabase, Gemini AI
+**Stack:** Next.js 16, TypeScript, Tailwind 4, Supabase, Gemini AI, ChatGPT Pro image generation workflow
 **Deployment:** Vercel (auto-deploys on push to `main`)
 
 ---
@@ -63,8 +63,8 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 ### AI Generation
 - **Ad copy generation:** `/api/ads/generate` route (Gemini 2.0 Flash) — constrained pipeline with validation
 - **Text copy (legacy):** `/api/generate` route (Gemini 2.5 Flash)
-- **Image gen:** `/api/ai-creative` route (model: `gemini-3.1-flash-image-preview`)
-- **OpenAI:** QUOTA EXHAUSTED — do not use
+- **Image gen (legacy):** `/api/ai-creative` route (model: `gemini-3.1-flash-image-preview`)
+- **Image gen (rebuild direction):** Generate manually here with ChatGPT Pro using `chatgpt-image-latest`; if an API path is ever revisited, the current official API model target is `gpt-image-1.5`. Do not add API hooks, spend, or launch externally without Jarrad approval.
 
 ---
 
@@ -82,9 +82,11 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 | `app/api/ads/generate/route.ts` | Ad copy generation pipeline (Gemini + validator) |
 | `app/api/generate/route.ts` | Legacy AI copy generation (Gemini) |
 | `app/api/ai-creative/route.ts` | Image creative generation (Gemini) |
+| `app/api/image-concepts/route.ts` | ChatGPT Pro image prompt brief API; saves prompt metadata for manual generation |
 | `lib/trade-copy-context.ts` | Per-trade context data for 20 live trades |
 | `lib/ad-copy-prompts.ts` | Prompt templates (4 angles x 4 platforms) |
 | `lib/ad-copy-validator.ts` | Hard rule validation + soft warnings |
+| `lib/image-creative-briefs.ts` | ChatGPT Pro image prompt briefs for beachhead trades |
 | `supabase/migrations/` | SQL migrations — apply via Supabase SQL editor |
 | `TASKS.md` | Active tasks and backlog |
 | `BOB.md` | Full operating manual for Bob agent — CLI reference + ad system ops |
@@ -124,14 +126,58 @@ ad_templates (
 
 marketing_events (
   id UUID PRIMARY KEY,
-  tenant_id TEXT,
+  event_key TEXT UNIQUE,
   event_type TEXT,
+  event_at TIMESTAMPTZ,
+  tenant_id TEXT,
+  visitor_id TEXT,
+  session_id TEXT,
+  creator_id TEXT,
+  creative_asset_id TEXT,
+  trade_slug TEXT,
+  angle TEXT,
+  platform TEXT,
   utm_source TEXT,
   utm_medium TEXT,
   utm_campaign TEXT,
   utm_content TEXT,
   utm_term TEXT,
+  variant_id TEXT,
+  contact_id TEXT,
+  value_cents INT,
+  metadata JSONB,
   created_at TIMESTAMPTZ
+)
+
+creative_assets (
+  id TEXT PRIMARY KEY,
+  trade_slug TEXT,
+  title TEXT,
+  angle TEXT,
+  tool_used TEXT,
+  status TEXT,
+  target_platform TEXT,
+  thumbnail_url TEXT,
+  asset_url TEXT,
+  provider TEXT,                 -- chatgpt-pro for Phase 2 concepts
+  model TEXT,                    -- default: chatgpt-image-latest
+  prompt_brief_id TEXT,
+  prompt_text TEXT,
+  negative_prompt TEXT,
+  source_image_url TEXT,
+  dimensions TEXT,
+  variant_id TEXT,
+  parent_asset_id TEXT,
+  generation_status TEXT,        -- brief | queued | generated | failed
+  generation_error TEXT,
+  storage_path TEXT,
+  output_format TEXT,
+  quality TEXT,
+  moderation TEXT,
+  response_metadata JSONB,
+  notes TEXT,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ
 )
 ```
 

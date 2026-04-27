@@ -3,12 +3,13 @@ import { requireAuth } from "@/lib/auth";
 import { DataFiles, writeJsonFile } from "@/lib/file-db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { hasSupabase, logActivity, readFallback } from "@/lib/server-utils";
-import type { CreativeAsset, CreativeAssetPlatform, CreativeAssetStatus } from "@/lib/types";
+import type { CreativeAsset, CreativeAssetAngle, CreativeAssetPlatform, CreativeAssetStatus } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 const VALID_STATUSES: CreativeAssetStatus[] = ["draft", "review", "approved", "live"];
 const VALID_PLATFORMS: CreativeAssetPlatform[] = ["linkedin", "youtube", "facebook", "instagram", "multi"];
+const VALID_ANGLES: CreativeAssetAngle[] = ["missed-call", "demo-call", "owner-agent", "roi-math", "voice-boss", "demo", "math"];
 
 export function OPTIONS() {
   return optionsResponse();
@@ -21,6 +22,22 @@ function normalizeCreativeAsset(input: Record<string, unknown>): CreativeAsset {
     title: String(input.title ?? "Untitled asset"),
     angle: (input.angle as CreativeAsset["angle"] | undefined) ?? "missed-call",
     tool_used: String(input.tool_used ?? "unknown"),
+    provider: (input.provider as string | null | undefined) ?? null,
+    model: (input.model as string | null | undefined) ?? null,
+    prompt_brief_id: (input.prompt_brief_id as string | null | undefined) ?? null,
+    prompt_text: (input.prompt_text as string | null | undefined) ?? null,
+    source_image_url: (input.source_image_url as string | null | undefined) ?? null,
+    dimensions: (input.dimensions as string | null | undefined) ?? null,
+    variant_id: (input.variant_id as string | null | undefined) ?? null,
+    parent_asset_id: (input.parent_asset_id as string | null | undefined) ?? null,
+    negative_prompt: (input.negative_prompt as string | null | undefined) ?? null,
+    generation_status: (input.generation_status as string | null | undefined) ?? null,
+    generation_error: (input.generation_error as string | null | undefined) ?? null,
+    storage_path: (input.storage_path as string | null | undefined) ?? null,
+    output_format: (input.output_format as string | null | undefined) ?? null,
+    quality: (input.quality as string | null | undefined) ?? null,
+    moderation: (input.moderation as string | null | undefined) ?? null,
+    response_metadata: (input.response_metadata as Record<string, unknown> | null | undefined) ?? {},
     status: (input.status as CreativeAssetStatus | undefined) ?? "draft",
     target_platform: (input.target_platform as CreativeAssetPlatform | undefined) ?? "multi",
     thumbnail_url: (input.thumbnail_url as string | null | undefined) ?? null,
@@ -39,14 +56,33 @@ function writeFallbackAssets(assets: CreativeAsset[]) {
   writeJsonFile(DataFiles.creativeAssets, assets);
 }
 
-function isCreativeAssetsTableMissing(error: { code?: string; message?: string } | null | undefined) {
-  return Boolean(
-    error &&
-      (error.code === "42P01" ||
-        error.code === "PGRST205" ||
-        error.message?.includes("creative_assets") ||
-        error.message?.includes("schema cache")),
-  );
+function safeFileName(fileName: string) {
+  return fileName.replace(/[^a-zA-Z0-9._-]+/g, "-");
+}
+
+async function uploadFileFromBase64(body: Record<string, unknown>, id: string) {
+  if (!body.upload_base64 || !body.upload_file_name || !body.upload_target || !supabaseAdmin) {
+    return {};
+  }
+
+  const buffer = Buffer.from(String(body.upload_base64), "base64");
+  const fileName = safeFileName(String(body.upload_file_name));
+  const uploadTarget = String(body.upload_target) === "thumbnail" ? "thumbnail" : "asset";
+  const path = `creative-assets/${uploadTarget}/${id}-${Date.now()}-${fileName}`;
+
+  const { error } = await supabaseAdmin.storage.from("ad-creatives").upload(path, buffer, {
+    contentType: String(body.upload_content_type ?? "application/octet-stream"),
+    upsert: true,
+  });
+
+  if (error) {
+    throw new Error(`Upload failed: ${error.message}`);
+  }
+
+  const { data } = supabaseAdmin.storage.from("ad-creatives").getPublicUrl(path);
+  return uploadTarget === "thumbnail"
+    ? { thumbnail_url: data.publicUrl, storage_path: path }
+    : { asset_url: data.publicUrl, thumbnail_url: data.publicUrl, storage_path: path };
 }
 
 export async function PATCH(
@@ -61,10 +97,32 @@ export async function PATCH(
     const body = (await request.json()) as Record<string, unknown>;
 
     const update: Record<string, unknown> = {};
+    const requestedStatus = body.status === undefined ? null : String(body.status);
     if (body.title !== undefined) update.title = body.title;
     if (body.trade_slug !== undefined) update.trade_slug = body.trade_slug;
-    if (body.angle !== undefined) update.angle = body.angle;
+    if (body.angle !== undefined) {
+      if (!VALID_ANGLES.includes(String(body.angle) as CreativeAssetAngle)) {
+        return errorJson(`angle must be one of: ${VALID_ANGLES.join(", ")}`, 400);
+      }
+      update.angle = body.angle;
+    }
     if (body.tool_used !== undefined) update.tool_used = body.tool_used;
+    if (body.provider !== undefined) update.provider = body.provider;
+    if (body.model !== undefined) update.model = body.model;
+    if (body.prompt_brief_id !== undefined) update.prompt_brief_id = body.prompt_brief_id;
+    if (body.prompt_text !== undefined) update.prompt_text = body.prompt_text;
+    if (body.source_image_url !== undefined) update.source_image_url = body.source_image_url;
+    if (body.dimensions !== undefined) update.dimensions = body.dimensions;
+    if (body.variant_id !== undefined) update.variant_id = body.variant_id;
+    if (body.parent_asset_id !== undefined) update.parent_asset_id = body.parent_asset_id;
+    if (body.negative_prompt !== undefined) update.negative_prompt = body.negative_prompt;
+    if (body.generation_status !== undefined) update.generation_status = body.generation_status;
+    if (body.generation_error !== undefined) update.generation_error = body.generation_error;
+    if (body.storage_path !== undefined) update.storage_path = body.storage_path;
+    if (body.output_format !== undefined) update.output_format = body.output_format;
+    if (body.quality !== undefined) update.quality = body.quality;
+    if (body.moderation !== undefined) update.moderation = body.moderation;
+    if (body.response_metadata !== undefined) update.response_metadata = body.response_metadata;
     if (body.status !== undefined) {
       if (!VALID_STATUSES.includes(String(body.status) as CreativeAssetStatus)) {
         return errorJson(`status must be one of: ${VALID_STATUSES.join(", ")}`, 400);
@@ -82,8 +140,14 @@ export async function PATCH(
     if (body.notes !== undefined) update.notes = body.notes;
 
     if (!Object.keys(update).length) {
-      return errorJson("No fields to update", 400);
+      const hasUpload = Boolean(body.upload_base64 && body.upload_file_name && body.upload_target);
+      if (!hasUpload) {
+        return errorJson("No fields to update", 400);
+      }
     }
+
+    const uploadedUrls = hasSupabase() ? await uploadFileFromBase64(body, id) : {};
+    Object.assign(update, uploadedUrls);
 
     if (!hasSupabase()) {
       const assets = readFallbackAssets();
@@ -93,6 +157,9 @@ export async function PATCH(
       }
 
       const previous = assets[index];
+      if (requestedStatus === "live" && previous.status !== "approved") {
+        return errorJson("Creative asset must be approved before it can be marked live", 400);
+      }
       const next = normalizeCreativeAsset({ ...previous, ...update, id });
       assets[index] = next;
       writeFallbackAssets(assets);
@@ -108,20 +175,26 @@ export async function PATCH(
       return okJson(next);
     }
 
+    if (requestedStatus === "live") {
+      const { data: existing, error: existingError } = await supabaseAdmin
+        .from("creative_assets")
+        .select("status")
+        .eq("id", id)
+        .single();
+
+      if (existingError) {
+        return errorJson("Failed to load creative asset before status change", 500, existingError.message);
+      }
+      if (!existing) {
+        return errorJson("Creative asset not found", 404);
+      }
+      if (existing.status !== "approved") {
+        return errorJson("Creative asset must be approved before it can be marked live", 400);
+      }
+    }
+
     const { data, error } = await supabaseAdmin.from("creative_assets").update(update).eq("id", id).select("*").single();
     if (error) {
-      if (isCreativeAssetsTableMissing(error)) {
-        const assets = readFallbackAssets();
-        const index = assets.findIndex((row) => row.id === id);
-        if (index < 0) {
-          return errorJson("Creative asset not found", 404);
-        }
-
-        const next = normalizeCreativeAsset({ ...assets[index], ...update, id });
-        assets[index] = next;
-        writeFallbackAssets(assets);
-        return okJson(next);
-      }
       return errorJson("Failed to update creative asset", 500, error.message);
     }
 
@@ -173,15 +246,6 @@ export async function DELETE(
 
     const { data, error } = await supabaseAdmin.from("creative_assets").delete().eq("id", id).select("*").single();
     if (error) {
-      if (isCreativeAssetsTableMissing(error)) {
-        const assets = readFallbackAssets();
-        const deleted = assets.find((row) => row.id === id);
-        if (!deleted) {
-          return errorJson("Creative asset not found", 404);
-        }
-        writeFallbackAssets(assets.filter((row) => row.id !== id));
-        return okJson({ ok: true, deleted });
-      }
       return errorJson("Failed to delete creative asset", 500, error.message);
     }
 

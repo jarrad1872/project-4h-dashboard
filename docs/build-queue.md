@@ -1,0 +1,63 @@
+# Project 4H Build Queue
+
+Last updated: 2026-04-27
+
+This is the standing queue for Codex/Bob work. Pick the first ready item that does not require Jarrad approval, complete it end to end, update docs, run tests/build/browser verification, then continue to the next ready item.
+
+## Rules
+
+- Do not edit `sawcity-lite`; use it only as read-only reference.
+- Do not send outreach, launch ads, upload to ad platforms, create webhooks, or spend money.
+- If an item says `review-required`, build the draft/review surface but stop before the external action.
+- Keep generated image work in the ChatGPT Pro workflow using `chatgpt-image-latest`; no OpenAI image API hookup.
+- Preserve offer rules: `$39/mo`, `14-day free trial, no credit card required`, and trade-specific `.city` domains.
+
+## Ready Queue
+
+| ID | Phase | Lane | Work | Approval | Acceptance |
+| --- | --- | --- | --- | --- | --- |
+| Q-01 | Phase 2 | Creative | Generate first beachhead image pack | None | In progress. Production desk, progress bar, copy packets, and per-card upload are ready. Finish by generating and uploading all 20 images. |
+| Q-02 | Phase 2 | Creative | Add Creative Lab filters | None | Filter by status, trade, angle, and generation state without reload. |
+| Q-03 | Phase 2 | Creative | Add variant replacement workflow | None | v2/v3 prompts preserve parent/child lineage and stable variant IDs. |
+| Q-04 | Phase 2 | Creative | Create Claude Design handoff packet | None | Handoff includes UX goals, data model, routes, screenshots to inspect, and constraints. |
+| Q-05 | Phase 3 | Creators | Audit creator shortlist | None | Creators are labeled keep/maybe/remove/needs-research without deleting history. |
+| Q-06 | Phase 3 | Creators | Upgrade creator scoring model | None | Score fields render and tests cover scoring logic. |
+| Q-07 | Phase 3 | Creators | Draft creator outreach packets | Review required | 10 drafts exist, but nothing is sent. |
+| Q-08 | Phase 3 | Creators | Add creator UTM builder | None | URLs include creator, trade, platform, campaign, and content IDs. |
+| Q-09 | Phase 3 | Creators | Build content brief templates | None | Demo-call, founder assist, and screenshot-proof templates include hook, shots, CTA, offer, and tracking. |
+| Q-10 | Phase 4 | Landing | Inventory read-only product routes | None | Findings are copied into 4H docs/data only; sawcity-lite is untouched. |
+| Q-11 | Phase 4 | Landing | Create launch URL builder | None | UTM format matches AGENTS.md and tests cover key permutations. |
+| Q-12 | Phase 4 | Landing | Create message-match briefs | None | Briefs include angle, headline promise, $39/mo, trial, and trade domain. |
+| Q-13 | Phase 4 | Landing | Add launch readiness validator | None | Validator returns actionable blockers with unit tests. |
+| Q-14 | Phase 5 | Launch | Archive historical ad library | None | Old ads are visibly archived/labeled, not deleted. |
+| Q-15 | Phase 5 | Launch | Build launch bundle model | None | Bundles connect trade, angle, image, copy, URL, budget, and approvals without launching. |
+| Q-16 | Phase 5 | Launch | Add experiment budget allocation | None | Planning state only; no billing changes. |
+| Q-17 | Phase 5 | Launch | Create platform upload sheets | Review required | Local/download exports only; no platform upload. |
+| Q-18 | Phase 6 | Learning | Upgrade weekly report | None | Ranks trades, creators, images, and angles with honest zero-data states. |
+| Q-19 | Phase 6 | Learning | Add keep/kill/iterate decisions | None | Decisions are visible, reversible, and timestamped. |
+| Q-20 | Phase 6 | Learning | Add customer pace forecast | None | Shows target, current pace, gap, and next bet using real paid data when available. |
+| Q-21 | Phase 6 | Research | Validate Meta Ad Library access | None | Report separates official API limits from assumptions. |
+| Q-22 | Phase 6 | Research | Create competitor research template | None | Template captures offers, hooks, visuals, platforms, evidence quality, and citation fields. |
+| Q-23 | Governance | Safety | Add approval audit log | None | Audit covers creative, outreach, launch bundle, and export approvals. |
+| Q-24 | Governance | Safety | Add external-action stop screen | None | UI explains exact approval needed and performs no external API action. |
+
+## Stop Conditions
+
+Stop and ask Jarrad before:
+
+- Sending a creator message or email.
+- Uploading to an ad platform.
+- Launching or editing a campaign.
+- Creating an external webhook.
+- Moving money or changing billing.
+- Editing `sawcity-lite`.
+
+## Verification
+
+Every completed item needs:
+
+- `npm test`
+- `npm run build`
+- `git diff --check`
+- In-app browser check on the changed route
+- TASKS/SOP/README update if behavior changed

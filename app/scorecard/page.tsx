@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
 import { CHANNELS } from "@/lib/constants";
 import { calcActivationRate, calcCpaPaid, calcCpaStart, calcCtr, signal } from "@/lib/metrics";
-import type { ChannelMetrics, MetricsData, MetricsWeek } from "@/lib/types";
+import type { ChannelMetrics, MarketingEventSummary, MetricsData, MetricsWeek } from "@/lib/types";
 
 const emptyChannel: ChannelMetrics = {
   spend: 0, impressions: 0, clicks: 0, signups: 0, activations: 0, paid: 0,
@@ -49,8 +49,25 @@ const SIGNAL_LABEL: Record<string, string> = {
   kill: "🔴 Kill",
 };
 
+const EMPTY_MARKETING_SUMMARY: MarketingEventSummary = {
+  total: 0,
+  byType: {
+    asset_view: 0,
+    demo_call: 0,
+    signup: 0,
+    trial_started: 0,
+    activated: 0,
+    paid: 0,
+  },
+  byPlatform: {},
+  byTrade: {},
+  byAngle: {},
+  paidValueCents: 0,
+};
+
 export default function ScorecardPage() {
   const [metrics, setMetrics] = useState<MetricsData>({ weeks: [] });
+  const [marketingSummary, setMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_SUMMARY);
   const [selectedWeek, setSelectedWeek] = useState("");
   const [draft, setDraft] = useState<MetricsWeek | null>(null);
   const [saving, setSaving] = useState(false);
@@ -58,9 +75,16 @@ export default function ScorecardPage() {
   const [showAddWeek, setShowAddWeek] = useState(false);
 
   async function load() {
-    const res = await fetch("/api/metrics", { cache: "no-store" });
-    const data = (await res.json()) as MetricsData;
+    const [metricsRes, eventsRes] = await Promise.all([
+      fetch("/api/metrics", { cache: "no-store" }),
+      fetch("/api/events?summary=1", { cache: "no-store" }).catch(() => null),
+    ]);
+    const data = (await metricsRes.json()) as MetricsData;
     setMetrics(data);
+    if (eventsRes?.ok) {
+      const eventsData = (await eventsRes.json()) as { summary?: MarketingEventSummary };
+      setMarketingSummary(eventsData.summary ?? EMPTY_MARKETING_SUMMARY);
+    }
     const latest = data.weeks.at(-1);
     if (latest && !selectedWeek) {
       setSelectedWeek(latest.weekStart);
@@ -187,6 +211,31 @@ export default function ScorecardPage() {
                style={{ width: `${Math.min((totalUsers / 2000) * 100, 100)}%` }} />
         </div>
         {totalUsers === 0 && <p className="mt-2 text-xs text-slate-500">No paying users yet — campaign pre-launch. Log weekly actuals here once ads go live.</p>}
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Marketing Event Funnel</h2>
+            <p className="mt-1 text-sm text-slate-500">Raw attribution for assets, demo calls, trials, activations, and paid conversions.</p>
+          </div>
+          <span className="text-sm font-semibold text-slate-300">{marketingSummary.total.toLocaleString()} total events</span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+          {[
+            { label: "Asset views", value: marketingSummary.byType.asset_view },
+            { label: "Demo calls", value: marketingSummary.byType.demo_call },
+            { label: "Signups", value: marketingSummary.byType.signup },
+            { label: "Trials", value: marketingSummary.byType.trial_started },
+            { label: "Activated", value: marketingSummary.byType.activated },
+            { label: "Paid", value: marketingSummary.byType.paid },
+          ].map((item) => (
+            <div key={item.label} className="rounded border border-slate-700 bg-slate-800 p-3">
+              <p className="text-2xl font-bold text-slate-100">{item.value.toLocaleString()}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+            </div>
+          ))}
+        </div>
       </Card>
 
       {/* Weekly metrics table */}

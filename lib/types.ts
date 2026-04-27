@@ -24,8 +24,16 @@ export type InfluencerOutreachStage =
 export type InfluencerOutreachDraftStatus = "not_started" | "drafted" | "pending_approval" | "approved" | "rejected" | "sent";
 export type InfluencerOutreachDraftStep = "initial" | "follow_up_1" | "follow_up_2";
 export type CreativeAssetStatus = "draft" | "review" | "approved" | "live";
-export type CreativeAssetAngle = "missed-call" | "voice-boss" | "demo" | "math";
+export type CreativeAssetAngle =
+  | "missed-call"
+  | "demo-call"
+  | "owner-agent"
+  | "roi-math"
+  | "voice-boss"
+  | "demo"
+  | "math";
 export type CreativeAssetPlatform = AdPlatform | "multi";
+export type MarketingEventType = "asset_view" | "demo_call" | "signup" | "trial_started" | "activated" | "paid";
 
 export interface Ad {
   id: string;
@@ -209,6 +217,22 @@ export interface CreativeAsset {
   title: string;
   angle: CreativeAssetAngle;
   tool_used: string;
+  provider: string | null;
+  model: string | null;
+  prompt_brief_id: string | null;
+  prompt_text: string | null;
+  source_image_url: string | null;
+  dimensions: string | null;
+  variant_id: string | null;
+  parent_asset_id: string | null;
+  negative_prompt: string | null;
+  generation_status: string | null;
+  generation_error: string | null;
+  storage_path: string | null;
+  output_format: string | null;
+  quality: string | null;
+  moderation: string | null;
+  response_metadata: Record<string, unknown>;
   status: CreativeAssetStatus;
   target_platform: CreativeAssetPlatform;
   thumbnail_url: string | null;
@@ -216,6 +240,40 @@ export interface CreativeAsset {
   notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface MarketingEvent {
+  id: string;
+  event_key: string | null;
+  event_type: MarketingEventType;
+  event_at: string;
+  tenant_id: string | null;
+  visitor_id: string | null;
+  platform: CreativeAssetPlatform | null;
+  trade_slug: string | null;
+  creator_id: string | null;
+  creative_asset_id: string | null;
+  angle: string | null;
+  variant_id: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  utm_term: string | null;
+  session_id: string | null;
+  contact_id: string | null;
+  value_cents: number;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface MarketingEventSummary {
+  total: number;
+  byType: Record<MarketingEventType, number>;
+  byPlatform: Record<string, number>;
+  byTrade: Record<string, number>;
+  byAngle: Record<string, number>;
+  paidValueCents: number;
 }
 
 // ─── Compatibility Types used by existing UI components ───────────────────────

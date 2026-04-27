@@ -57,7 +57,7 @@ describe("label helpers", () => {
   });
 
   it("uses the configured default creative tool model", () => {
-    expect(DEFAULT_CREATIVE_TOOL).toBe("gemini-3.1-flash-image-preview");
+    expect(DEFAULT_CREATIVE_TOOL).toBe("chatgpt-image-latest");
   });
 });
 

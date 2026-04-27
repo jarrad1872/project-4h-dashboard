@@ -21,6 +21,15 @@ const BASE_URL = process.env.PUMPCANS_BASE_URL || 'https://pumpcans.com';
 const TOKEN = process.env.PUMPCANS_TOKEN;
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TG_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const fs = require('node:fs');
+const path = require('node:path');
+const {
+  DEFAULT_META_GRAPH_VERSION,
+  DEFAULT_SEARCH_TERMS,
+  formatMetaValidationMarkdown,
+  runMetaValidation,
+} = require('./competitive-intel-meta');
+const { INFLUENCER_SHORTLIST, runInfluencerSeed } = require('./influencer-seed');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -956,29 +965,33 @@ async function cmdInfluencer(subArgs) {
   }
 
   if (sub === 'seed') {
-    console.log('Seeding influencer pipeline from static data...');
-    const creators = [
-      { creator_name: "Mike Andes", trade: "Lawn Care", platform: "youtube", channel_url: "https://www.youtube.com/@MikeAndes", estimated_reach: "80K+ operators", deal_page: "mow.city/mikeandes", status: "identified" },
-      { creator_name: "Brian's Lawn Maintenance", trade: "Lawn Care", platform: "youtube", channel_url: "https://www.youtube.com/@BriansLawnMaintenance", estimated_reach: "150K+ operators", deal_page: "mow.city/brianslawn", status: "identified" },
-      { creator_name: "AC Service Tech LLC", trade: "HVAC", platform: "youtube", channel_url: "https://www.youtube.com/@ACServiceTech", estimated_reach: "90K+ techs/owners", deal_page: "duct.city/acservicetech", status: "identified" },
-      { creator_name: "Blades of Grass Lawn Care", trade: "Lawn Care", platform: "youtube", channel_url: "https://www.youtube.com/channel/UCPIZI7", estimated_reach: "300K+ operators", deal_page: "mow.city/bladesofgrass", status: "identified" },
-      { creator_name: "HVAC School (Bryan Orr)", trade: "HVAC", platform: "youtube", channel_url: "https://www.youtube.com/@HVACSchool", estimated_reach: "60K+ techs/owners", deal_page: "duct.city/hvacschool", status: "identified" },
-      { creator_name: "Roofing Insights (Dmitry)", trade: "Roofing", platform: "youtube", channel_url: "https://www.youtube.com/@RoofingInsights3.0", estimated_reach: "60K+ contractors", deal_page: "roofrepair.city/roofinginsights", status: "identified" },
-      { creator_name: "Electrician U (Dustin Stelzer)", trade: "Electrical", platform: "youtube", channel_url: "https://www.youtube.com/@ElectricianU", estimated_reach: "120K+ electricians", deal_page: "electricians.city/electricianu", status: "identified" },
-      { creator_name: "Roger Wakefield", trade: "Plumbing", platform: "youtube", channel_url: "https://www.youtube.com/@rogerplumbing", estimated_reach: "120K+ contractor-adjacent", deal_page: "pipe.city/rogerwakefield", status: "identified" },
-      { creator_name: "King of Pressure Washing", trade: "Pressure Washing", platform: "youtube", channel_url: "https://www.youtube.com/@kingofpressurewash", estimated_reach: "35K+ operators", deal_page: "rinse.city/kingofpw", status: "identified" },
-      { creator_name: "Painting Business Pro (Barstow)", trade: "Painting", platform: "youtube", channel_url: "https://www.youtube.com/@PaintingBusinessPro", estimated_reach: "36K operators", deal_page: "coat.city/paintingbizpro", status: "identified" },
-    ];
+    console.log('Seeding influencer pipeline from static data (idempotent mode)...');
 
-    for (const c of creators) {
-      try {
-        await api('POST', '/api/influencers', c);
-        console.log(`  ✓ ${c.creator_name}`);
-      } catch {
-        console.log(`  ✗ ${c.creator_name} (may already exist)`);
+    const result = await runInfluencerSeed({
+      shortlist: INFLUENCER_SHORTLIST,
+      listInfluencers: async () => {
+        const influencers = await api('GET', '/api/influencers');
+        return Array.isArray(influencers) ? influencers : [];
+      },
+      createInfluencer: async (creator) => api('POST', '/api/influencers', creator),
+      updateInfluencer: async (id, update) => api('PATCH', `/api/influencers/${id}`, update),
+    });
+
+    for (const operation of result.operations) {
+      if (operation.action === 'created') {
+        console.log(`  + ${operation.creator_name} (created)`);
+        continue;
       }
+
+      if (operation.action === 'updated') {
+        console.log(`  ~ ${operation.creator_name} (updated: ${operation.changed_fields.join(', ')})`);
+        continue;
+      }
+
+      console.log(`  = ${operation.creator_name} (no changes)`);
     }
-    console.log('Done.');
+
+    console.log(`Done. created=${result.created} updated=${result.updated} skipped=${result.skipped}`);
     return;
   }
 
@@ -1072,6 +1085,63 @@ async function cmdGenerateCopy(subArgs) {
   }
 }
 
+async function cmdCompetitiveIntel(subArgs) {
+  const sub = subArgs[0];
+  const flags = parseArgs(subArgs.slice(1));
+
+  if (sub === 'validate-meta') {
+    const accessToken = process.env.META_ACCESS_TOKEN;
+
+    if (!accessToken) {
+      console.error('META_ACCESS_TOKEN is required for competitive-intel validate-meta');
+      console.error('Expected: META_ACCESS_TOKEN=<token> npm run cli -- competitive-intel validate-meta');
+      process.exit(1);
+    }
+
+    const validationRun = await runMetaValidation({
+      accessToken,
+      apiVersion: flags.version || flags['api-version'] || process.env.META_GRAPH_API_VERSION || DEFAULT_META_GRAPH_VERSION,
+      countries: flags.country || flags.countries || process.env.META_AD_REACHED_COUNTRIES || 'US',
+      limit: Number(flags.limit || 25),
+      activeStatus: flags['active-status'] || flags.activeStatus || 'ACTIVE',
+      adType: flags['ad-type'] || flags.adType || 'ALL',
+      searchTerms: flags.terms || DEFAULT_SEARCH_TERMS,
+    });
+
+    const markdown = formatMetaValidationMarkdown(validationRun);
+    const outputPath = flags.out || flags.output;
+
+    if (outputPath) {
+      const resolvedPath = path.resolve(outputPath);
+      fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
+
+      if (resolvedPath.toLowerCase().endsWith('.json')) {
+        fs.writeFileSync(resolvedPath, JSON.stringify(validationRun, null, 2));
+      } else {
+        fs.writeFileSync(resolvedPath, markdown);
+      }
+
+      console.log(`Wrote validation output to ${resolvedPath}`);
+    }
+
+    if (flags.json) {
+      printJson(validationRun);
+    } else {
+      console.log(markdown);
+    }
+
+    const failures = validationRun.results.filter((result) => !result.ok);
+    if (failures.length > 0) {
+      process.exit(1);
+    }
+
+    return;
+  }
+
+  console.error('Unknown competitive-intel subcommand. Use: validate-meta');
+  process.exit(1);
+}
+
 // ─── Context Generate ─────────────────────────────────────────────────────────
 
 async function cmdContext(subArgs) {
@@ -1113,6 +1183,7 @@ Commands:
   ads archive --campaign-group <group>
 
   generate-copy [--trades pipe,mow|all] [--platforms linkedin,facebook|all] [--angles pain,solution|all] [--dry-run]
+  competitive-intel validate-meta [--terms "smith.ai,ai receptionist"] [--country US] [--limit 25] [--out data/competitive-intel/meta-validation.md] [--json]
 
   context generate --trade <slug>
 
@@ -1169,6 +1240,7 @@ Config:
   const commands = {
     ads: cmdAds,
     'generate-copy': cmdGenerateCopy,
+    'competitive-intel': cmdCompetitiveIntel,
     context: cmdContext,
     campaign: cmdCampaign,
     budget: cmdBudget,

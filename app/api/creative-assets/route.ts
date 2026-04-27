@@ -13,7 +13,8 @@ import type {
 export const dynamic = "force-dynamic";
 
 const VALID_STATUSES: CreativeAssetStatus[] = ["draft", "review", "approved", "live"];
-const VALID_ANGLES: CreativeAssetAngle[] = ["missed-call", "voice-boss", "demo", "math"];
+const CREATE_STATUSES: CreativeAssetStatus[] = ["draft", "review", "approved"];
+const VALID_ANGLES: CreativeAssetAngle[] = ["missed-call", "demo-call", "owner-agent", "roi-math", "voice-boss", "demo", "math"];
 const VALID_PLATFORMS: CreativeAssetPlatform[] = ["linkedin", "youtube", "facebook", "instagram", "multi"];
 
 export function OPTIONS() {
@@ -27,6 +28,22 @@ function normalizeCreativeAsset(input: Record<string, unknown>): CreativeAsset {
     title: String(input.title ?? "Untitled asset"),
     angle: (input.angle as CreativeAssetAngle | null | undefined) ?? "missed-call",
     tool_used: String(input.tool_used ?? "unknown"),
+    provider: (input.provider as string | null | undefined) ?? null,
+    model: (input.model as string | null | undefined) ?? null,
+    prompt_brief_id: (input.prompt_brief_id as string | null | undefined) ?? null,
+    prompt_text: (input.prompt_text as string | null | undefined) ?? null,
+    source_image_url: (input.source_image_url as string | null | undefined) ?? null,
+    dimensions: (input.dimensions as string | null | undefined) ?? null,
+    variant_id: (input.variant_id as string | null | undefined) ?? null,
+    parent_asset_id: (input.parent_asset_id as string | null | undefined) ?? null,
+    negative_prompt: (input.negative_prompt as string | null | undefined) ?? null,
+    generation_status: (input.generation_status as string | null | undefined) ?? null,
+    generation_error: (input.generation_error as string | null | undefined) ?? null,
+    storage_path: (input.storage_path as string | null | undefined) ?? null,
+    output_format: (input.output_format as string | null | undefined) ?? null,
+    quality: (input.quality as string | null | undefined) ?? null,
+    moderation: (input.moderation as string | null | undefined) ?? null,
+    response_metadata: (input.response_metadata as Record<string, unknown> | null | undefined) ?? {},
     status: (input.status as CreativeAssetStatus | null | undefined) ?? "draft",
     target_platform: (input.target_platform as CreativeAssetPlatform | null | undefined) ?? "multi",
     thumbnail_url: (input.thumbnail_url as string | null | undefined) ?? null,
@@ -47,16 +64,6 @@ function readFallbackAssets() {
 
 function writeFallbackAssets(assets: CreativeAsset[]) {
   writeJsonFile(DataFiles.creativeAssets, assets);
-}
-
-function isCreativeAssetsTableMissing(error: { code?: string; message?: string } | null | undefined) {
-  return Boolean(
-    error &&
-      (error.code === "42P01" ||
-        error.code === "PGRST205" ||
-        error.message?.includes("creative_assets") ||
-        error.message?.includes("schema cache")),
-  );
 }
 
 function isValidValue<T extends string>(value: string | undefined, validValues: T[]): value is T {
@@ -115,9 +122,6 @@ export async function GET(request: Request) {
 
     const { data, error } = await query;
     if (error) {
-      if (isCreativeAssetsTableMissing(error)) {
-        return okJson(readFallbackAssets());
-      }
       return errorJson("Failed to load creative assets", 500, error.message);
     }
 
@@ -133,7 +137,6 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as Record<string, unknown>;
-    const uploadedUrls = hasSupabase() ? await uploadFileFromBase64(body) : {};
 
     const status = String(body.status ?? "draft");
     const angle = String(body.angle ?? "missed-call");
@@ -142,8 +145,8 @@ export async function POST(request: Request) {
     if (!body.title || !body.tool_used) {
       return errorJson("title and tool_used are required", 400);
     }
-    if (!isValidValue(status, VALID_STATUSES)) {
-      return errorJson(`status must be one of: ${VALID_STATUSES.join(", ")}`, 400);
+    if (!isValidValue(status, CREATE_STATUSES)) {
+      return errorJson(`status must be one of: ${CREATE_STATUSES.join(", ")}`, 400);
     }
     if (!isValidValue(angle, VALID_ANGLES)) {
       return errorJson(`angle must be one of: ${VALID_ANGLES.join(", ")}`, 400);
@@ -151,6 +154,8 @@ export async function POST(request: Request) {
     if (!isValidValue(targetPlatform, VALID_PLATFORMS)) {
       return errorJson(`target_platform must be one of: ${VALID_PLATFORMS.join(", ")}`, 400);
     }
+
+    const uploadedUrls = hasSupabase() ? await uploadFileFromBase64(body) : {};
 
     const row = normalizeCreativeAsset({
       id: body.id ?? crypto.randomUUID(),
@@ -160,8 +165,24 @@ export async function POST(request: Request) {
       tool_used: body.tool_used,
       status,
       target_platform: targetPlatform,
-      thumbnail_url: body.thumbnail_url ?? uploadedUrls.thumbnail_url ?? null,
+      thumbnail_url: body.thumbnail_url ?? uploadedUrls.thumbnail_url ?? uploadedUrls.asset_url ?? null,
       asset_url: body.asset_url ?? uploadedUrls.asset_url ?? null,
+      provider: body.provider ?? null,
+      model: body.model ?? null,
+      prompt_brief_id: body.prompt_brief_id ?? null,
+      prompt_text: body.prompt_text ?? null,
+      source_image_url: body.source_image_url ?? null,
+      dimensions: body.dimensions ?? null,
+      variant_id: body.variant_id ?? null,
+      parent_asset_id: body.parent_asset_id ?? null,
+      negative_prompt: body.negative_prompt ?? null,
+      generation_status: body.generation_status ?? null,
+      generation_error: body.generation_error ?? null,
+      storage_path: body.storage_path ?? null,
+      output_format: body.output_format ?? null,
+      quality: body.quality ?? null,
+      moderation: body.moderation ?? null,
+      response_metadata: body.response_metadata ?? {},
       notes: body.notes ?? null,
       created_at: isoNow(),
       updated_at: isoNow(),
@@ -184,12 +205,6 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabaseAdmin.from("creative_assets").insert(row).select("*").single();
     if (error) {
-      if (isCreativeAssetsTableMissing(error)) {
-        const assets = readFallbackAssets();
-        assets.unshift(row);
-        writeFallbackAssets(assets);
-        return okJson(row, 201);
-      }
       return errorJson("Failed to create creative asset", 500, error.message);
     }
 
