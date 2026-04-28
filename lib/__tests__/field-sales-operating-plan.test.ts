@@ -40,10 +40,10 @@ function event(overrides: Partial<MarketingEvent> = {}): MarketingEvent {
     creative_asset_id: null,
     angle: null,
     variant_id: null,
-    utm_source: "azfounding",
+    utm_source: "dustinaz",
     utm_medium: "field-sales",
-    utm_campaign: "4h_2026-04_az_field_sales",
-    utm_content: "azfounding_az-founding-card-a_az-p-001",
+    utm_campaign: "4h_2026-04_az_pipe_proof_sprint",
+    utm_content: "dustinaz_dustin-pipe-local-trust_az-p-001",
     utm_term: "phoenix_metro_trade_smb",
     session_id: null,
     contact_id: null,
@@ -98,6 +98,6 @@ describe("buildFieldSalesOperatingPacket", () => {
     expect(packet.priorityLeads[0].trackingUrl).toContain("https://duct.city/");
     expect(packet.priorityLeads[0].trackingUrl).toContain("utm_medium=field-sales");
     expect(packet.priorityLeads[0].trackingUrl).toContain("card_id=az-d-009");
-    expect(packet.priorityLeads[0].contentId).toBe("azfounding_az-founding-card-a_az-d-009");
+    expect(packet.priorityLeads[0].contentId).toBe("dustinaz_dustin-pipe-local-trust_az-d-009");
   });
 });

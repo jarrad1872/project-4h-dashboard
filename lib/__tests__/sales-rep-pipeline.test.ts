@@ -42,15 +42,15 @@ describe("buildSalesTrackingUrl", () => {
     const result = buildSalesTrackingUrl({ rep, cardVariant });
     const url = new URL(result.url);
 
-    expect(url.hostname).toBe("answered.city");
-    expect(url.searchParams.get("utm_source")).toBe("azfounding");
+    expect(url.hostname).toBe("pipe.city");
+    expect(url.searchParams.get("utm_source")).toBe("dustinaz");
     expect(url.searchParams.get("utm_medium")).toBe(FIELD_SALES_UTM_MEDIUM);
-    expect(url.searchParams.get("utm_campaign")).toBe("4h_2026-04_az_field_sales");
-    expect(url.searchParams.get("utm_content")).toBe("azfounding_az-founding-card-a_az-founding-card-a-master");
-    expect(url.searchParams.get("rep")).toBe("AZFOUNDING");
+    expect(url.searchParams.get("utm_campaign")).toBe("4h_2026-04_az_pipe_proof_sprint");
+    expect(url.searchParams.get("utm_content")).toBe("dustinaz_dustin-pipe-local-trust_dustin-pipe-local-trust-master");
+    expect(url.searchParams.get("rep")).toBe("DUSTINAZ");
     expect(url.searchParams.get("rep_id")).toBe("rep-az-founding");
-    expect(url.searchParams.get("card")).toBe("az-founding-card-a");
-    expect(url.searchParams.get("card_id")).toBe("az-founding-card-a-master");
+    expect(url.searchParams.get("card")).toBe("dustin-pipe-local-trust");
+    expect(url.searchParams.get("card_id")).toBe("dustin-pipe-local-trust-master");
     expect(url.searchParams.get("offer")).toBe("14-day-free-trial-no-credit-card");
   });
 
@@ -63,7 +63,7 @@ describe("buildSalesTrackingUrl", () => {
     expect(url.hostname).toBe("pipe.city");
     expect(url.searchParams.get("utm_medium")).toBe("field-sales");
     expect(url.searchParams.get("trade_domain")).toBe("pipe.city");
-    expect(url.searchParams.get("utm_content")).toBe("azfounding_az-founding-card-a_az-p-001");
+    expect(url.searchParams.get("utm_content")).toBe("dustinaz_dustin-pipe-local-trust_az-p-001");
     expect(url.searchParams.get("card_id")).toBe("az-p-001");
   });
 });

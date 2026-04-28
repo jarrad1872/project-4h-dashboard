@@ -36,6 +36,7 @@ import {
   buildSalesTrackingUrl,
   businessCardPrintSpec,
   getPrimarySalesCard,
+  salesCardVariants,
   salesLeads as seedSalesLeads,
   salesReps,
   salesStages,
@@ -116,8 +117,7 @@ function AttributionBucketRows({ title, rows }: { title: string; rows: FieldSale
 export default function SalesPageClient() {
   const rep = salesReps[0];
   const cardVariant = getPrimarySalesCard();
-  const cardValidation = validateSalesCardVariant(cardVariant);
-  const tracking = buildSalesTrackingUrl({ rep, cardVariant });
+  const cardProofs = salesCardVariants.filter((variant) => variant.repId === rep.id);
   const [leads, setLeads] = useState<SalesLead[]>(seedSalesLeads);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -624,63 +624,117 @@ export default function SalesPageClient() {
         <Card className="space-y-4 border-amber-900/60 bg-amber-950/10">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-wide text-amber-300">Business card system</p>
-              <h2 className="mt-1 text-lg font-semibold text-white">{cardVariant.label}</h2>
+              <p className="text-xs uppercase tracking-wide text-amber-300">Business card proof set</p>
+              <h2 className="mt-1 text-lg font-semibold text-white">Dustin Bouwhuis pipe.city cards</h2>
               <p className="mt-1 text-sm text-slate-400">
-                Rep-coded card assets with a QR-backed field-sales URL, hard offer language, and no external order action.
+                Three print-ready front/back concepts using the local pipe.city icon and hero asset. Each QR is rep-coded
+                for Dustin and stops at a tracked demo path; no external order action exists here.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full border border-emerald-800 px-3 py-1 text-emerald-300">
-                {cardValidation.hasPrice ? "$39/mo OK" : "Price missing"}
-              </span>
-              <span className="rounded-full border border-cyan-800 px-3 py-1 text-cyan-300">
-                {cardValidation.hasTrial && cardValidation.hasNoCreditCard ? "Trial OK" : "Trial missing"}
-              </span>
+              <span className="rounded-full border border-emerald-800 px-3 py-1 text-emerald-300">$39/mo locked</span>
+              <span className="rounded-full border border-cyan-800 px-3 py-1 text-cyan-300">AI Agent angle</span>
+              <span className="rounded-full border border-amber-800 px-3 py-1 text-amber-300">{rep.email}</span>
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div data-testid="sales-card-front">
-              <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
-                <Image
-                  src={`/api/sales/business-card/${cardVariant.id}/front.svg`}
-                  alt="Answered.City Arizona field sales business card front"
-                  width={businessCardPrintSpec.pixelSize.width}
-                  height={businessCardPrintSpec.pixelSize.height}
-                  unoptimized
-                  className="block w-full"
-                />
-              </div>
-              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Front</p>
-            </div>
-            <div data-testid="sales-card-back">
-              <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
-                <Image
-                  src={`/api/sales/business-card/${cardVariant.id}/back.svg`}
-                  alt="Answered.City Arizona field sales business card back"
-                  width={businessCardPrintSpec.pixelSize.width}
-                  height={businessCardPrintSpec.pixelSize.height}
-                  unoptimized
-                  className="block w-full"
-                />
-              </div>
-              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Back</p>
-            </div>
+          <div className="space-y-5">
+            {cardProofs.map((proof, index) => {
+              const proofValidation = validateSalesCardVariant(proof);
+              const proofTracking = buildSalesTrackingUrl({ rep, cardVariant: proof });
+
+              return (
+                <div
+                  key={proof.id}
+                  className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"
+                  data-testid={`sales-card-proof-${proof.id}`}
+                >
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-slate-500">Mockup {index + 1}</p>
+                      <h3 className="mt-1 text-base font-semibold text-white">{proof.label}</h3>
+                      <p className="mt-1 text-sm text-slate-400">{proof.frontHeadline}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">{proof.frontSubhead}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-full border border-emerald-800 px-3 py-1 text-emerald-300">
+                        {proofValidation.hasPrice ? "$39/mo OK" : "Price missing"}
+                      </span>
+                      <span className="rounded-full border border-cyan-800 px-3 py-1 text-cyan-300">
+                        {proofValidation.hasTrial && proofValidation.hasNoCreditCard ? "Trial OK" : "Trial missing"}
+                      </span>
+                      <span className="rounded-full border border-violet-800 px-3 py-1 text-violet-300">
+                        {proof.primaryTradeDomain}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                    <div data-testid={index === 0 ? "sales-card-front" : undefined}>
+                      <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
+                        <Image
+                          src={`/api/sales/business-card/${proof.id}/front.svg`}
+                          alt={`pipe.city Dustin Bouwhuis business card ${proof.label} front`}
+                          width={businessCardPrintSpec.pixelSize.width}
+                          height={businessCardPrintSpec.pixelSize.height}
+                          unoptimized
+                          className="block w-full"
+                        />
+                      </div>
+                      <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Front</p>
+                    </div>
+                    <div data-testid={index === 0 ? "sales-card-back" : undefined}>
+                      <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
+                        <Image
+                          src={`/api/sales/business-card/${proof.id}/back.svg`}
+                          alt={`pipe.city Dustin Bouwhuis business card ${proof.label} back`}
+                          width={businessCardPrintSpec.pixelSize.width}
+                          height={businessCardPrintSpec.pixelSize.height}
+                          unoptimized
+                          className="block w-full"
+                        />
+                      </div>
+                      <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Back</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-start">
+                    <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">Tracking URL</p>
+                      <p
+                        className="mt-2 break-all font-mono text-xs text-cyan-200"
+                        data-testid={index === 0 ? "sales-card-tracking-url" : undefined}
+                      >
+                        {proofTracking.url}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2" data-testid={index === 0 ? "sales-card-download-front" : undefined}>
+                      <DownloadLink href={`/api/sales/business-card/${proof.id}/front.png`}>Front PNG</DownloadLink>
+                      <DownloadLink href={`/api/sales/business-card/${proof.id}/back.png`}>Back PNG</DownloadLink>
+                      <DownloadLink href={`/api/sales/business-card/${proof.id}/front.svg`}>Front SVG</DownloadLink>
+                      <DownloadLink href={`/api/sales/business-card/${proof.id}/back.svg`}>Back SVG</DownloadLink>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-start">
-            <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Tracking URL</p>
-              <p className="mt-2 break-all font-mono text-xs text-cyan-200" data-testid="sales-card-tracking-url">
-                {tracking.url}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2" data-testid="sales-card-download-front">
-              <DownloadLink href={`/api/sales/business-card/${cardVariant.id}/front.png`}>Front PNG</DownloadLink>
-              <DownloadLink href={`/api/sales/business-card/${cardVariant.id}/back.png`}>Back PNG</DownloadLink>
-              <DownloadLink href={`/api/sales/business-card/${cardVariant.id}/front.svg`}>Front SVG</DownloadLink>
-              <DownloadLink href={`/api/sales/business-card/${cardVariant.id}/back.svg`}>Back SVG</DownloadLink>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Dustin proof guidance</p>
+            <div className="mt-3 grid gap-2 md:grid-cols-3">
+              <div className="rounded border border-slate-800 bg-slate-900/50 p-3">
+                <p className="text-sm font-semibold text-white">1. Local trust</p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">Best for face-to-face handoffs and supply-house conversations.</p>
+              </div>
+              <div className="rounded border border-slate-800 bg-slate-900/50 p-3">
+                <p className="text-sm font-semibold text-white">2. Missed-call emergency</p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">Best when the owner already knows missed calls are costing jobs.</p>
+              </div>
+              <div className="rounded border border-slate-800 bg-slate-900/50 p-3">
+                <p className="text-sm font-semibold text-white">3. Live demo QR</p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">Best when the card needs to sell the demo before a longer conversation.</p>
+              </div>
             </div>
           </div>
 

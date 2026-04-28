@@ -16,6 +16,8 @@ export interface SalesRep {
   state: string;
   code: string;
   role: string;
+  phone: string;
+  email: string;
   weeklyTouchTarget: number;
   focusTrades: string[];
   notes: string;
@@ -91,7 +93,7 @@ export interface SalesPipelineSummary {
 export const advancedSalesStages: SalesStage[] = ["visited", "card-left", "demo-booked", "trial-started", "activated", "paid"];
 
 export const FIELD_SALES_UTM_MEDIUM = "field-sales";
-export const FIELD_SALES_CAMPAIGN = "4h_2026-04_az_field_sales";
+export const FIELD_SALES_CAMPAIGN = "4h_2026-04_az_pipe_proof_sprint";
 export const SALES_CARD_PRICE = "$39/mo";
 export const SALES_CARD_TRIAL = "14-day free trial, no credit card required";
 
@@ -110,38 +112,80 @@ export const salesStages: { id: SalesStage; label: string; intent: string }[] = 
 export const salesReps: SalesRep[] = [
   {
     id: "rep-az-founding",
-    name: "Arizona founding rep",
+    name: "Dustin Bouwhuis",
     region: "Phoenix metro",
     state: "AZ",
-    code: "AZFOUNDING",
-    role: "Human field sales pilot",
+    code: "DUSTINAZ",
+    role: "Arizona Growth Rep",
+    phone: "949-933-2719",
+    email: "dustin@saw.city",
     weeklyTouchTarget: 35,
-    focusTrades: ["saw.city", "pipe.city", "mow.city", "rinse.city", "lockout.city"],
+    focusTrades: ["pipe.city", "saw.city", "rinse.city", "lockout.city", "mow.city"],
     notes:
-      "Friend-led Arizona pilot. Use local trust, quick demos, and rep-coded cards to find early tester signal before scaling paid spend.",
+      "Dustin-led Arizona pilot. Use local trust, pipe.city demos, and rep-coded cards to find early tester signal before scaling paid spend.",
   },
 ];
 
 export const salesCardVariants: SalesCardVariant[] = [
   {
-    id: "az-founding-card-a",
+    id: "dustin-pipe-local-trust",
     repId: "rep-az-founding",
-    label: "AZ tester card A",
+    label: "Concept 1 - Local trust",
     campaignMonth: "2026-04",
-    campaignName: "az field sales",
-    destination: "answered-city",
-    primaryTradeDomain: null,
-    frontHeadline: "Never miss the call that becomes the next job.",
-    frontSubhead: "Answered.City is an AI phone rep for busy trade owners.",
-    backHeadline: "Built for Arizona owner-operators",
+    campaignName: "az pipe proof sprint",
+    destination: "trade-domain",
+    primaryTradeDomain: "pipe.city",
+    frontHeadline: "AI Agent answers plumbing calls when you cannot.",
+    frontSubhead: "Local Arizona setup help for solo plumbing owners.",
+    backHeadline: "Let pipe.city catch the next urgent call.",
     backBullets: [
-      "Scan the card and hear the AI answer.",
-      "Try it on your trade's .city domain.",
-      "Start the 14-day trial with no credit card.",
+      "Answers the call before the next plumber gets it.",
+      "Texts you the summary while you keep working.",
+      "Captures the lead or job for follow-up.",
     ],
     offer: SALES_CARD_TRIAL,
     price: SALES_CARD_PRICE,
-    callout: "Early tester route for saw cutters, plumbers, lawn, pressure washing, and locksmiths.",
+    callout: "Best for trust-first drops with plumbing owners who want a human contact.",
+  },
+  {
+    id: "dustin-pipe-missed-call",
+    repId: "rep-az-founding",
+    label: "Concept 2 - Missed-call emergency",
+    campaignMonth: "2026-04",
+    campaignName: "az pipe proof sprint",
+    destination: "trade-domain",
+    primaryTradeDomain: "pipe.city",
+    frontHeadline: "Missed call = missed job.",
+    frontSubhead: "pipe.city AI Agent answers while you are under the sink, driving, or already on a call.",
+    backHeadline: "Your AI Agent for plumbing calls.",
+    backBullets: [
+      "24/7 answering for urgent plumbing leads.",
+      "Owner text summary after the call.",
+      "Lead captured before it goes cold.",
+    ],
+    offer: SALES_CARD_TRIAL,
+    price: SALES_CARD_PRICE,
+    callout: "Best for urgent-call conversations and review-signal prospects.",
+  },
+  {
+    id: "dustin-pipe-live-demo",
+    repId: "rep-az-founding",
+    label: "Concept 3 - Live demo QR",
+    campaignMonth: "2026-04",
+    campaignName: "az pipe proof sprint",
+    destination: "trade-domain",
+    primaryTradeDomain: "pipe.city",
+    frontHeadline: "Scan for a live pipe.city AI Agent demo.",
+    frontSubhead: "Hear the AI Agent answer, qualify, text the owner, and capture the job.",
+    backHeadline: "AI Agent built for solo plumbing owners on the jobsite.",
+    backBullets: [
+      "Answers call",
+      "Texts owner",
+      "Captures job",
+    ],
+    offer: SALES_CARD_TRIAL,
+    price: SALES_CARD_PRICE,
+    callout: "Best for counter drops, supply houses, and quick QR-first pitches.",
   },
 ];
 
@@ -419,7 +463,7 @@ export function validateSalesCardVariant(variant: SalesCardVariant) {
     hasPrice: text.includes(SALES_CARD_PRICE),
     hasTrial: text.toLowerCase().includes("14-day free trial"),
     hasNoCreditCard: text.toLowerCase().includes("no credit card"),
-    hasAnsweredCity: text.includes("Answered.City"),
+    hasAnsweredCity: text.includes("Answered.City") || text.includes("pipe.city"),
   };
 }
 

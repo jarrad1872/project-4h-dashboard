@@ -365,7 +365,8 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `/sales` is the internal operating surface for the Arizona founding rep pilot.
 - Sales rep cards must include a stable rep code, `utm_medium=field-sales`, `utm_campaign=4h_YYYY-MM_{campaign}`, and a unique card ID in `utm_content`.
 - Printed cards must preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
-- The default Arizona pilot card points to `answered.city` for broad discovery, while lead-specific CRM rows can carry trade-domain tracking such as `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, or `lockout.city`.
+- Dustin Bouwhuis is the active Arizona rep for the pipe.city proof sprint. His default card set uses `dustin@saw.city`, `949-933-2719`, `DUSTINAZ`, and trade-domain tracking to `pipe.city`.
+- Business card visual proofs should follow the read-only sawcity-lite Jobsite design package: dark canonical surface, Geist typography, safety-yellow accent, token-style lines/surfaces, real pipe.city icon/hero assets, and "AI Agent" positioning rather than generic "AI receptionist" language.
 - Business card exports use 3.75 x 2.25 inch bleed artwork at 300 DPI, with key text inside the safe area. The dashboard generates SVG/PNG assets only; it does not place a Vistaprint order or move money.
 - CRM stages are internal tracking states: prospect, qualified, visited, card-left, demo-booked, trial-started, activated, paid, and lost.
 - Placeholder lead rows are target archetypes unless a real owner is intentionally entered later. Do not represent them as contacted businesses, testers, or customers.
