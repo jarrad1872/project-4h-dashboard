@@ -77,10 +77,14 @@ async function buildCardSvg(variantId: string, side: CardSide) {
         .brandQr { font: 900 54px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .kickerDark { font: 800 20px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 2px; }
         .kickerLight { font: 800 20px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 2px; }
+        .micro { font: 800 15px Geist, Arial, Helvetica, sans-serif; fill: #B9C1CA; letter-spacing: 1.1px; }
         .headlineDark { font: 900 48px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .headlineLight { font: 900 58px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
-        .heroHeadline { font: 900 72px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .heroHeadline { font: 900 78px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .heroYellow { font: 900 78px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 0; }
+        .repName { font: 900 54px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .demoNumber { font: 900 68px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 0; }
+        .demoHuge { font: 900 82px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .subDark { font: 700 26px Geist, Arial, Helvetica, sans-serif; fill: #D8DEE5; letter-spacing: 0; }
         .subLight { font: 700 26px Geist, Arial, Helvetica, sans-serif; fill: #D8DEE5; letter-spacing: 0; }
         .smallDark { font: 800 21px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
@@ -98,7 +102,7 @@ async function buildCardSvg(variantId: string, side: CardSide) {
   const heroBase = (opacity = 0.7) => `
     <rect width="${width}" height="${height}" fill="#0B0D0F"/>
     <image href="${pipeHero}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice" opacity="${opacity}"/>
-    <rect x="0" y="0" width="${width}" height="${height}" fill="#0B0D0F" opacity="0.28"/>`;
+    <rect x="0" y="0" width="${width}" height="${height}" fill="#0B0D0F" opacity="0.34"/>`;
 
   const yellowRule = (x: number, y: number, ruleWidth = 132) => `
     <line x1="${x}" y1="${y}" x2="${x + ruleWidth}" y2="${y}" stroke="#F5C518" stroke-width="8" stroke-linecap="round"/>`;
@@ -111,34 +115,55 @@ async function buildCardSvg(variantId: string, side: CardSide) {
 
   const demoLine = (x: number, y: number, className = "demoNumber") => textLine(PIPE_CITY_DEMO_LINE, x, y, className);
 
+  const contactStack = (x: number, y: number) => `
+    ${textLine(`Phone  ${rep.phone}`, x, y, "smallLight")}
+    ${textLine(`Email  ${rep.email}`, x, y + 38, "smallLight")}
+    ${textLine(`Demo   ${PIPE_CITY_DEMO_LINE}`, x, y + 76, "smallLight")}`;
+
+  const yellowIcon = (x: number, y: number, label: string) => `
+    <circle cx="${x}" cy="${y}" r="23" fill="none" stroke="#F5C518" stroke-width="5"/>
+    ${textLine(label, x, y + 8, "smallLight", "middle")}`;
+
+  const bulletRows = (x: number, y: number) => `
+    ${yellowIcon(x, y, "1")}
+    ${textLine("AI Agent answers", x + 48, y - 4, "bulletLight")}
+    ${textLine("your calls 24/7", x + 48, y + 26, "fineLight")}
+    ${yellowIcon(x, y + 88, "2")}
+    ${textLine("Qualifies and books", x + 48, y + 84, "bulletLight")}
+    ${textLine("more jobs", x + 48, y + 114, "fineLight")}
+    ${yellowIcon(x, y + 176, "3")}
+    ${textLine("Text summaries", x + 48, y + 172, "bulletLight")}
+    ${textLine("while you work", x + 48, y + 202, "fineLight")}
+    ${yellowIcon(x, y + 264, "$")}
+    ${textLine(SALES_CARD_PRICE, x + 48, y + 260, "price")}
+    ${textLine("14-day free trial", x + 48, y + 294, "fineLight")}
+    ${textLine("No credit card required", x + 48, y + 322, "fineLight")}`;
+
   if (variant.id === "dustin-pipe-missed-call") {
     if (side === "front") {
       return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city missed-call card front">
   ${commonDefs}
-  ${heroBase(0.76)}
-  ${textLine("pipe.city", 74, 116, "brandLight")}
-  ${yellowRule(78, 152, 112)}
-  ${textLine("Missed call", 78, 284, "heroHeadline")}
-  ${textLine("= missed job.", 78, 360, "heroHeadline")}
-  ${textLine("AI Agent answers while you're on the job.", 82, 420, "subLight")}
-  ${textLine("Demo line", 82, 502, "kickerLight")}
-  ${demoLine(82, 575)}
-  ${repLine(82, 628, "smallLight")}
+  ${heroBase(0.78)}
+  ${textLine("MISSED CALL", 74, 148, "heroHeadline")}
+  ${textLine("= MISSED JOB", 74, 232, "heroYellow")}
+  ${textLine("AI Agent answers", 78, 300, "subLight")}
+  ${textLine("while you're on the job", 78, 336, "subLight")}
+  ${textLine("pipe.city", 78, 508, "brandLight")}
+  ${textLine("AI AGENT FOR PLUMBING CALLS", 82, 544, "micro")}
+  ${demoLine(78, 628, "headlineLight")}
 </svg>`;
     }
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city missed-call card back">
   ${commonDefs}
-  ${heroBase(0.62)}
-  ${textLine("Your AI Agent", 76, 132, "headlineLight")}
-  ${textLine("for plumbing calls.", 76, 190, "headlineLight")}
-  ${variant.backBullets.map((bullet, index) => textLine(`${index + 1}. ${bullet}`, 86, 302 + index * 62, "bulletLight")).join("\n  ")}
-  ${offerLine(84, 532)}
-  ${repLine(84, 596)}
-  <image href="${qrDataUrl}" x="850" y="96" width="170" height="170"/>
-  ${textLine("Scan", 935, 300, "smallLight", "middle")}
+  ${heroBase(0.64)}
+  ${bulletRows(84, 112)}
+  ${textLine(rep.name.toUpperCase(), 610, 330, "repName")}
+  ${textLine("ARIZONA GROWTH REP", 614, 374, "kickerLight")}
+  ${contactStack(616, 440)}
+  ${textLine("pipe.city", 970, 610, "smallLight", "middle")}
 </svg>`;
   }
 
@@ -147,29 +172,27 @@ async function buildCardSvg(variantId: string, side: CardSide) {
       return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city live demo card front">
   ${commonDefs}
-  ${heroBase(0.72)}
-  ${textLine("pipe.city", 74, 116, "brandLight")}
-  ${yellowRule(78, 152, 112)}
-  ${textLine("Call the", 78, 290, "heroHeadline")}
-  ${textLine("demo line.", 78, 366, "heroHeadline")}
-  ${demoLine(78, 476)}
-  ${textLine("Hear the AI Agent answer a plumbing call.", 82, 536, "subLight")}
-  ${repLine(82, 612, "smallLight")}
+  ${heroBase(0.74)}
+  ${textLine("CALL THE", 74, 148, "heroHeadline")}
+  ${textLine("DEMO LINE", 74, 232, "heroYellow")}
+  ${yellowIcon(104, 326, "D")}
+  ${demoLine(154, 348, "demoHuge")}
+  ${textLine("pipe.city", 78, 534, "brandLight")}
+  ${textLine("AI AGENT FOR PLUMBING CALLS", 82, 570, "micro")}
 </svg>`;
     }
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city live demo card back">
   ${commonDefs}
-  ${heroBase(0.62)}
-  ${textLine("Live pipe.city", 76, 138, "headlineLight")}
-  ${textLine("AI Agent demo.", 76, 196, "headlineLight")}
-  ${textLine("Answers call  |  Texts owner  |  Captures job", 82, 286, "subLight")}
-  ${textLine("Demo line", 82, 380, "kickerLight")}
-  ${demoLine(82, 452)}
-  ${offerLine(84, 548)}
-  ${repLine(84, 606)}
-  <image href="${qrDataUrl}" x="870" y="92" width="150" height="150"/>
+  ${heroBase(0.64)}
+  ${bulletRows(84, 112)}
+  ${textLine(rep.name.toUpperCase(), 664, 188, "headlineLight")}
+  ${textLine("ARIZONA GROWTH REP", 668, 224, "kickerLight")}
+  ${contactStack(670, 292)}
+  <rect x="870" y="430" width="178" height="178" rx="10" fill="#ffffff"/>
+  <image href="${qrDataUrl}" x="884" y="444" width="150" height="150"/>
+  ${textLine("pipe.city", 959, 626, "smallLight", "middle")}
 </svg>`;
   }
 
@@ -177,29 +200,25 @@ async function buildCardSvg(variantId: string, side: CardSide) {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city local trust card front">
   ${commonDefs}
-  ${heroBase(0.7)}
+  ${heroBase(0.74)}
   ${textLine("pipe.city", 74, 116, "brandLight")}
-  ${yellowRule(78, 152, 112)}
-  ${textLine("AI Agent", 78, 300, "heroHeadline")}
-  ${textLine("for plumbing calls.", 78, 376, "heroHeadline")}
-  ${textLine("Demo line", 82, 462, "kickerLight")}
-  ${demoLine(82, 535)}
-  ${repLine(82, 612, "smallLight")}
+  ${yellowRule(315, 82, 142)}
+  ${textLine("AI AGENT FOR PLUMBING CALLS", 82, 152, "micro")}
+  ${textLine(rep.name.toUpperCase(), 78, 392, "repName")}
+  ${textLine("ARIZONA GROWTH REP", 82, 430, "kickerLight")}
+  ${contactStack(84, 504)}
 </svg>`;
   }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city local trust card back">
   ${commonDefs}
-  ${heroBase(0.62)}
-  ${textLine(rep.name, 76, 140, "headlineLight")}
-  ${textLine(rep.role, 80, 196, "subLight")}
-  ${textLine(rep.phone, 80, 286, "demoNumber")}
-  ${textLine(rep.email, 84, 342, "smallLight")}
-  ${textLine("Local setup help for Arizona plumbing owners.", 84, 430, "subLight")}
-  ${textLine("Demo line", 84, 514, "kickerLight")}
-  ${textLine(PIPE_CITY_DEMO_LINE, 84, 586, "headlineLight")}
-  <image href="${qrDataUrl}" x="892" y="92" width="132" height="132"/>
+  ${heroBase(0.64)}
+  ${bulletRows(84, 112)}
+  <rect x="840" y="396" width="178" height="178" rx="10" fill="#ffffff"/>
+  <image href="${qrDataUrl}" x="854" y="410" width="150" height="150"/>
+  ${textLine("Learn more", 929, 596, "fineLight", "middle")}
+  ${textLine("pipe.city", 929, 624, "smallLight", "middle")}
 </svg>`;
 }
 

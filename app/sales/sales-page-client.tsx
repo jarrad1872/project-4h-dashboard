@@ -73,6 +73,21 @@ const EMPTY_FORM = {
   notes: "",
 };
 
+const PROOF_SHEET_CAPTIONS = [
+  {
+    title: "Local Trust",
+    detail: "Understated. Clean. Local rep first. Built on credibility and relationships.",
+  },
+  {
+    title: "Missed Call Urgency",
+    detail: "Pain-forward. Big headline. Speaks the owner-operator reality.",
+  },
+  {
+    title: "Live Demo First",
+    detail: "Demo line front and center. Drives action and curiosity.",
+  },
+];
+
 function DownloadLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
@@ -251,11 +266,11 @@ export default function SalesPageClient() {
           <div>
             <p className="text-xs uppercase tracking-wide text-amber-300">Business card proofs</p>
             <h2 className="mt-1 text-lg font-semibold text-white">Dustin Bouwhuis pipe.city card mockups</h2>
-              <p className="mt-1 max-w-3xl text-sm text-slate-400">
-                Three print-ready Jobsite-design concepts are live below with front/back PNG and SVG exports. The cards
-                use the pipe.city hero image as the full-bleed background, `DUSTINAZ`, Dustin's phone, `dustin@saw.city`,
-                demo line {PIPE_CITY_DEMO_LINE}, and the AI Agent angle.
-              </p>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Three print-ready Jobsite-design concepts are live in the same front/back proof-board format as the
+              approved chat mockup. The cards use the pipe.city hero image as the full-bleed background, `DUSTINAZ`,
+              Dustin's phone, `dustin@saw.city`, demo line {PIPE_CITY_DEMO_LINE}, and the AI Agent angle.
+            </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
             <span className="rounded-full border border-emerald-800 px-3 py-1 text-emerald-300">$39/mo locked</span>
@@ -264,50 +279,69 @@ export default function SalesPageClient() {
           </div>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
-                <Image
-                  src="/api/sales/business-card/dustin-pipe-local-trust/front.svg"
-                  alt="pipe.city Dustin Bouwhuis local trust business card front"
-                  width={businessCardPrintSpec.pixelSize.width}
-                  height={businessCardPrintSpec.pixelSize.height}
-                  unoptimized
-                  className="block w-full"
-                />
-              </div>
-              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Concept 1 front</p>
-            </div>
-            <div>
-              <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
-                <Image
-                  src="/api/sales/business-card/dustin-pipe-missed-call/back.svg"
-                  alt="pipe.city Dustin Bouwhuis missed-call business card back"
-                  width={businessCardPrintSpec.pixelSize.width}
-                  height={businessCardPrintSpec.pixelSize.height}
-                  unoptimized
-                  className="block w-full"
-                />
-              </div>
-              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Concept 2 back</p>
-            </div>
-          </div>
+        <div
+          className="rounded-xl border border-slate-800 bg-[#090b0d] p-3 shadow-2xl sm:p-4"
+          data-testid="sales-card-proof-sheet"
+        >
+          <div className="grid gap-3 lg:grid-cols-3">
+            {cardProofs.map((proof, index) => {
+              const caption = PROOF_SHEET_CAPTIONS[index] ?? {
+                title: proof.label,
+                detail: proof.frontSubhead,
+              };
 
-          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Fast exports</p>
-            <div className="mt-3 grid gap-2">
-              {cardProofs.map((proof) => (
-                <div key={proof.id} className="rounded border border-slate-800 bg-slate-900/50 p-3">
-                  <p className="text-sm font-semibold text-white">{proof.label}</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-400">{proof.frontHeadline}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <DownloadLink href={`/api/sales/business-card/${proof.id}/front.png`}>Front PNG</DownloadLink>
-                    <DownloadLink href={`/api/sales/business-card/${proof.id}/back.png`}>Back PNG</DownloadLink>
+              return (
+                <div key={proof.id} className="min-w-0">
+                  <div className="overflow-hidden rounded-md border border-slate-700 bg-slate-950 shadow-xl">
+                    <Image
+                      src={`/api/sales/business-card/${proof.id}/front.svg`}
+                      alt={`pipe.city Dustin Bouwhuis ${caption.title} business card front`}
+                      width={businessCardPrintSpec.pixelSize.width}
+                      height={businessCardPrintSpec.pixelSize.height}
+                      unoptimized
+                      className="block w-full"
+                    />
+                  </div>
+                  <div className="mt-2 overflow-hidden rounded-md border border-slate-700 bg-slate-950 shadow-xl">
+                    <Image
+                      src={`/api/sales/business-card/${proof.id}/back.svg`}
+                      alt={`pipe.city Dustin Bouwhuis ${caption.title} business card back`}
+                      width={businessCardPrintSpec.pixelSize.width}
+                      height={businessCardPrintSpec.pixelSize.height}
+                      unoptimized
+                      className="block w-full"
+                    />
+                  </div>
+                  <div className="mt-4 grid grid-cols-[auto_1fr] gap-3 border-t border-slate-800 pt-3">
+                    <p className="text-5xl font-black leading-none text-amber-300">{index + 1}</p>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-white">{caption.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">{caption.detail}</p>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
+          <p className="mt-5 text-center text-[11px] text-slate-600">
+            Business card size: 3.5 x 2 in trim, 3.75 x 2.25 in bleed. Dark Jobsite design, safety yellow #F5C518,
+            real pipe.city hero artwork.
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+          <p className="text-xs uppercase tracking-wide text-slate-500">Print exports</p>
+          <div className="mt-3 grid gap-2 lg:grid-cols-3">
+            {cardProofs.map((proof) => (
+              <div key={proof.id} className="rounded border border-slate-800 bg-slate-900/50 p-3">
+                <p className="text-sm font-semibold text-white">{proof.label}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">{proof.frontHeadline}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <DownloadLink href={`/api/sales/business-card/${proof.id}/front.png`}>Front PNG</DownloadLink>
+                  <DownloadLink href={`/api/sales/business-card/${proof.id}/back.png`}>Back PNG</DownloadLink>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </Card>
