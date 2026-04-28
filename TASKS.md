@@ -212,7 +212,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-50 Ad Archive read-only hardening.
 - [x] Add Q-51 blocked-route cleanup packet drafts.
 - [x] Add Q-52 Creatives static URL guard resolution packet.
-- [ ] Add Q-53 Creatives page redirect packet with after-checks.
+- [x] Add Q-53 Creatives page redirect packet with after-checks.
+- [ ] Add Q-54 Workflow ownership guard resolution packet.
 
 ---
 
@@ -264,7 +265,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Harden `/ads` as archive-only reference.
 - [x] Draft blocked cleanup packets for `/creatives` and `/workflow`.
 - [x] Run and document all-public-creative-URL 200 checks before any `/creatives` redirect.
-- [ ] Redirect `/creatives` page route to `/assets` and re-check all static URLs.
+- [x] Redirect `/creatives` page route to `/assets` and re-check all static URLs.
+- [ ] Document workflow ownership before any `/workflow` redirect.
 
 ---
 

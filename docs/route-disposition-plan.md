@@ -54,12 +54,13 @@ These routes are not active operating lanes. They remain available from the coll
 16. Q-50: Harden `/ads` as read-only archive reference. Complete; create/edit/pause/regenerate controls are removed and `/ads/[id]` redirects back to `/ads`.
 17. Q-51: Draft blocked-route cleanup packets. Complete; `/creatives` and `/workflow` now have explicit pre-redirect requirements for static 200 checks and workflow-history preservation.
 18. Q-52: Resolve `/creatives` static URL guard. Complete; `/creatives` plus all 24 public JPEG URLs returned 200 before any page-route redirect work.
+19. Q-53: Apply `/creatives` page redirect. Complete; `/creatives` redirects to `/assets` and all 24 public JPEG URLs still return 200 after the redirect.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
 ## Q-38 Decision Matrix
 
-These are recommendations only. No redirect, deletion, route hiding, or file removal is authorized by this matrix.
+These were the Q-38 recommendations before implementation packets. Later sections record which recommendations have now been applied; no deletion, route hiding, file removal, or external action is authorized by this matrix.
 
 | Route | Recommendation | Replacement | Rationale | Next required step |
 | --- | --- | --- | --- | --- |
@@ -67,7 +68,7 @@ These are recommendations only. No redirect, deletion, route hiding, or file rem
 | `/generate` | Redirect later | `/assets` | Legacy Gemini/NB2 generation is superseded by ChatGPT Pro Creative Lab. | Preserve reusable prompt notes, then redirect after a dependency check. |
 | `/gtm` | Archive | `/` | Historical GTM and product-route inventory context still helps audits. | Keep direct-link access until active launch/support data covers the inventory. |
 | `/settings` | Delete later | `/approval` | Old settings/source-doc surface overlaps docs and governance pages. | Move any unique notes into docs and verify no active dependency before deletion. |
-| `/creatives` | Redirect later | `/assets` | Original master gallery is superseded by Creative Lab. | Confirm needed lookups exist in Creative Lab or docs, then redirect. |
+| `/creatives` | Redirect applied Q-53 | `/assets` | Original master gallery is superseded by Creative Lab, and static creative URLs remain preserved. | Keep after-check evidence in `docs/creative-static-url-guard.md`. |
 | `/workflow` | Redirect later | `/launch` | Old concept-to-live board is superseded by queue, Approval, and Launch. | Confirm no launch/approval workflow depends on it, then redirect. |
 | `/templates` | Rebuild as support | `/scorecard` | Briefs and research templates remain useful but belong behind active loops. | Keep support route while folding high-use actions into Launch, Creators, or Scorecard. |
 | `/lifecycle` | Rebuild as support | `/scorecard` | Lifecycle measurement belongs in the learning loop, with detail available while summaries mature. | Keep support route while moving decision-grade lifecycle summaries into Scorecard. |
@@ -82,7 +83,7 @@ The Command page now shows a route dependency guard with these current statuses:
 | Support | 2 | Keep as detail/support routes reached from active loops. |
 | Clear | 5 | Candidate or already-applied route cleanup after preserving useful notes. |
 
-Current pending clear route: `/creatives`. Applied clear routes: `/generate`, `/gtm`, `/settings`, `/ads`.
+Current pending clear routes: none. Applied clear routes: `/generate`, `/gtm`, `/settings`, `/ads`, `/creatives`.
 
 Current blockers to resolve first:
 
@@ -99,7 +100,7 @@ Creator campaign-flow links now point only at active operating lanes:
 | Launch readiness | `/launch` |
 | Learning loop | `/scorecard` |
 
-Legacy `/creatives` and `/workflow` pages remain reachable by direct link and still carry their disposition banners. Q-40 only changed the internal campaign-flow data; it did not redirect, delete, hide, or break either route.
+At Q-40, legacy `/creatives` and `/workflow` pages remained reachable by direct link and carried disposition banners. Q-53 later redirected only the `/creatives` page route to `/assets`; `/workflow` remains reachable while its ownership guard is resolved.
 
 ## Q-41 Public Creative URL Map
 
@@ -210,3 +211,9 @@ Q-51 did not redirect or delete a route, move static creative files, mutate work
 Q-52 resolves the `/creatives` blocker without redirecting the route. Browser/local HTTP verification against `http://127.0.0.1:3106` confirmed `/creatives` returned `200 text/html; charset=utf-8`, and all 24 inventoried public `/creatives/*.jpg` URLs returned `200 image/jpeg`. Evidence is recorded in `docs/creative-static-url-guard.md` and `lib/static-creative-url-guard.ts`.
 
 Q-52 did not redirect or delete `/creatives`, move static creative files, regenerate assets, upload to ad platforms, launch campaigns, create webhooks, send outreach, call external APIs, spend money, change billing, or touch sawcity-lite. `/creatives` is now clear only for a future page-route redirect packet, and that future packet must recheck all 24 public JPEG URLs after redirect implementation.
+
+## Q-53 Creatives Page Redirect
+
+Q-53 applies the `/creatives` page-route redirect to `/assets`. This redirects only the page route; it does not move, delete, rename, or regenerate files under `public/creatives`.
+
+Browser/local HTTP verification against `http://127.0.0.1:3106` confirmed `/creatives` lands on `/assets`, and all 24 inventoried public `/creatives/*.jpg` URLs still return `200 image/jpeg` after the redirect. Q-53 did not upload to ad platforms, launch campaigns, create webhooks, send outreach, call external APIs, spend money, change billing, or touch sawcity-lite.

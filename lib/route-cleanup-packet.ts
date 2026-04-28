@@ -65,6 +65,13 @@ export const appliedRouteCleanupPackets: AppliedRouteCleanupEntry[] = [
     verification: ["/ads shows read-only guard", "/ads/[id] redirects to /ads", "historical rows remain readable"],
     externalActionAllowed: false,
   },
+  {
+    route: "/creatives",
+    appliedIn: "Q-53",
+    outcome: "Internal page route redirects to Creative Lab while public static /creatives/*.jpg URLs remain available.",
+    verification: ["/creatives redirects to /assets", "all 24 /creatives/*.jpg URLs return 200", "static files are not moved"],
+    externalActionAllowed: false,
+  },
 ];
 
 function intentForRecommendation(recommendation: RouteRetirementRecommendation) {

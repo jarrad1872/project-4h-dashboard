@@ -268,6 +268,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-50 hardens `/ads` as a read-only archive: create/edit/pause/regenerate controls are removed, `/ads/[id]` redirects back to `/ads`, and historical rows remain readable without deleting or sending anything
 - Q-51 adds a blocked-route cleanup packet for `/creatives` and `/workflow`; it requires public static `/creatives/*.jpg` 200 checks plus workflow-history preservation before future redirect work
 - Q-52 resolves the `/creatives` static URL guard: `/creatives` plus all 24 public JPEG URLs returned 200 locally, evidence is recorded in `docs/creative-static-url-guard.md`, and no redirect or file move happened
+- Q-53 applies the `/creatives` page-route redirect to `/assets`; all 24 public `/creatives/*.jpg` URLs still return 200 as static JPEGs after the redirect
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -296,7 +297,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-52 creative static URL guard | v4.4.21*
+*Last updated: 2026-04-27 Q-53 creatives redirect | v4.4.22*
 
 ---
 

@@ -49,4 +49,17 @@ Local production server: `http://127.0.0.1:3106`
 
 ## Next Packet
 
-`/creatives` is now eligible for a future page-route redirect packet only. That future packet must prove these same 24 static URLs still return `200 image/jpeg` after the page route redirects to `/assets`.
+Q-53 applied that page-route redirect. `/creatives` now redirects internally to `/assets`, and these same 24 static URLs were rechecked after the redirect.
+
+## Q-53 After-Check
+
+Local production server: `http://127.0.0.1:3106`
+
+| Check | Result |
+| --- | --- |
+| `/creatives` page route | Redirects to `/assets` |
+| Public static JPEG URLs checked after redirect | 24 / 24 |
+| Static URL status after redirect | All returned `200` |
+| Static URL content type after redirect | All returned `image/jpeg` |
+| Static file moved/renamed/deleted | No |
+| External action | No upload, launch, webhook, spend, billing, outreach, external API call, or sawcity-lite change |

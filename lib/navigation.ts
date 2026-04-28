@@ -267,11 +267,12 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   {
     route: "/creatives",
     status: "clear",
-    readyForRedirectOrDelete: true,
-    activeReferences: ["Direct-link archive until page-route redirect packet", "legacy banner only"],
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Direct-link archive now lands on Creative Lab", "public static image URLs remain direct-link accessible"],
     dataDependencies: [
       "24 static public /creatives/*.jpg URLs inventoried in trade-utils",
       "Q-52 verified /creatives page route and all 24 public JPEG URLs returned 200 before redirect work",
+      "Q-53 internal /creatives page route redirects to /assets and all 24 public JPEG URLs still return 200",
     ],
     docOrTestReferences: [
       "README route table",
@@ -280,7 +281,7 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
       "static-creative-url-guard",
       "Command dependency map",
     ],
-    guardrail: "Q-52 resolved the static URL blocker. Any future page-route redirect must preserve all public /creatives/*.jpg responses with after-check evidence.",
+    guardrail: "Implemented in Q-53. Keep the page-route redirect internal and preserve all public /creatives/*.jpg responses.",
   },
   {
     route: "/workflow",

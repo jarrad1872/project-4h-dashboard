@@ -33,7 +33,7 @@ import {
   settingsSourceDocs,
   settingsSourceNoteSummary,
 } from "@/lib/settings-source-notes";
-import { staticCreativeUrlGuardSummary } from "@/lib/static-creative-url-guard";
+import { staticCreativeUrlGuardSummary, staticCreativeUrlRedirectSummary } from "@/lib/static-creative-url-guard";
 import {
   getBeachheadProductRoutes,
   productRouteInventorySources,
@@ -175,6 +175,7 @@ export default function OverviewPage() {
   const routeGuardSummary = useMemo(() => routeDependencyGuardSummary(), []);
   const publicCreativeSummary = useMemo(() => publicCreativeUrlDependencySummary(), []);
   const staticCreativeGuardSummary = useMemo(() => staticCreativeUrlGuardSummary(), []);
+  const staticCreativeRedirectSummary = useMemo(() => staticCreativeUrlRedirectSummary(), []);
   const workflowHistorySummary = useMemo(() => workflowHistoryDependencySummary(), []);
   const workflowTransitions = useMemo(() => workflowTransitionPairs(), []);
   const settingsSummary = useMemo(() => settingsSourceNoteSummary(), []);
@@ -692,7 +693,7 @@ export default function OverviewPage() {
             <StatusPill>{publicCreativeSummary.assetCount} URLs</StatusPill>
             <StatusPill>{publicCreativeSummary.tradeCount} trades</StatusPill>
             <StatusPill>{publicCreativeSummary.formatCount} formats</StatusPill>
-            <StatusPill>{staticCreativeGuardSummary.readyForPageRedirectPacket ? "Q-52 guard resolved" : "guard blocked"}</StatusPill>
+            <StatusPill>{staticCreativeRedirectSummary.redirectVerified ? "Q-53 redirect verified" : "guard blocked"}</StatusPill>
           </div>
         </div>
         <Card className="mt-3 border-amber-900/50 bg-amber-950/10">
@@ -706,6 +707,11 @@ export default function OverviewPage() {
             URLs returned {staticCreativeGuardSummary.staticAssetStatus} as {staticCreativeGuardSummary.staticAssetContentType};
             page route returned {staticCreativeGuardSummary.pageRouteStatus}. Redirect implemented:{" "}
             {staticCreativeGuardSummary.redirectImplemented ? "yes" : "no"}.
+          </p>
+          <p className="mt-2 text-xs text-emerald-200">
+            Q-53 after-check: /creatives redirects to {staticCreativeRedirectSummary.pageRouteRedirect};{" "}
+            {staticCreativeRedirectSummary.checkedStaticUrls}/{staticCreativeRedirectSummary.expectedStaticUrls} static URLs still
+            return {staticCreativeRedirectSummary.staticAssetStatus} as {staticCreativeRedirectSummary.staticAssetContentType}.
           </p>
           <div className="mt-4 grid gap-3 xl:grid-cols-4">
             {publicCreativeRows.map((row) => (

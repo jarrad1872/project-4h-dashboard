@@ -94,7 +94,10 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.dataDependencies).toContain(
       "Q-52 verified /creatives page route and all 24 public JPEG URLs returned 200 before redirect work",
     );
-    expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.readyForRedirectOrDelete).toBe(true);
+    expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.dataDependencies).toContain(
+      "Q-53 internal /creatives page route redirects to /assets and all 24 public JPEG URLs still return 200",
+    );
+    expect(routeDependencyGuards.find((row) => row.route === "/creatives")?.readyForRedirectOrDelete).toBe(false);
     expect(routeDependencyGuards.find((row) => row.route === "/workflow")?.dataDependencies).toContain(
       "6-stage bulk workflow history inventory in workflow-history",
     );
@@ -102,7 +105,7 @@ describe("navigation IA", () => {
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
       counts: { clear: 5, blocked: 1, support: 2 },
-      readyForRedirectOrDelete: 1,
+      readyForRedirectOrDelete: 0,
     });
   });
 });
