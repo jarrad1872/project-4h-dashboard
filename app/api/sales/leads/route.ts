@@ -2,12 +2,13 @@ import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
 import { isoNow } from "@/lib/file-db";
 import { readSalesLeadsFallback, writeSalesLeadsFallback } from "@/lib/sales-lead-store";
-import { requireSalesWriteAuth } from "@/lib/sales-write-auth";
+import { getSalesRepAccessStatus, requireSalesWriteAuth } from "@/lib/sales-write-auth";
 import {
   canUseSalesStage,
   normalizeSalesLead,
   normalizeSalesStage,
   salesLeadToDb,
+  type SalesStage,
 } from "@/lib/sales-rep-pipeline";
 import { hasSupabase, logActivity } from "@/lib/server-utils";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -16,6 +17,39 @@ export const dynamic = "force-dynamic";
 
 export function OPTIONS() {
   return optionsResponse();
+}
+
+const REP_CREATE_STAGES = new Set<SalesStage>(["prospect", "qualified", "visited", "card-left", "demo-booked", "trial-started"]);
+
+function optionalString(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function buildRepCreateBody(body: Record<string, unknown>, repId: string) {
+  const requestedStage = normalizeSalesStage(body.stage);
+  if (!REP_CREATE_STAGES.has(requestedStage)) {
+    return {
+      error: "Rep access can create or move leads through prospect, qualified, visited, card-left, demo-booked, and trial-started only.",
+      body: null,
+    };
+  }
+
+  return {
+    error: null,
+    body: {
+      businessName: optionalString(body.businessName) ?? optionalString(body.business_name),
+      city: optionalString(body.city) ?? "Phoenix",
+      state: optionalString(body.state) ?? "AZ",
+      tradeDomain: "pipe.city",
+      leadType: "real",
+      stage: requestedStage,
+      ownerProfile: optionalString(body.ownerProfile) ?? optionalString(body.owner_profile) ?? "",
+      painSignal: optionalString(body.painSignal) ?? optionalString(body.pain_signal) ?? "",
+      nextAction: optionalString(body.nextAction) ?? optionalString(body.next_action) ?? "",
+      notes: optionalString(body.notes) ?? "",
+      repId,
+    },
+  };
 }
 
 function validateLeadInput(body: Record<string, unknown>) {
@@ -61,20 +95,28 @@ export async function POST(request: Request) {
   if (authError) return authError;
   const writeAuthError = requireSalesWriteAuth(request);
   if (writeAuthError) return writeAuthError;
+  const access = getSalesRepAccessStatus(request);
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const rawBody = (await request.json()) as Record<string, unknown>;
+    const repCreate = access.mode === "rep-code" && access.repId ? buildRepCreateBody(rawBody, access.repId) : null;
+    if (repCreate?.error) return errorJson(repCreate.error, 403);
+
+    const body = (repCreate?.body ?? rawBody) as Record<string, unknown>;
     const validation = validateLeadInput(body);
     if (validation.error) return errorJson(validation.error, 400);
 
     const now = isoNow();
     const lead = normalizeSalesLead({
       ...body,
-      id: typeof body.id === "string" ? body.id : crypto.randomUUID(),
+      repId: access.mode === "rep-code" && access.repId ? access.repId : typeof body.repId === "string" ? body.repId : undefined,
+      id: access.mode === "rep-code" ? crypto.randomUUID() : typeof body.id === "string" ? body.id : crypto.randomUUID(),
       createdAt: now,
       updatedAt: now,
       trackingCode:
-        typeof body.trackingCode === "string"
+        access.mode === "rep-code"
+          ? `AZ-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+          : typeof body.trackingCode === "string"
           ? body.trackingCode
           : typeof body.tracking_code === "string"
             ? body.tracking_code

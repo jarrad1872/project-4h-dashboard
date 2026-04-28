@@ -34,6 +34,7 @@ import {
   tenCustomerSprintRows,
 } from "@/lib/customer-proof-sprint";
 import {
+  buildSalesTrackingParams,
   buildSalesTrackingUrl,
   businessCardPrintSpec,
   getPrimarySalesCard,
@@ -73,6 +74,9 @@ const EMPTY_FORM = {
   nextAction: "",
   notes: "",
 };
+
+const SALES_REP_CODE_HEADER = "x-sales-rep-code";
+const REP_FIELD_STAGES: SalesStage[] = ["prospect", "qualified", "visited", "card-left", "demo-booked", "trial-started"];
 
 function DownloadLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -127,6 +131,44 @@ export default function SalesPageClient() {
   const [attributionEvents, setAttributionEvents] = useState<MarketingEvent[]>([]);
   const [attributionLoading, setAttributionLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [repAccessCode, setRepAccessCode] = useState(() =>
+    typeof window === "undefined" ? "" : (window.sessionStorage.getItem("dustin-sales-rep-code") ?? ""),
+  );
+  const [repAccessUnlocked, setRepAccessUnlocked] = useState(false);
+  const [repAccessMessage, setRepAccessMessage] = useState("Checking field mode...");
+  const [repAccessMode, setRepAccessMode] = useState("locked");
+  const [appOrigin] = useState(() => (typeof window === "undefined" ? "https://pumpcans.com" : window.location.origin));
+
+  function salesWriteHeaders() {
+    return {
+      "Content-Type": "application/json",
+      ...(repAccessCode.trim() ? { [SALES_REP_CODE_HEADER]: repAccessCode.trim() } : {}),
+    };
+  }
+
+  async function checkRepAccess(code = repAccessCode) {
+    const response = await fetch("/api/sales/access", {
+      cache: "no-store",
+      headers: code.trim() ? { [SALES_REP_CODE_HEADER]: code.trim() } : undefined,
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      unlocked?: boolean;
+      mode?: string;
+      message?: string;
+      productionRepCodeConfigured?: boolean;
+    };
+    setRepAccessUnlocked(Boolean(data.unlocked));
+    setRepAccessMode(data.mode ?? "locked");
+    setRepAccessMessage(
+      data.message ??
+        (data.unlocked
+          ? "Sales field mode is unlocked."
+          : data.productionRepCodeConfigured
+            ? "Enter Dustin's rep access code to unlock writes."
+            : "Production rep access code is not configured yet."),
+    );
+    return Boolean(data.unlocked);
+  }
 
   async function loadLeads() {
     const response = await fetch("/api/sales/leads", { cache: "no-store" });
@@ -148,9 +190,9 @@ export default function SalesPageClient() {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial API hydration happens after fetch resolves.
     void loadLeads();
     void loadAttribution();
+    void checkRepAccess(repAccessCode);
   }, []);
 
   async function createLead() {
@@ -159,7 +201,7 @@ export default function SalesPageClient() {
     setSaveError(null);
     const response = await fetch("/api/sales/leads", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: salesWriteHeaders(),
       body: JSON.stringify({
         ...form,
         repId: rep.id,
@@ -173,6 +215,7 @@ export default function SalesPageClient() {
       setSavingId(null);
       return;
     }
+    if (repAccessCode.trim()) window.sessionStorage.setItem("dustin-sales-rep-code", repAccessCode.trim());
     setForm(EMPTY_FORM);
     setSavingId(null);
     await loadLeads();
@@ -183,7 +226,7 @@ export default function SalesPageClient() {
     setSaveError(null);
     const response = await fetch(`/api/sales/leads/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: salesWriteHeaders(),
       body: JSON.stringify(patch),
     });
     if (!response.ok) {
@@ -211,6 +254,8 @@ export default function SalesPageClient() {
       >,
     [leads],
   );
+  const primaryTracking = useMemo(() => buildSalesTrackingParams({ rep, cardVariant }), [rep, cardVariant]);
+  const primaryTrackingUrl = `${appOrigin}${primaryTracking.path}`;
 
   return (
     <div className="space-y-6" data-testid="sales-crm-page">
@@ -246,6 +291,56 @@ export default function SalesPageClient() {
           </Card>
         ))}
       </div>
+
+      <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10" data-testid="dustin-field-mode">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Dustin field mode</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">
+              {repAccessUnlocked ? "CRM writes unlocked" : "Unlock limited rep CRM writes"}
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+              Dustin can add real prospect rows, move his own field stages, and keep next actions current. This does not
+              send outreach, place card orders, create webhooks, launch ads, move money, or change billing.
+            </p>
+            <p className="mt-2 text-xs text-slate-500">{repAccessMessage}</p>
+          </div>
+          <div className="w-full rounded-lg border border-slate-800 bg-slate-950/60 p-3 xl:max-w-md">
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-500" htmlFor="rep-access-code">
+              Rep access code
+            </label>
+            <div className="mt-2 flex gap-2">
+              <input
+                id="rep-access-code"
+                type="password"
+                value={repAccessCode}
+                onChange={(event) => setRepAccessCode(event.target.value)}
+                placeholder="Configured in Vercel env"
+                className="min-w-0 flex-1 rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+              />
+              <Button
+                onClick={() => {
+                  if (repAccessCode.trim()) window.sessionStorage.setItem("dustin-sales-rep-code", repAccessCode.trim());
+                  void checkRepAccess();
+                }}
+              >
+                Unlock
+              </Button>
+            </div>
+            <p className="mt-3 break-all font-mono text-xs text-cyan-200">{primaryTrackingUrl}</p>
+            <p className="mt-2 text-xs text-slate-500">
+              QR/card scan path logs `asset_view` and lands on Dustin&apos;s demo page.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-2 md:grid-cols-4">
+          {["Add real lead", "Mark card left", "Book demo", "Log next action"].map((step) => (
+            <div key={step} className="rounded border border-slate-800 bg-slate-950/50 p-3 text-sm font-semibold text-white">
+              {step}
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="space-y-4 border-amber-900/60 bg-amber-950/10" data-testid="sales-card-proof-top">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
@@ -284,20 +379,21 @@ export default function SalesPageClient() {
         </div>
 
         <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Source artifact and legacy exports</p>
+          <p className="text-xs uppercase tracking-wide text-slate-500">Vistaprint-ready flattened exports</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            Use the generated proof sheet above for selection. The SVG/PNG exports below are legacy mechanical card
-            files and should not override the approved image-gen creative direction.
+            These PNGs are cropped from the approved generated proof sheet with the text baked into the image. Use these
+            for Vistaprint instead of the legacy generated SVG/PNG route.
           </p>
           <div className="mt-3 grid gap-2 lg:grid-cols-3">
             <div className="rounded border border-amber-800/60 bg-amber-950/20 p-3 lg:col-span-3">
-              <p className="text-sm font-semibold text-white">Approved generated proof sheet</p>
+              <p className="text-sm font-semibold text-white">Approved generated proof sheet and print pack</p>
               <p className="mt-1 text-xs leading-5 text-slate-400">
                 Source creative for Dustin to review: three concepts, front/back, captions, contact details, demo line{" "}
                 {PIPE_CITY_DEMO_LINE}.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
+                <DownloadLink href="/sales-assets/print/dustin-pipe-business-card-print-pack.zip">Print Pack ZIP</DownloadLink>
               </div>
             </div>
             {cardProofs.map((proof) => (
@@ -305,8 +401,12 @@ export default function SalesPageClient() {
                 <p className="text-sm font-semibold text-white">{proof.label}</p>
                 <p className="mt-1 text-xs leading-5 text-slate-400">{proof.frontHeadline}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <DownloadLink href={`/api/sales/business-card/${proof.id}/front.png`}>Front PNG</DownloadLink>
-                  <DownloadLink href={`/api/sales/business-card/${proof.id}/back.png`}>Back PNG</DownloadLink>
+                  <DownloadLink href={proof.printFrontPath ?? `/api/sales/business-card/${proof.id}/front.png`}>
+                    Print Front PNG
+                  </DownloadLink>
+                  <DownloadLink href={proof.printBackPath ?? `/api/sales/business-card/${proof.id}/back.png`}>
+                    Print Back PNG
+                  </DownloadLink>
                 </div>
               </div>
             ))}
@@ -697,7 +797,7 @@ export default function SalesPageClient() {
               <h2 className="mt-1 text-lg font-semibold text-white">Dustin Bouwhuis pipe.city cards</h2>
               <p className="mt-1 text-sm text-slate-400">
                 The generated proof sheet above is the visual source of truth. This section keeps rep-coded URLs and
-                legacy mechanical exports available without presenting them as the approved creative.
+                flattened print files available without sending outreach or placing card orders.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
@@ -710,7 +810,8 @@ export default function SalesPageClient() {
           <div className="space-y-5">
             {cardProofs.map((proof, index) => {
               const proofValidation = validateSalesCardVariant(proof);
-              const proofTracking = buildSalesTrackingUrl({ rep, cardVariant: proof });
+              const proofTracking = buildSalesTrackingParams({ rep, cardVariant: proof });
+              const proofTrackingUrl = `${appOrigin}${proofTracking.path}`;
 
               return (
                 <div
@@ -745,15 +846,13 @@ export default function SalesPageClient() {
                         className="mt-2 break-all font-mono text-xs text-cyan-200"
                         data-testid={index === 0 ? "sales-card-tracking-url" : undefined}
                       >
-                        {proofTracking.url}
+                        {proofTrackingUrl}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2" data-testid={index === 0 ? "sales-card-download-front" : undefined}>
                       <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
-                      <DownloadLink href={`/api/sales/business-card/${proof.id}/front.png`}>Front PNG</DownloadLink>
-                      <DownloadLink href={`/api/sales/business-card/${proof.id}/back.png`}>Back PNG</DownloadLink>
-                      <DownloadLink href={`/api/sales/business-card/${proof.id}/front.svg`}>Front SVG</DownloadLink>
-                      <DownloadLink href={`/api/sales/business-card/${proof.id}/back.svg`}>Back SVG</DownloadLink>
+                      {proof.printFrontPath ? <DownloadLink href={proof.printFrontPath}>Print Front PNG</DownloadLink> : null}
+                      {proof.printBackPath ? <DownloadLink href={proof.printBackPath}>Print Back PNG</DownloadLink> : null}
                     </div>
                   </div>
                 </div>
@@ -879,6 +978,46 @@ export default function SalesPageClient() {
             data-testid="sales-form-next-action"
             className="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
           />
+          <select
+            value={form.stage}
+            onChange={(event) => setForm((prev) => ({ ...prev, stage: event.target.value as SalesStage }))}
+            data-testid="sales-form-stage"
+            className="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+          >
+            {salesStages.map((stage) => (
+              <option
+                key={stage.id}
+                value={stage.id}
+                disabled={
+                  form.leadType === "archetype" &&
+                  ["visited", "card-left", "demo-booked", "trial-started", "activated", "paid"].includes(stage.id)
+                }
+              >
+                {stage.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <textarea
+            value={form.ownerProfile}
+            onChange={(event) => setForm((prev) => ({ ...prev, ownerProfile: event.target.value }))}
+            placeholder="Owner/context notes"
+            data-testid="sales-form-owner-profile"
+            className="min-h-24 rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+          />
+          <textarea
+            value={form.notes}
+            onChange={(event) => setForm((prev) => ({ ...prev, notes: event.target.value }))}
+            placeholder="Visit notes, objection, or follow-up context"
+            data-testid="sales-form-notes"
+            className="min-h-24 rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs leading-5 text-slate-500">
+            Enter only information shared for this pilot. This is internal CRM storage, not an outreach sender.
+          </p>
           <Button
             onClick={() => void createLead()}
             disabled={savingId === "new" || !form.businessName.trim()}
@@ -947,11 +1086,33 @@ export default function SalesPageClient() {
                       <p className="mt-2 text-xs text-slate-300">{lead.painSignal || "No pain signal logged yet."}</p>
                       <p className="mt-2 text-xs text-slate-500">{lead.nextAction || "Set the next action before touching this row."}</p>
                       <p className="mt-2 break-all font-mono text-[11px] text-cyan-200">{leadUrl.contentId}</p>
-                      <div className="mt-3 flex flex-wrap gap-2">
+                      <div className="mt-3 grid grid-cols-2 gap-1">
+                        {(["visited", "card-left", "demo-booked", "trial-started"] as SalesStage[]).map((stageId) => {
+                          const stage = salesStages.find((option) => option.id === stageId)!;
+                          const disabled =
+                            savingId === lead.id ||
+                            lead.stage === stageId ||
+                            (lead.leadType === "archetype" && ["visited", "card-left", "demo-booked", "trial-started"].includes(stageId));
+                          return (
+                            <button
+                              key={stageId}
+                              type="button"
+                              disabled={disabled}
+                              onClick={() => void updateLead(lead.id, { stage: stageId, lastTouchedAt: new Date().toISOString() })}
+                              className="rounded border border-current/40 bg-slate-950 px-2 py-1 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              {stage.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-2">
                         <select
                           value={lead.stage}
                           disabled={savingId === lead.id}
-                          onChange={(event) => void updateLead(lead.id, { stage: event.target.value as SalesStage })}
+                          onChange={(event) =>
+                            void updateLead(lead.id, { stage: event.target.value as SalesStage, lastTouchedAt: new Date().toISOString() })
+                          }
                           data-testid={`sales-lead-stage-${lead.id}`}
                           className="rounded border border-current/40 bg-slate-950 px-2 py-1 text-xs text-white outline-none"
                         >
@@ -959,7 +1120,11 @@ export default function SalesPageClient() {
                             <option
                               key={option.id}
                               value={option.id}
-                              disabled={lead.leadType === "archetype" && ["visited", "card-left", "demo-booked", "trial-started", "activated", "paid"].includes(option.id)}
+                              disabled={
+                                (lead.leadType === "archetype" &&
+                                  ["visited", "card-left", "demo-booked", "trial-started", "activated", "paid"].includes(option.id)) ||
+                                (repAccessMode === "rep-code" && !REP_FIELD_STAGES.includes(option.id))
+                              }
                             >
                               {option.label}
                             </option>

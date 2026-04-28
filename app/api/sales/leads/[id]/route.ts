@@ -2,13 +2,14 @@ import { errorJson, okJson, optionsResponse } from "@/lib/api";
 import { requireAuth } from "@/lib/auth";
 import { isoNow } from "@/lib/file-db";
 import { readSalesLeadsFallback, writeSalesLeadsFallback } from "@/lib/sales-lead-store";
-import { requireSalesWriteAuth } from "@/lib/sales-write-auth";
+import { getSalesRepAccessStatus, requireSalesWriteAuth } from "@/lib/sales-write-auth";
 import {
   canUseSalesStage,
   canReclassifySalesLead,
   normalizeSalesLead,
   normalizeSalesStage,
   salesLeadToDb,
+  type SalesStage,
 } from "@/lib/sales-rep-pipeline";
 import { hasSupabase, logActivity } from "@/lib/server-utils";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -19,7 +20,10 @@ export function OPTIONS() {
   return optionsResponse();
 }
 
-function buildPatch(body: Record<string, unknown>) {
+const REP_PATCH_FIELDS = new Set(["stage", "painSignal", "pain_signal", "nextAction", "next_action", "lastTouchedAt", "last_touched_at", "notes"]);
+const REP_PATCH_STAGES = new Set<SalesStage>(["prospect", "qualified", "visited", "card-left", "demo-booked", "trial-started"]);
+
+function buildPatch(body: Record<string, unknown>, repLimited = false) {
   const patch: Record<string, unknown> = {};
   for (const [from, to] of [
     ["businessName", "businessName"],
@@ -43,6 +47,7 @@ function buildPatch(body: Record<string, unknown>) {
     ["tracking_code", "trackingCode"],
     ["notes", "notes"],
   ] as const) {
+    if (repLimited && !REP_PATCH_FIELDS.has(from)) continue;
     if (body[from] !== undefined) patch[to] = body[from];
   }
   return patch;
@@ -53,11 +58,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (authError) return authError;
   const writeAuthError = requireSalesWriteAuth(request);
   if (writeAuthError) return writeAuthError;
+  const access = getSalesRepAccessStatus(request);
 
   try {
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
-    const patch = buildPatch(body);
+    const patch = buildPatch(body, access.mode === "rep-code");
 
     if (Object.keys(patch).length === 0) {
       return errorJson("No fields to update", 400);
@@ -65,6 +71,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     const requestedLeadType = patch.leadType === "real" ? "real" : patch.leadType === "archetype" ? "archetype" : null;
     const requestedStage = patch.stage !== undefined ? normalizeSalesStage(patch.stage) : null;
+    if (access.mode === "rep-code" && requestedStage && !REP_PATCH_STAGES.has(requestedStage)) {
+      return errorJson("Rep access can move leads through prospect, qualified, visited, card-left, demo-booked, and trial-started only.", 403);
+    }
 
     if (!hasSupabase()) {
       const leads = readSalesLeadsFallback();
@@ -72,6 +81,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       if (index < 0) return errorJson("Sales lead not found", 404);
 
       const previous = leads[index];
+      if (access.mode === "rep-code" && access.repId && previous.repId !== access.repId) {
+        return errorJson("Rep access can only update that rep's own leads.", 403);
+      }
       if (requestedLeadType && !canReclassifySalesLead(previous.leadType, requestedLeadType)) {
         return errorJson("Create a new real lead instead of reclassifying an archetype row.", 400);
       }
@@ -103,6 +115,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!existing) return errorJson("Sales lead not found", 404);
 
     const previous = normalizeSalesLead(existing as Record<string, unknown>);
+    if (access.mode === "rep-code" && access.repId && previous.repId !== access.repId) {
+      return errorJson("Rep access can only update that rep's own leads.", 403);
+    }
     if (requestedLeadType && !canReclassifySalesLead(previous.leadType, requestedLeadType)) {
       return errorJson("Create a new real lead instead of reclassifying an archetype row.", 400);
     }

@@ -89,6 +89,8 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-71 | Deep Research Reset | Research | Expand Google Maps review-signal import plan | 2026-04-28 | `/sales` and `docs/google-maps-pain-signal-roadmap.md` now document manual/API/provider import paths with source URL, quote, confidence, and compliance gates; scraping/evasion remains blocked. |
 | Q-72 | Deep Research Reset | Strategy | Add Deep Research verdict shelf | 2026-04-28 | Command and `/templates` now expose the Deep Research verdict, preferred/alternative options, kill criteria, and stop/start/keep guidance for future agents. |
 | Q-73 | Creative System | Assets | Enforce generated creative source of truth | 2026-04-28 | `/assets`, `/sales`, README, SOP, and TASKS now state that finished creative is the image-gen artifact; coded SVG/HTML recreations are wireframes, crop helpers, metadata previews, or legacy utilities only. |
+| Q-74 | Field Sales | Sales | Add Dustin Field Mode | 2026-04-28 | `/sales` now has limited rep access-code support, mobile quick-add CRM fields, fast stage buttons, tracked card scan URLs, and `/sales/dustin` as the demo landing page; no outreach, billing, webhook, ad, or money movement path is added. |
+| Q-75 | Field Sales | Print Assets | Add flattened Dustin Vistaprint files | 2026-04-28 | `/sales` now downloads the actual print artwork: six flattened 1086x636 PNGs cropped from the approved generated proof sheet plus a ZIP pack, instead of pointing Dustin at background-only or legacy mechanical exports. |
 
 ## Ready Queue
 

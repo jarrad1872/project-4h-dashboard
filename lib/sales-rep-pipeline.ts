@@ -57,6 +57,8 @@ export interface SalesCardVariant {
   offer: string;
   price: string;
   callout: string;
+  printFrontPath?: string;
+  printBackPath?: string;
 }
 
 export interface SalesTrackingUrlInput {
@@ -147,6 +149,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     offer: SALES_CARD_TRIAL,
     price: SALES_CARD_PRICE,
     callout: "Best for trust-first drops with plumbing owners who want a human contact.",
+    printFrontPath: "/sales-assets/print/dustin-pipe-local-trust-front-print-1086x636.png",
+    printBackPath: "/sales-assets/print/dustin-pipe-local-trust-back-print-1086x636.png",
   },
   {
     id: "dustin-pipe-missed-call",
@@ -167,6 +171,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     offer: SALES_CARD_TRIAL,
     price: SALES_CARD_PRICE,
     callout: "Best for urgent-call conversations and review-signal prospects.",
+    printFrontPath: "/sales-assets/print/dustin-pipe-missed-call-front-print-1086x636.png",
+    printBackPath: "/sales-assets/print/dustin-pipe-missed-call-back-print-1086x636.png",
   },
   {
     id: "dustin-pipe-live-demo",
@@ -187,6 +193,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     offer: SALES_CARD_TRIAL,
     price: SALES_CARD_PRICE,
     callout: "Best for counter drops, supply houses, and quick QR-first pitches.",
+    printFrontPath: "/sales-assets/print/dustin-pipe-live-demo-front-print-1086x636.png",
+    printBackPath: "/sales-assets/print/dustin-pipe-live-demo-back-print-1086x636.png",
   },
 ];
 
@@ -434,6 +442,22 @@ export function buildSalesTrackingUrl({
     source,
     medium: FIELD_SALES_UTM_MEDIUM,
     term,
+  };
+}
+
+export function buildSalesTrackingParams(input: SalesTrackingUrlInput) {
+  const tracking = buildSalesTrackingUrl(input);
+  const sourceUrl = new URL(tracking.url);
+  const params = new URLSearchParams();
+  for (const [key, value] of sourceUrl.searchParams.entries()) {
+    params.set(key, value);
+  }
+  params.set("event_type", "asset_view");
+  return {
+    ...tracking,
+    params,
+    path: `/api/sales/track?${params.toString()}`,
+    landingPath: `/sales/dustin?${params.toString()}`,
   };
 }
 
