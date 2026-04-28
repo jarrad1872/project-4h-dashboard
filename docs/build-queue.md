@@ -65,12 +65,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-47 | Governance | Navigation | Apply legacy AI Studio redirect packet | 2026-04-27 | `/generate` now redirects internally to `/assets`; legacy API routes stay untouched and no external action is performed. |
 | Q-48 | Governance | Navigation | Apply legacy GTM archive-only packet | 2026-04-27 | `/gtm` now redirects internally to Command; product-route inventory remains preserved on Command/docs and sawcity-lite is untouched. |
 | Q-49 | Governance | Navigation | Apply legacy Settings cleanup packet | 2026-04-27 | `/settings` now redirects internally to Approval; setup/source notes remain preserved and placeholder credentials no longer render on the page. |
+| Q-50 | Governance | Navigation | Harden Ad Archive as read-only reference | 2026-04-27 | `/ads` now displays archive rows as read-only reference, removes create/edit/pause/regenerate affordances, and redirects `/ads/[id]` back to the archive. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-50 | Governance | Navigation | Harden Ad Archive as read-only reference | none | `/ads` keeps historical rows readable but removes or disables current-candidate creation/edit affordances; no ad copy deletion, upload, launch, webhook, spend, billing, or external action is changed. |
+| Q-51 | Governance | Navigation | Draft blocked-route cleanup packets | none | Draft packets cover `/creatives` and `/workflow` dependencies and require 200/static checks; no redirects, deletions, uploads, launches, spend, billing, or sawcity-lite changes occur. |
 
 ## Stop Conditions
 

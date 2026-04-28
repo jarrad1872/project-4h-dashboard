@@ -51,6 +51,7 @@ These routes are not active operating lanes. They remain available from the coll
 13. Q-47: Apply the legacy AI Studio redirect packet. Complete; `/generate` redirects internally to `/assets` and legacy API routes remain untouched.
 14. Q-48: Apply the legacy GTM archive-only packet. Complete; `/gtm` redirects internally to Command and product-route inventory remains preserved in Command/docs.
 15. Q-49: Apply the legacy Settings cleanup packet. Complete; `/settings` redirects internally to Approval and setup/source notes remain preserved in Command/docs.
+16. Q-50: Harden `/ads` as read-only archive reference. Complete; create/edit/pause/regenerate controls are removed and `/ads/[id]` redirects back to `/ads`.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -79,7 +80,7 @@ The Command page now shows a route dependency guard with these current statuses:
 | Support | 2 | Keep as detail/support routes reached from active loops. |
 | Clear | 4 | Candidate or already-applied route cleanup after preserving useful notes. |
 
-Current pending clear route: `/ads`. Applied clear routes: `/generate`, `/gtm`, `/settings`.
+Current pending clear routes: none. Applied clear routes: `/generate`, `/gtm`, `/settings`, `/ads`.
 
 Current blockers to resolve first:
 
@@ -190,3 +191,9 @@ Q-48 did not change launch URLs, remove product-route data, edit sawcity-lite, u
 Q-49 applies the third clear-route cleanup packet: the `/settings` page route now redirects internally to `/approval`. Setup/source notes remain preserved in `lib/settings-source-notes.ts`, Command, SOP, and this route disposition plan.
 
 Q-49 did not expose credentials, change campaign status, remove source-note data, create webhooks, upload to ad platforms, launch campaigns, spend money, change billing, or touch sawcity-lite. Browser verification must confirm `/settings` lands on `/approval` and Approval loads.
+
+## Q-50 Ad Archive Read-Only Hardening
+
+Q-50 applies the final clear-route cleanup packet: `/ads` remains available as a readable archive reference, while create, edit, pause/unpause, creative-regeneration, and ad-detail editor affordances are removed. `/ads/[id]` redirects back to `/ads`.
+
+Q-50 did not delete ad rows, edit ad copy, upload to ad platforms, launch campaigns, create webhooks, spend money, change billing, or touch sawcity-lite. Browser verification must confirm the read-only guard is visible, no old mutable action labels are rendered, archive rows remain readable, and `/ads/[id]` returns to `/ads`.

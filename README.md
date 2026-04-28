@@ -265,6 +265,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-47 applies the first cleanup packet: `/generate` now redirects internally to `/assets`; legacy generation API routes stay available and no external action is performed
 - Q-48 applies the GTM archive-only packet: `/gtm` now redirects internally to Command while product-route inventory remains preserved in Command/docs and sawcity-lite stays untouched
 - Q-49 applies the Settings cleanup packet: `/settings` now redirects internally to Approval while setup/source notes remain preserved and placeholder credentials no longer render on that page
+- Q-50 hardens `/ads` as a read-only archive: create/edit/pause/regenerate controls are removed, `/ads/[id]` redirects back to `/ads`, and historical rows remain readable without deleting or sending anything
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -293,7 +294,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-49 legacy Settings redirect | v4.4.18*
+*Last updated: 2026-04-27 Q-50 read-only ad archive | v4.4.19*
 
 ---
 

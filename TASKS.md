@@ -209,7 +209,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-47 legacy AI Studio redirect packet from `/generate` to `/assets`.
 - [x] Add Q-48 legacy GTM archive-only packet.
 - [x] Add Q-49 legacy Settings cleanup packet.
-- [ ] Add Q-50 Ad Archive read-only hardening.
+- [x] Add Q-50 Ad Archive read-only hardening.
+- [ ] Add Q-51 blocked-route cleanup packet drafts.
 
 ---
 
@@ -258,7 +259,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Apply first clear-route cleanup packet for `/generate`.
 - [x] Apply archive-only cleanup packet for `/gtm`.
 - [x] Apply cleanup packet for `/settings`.
-- [ ] Harden `/ads` as archive-only reference.
+- [x] Harden `/ads` as archive-only reference.
+- [ ] Draft blocked cleanup packets for `/creatives` and `/workflow`.
 
 ---
 

@@ -231,11 +231,11 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   {
     route: "/ads",
     status: "clear",
-    readyForRedirectOrDelete: true,
-    activeReferences: ["Reference Shelf", "/ads/[id] detail links"],
-    dataDependencies: ["Historical ad archive audit map preserved in ad-archive"],
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Reference Shelf", "/ads/[id] redirects back to archive"],
+    dataDependencies: ["Historical ad archive audit map preserved in ad-archive", "Ad archive UI is read-only"],
     docOrTestReferences: ["README route table", "route-disposition-plan", "ad-archive.test", "navigation.test", "Command ad archive audit map"],
-    guardrail: "Candidate for future archive-only packet after confirming approval and launch still read /api/ads directly.",
+    guardrail: "Implemented in Q-50. Keep historical rows readable and move current-candidate actions to Launch/Approval.",
   },
   {
     route: "/generate",

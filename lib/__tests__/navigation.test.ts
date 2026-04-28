@@ -75,6 +75,7 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.find((row) => row.route === "/ads")?.dataDependencies).toContain(
       "Historical ad archive audit map preserved in ad-archive",
     );
+    expect(routeDependencyGuards.find((row) => row.route === "/ads")?.dataDependencies).toContain("Ad archive UI is read-only");
     expect(routeDependencyGuards.find((row) => row.route === "/settings")?.dataDependencies).toContain(
       "Internal /settings page route redirects to /approval",
     );
@@ -97,7 +98,7 @@ describe("navigation IA", () => {
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
       counts: { clear: 4, blocked: 2, support: 2 },
-      readyForRedirectOrDelete: 1,
+      readyForRedirectOrDelete: 0,
     });
   });
 });

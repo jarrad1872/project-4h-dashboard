@@ -7,7 +7,7 @@ import {
 
 describe("clearRouteCleanupPacket", () => {
   it("groups only clear route candidates without authorizing implementation", () => {
-    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/ads"]);
+    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual([]);
     expect(clearRouteCleanupPacket.every((entry) => entry.implementationAllowed === false)).toBe(true);
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/generate")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/gtm")).toBeUndefined();
@@ -16,24 +16,17 @@ describe("clearRouteCleanupPacket", () => {
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/workflow")).toBeUndefined();
   });
 
-  it("keeps preserved evidence and verification attached to every candidate", () => {
-    for (const entry of clearRouteCleanupPacket) {
-      expect(entry.preservedEvidence.length).toBeGreaterThan(0);
-      expect(entry.requiredVerification).toContain("No redirect, deletion, upload, launch, webhook, spend, or external action occurs in the packet draft");
-    }
-
-    expect(clearRouteCleanupPacket.find((entry) => entry.route === "/ads")?.preservedEvidence).toContain(
-      "Historical ad archive audit map preserved in ad-archive",
-    );
+  it("has no pending clear candidates after Q50", () => {
+    expect(clearRouteCleanupPacket).toHaveLength(0);
   });
 
   it("summarizes packet counts and blocked actions", () => {
     expect(clearRouteCleanupPacketSummary()).toEqual({
-      total: 1,
-      routes: ["/ads"],
-      appliedRoutes: ["/generate", "/gtm", "/settings"],
-      counts: { rebuild: 0, redirect: 0, archive: 1, delete: 0 },
-      appliedCount: 3,
+      total: 0,
+      routes: [],
+      appliedRoutes: ["/generate", "/gtm", "/settings", "/ads"],
+      counts: { rebuild: 0, redirect: 0, archive: 0, delete: 0 },
+      appliedCount: 4,
       implementationAllowed: false,
       blockedActions: ["route redirect", "route deletion", "ad upload", "campaign launch", "webhook creation", "spend change"],
       preservationRule:
@@ -62,6 +55,13 @@ describe("clearRouteCleanupPacket", () => {
         appliedIn: "Q-49",
         outcome: "Internal page route redirects to Approval while setup/source notes remain preserved in Command/docs.",
         verification: ["/settings redirects to /approval", "Approval route loads", "placeholder credentials are not rendered"],
+        externalActionAllowed: false,
+      },
+      {
+        route: "/ads",
+        appliedIn: "Q-50",
+        outcome: "Ad archive remains readable while create/edit/pause/regenerate controls are removed and detail editor routes redirect back to archive.",
+        verification: ["/ads shows read-only guard", "/ads/[id] redirects to /ads", "historical rows remain readable"],
         externalActionAllowed: false,
       },
     ]);

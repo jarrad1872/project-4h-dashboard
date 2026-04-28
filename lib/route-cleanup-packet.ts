@@ -46,6 +46,13 @@ export const appliedRouteCleanupPackets: AppliedRouteCleanupEntry[] = [
     verification: ["/settings redirects to /approval", "Approval route loads", "placeholder credentials are not rendered"],
     externalActionAllowed: false,
   },
+  {
+    route: "/ads",
+    appliedIn: "Q-50",
+    outcome: "Ad archive remains readable while create/edit/pause/regenerate controls are removed and detail editor routes redirect back to archive.",
+    verification: ["/ads shows read-only guard", "/ads/[id] redirects to /ads", "historical rows remain readable"],
+    externalActionAllowed: false,
+  },
 ];
 
 function intentForRecommendation(recommendation: RouteRetirementRecommendation) {

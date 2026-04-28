@@ -1,173 +1,67 @@
 "use client";
 
-/* eslint-disable react-hooks/set-state-in-effect -- Ads page loads API rows after mount and resets pagination when filters change. */
+/* eslint-disable react-hooks/set-state-in-effect -- Ads archive loads API rows after mount and resets pagination when filters change. */
 
-import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PlatformChip, StatusChip } from "@/components/chips";
 import { LegacyRouteBanner } from "@/components/route-disposition-banner";
-import { getAdArchiveState, summarizeAdArchive } from "@/lib/ad-archive";
-import { tradeBadge, TRADE_MAP, tradeFromAd, getCreativeUrls, CREATIVE_LABELS } from "@/lib/trade-utils";
 import { AdPreviewModal } from "@/components/ad-preview-modal";
-import { Button, Card, GhostButton } from "@/components/ui";
-import type { Ad, AdStatus, AdTemplate, WorkflowStage } from "@/lib/types";
+import { Card, GhostButton } from "@/components/ui";
+import { getAdArchiveState, summarizeAdArchive } from "@/lib/ad-archive";
+import { CREATIVE_LABELS, getCreativeUrls, TRADE_MAP, tradeBadge, tradeFromAd } from "@/lib/trade-utils";
+import type { Ad } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 const platformFilters = ["all", "linkedin", "youtube", "facebook", "instagram", "retargeting"] as const;
 const statusFilters = ["all", "approved", "pending", "paused", "rejected"] as const;
-const archiveFilters = ["current", "historical", "all"] as const;
+const archiveFilters = ["historical", "current", "all"] as const;
+const PAGE_SIZE = 30;
 
 function isPlatformFilter(value: string): value is (typeof platformFilters)[number] {
   return platformFilters.includes(value as (typeof platformFilters)[number]);
 }
 
-interface EditTarget {
-  adId: string;
-  variant: 1 | 2 | 3;
-  label: string;
-  storagePath: string;
-  currentUrl: string;
-}
-
-const emptyAd: Partial<Ad> = {
-  platform: "linkedin",
-  campaignGroup: "4h_custom",
-  format: "static1x1",
-  primaryText: "",
-  headline: "",
-  cta: "Start now",
-  landingPath: "/li",
-  utmSource: "linkedin",
-  utmMedium: "paid-social",
-  utmCampaign: "4h_2026-03_custom",
-  utmContent: "custom",
-  utmTerm: "owners_1-10",
-  status: "pending",
-  workflowStage: "concept",
-};
-
 function AdsContent() {
   const [ads, setAds] = useState<Ad[]>([]);
-  const [templates, setTemplates] = useState<AdTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const [platform, setPlatform] = useState<(typeof platformFilters)[number]>(() => {
     const p = searchParams.get("platform") ?? "all";
     return isPlatformFilter(p) ? p : "all";
   });
   const [status, setStatus] = useState<(typeof statusFilters)[number]>("all");
-  const [archiveFilter, setArchiveFilter] = useState<(typeof archiveFilters)[number]>("current");
+  const [archiveFilter, setArchiveFilter] = useState<(typeof archiveFilters)[number]>("historical");
   const [search, setSearch] = useState("");
   const [tradeFilter, setTradeFilter] = useState("all");
-  const [showModal, setShowModal] = useState(false);
-  const [startFromTemplate, setStartFromTemplate] = useState(false);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
-  const [form, setForm] = useState<Partial<Ad>>(emptyAd);
-  const [savingCreative, setSavingCreative] = useState<Set<string>>(new Set());
-
-  // Creative edit modal
-  const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
-  const [editPrompt, setEditPrompt] = useState("");
-  const [regenLoading, setRegenLoading] = useState(false);
-  const [regenResult, setRegenResult] = useState<string | null>(null);
-  const [regenError, setRegenError] = useState<string | null>(null);
-  // Cache-busted URL overrides after a regen — keyed by `${adId}-c${variant}`
-  const [creativeUrlOverrides, setCreativeUrlOverrides] = useState<Record<string, string>>({});
-  const [previewAd, setPreviewAd] = useState<{ imageUrl: string; headline: string; domain: string; cta?: string; primaryText?: string } | null>(null);
-
-  function getStoragePath(variant: 1|2|3, prefix: string, imageUrl?: string | null): string {
-    if (variant === 1 && imageUrl) {
-      const match = imageUrl.match(/\/public\/ad-creatives\/(.+?)(\?|$)/);
-      if (match) return match[1];
-    }
-    if (variant === 2) return `nb2-creatives/${prefix}-c2.jpg`;
-    if (variant === 3) return `nb2-creatives/${prefix}-c3.jpg`;
-    return `trade-heros/nb2/${prefix}-hero-a.jpg`;
-  }
-
-  function openEditModal(ad: Ad, variant: 1|2|3, prefix: string) {
-    const urls = getCreativeUrls(prefix, ad.imageUrl ?? ad.image_url);
-    const overrideKey = `${ad.id}-c${variant}`;
-    const baseUrl = variant === 2 ? urls.c2 : variant === 3 ? urls.c3 : urls.c1;
-    const currentUrl = creativeUrlOverrides[overrideKey] ?? baseUrl;
-    const storagePath = getStoragePath(variant, prefix, ad.imageUrl ?? ad.image_url);
-    setEditTarget({ adId: ad.id, variant, label: `${prefix} · ${CREATIVE_LABELS[variant]}`, storagePath, currentUrl });
-    setEditPrompt("");
-    setRegenResult(null);
-    setRegenError(null);
-  }
-
-  async function regenCreative() {
-    if (!editTarget || !editPrompt.trim()) return;
-    setRegenLoading(true);
-    setRegenError(null);
-    setRegenResult(null);
-    try {
-      const res = await fetch("/api/regen-creative", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ storagePath: editTarget.storagePath, prompt: editPrompt.trim(), label: editTarget.label }),
-      });
-      const data = await res.json() as { url?: string; error?: string };
-      if (!res.ok || data.error) { setRegenError(data.error ?? "Unknown error"); }
-      else { setRegenResult(data.url ?? null); }
-    } catch (err) {
-      setRegenError(String(err));
-    }
-    setRegenLoading(false);
-  }
-
-  function applyRegenResult() {
-    if (!regenResult || !editTarget) return;
-    const overrideKey = `${editTarget.adId}-c${editTarget.variant}`;
-    if (editTarget.variant === 1) {
-      // C1: update the ad's imageUrl so the card and getCreativeUrls both pick it up
-      setAds((prev) => prev.map((a) =>
-        a.id === editTarget.adId ? { ...a, imageUrl: regenResult, image_url: regenResult } : a
-      ));
-    } else {
-      // C2/C3: store cache-busted URL override so the thumbnail and main preview update immediately
-      setCreativeUrlOverrides((prev) => ({ ...prev, [overrideKey]: regenResult }));
-    }
-    setEditTarget(null);
-  }
-
-  async function setCreativeVariant(adId: string, variant: number) {
-    setSavingCreative((prev) => new Set(prev).add(adId));
-    setAds((prev) => prev.map((a) => a.id === adId ? { ...a, creative_variant: variant, creativeVariant: variant } : a));
-    await fetch(`/api/ads/${adId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ creative_variant: variant }),
-    });
-    setSavingCreative((prev) => { const next = new Set(prev); next.delete(adId); return next; });
-  }
+  const [page, setPage] = useState(0);
+  const [copiedAdId, setCopiedAdId] = useState<string | null>(null);
+  const [previewAd, setPreviewAd] = useState<{
+    imageUrl: string;
+    headline: string;
+    domain: string;
+    cta?: string;
+    primaryText?: string;
+  } | null>(null);
 
   async function loadAds() {
+    setLoading(true);
     const res = await fetch("/api/ads", { cache: "no-store" });
     const data = (await res.json()) as Ad[];
-    setAds(data);
-  }
-
-  async function loadTemplates() {
-    const res = await fetch("/api/templates", { cache: "no-store" });
-    if (!res.ok) return;
-    const data = (await res.json()) as AdTemplate[];
-    setTemplates(data);
+    setAds(Array.isArray(data) ? data : []);
+    setLoading(false);
   }
 
   useEffect(() => {
     void loadAds();
-    void loadTemplates();
   }, []);
 
-  const [page, setPage] = useState(0);
-  const PAGE_SIZE = 30;
   const archiveSummary = useMemo(() => summarizeAdArchive(ads), [ads]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
+
     return ads.filter((ad) => {
       const archiveState = getAdArchiveState(ad);
       const platformMatch =
@@ -186,6 +80,7 @@ function AdsContent() {
           (ad.campaignGroup ?? "").toLowerCase().includes(q) ||
           (ad.landingPath ?? "").toLowerCase().includes(q) ||
           (TRADE_MAP[tradeFromAd(ad)]?.domain ?? "").toLowerCase().includes(q);
+
       return platformMatch && statusMatch && archiveMatch && tradeMatch && searchMatch;
     });
   }, [ads, archiveFilter, platform, status, search, tradeFilter]);
@@ -197,74 +92,45 @@ function AdsContent() {
     setPage(0);
   }, [archiveFilter, platform, status, search, tradeFilter]);
 
-  async function togglePause(id: string, currentStatus: AdStatus) {
-    const next: AdStatus = currentStatus === "paused" ? "pending" : "paused";
-    await fetch(`/api/ads/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: next }),
-    });
-    void loadAds();
+  function adUtmUrl(ad: Ad) {
+    return `https://saw.city${ad.landingPath}?utm_source=${ad.utmSource}&utm_medium=${ad.utmMedium}&utm_campaign=${ad.utmCampaign}&utm_content=${ad.utmContent}&utm_term=${ad.utmTerm}`;
   }
 
-  async function createAd() {
-    await fetch("/api/ads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    setShowModal(false);
-    setStartFromTemplate(false);
-    setSelectedTemplateId("");
-    setForm(emptyAd);
-    void loadAds();
+  async function copyUtm(ad: Ad) {
+    await navigator.clipboard.writeText(adUtmUrl(ad)).catch(() => null);
+    setCopiedAdId(ad.id);
   }
 
-  function applyTemplate(templateId: string) {
-    setSelectedTemplateId(templateId);
-    const template = templates.find((item) => item.id === templateId);
-    if (!template) return;
-
-    setForm((prev) => ({
-      ...prev,
-      platform: template.platform,
-      format: template.format ?? prev.format ?? "static1x1",
-      headline: template.headline ?? "",
-      primaryText: template.primaryText ?? "",
-      cta: template.cta ?? "Start now",
-      landingPath: template.landingPath || "/li",
-      utmCampaign: template.utmCampaign || "4h_2026-03_template",
-    }));
-  }
-
-  function updateWorkflowStage(workflowStage: WorkflowStage) {
-    setForm((f) => ({ ...f, workflowStage }));
+  if (loading) {
+    return <div className="flex h-64 items-center justify-center text-slate-400">Loading ad archive...</div>;
   }
 
   return (
     <div className="space-y-6">
       <LegacyRouteBanner route="/ads" />
 
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold">Ad Library</h1>
-        <Button
-          onClick={() => {
-            setShowModal(true);
-            setForm(emptyAd);
-          }}
-        >
-          + New Ad
-        </Button>
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Read-only reference</p>
+          <h1 className="mt-1 text-2xl font-bold">Ad Archive</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+            Historical ads stay readable for audit, copy review, UTM lookup, and preview. Current-candidate creation,
+            editing, pause/unpause, and creative regeneration have moved out of this route.
+          </p>
+        </div>
+        <span className="rounded-md border border-amber-700/60 bg-amber-950/30 px-3 py-2 text-sm font-semibold text-amber-200">
+          Archive-only
+        </span>
       </div>
 
-      <Card className="border-amber-800/60 bg-amber-950/20">
+      <Card className="border-amber-800/60 bg-amber-950/20" data-testid="ad-archive-readonly-guard">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Historical Archive</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-amber-300">No mutable ad actions</p>
             <h2 className="mt-1 text-xl font-black text-white">{archiveSummary.historical} legacy ads labeled</h2>
             <p className="mt-1 max-w-3xl text-sm text-slate-300">
-              Old NB2, imported, and generic Saw.City rows stay visible for reference but are not current launch candidates.
-              No ad copy is deleted or sent anywhere from this page.
+              This page does not create ads, edit ads, pause campaigns, regenerate creatives, upload to ad platforms,
+              launch campaigns, create webhooks, spend money, or change billing.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs text-slate-400 sm:min-w-80">
@@ -292,11 +158,7 @@ function AdsContent() {
               className={archiveFilter === value ? "bg-slate-700" : ""}
               onClick={() => setArchiveFilter(value)}
             >
-              {value === "current"
-                ? "Current candidates"
-                : value === "historical"
-                  ? "Historical archive"
-                  : "All ads"}
+              {value === "current" ? "Current references" : value === "historical" ? "Historical archive" : "All ads"}
             </GhostButton>
           ))}
         </div>
@@ -321,25 +183,32 @@ function AdsContent() {
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             type="text"
-            placeholder="Search headline, copy, domain…"
+            placeholder="Search headline, copy, domain..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(event) => setSearch(event.target.value)}
             className="flex-1 rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-slate-400 focus:outline-none"
           />
           <select
             value={tradeFilter}
-            onChange={(e) => setTradeFilter(e.target.value)}
+            onChange={(event) => setTradeFilter(event.target.value)}
             className="rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 focus:border-slate-400 focus:outline-none"
           >
             <option value="all">All trades</option>
             {Object.entries(TRADE_MAP)
               .sort((a, b) => a[1].tier - b[1].tier || a[1].domain.localeCompare(b[1].domain))
-              .map(([key, t]) => (
-                <option key={key} value={key}>{t.domain}</option>
+              .map(([key, trade]) => (
+                <option key={key} value={key}>
+                  {trade.domain}
+                </option>
               ))}
           </select>
           {(search || tradeFilter !== "all") && (
-            <GhostButton onClick={() => { setSearch(""); setTradeFilter("all"); }}>
+            <GhostButton
+              onClick={() => {
+                setSearch("");
+                setTradeFilter("all");
+              }}
+            >
               Clear
             </GhostButton>
           )}
@@ -347,96 +216,91 @@ function AdsContent() {
       </Card>
 
       <div className="flex items-center justify-between text-sm text-slate-400">
-        <span>{filtered.length} ads shown · {archiveFilter === "current" ? "historical rows hidden" : archiveFilter === "historical" ? "archive reference view" : "all rows visible"}</span>
+        <span>
+          {filtered.length} ads shown -{" "}
+          {archiveFilter === "current"
+            ? "current-reference rows"
+            : archiveFilter === "historical"
+              ? "archive reference view"
+              : "all rows visible"}
+        </span>
         <div className="flex items-center gap-2">
-          <GhostButton disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>← Prev</GhostButton>
-          <span>Page {page + 1} / {totalPages || 1}</span>
-          <GhostButton disabled={page >= totalPages - 1} onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}>Next →</GhostButton>
+          <GhostButton disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+            Prev
+          </GhostButton>
+          <span>
+            Page {page + 1} / {totalPages || 1}
+          </span>
+          <GhostButton disabled={page >= totalPages - 1} onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}>
+            Next
+          </GhostButton>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {paginated.map((ad) => {
-          const utmUrl = `https://saw.city${ad.landingPath}?utm_source=${ad.utmSource}&utm_medium=${ad.utmMedium}&utm_campaign=${ad.utmCampaign}&utm_content=${ad.utmContent}&utm_term=${ad.utmTerm}`;
           const archiveState = getAdArchiveState(ad);
-
           const adPrefix = tradeFromAd(ad);
           const adUrls = getCreativeUrls(adPrefix, ad.imageUrl ?? ad.image_url);
           const adVariant = ad.creative_variant ?? ad.creativeVariant ?? 1;
-          const adResolvedUrls = {
-            c1: creativeUrlOverrides[`${ad.id}-c1`] ?? adUrls.c1,
-            c2: creativeUrlOverrides[`${ad.id}-c2`] ?? adUrls.c2,
-            c3: creativeUrlOverrides[`${ad.id}-c3`] ?? adUrls.c3,
-          };
-          const adActiveUrl = adVariant === 2 ? adResolvedUrls.c2 : adVariant === 3 ? adResolvedUrls.c3 : adResolvedUrls.c1;
+          const adActiveUrl = adVariant === 2 ? adUrls.c2 : adVariant === 3 ? adUrls.c3 : adUrls.c1;
           const adDomain = tradeBadge(ad).domain;
 
           return (
             <Card key={ad.id} className={archiveState.bucket === "historical" ? "border-amber-900/70 bg-slate-900/70" : ""}>
-              {(() => {
-                const isSaving = savingCreative.has(ad.id);
-                return (
-                  <>
-                    {/* Main creative preview */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={adActiveUrl}
-                      alt={ad.headline ?? "Ad creative"}
-                      className="mb-2 w-full rounded object-cover"
-                      style={{ maxHeight: 160 }}
-                      loading="lazy"
-                    />
-                    {/* 3-slot creative picker */}
-                    <div className="mb-3 flex gap-1.5">
-                      {([1, 2, 3] as const).map((v) => {
-                        const thumbUrl = v === 2 ? adResolvedUrls.c2 : v === 3 ? adResolvedUrls.c3 : adResolvedUrls.c1;
-                        const isActive = adVariant === v;
-                        return (
-                          <div key={v} className="relative flex-1" style={{ height: 40 }}>
-                            <button
-                              title={CREATIVE_LABELS[v]}
-                              disabled={isSaving || archiveState.bucket === "historical"}
-                              onClick={() => {
-                                if (archiveState.bucket !== "historical") void setCreativeVariant(ad.id, v);
-                              }}
-                              className={`h-full w-full overflow-hidden rounded border-2 transition-all ${isActive ? "border-blue-400 opacity-100" : "border-slate-700 opacity-50 hover:opacity-80"}`}
-                            >
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={thumbUrl} alt={`C${v}`} className="h-full w-full object-cover" loading="lazy" />
-                              <span className={`absolute bottom-0 left-0 right-0 py-0.5 text-center text-[9px] font-bold ${isActive ? "bg-blue-500/80 text-white" : "bg-black/50 text-slate-300"}`}>C{v}</span>
-                            </button>
-                            {archiveState.bucket !== "historical" && (
-                              <button
-                                title={`Edit C${v} with prompt`}
-                                onClick={(e) => { e.stopPropagation(); openEditModal(ad, v as 1|2|3, adPrefix); }}
-                                className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-bl bg-black/70 text-[9px] text-white hover:bg-blue-600/90 transition-colors"
-                              >✏️</button>
-                            )}
-                          </div>
-                        );
-                      })}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={adActiveUrl}
+                alt={ad.headline ?? "Ad creative"}
+                className="mb-2 w-full rounded object-cover"
+                style={{ maxHeight: 160 }}
+                loading="lazy"
+              />
+              <div className="mb-3 grid grid-cols-3 gap-1.5">
+                {([1, 2, 3] as const).map((variant) => {
+                  const thumbUrl = variant === 2 ? adUrls.c2 : variant === 3 ? adUrls.c3 : adUrls.c1;
+                  const isActive = adVariant === variant;
+
+                  return (
+                    <div
+                      key={variant}
+                      className={`relative h-10 overflow-hidden rounded border-2 ${
+                        isActive ? "border-blue-400 opacity-100" : "border-slate-700 opacity-60"
+                      }`}
+                      title={`${CREATIVE_LABELS[variant]} reference only`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={thumbUrl} alt={`C${variant}`} className="h-full w-full object-cover" loading="lazy" />
+                      <span
+                        className={`absolute bottom-0 left-0 right-0 py-0.5 text-center text-[9px] font-bold ${
+                          isActive ? "bg-blue-500/80 text-white" : "bg-black/50 text-slate-300"
+                        }`}
+                      >
+                        C{variant}
+                      </span>
                     </div>
-                    {isSaving && <p className="mb-1 text-center text-xs text-slate-400">Saving…</p>}
-                  </>
-                );
-              })()}
+                  );
+                })}
+              </div>
+
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <PlatformChip platform={ad.platform} />
-                {(() => { const t = tradeBadge(ad); return (
-                  <span className={`rounded px-2 py-0.5 text-xs font-semibold ${t.bg} ${t.color}`}>{t.domain}</span>
-                ); })()}
+                {(() => {
+                  const trade = tradeBadge(ad);
+                  return <span className={`rounded px-2 py-0.5 text-xs font-semibold ${trade.bg} ${trade.color}`}>{trade.domain}</span>;
+                })()}
                 <span className="ml-auto rounded bg-slate-700 px-2 py-1 text-xs">{ad.format}</span>
               </div>
-              <div className={`mb-3 rounded border px-3 py-2 text-xs ${
-                archiveState.bucket === "historical"
-                  ? "border-amber-800/60 bg-amber-950/25 text-amber-100"
-                  : "border-emerald-800/60 bg-emerald-950/20 text-emerald-100"
-              }`}>
+              <div
+                className={`mb-3 rounded border px-3 py-2 text-xs ${
+                  archiveState.bucket === "historical"
+                    ? "border-amber-800/60 bg-amber-950/25 text-amber-100"
+                    : "border-emerald-800/60 bg-emerald-950/20 text-emerald-100"
+                }`}
+              >
                 <p className="font-semibold">{archiveState.label}</p>
                 <p className="mt-1 text-slate-300">{archiveState.guidance}</p>
-                {archiveState.bucket === "historical" && (
-                  <p className="mt-1 text-amber-200">Archive signal: {archiveState.reason}</p>
-                )}
+                {archiveState.bucket === "historical" && <p className="mt-1 text-amber-200">Archive signal: {archiveState.reason}</p>}
               </div>
               <p className="mb-2 font-semibold">{ad.headline || "(No headline)"}</p>
               <p className="line-clamp-3 text-sm text-slate-300">{ad.primaryText}</p>
@@ -445,27 +309,10 @@ function AdsContent() {
               <p className="mb-3 text-xs text-slate-400">Workflow: {ad.workflowStage}</p>
               <StatusChip status={ad.status} className="mb-3" />
               <div className="flex flex-wrap gap-2">
-                {archiveState.bucket === "historical" ? (
-                  <span className="rounded-md border border-amber-800/60 px-3 py-2 text-sm font-semibold text-amber-200">
-                    Archived reference
-                  </span>
-                ) : (
-                  <>
-                    <Link className="rounded-md border border-slate-600 px-3 py-2 text-sm hover:bg-slate-700" href={`/ads/${ad.id}`}>
-                      Edit
-                    </Link>
-                    <GhostButton onClick={() => togglePause(ad.id, ad.status)}>
-                      {ad.status === "paused" ? "Unpause" : "Pause"}
-                    </GhostButton>
-                  </>
-                )}
-                <GhostButton
-                  onClick={() => {
-                    navigator.clipboard.writeText(utmUrl).catch(() => null);
-                  }}
-                >
-                  Copy UTM
-                </GhostButton>
+                <span className="rounded-md border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300">
+                  Read-only reference
+                </span>
+                <GhostButton onClick={() => void copyUtm(ad)}>{copiedAdId === ad.id ? "Copied" : "Copy UTM"}</GhostButton>
                 <GhostButton
                   className="border-orange-500/60 text-orange-400 hover:bg-orange-900/30"
                   onClick={() =>
@@ -488,117 +335,30 @@ function AdsContent() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 pt-2 text-sm text-slate-400">
-          <GhostButton disabled={page === 0} onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo(0,0); }}>← Prev</GhostButton>
-          <span>Page {page + 1} / {totalPages}</span>
-          <GhostButton disabled={page >= totalPages - 1} onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo(0,0); }}>Next →</GhostButton>
+          <GhostButton
+            disabled={page === 0}
+            onClick={() => {
+              setPage((p) => Math.max(0, p - 1));
+              window.scrollTo(0, 0);
+            }}
+          >
+            Prev
+          </GhostButton>
+          <span>
+            Page {page + 1} / {totalPages}
+          </span>
+          <GhostButton
+            disabled={page >= totalPages - 1}
+            onClick={() => {
+              setPage((p) => Math.min(totalPages - 1, p + 1));
+              window.scrollTo(0, 0);
+            }}
+          >
+            Next
+          </GhostButton>
         </div>
       )}
 
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="max-h-[95vh] w-full max-w-3xl overflow-y-auto rounded-lg border border-slate-700 bg-slate-900 p-4">
-            <h2 className="mb-3 text-lg font-bold">New Ad</h2>
-
-            <div className="mb-4 flex gap-2">
-              <GhostButton className={!startFromTemplate ? "bg-slate-700" : ""} onClick={() => setStartFromTemplate(false)}>
-                Manual
-              </GhostButton>
-              <GhostButton className={startFromTemplate ? "bg-slate-700" : ""} onClick={() => setStartFromTemplate(true)}>
-                Start from Template
-              </GhostButton>
-            </div>
-
-            {startFromTemplate && (
-              <label className="mb-4 block text-sm">
-                Template
-                <select
-                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  value={selectedTemplateId}
-                  onChange={(e) => applyTemplate(e.target.value)}
-                >
-                  <option value="">Choose a template</option>
-                  {templates.map((template) => (
-                    <option key={template.id} value={template.id}>
-                      {template.name} ({template.platform})
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <label className="text-sm">
-                Platform
-                <select
-                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  value={form.platform}
-                  onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value as Ad["platform"] }))}
-                >
-                  <option value="linkedin">LinkedIn</option>
-                  <option value="youtube">YouTube</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="instagram">Instagram</option>
-                </select>
-              </label>
-              <label className="text-sm">
-                Headline
-                <input
-                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  value={form.headline ?? ""}
-                  onChange={(e) => setForm((f) => ({ ...f, headline: e.target.value }))}
-                />
-              </label>
-              <label className="text-sm md:col-span-2">
-                Primary text
-                <textarea
-                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  rows={4}
-                  value={form.primaryText}
-                  onChange={(e) => setForm((f) => ({ ...f, primaryText: e.target.value }))}
-                />
-              </label>
-              <label className="text-sm">
-                CTA
-                <input
-                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  value={form.cta}
-                  onChange={(e) => setForm((f) => ({ ...f, cta: e.target.value }))}
-                />
-              </label>
-              <label className="text-sm">
-                Landing path
-                <input
-                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  value={form.landingPath}
-                  onChange={(e) => setForm((f) => ({ ...f, landingPath: e.target.value }))}
-                />
-              </label>
-              <label className="text-sm">
-                Workflow stage
-                <select
-                  className="mt-1 w-full rounded border border-slate-600 bg-slate-800 p-2"
-                  value={form.workflowStage}
-                  onChange={(e) => updateWorkflowStage(e.target.value as WorkflowStage)}
-                >
-                  <option value="concept">Concept</option>
-                  <option value="copy-ready">Copy Ready</option>
-                  <option value="approved">Approved</option>
-                  <option value="creative-brief">Creative Brief</option>
-                  <option value="uploaded">Uploaded</option>
-                  <option value="live">Live</option>
-                </select>
-              </label>
-            </div>
-
-            <div className="mt-4 flex justify-end gap-2">
-              <GhostButton onClick={() => setShowModal(false)}>Cancel</GhostButton>
-              <Button onClick={createAd}>Create</Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Ad Preview Modal ───────────────────────────────────────────────── */}
       {previewAd && (
         <AdPreviewModal
           imageUrl={previewAd.imageUrl}
@@ -609,78 +369,13 @@ function AdsContent() {
           onClose={() => setPreviewAd(null)}
         />
       )}
-
-      {/* ── Creative Edit Modal ─────────────────────────────────────────────── */}
-      {editTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-lg rounded-xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
-            <div className="mb-4 flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-bold">Edit Creative</h2>
-                <p className="text-xs text-slate-400">{editTarget.label}</p>
-              </div>
-              <button onClick={() => setEditTarget(null)} className="text-slate-400 hover:text-white text-xl leading-none">✕</button>
-            </div>
-
-            {/* Current / result image */}
-            <div className="mb-4 overflow-hidden rounded-lg border border-slate-700">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={regenResult ?? editTarget.currentUrl}
-                alt="Creative preview"
-                className="w-full object-cover"
-                style={{ maxHeight: 240 }}
-              />
-              {regenResult && (
-                <div className="bg-green-900/30 px-3 py-1.5 text-center text-xs text-green-400">
-                  ✅ New image generated — looks good? Hit &quot;Use This&quot; to save.
-                </div>
-              )}
-            </div>
-
-            {/* Prompt input */}
-            <label className="mb-1 block text-sm font-medium text-slate-300">
-              Describe the image you want
-            </label>
-            <p className="mb-2 text-xs text-slate-500">
-              Tip: describe the full scene you want, or describe the fix (e.g. &quot;painter on a ladder brushing the siding — window glass is clean, no paint on the glass panes&quot;)
-            </p>
-            <textarea
-              rows={3}
-              value={editPrompt}
-              onChange={(e) => setEditPrompt(e.target.value)}
-              placeholder="e.g. Painter on extension ladder brushing the exterior siding — window glass is clean and unpainted, clean brush stroke detail..."
-              className="mb-3 w-full rounded border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-            />
-
-            {regenError && (
-              <p className="mb-3 rounded border border-red-700 bg-red-900/30 px-3 py-2 text-xs text-red-400">
-                ❌ {regenError}
-              </p>
-            )}
-
-            <div className="flex gap-2">
-              <GhostButton onClick={() => setEditTarget(null)}>Cancel</GhostButton>
-              <GhostButton
-                onClick={regenCreative}
-                disabled={regenLoading || !editPrompt.trim()}
-              >
-                {regenLoading ? "Generating…" : regenResult ? "Regenerate Again" : "🎨 Generate"}
-              </GhostButton>
-              {regenResult && (
-                <Button onClick={applyRegenResult}>✅ Use This</Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
 export default function AdsPage() {
   return (
-    <Suspense fallback={<div className="flex h-64 items-center justify-center text-slate-400">Loading ads…</div>}>
+    <Suspense fallback={<div className="flex h-64 items-center justify-center text-slate-400">Loading ad archive...</div>}>
       <AdsContent />
     </Suspense>
   );
