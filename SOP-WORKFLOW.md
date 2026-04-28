@@ -387,6 +387,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-52 resolves the `/creatives` static URL guard before redirect work. Keep `docs/creative-static-url-guard.md` as the before-check evidence and require all 24 public JPEG URLs to be rechecked after any future `/creatives` page-route redirect.
 - Q-53 applies the `/creatives` page-route redirect to `/assets`. Keep all public `/creatives/*.jpg` URLs direct-link accessible and do not move or regenerate static files during page-route cleanup.
 - Q-54 resolves the `/workflow` ownership guard before redirect work. Keep `docs/workflow-ownership-guard.md` as the ownership evidence and do not bulk-mutate workflow rows during route cleanup.
+- Q-55 applies the `/workflow` page-route redirect to `/launch`. Keep the six-stage workflow history/ownership map on Command/docs and do not reintroduce direct-link bulk mutation UI on `/workflow`.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

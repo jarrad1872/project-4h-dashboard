@@ -70,12 +70,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-52 | Governance | Navigation | Resolve Creatives static URL guard | 2026-04-27 | `/creatives` plus all 24 public `/creatives/*.jpg` URLs returned 200 locally, evidence is documented, and `/creatives` is clear for a future page-route redirect packet. |
 | Q-53 | Governance | Navigation | Apply Creatives page redirect packet | 2026-04-27 | `/creatives` now redirects internally to `/assets`, and all 24 public `/creatives/*.jpg` URLs still return 200 as static JPEGs. |
 | Q-54 | Governance | Navigation | Resolve Workflow ownership guard | 2026-04-27 | `/workflow` ownership is documented across Approval, Launch, bulk-status API, fallback data, and workflow-history; no redirect or bulk mutation happened. |
+| Q-55 | Governance | Navigation | Apply Workflow page redirect packet | 2026-04-27 | `/workflow` now redirects internally to `/launch`, while Command keeps the workflow history/ownership map and the direct-link bulk mutation UI is no longer reachable from `/workflow`. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-55 | Governance | Navigation | Apply Workflow page redirect packet | none | `/workflow` redirects internally to `/launch`; Command still shows the workflow history/ownership map; no bulk mutations, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite changes occur. |
+| _None_ | - | - | Queue clear after Q-55 | - | Pick the next first-principles build item only after adding it to this queue with acceptance criteria. |
 
 ## Stop Conditions
 

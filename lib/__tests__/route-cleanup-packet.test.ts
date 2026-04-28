@@ -9,29 +9,26 @@ import {
 
 describe("clearRouteCleanupPacket", () => {
   it("groups only clear route candidates without authorizing implementation", () => {
-    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/workflow"]);
+    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual([]);
     expect(clearRouteCleanupPacket.every((entry) => entry.implementationAllowed === false)).toBe(true);
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/generate")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/gtm")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/settings")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/creatives")).toBeUndefined();
-    expect(clearRouteCleanupPacket.find((entry) => entry.route === "/workflow")?.preservedEvidence).toContain(
-      "Q-54 verified Launch/Approval ownership, fallback data, bulk-status API, and six-stage history before redirect work",
-    );
+    expect(clearRouteCleanupPacket.find((entry) => entry.route === "/workflow")).toBeUndefined();
   });
 
-  it("keeps only /workflow clear after Q54 guard resolution", () => {
-    expect(clearRouteCleanupPacket).toHaveLength(1);
-    expect(clearRouteCleanupPacket[0].requiredVerification).toContain("Command route guard shows clear");
+  it("has no pending clear candidates after Q55", () => {
+    expect(clearRouteCleanupPacket).toHaveLength(0);
   });
 
   it("summarizes packet counts and blocked actions", () => {
     expect(clearRouteCleanupPacketSummary()).toEqual({
-      total: 1,
-      routes: ["/workflow"],
-      appliedRoutes: ["/generate", "/gtm", "/settings", "/ads", "/creatives"],
-      counts: { rebuild: 0, redirect: 1, archive: 0, delete: 0 },
-      appliedCount: 5,
+      total: 0,
+      routes: [],
+      appliedRoutes: ["/generate", "/gtm", "/settings", "/ads", "/creatives", "/workflow"],
+      counts: { rebuild: 0, redirect: 0, archive: 0, delete: 0 },
+      appliedCount: 6,
       implementationAllowed: false,
       blockedActions: ["route redirect", "route deletion", "ad upload", "campaign launch", "webhook creation", "spend change"],
       preservationRule:
@@ -74,6 +71,17 @@ describe("clearRouteCleanupPacket", () => {
         appliedIn: "Q-53",
         outcome: "Internal page route redirects to Creative Lab while public static /creatives/*.jpg URLs remain available.",
         verification: ["/creatives redirects to /assets", "all 24 /creatives/*.jpg URLs return 200", "static files are not moved"],
+        externalActionAllowed: false,
+      },
+      {
+        route: "/workflow",
+        appliedIn: "Q-55",
+        outcome: "Internal page route redirects to Launch while workflow history and ownership evidence remain preserved on Command.",
+        verification: [
+          "/workflow redirects to /launch",
+          "Command loads workflow history/ownership map",
+          "bulk mutation UI is not reachable from /workflow",
+        ],
         externalActionAllowed: false,
       },
     ]);

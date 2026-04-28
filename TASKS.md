@@ -214,7 +214,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-52 Creatives static URL guard resolution packet.
 - [x] Add Q-53 Creatives page redirect packet with after-checks.
 - [x] Add Q-54 Workflow ownership guard resolution packet.
-- [ ] Add Q-55 Workflow page redirect packet.
+- [x] Add Q-55 Workflow page redirect packet.
 
 ---
 
@@ -268,7 +268,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Run and document all-public-creative-URL 200 checks before any `/creatives` redirect.
 - [x] Redirect `/creatives` page route to `/assets` and re-check all static URLs.
 - [x] Document workflow ownership before any `/workflow` redirect.
-- [ ] Redirect `/workflow` page route to `/launch` after ownership guard resolution.
+- [x] Redirect `/workflow` page route to `/launch` after ownership guard resolution.
 
 ---
 

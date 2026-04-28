@@ -761,7 +761,7 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     lane: "Navigation",
     title: "Apply Workflow page redirect packet",
     route: "/workflow",
-    status: "ready",
+    status: "complete",
     approval: "none",
     outcome: "The legacy `/workflow` page route redirects to Launch while workflow history remains visible from Command.",
     acceptance: "`/workflow` redirects internally to `/launch`; Command still shows the workflow history/ownership map; no bulk mutations, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite changes occur.",

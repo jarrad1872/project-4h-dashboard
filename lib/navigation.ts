@@ -74,7 +74,7 @@ export const legacyNavigationItems: NavigationItem[] = [
 
 export const hiddenLegacyRoutes: NavigationItem[] = [
   { href: "/creatives", label: "Creatives", status: "legacy", purpose: "Original asset repository; superseded by Creative Lab." },
-  { href: "/workflow", label: "Workflow", status: "legacy", purpose: "Original concept-to-live workflow view; superseded by queue and launch governance." },
+  { href: "/workflow", label: "Workflow", status: "legacy", purpose: "Original concept-to-live workflow route; now redirects to Launch." },
   { href: "/templates", label: "Templates", status: "support", purpose: "Message-match, creator, and competitor templates reached from active flows." },
   { href: "/lifecycle", label: "Lifecycle", status: "support", purpose: "Lifecycle follow-up measurement reached from scorecard/learning work." },
 ];
@@ -195,12 +195,12 @@ export const routeDispositionDecisions: RouteDispositionDecision[] = [
   {
     route: "/workflow",
     label: "Workflow",
-    currentDisposition: "direct-link archive",
+    currentDisposition: "reference shelf",
     recommendation: "redirect",
     replacementHref: "/launch",
     rationale:
-      "The old concept-to-live board is superseded by the build queue, Approval, Launch, and external-action stop screen.",
-    nextStep: "Confirm no launch-bundle or approval workflow links back to this route, then redirect to Launch.",
+      "The old concept-to-live board is superseded by the build queue, Approval, Launch, and external-action stop screen; the page route now redirects to Launch.",
+    nextStep: "Keep workflow history/ownership evidence on Command and do not reintroduce direct-link bulk mutation UI.",
     destructiveActionAllowed: false,
   },
   {
@@ -286,11 +286,12 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   {
     route: "/workflow",
     status: "clear",
-    readyForRedirectOrDelete: true,
-    activeReferences: ["Direct-link archive until page-route redirect packet", "legacy banner only"],
+    readyForRedirectOrDelete: false,
+    activeReferences: ["Direct-link archive now lands on Launch", "workflow history remains on Command"],
     dataDependencies: [
       "6-stage bulk workflow history inventory in workflow-history",
       "Q-54 verified Launch/Approval ownership, fallback data, bulk-status API, and six-stage history before redirect work",
+      "Q-55 internal /workflow page route redirects to /launch and removes direct-link bulk mutation UI",
     ],
     docOrTestReferences: [
       "README route table",
@@ -299,7 +300,7 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
       "workflow-ownership-guard",
       "Command workflow history map",
     ],
-    guardrail: "Q-54 resolved the workflow ownership blocker. Future page-route redirect must preserve six-stage history and leave bulk mutation ownership in Approval/API.",
+    guardrail: "Implemented in Q-55. Keep six-stage history on Command/docs and leave bulk mutation ownership in Approval/API.",
   },
   {
     route: "/templates",

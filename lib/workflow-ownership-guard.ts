@@ -9,7 +9,7 @@ export interface WorkflowOwnershipSurface {
 export const workflowOwnershipSurfaces: WorkflowOwnershipSurface[] = [
   {
     surface: "/workflow",
-    owns: "Legacy direct-link six-stage board and bulk-advance UI until Q-55 redirects the page route.",
+    owns: "Redirect-only legacy page route; six-stage history is preserved on Command and the bulk-advance UI is no longer reachable here.",
     mutationAllowedInGuard: false,
   },
   {
@@ -47,7 +47,8 @@ export function workflowOwnershipGuardSummary() {
     replacement: "/launch",
     verifiedAt: "2026-04-27",
     verifiedAgainst: "http://127.0.0.1:3106",
-    routeStatus: 200,
+    routeStatus: 307,
+    redirectDestination: "/launch",
     stageCount: bulkWorkflowStages.length,
     transitionCount: workflowTransitionPairs().length,
     dependencyCount: history.dependencyCount,
@@ -59,8 +60,8 @@ export function workflowOwnershipGuardSummary() {
       workflowOwnershipSurfaces.some((surface) => surface.surface === "/workflow") &&
       workflowOwnershipSurfaces.every((surface) => surface.mutationAllowedInGuard === false),
     externalActionAllowed: false,
-    redirectImplemented: false,
+    redirectImplemented: true,
     preservationRule:
-      "Workflow stage history and active ownership are documented before any future /workflow page-route redirect.",
+      "Workflow stage history and active ownership are documented; the /workflow page route now redirects internally to /launch.",
   };
 }

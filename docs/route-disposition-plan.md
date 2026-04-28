@@ -56,6 +56,7 @@ These routes are not active operating lanes. They remain available from the coll
 18. Q-52: Resolve `/creatives` static URL guard. Complete; `/creatives` plus all 24 public JPEG URLs returned 200 before any page-route redirect work.
 19. Q-53: Apply `/creatives` page redirect. Complete; `/creatives` redirects to `/assets` and all 24 public JPEG URLs still return 200 after the redirect.
 20. Q-54: Resolve `/workflow` ownership guard. Complete; six stages, five transitions, fallback data, bulk-status API, Approval, and Launch ownership are documented before any redirect work.
+21. Q-55: Apply `/workflow` page redirect. Complete; `/workflow` redirects to `/launch` and Command preserves workflow history/ownership evidence.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -70,7 +71,7 @@ These were the Q-38 recommendations before implementation packets. Later section
 | `/gtm` | Archive | `/` | Historical GTM and product-route inventory context still helps audits. | Keep direct-link access until active launch/support data covers the inventory. |
 | `/settings` | Delete later | `/approval` | Old settings/source-doc surface overlaps docs and governance pages. | Move any unique notes into docs and verify no active dependency before deletion. |
 | `/creatives` | Redirect applied Q-53 | `/assets` | Original master gallery is superseded by Creative Lab, and static creative URLs remain preserved. | Keep after-check evidence in `docs/creative-static-url-guard.md`. |
-| `/workflow` | Redirect later | `/launch` | Old concept-to-live board is superseded by queue, Approval, and Launch. | Confirm no launch/approval workflow depends on it, then redirect. |
+| `/workflow` | Redirect applied Q-55 | `/launch` | Old concept-to-live board is superseded by queue, Approval, and Launch, and the page route now redirects. | Keep workflow history/ownership evidence on Command/docs. |
 | `/templates` | Rebuild as support | `/scorecard` | Briefs and research templates remain useful but belong behind active loops. | Keep support route while folding high-use actions into Launch, Creators, or Scorecard. |
 | `/lifecycle` | Rebuild as support | `/scorecard` | Lifecycle measurement belongs in the learning loop, with detail available while summaries mature. | Keep support route while moving decision-grade lifecycle summaries into Scorecard. |
 
@@ -84,11 +85,11 @@ The Command page now shows a route dependency guard with these current statuses:
 | Support | 2 | Keep as detail/support routes reached from active loops. |
 | Clear | 6 | Candidate or already-applied route cleanup after preserving useful notes. |
 
-Current pending clear route: `/workflow`. Applied clear routes: `/generate`, `/gtm`, `/settings`, `/ads`, `/creatives`.
+Current pending clear routes: none. Applied clear routes: `/generate`, `/gtm`, `/settings`, `/ads`, `/creatives`, `/workflow`.
 
 Current blockers to resolve first:
 
-- None. `/workflow` is clear for a future redirect packet after Q-54 ownership preservation.
+- None. `/workflow` redirect was applied in Q-55 after Q-54 ownership preservation.
 
 ## Q-40 Campaign Flow Link Migration
 
@@ -117,7 +118,7 @@ Q-41 did not redirect `/creatives`, move files, delete assets, alter image URLs,
 
 ## Q-42 Bulk Workflow History Map
 
-The `/workflow` page route and the workflow data it displays are separate dependencies. Q-42 preserves the workflow-stage contract in `lib/workflow-history.ts` and surfaces the map on Command before any future redirect packet.
+The `/workflow` page route and the workflow data it displayed are separate dependencies. Q-42 preserved the workflow-stage contract in `lib/workflow-history.ts` and surfaced the map on Command before redirect work; Q-55 now redirects the page route to `/launch`.
 
 | Source | Count | Preservation rule |
 | --- | ---: | --- |
@@ -125,7 +126,7 @@ The `/workflow` page route and the workflow data it displays are separate depend
 | Bulk transitions | 5 | Preserve concept-to-copy-ready through uploaded-to-live movement before removing the old UI. |
 | Dependencies | 5 | Preserve `ads.workflow_stage`, `data/workflow-stages.json`, `/api/ads/bulk-status`, `/workflow`, and trade breakdown logic. |
 
-Q-42 did not redirect `/workflow`, delete the old page, bulk-move ads, call the bulk API, upload to ad platforms, or change external systems. Any future redirect packet must prove this history is moved into Launch/Approval or intentionally preserved.
+Q-42 did not redirect `/workflow`, delete the old page, bulk-move ads, call the bulk API, upload to ad platforms, or change external systems. Q-55 later proved this history remains preserved on Command/docs and applied the page-route redirect.
 
 ## Q-43 Settings Source Note Extraction
 
@@ -223,4 +224,10 @@ Browser/local HTTP verification against `http://127.0.0.1:3106` confirmed `/crea
 
 Q-54 resolves the `/workflow` blocker without redirecting the route. Browser/local HTTP verification against `http://127.0.0.1:3106` confirmed `/workflow` returned `200 text/html; charset=utf-8`. The guard preserves six workflow stages, five transition pairs, five historical dependencies, and six ownership surfaces: legacy `/workflow`, Approval, Launch, `/api/ads/bulk-status`, `data/workflow-stages.json`, and `lib/workflow-history.ts`.
 
-Q-54 did not redirect or delete `/workflow`, bulk-mutate ad rows, upload to ad platforms, launch campaigns, create webhooks, send outreach, call external APIs, spend money, change billing, or touch sawcity-lite. The live direct-link `/workflow` page still contains the legacy bulk-advance controls until Q-55 redirects it. `/workflow` is now clear only for a future page-route redirect packet, and that future packet must verify Launch loads and Command still shows the workflow history/ownership map.
+Q-54 did not redirect or delete `/workflow`, bulk-mutate ad rows, upload to ad platforms, launch campaigns, create webhooks, send outreach, call external APIs, spend money, change billing, or touch sawcity-lite. It made `/workflow` eligible for the Q-55 page-route redirect packet by proving Launch loads and Command preserves the workflow history/ownership map.
+
+## Q-55 Workflow Redirect
+
+Q-55 applies the `/workflow` page-route redirect to `/launch`. The page route is redirect-only; it no longer renders the legacy six-stage board or its bulk-advance controls.
+
+Browser/local HTTP verification against `http://127.0.0.1:3106` confirmed `/workflow` lands on `/launch`, and Command still shows the workflow history/ownership map with six stages, five transitions, fallback file, bulk-status API dependency, and the Q-55 ready queue cleared. Q-55 did not bulk-mutate ad rows, upload to ad platforms, launch campaigns, create webhooks, send outreach, call external APIs, spend money, change billing, or touch sawcity-lite.

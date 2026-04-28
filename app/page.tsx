@@ -737,13 +737,13 @@ export default function OverviewPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bulk workflow history map</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Legacy workflow behavior is preserved before redirect work</h2>
+            <h2 className="mt-1 text-xl font-semibold text-white">Legacy workflow behavior is preserved after redirect</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <StatusPill>{workflowHistorySummary.stageCount} stages</StatusPill>
             <StatusPill>{workflowHistorySummary.transitionCount} transitions</StatusPill>
             <StatusPill>{workflowHistorySummary.dependencyCount} deps</StatusPill>
-            <StatusPill>{workflowOwnershipSummary.readyForPageRedirectPacket ? "Q-54 guard resolved" : "guard blocked"}</StatusPill>
+            <StatusPill>{workflowOwnershipSummary.redirectImplemented ? "Q-55 redirect applied" : "guard blocked"}</StatusPill>
           </div>
         </div>
         <Card className="mt-3 border-cyan-900/50 bg-cyan-950/10">
@@ -753,7 +753,7 @@ export default function OverviewPage() {
             {workflowHistorySummary.fallbackFile}
           </p>
           <p className="mt-2 text-xs text-cyan-200">
-            Q-54 ownership check: {workflowOwnershipSummary.stageCount} stages, {workflowOwnershipSummary.transitionCount} transitions,{" "}
+            Q-55 ownership check: {workflowOwnershipSummary.stageCount} stages, {workflowOwnershipSummary.transitionCount} transitions,{" "}
             {workflowOwnershipSummary.dependencyCount} dependencies, and {workflowOwnershipSummary.ownershipSurfaceCount} owner
             surfaces documented. Redirect implemented: {workflowOwnershipSummary.redirectImplemented ? "yes" : "no"}.
           </p>

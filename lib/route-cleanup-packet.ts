@@ -72,6 +72,13 @@ export const appliedRouteCleanupPackets: AppliedRouteCleanupEntry[] = [
     verification: ["/creatives redirects to /assets", "all 24 /creatives/*.jpg URLs return 200", "static files are not moved"],
     externalActionAllowed: false,
   },
+  {
+    route: "/workflow",
+    appliedIn: "Q-55",
+    outcome: "Internal page route redirects to Launch while workflow history and ownership evidence remain preserved on Command.",
+    verification: ["/workflow redirects to /launch", "Command loads workflow history/ownership map", "bulk mutation UI is not reachable from /workflow"],
+    externalActionAllowed: false,
+  },
 ];
 
 function intentForRecommendation(recommendation: RouteRetirementRecommendation) {

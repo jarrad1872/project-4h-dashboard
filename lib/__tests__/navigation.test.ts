@@ -104,12 +104,15 @@ describe("navigation IA", () => {
     expect(routeDependencyGuards.find((row) => row.route === "/workflow")?.dataDependencies).toContain(
       "Q-54 verified Launch/Approval ownership, fallback data, bulk-status API, and six-stage history before redirect work",
     );
-    expect(routeDependencyGuards.find((row) => row.route === "/workflow")?.readyForRedirectOrDelete).toBe(true);
+    expect(routeDependencyGuards.find((row) => row.route === "/workflow")?.dataDependencies).toContain(
+      "Q-55 internal /workflow page route redirects to /launch and removes direct-link bulk mutation UI",
+    );
+    expect(routeDependencyGuards.find((row) => row.route === "/workflow")?.readyForRedirectOrDelete).toBe(false);
     expect(routeDependencyGuards.find((row) => row.route === "/templates")?.status).toBe("support");
     expect(routeDependencyGuardSummary()).toEqual({
       total: 8,
       counts: { clear: 6, blocked: 0, support: 2 },
-      readyForRedirectOrDelete: 1,
+      readyForRedirectOrDelete: 0,
     });
   });
 });
