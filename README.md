@@ -56,15 +56,20 @@ Nothing goes external (ad accounts, live campaigns) without Jarrad's explicit ap
 
 Each `.city` domain is a **separate trade community** — not "Saw.City" marketed generically to everyone. We market `rinse.city` to pressure washers, `pipe.city` to plumbers, etc.
 
-### Tier 1 Campaign Trades (TAM-Ranked, launch priority)
+### First Launch Beachheads (Q-56 locked)
 
 | Domain | Trade | US TAM | Businesses |
 |--------|-------|--------|------------|
+| `saw.city` | Concrete Cutting | $2.5B | 2K |
 | `pipe.city` | Plumbing | $191B | 130K |
 | `mow.city` | Lawn Care | $60B | 500K+ |
-| `duct.city` | HVAC | $30B | 105K |
-| `coat.city` | Painting | $28B | 220K |
-| `pest.city` | Pest Control | $26B | 33K |
+| `rinse.city` | Pressure Washing | $1.8B | 12K |
+| `lockout.city` | Locksmith | $3B | 25K |
+
+### TAM-ranked next-wave reference
+
+| Domain | Trade | US TAM | Businesses |
+|--------|-------|--------|------------|
 | `electricians.city` | Electrical | $202B | 75K |
 | `roofrepair.city` | Roofing | $56B | 100K |
 | `disaster.city` | Disaster Restoration | $210B | 30K |
@@ -176,7 +181,7 @@ utm_source={platform}&utm_medium=paid-social&utm_campaign=4h_2026-03_{theme}&utm
 ### Ad ID Format
 - Phase 1 Saw.City branded: `LI-01`, `YT-02`, etc.
 - Trade variants: `LI-R1` (Rinse), `FB-M3` (Mow), `YT-RO2` (Rooter)
-- Tier 1 pivot trades: `LI-P1` (Pipe), `LI-C1` (Coat), `LI-D1` (Duct), `LI-PE1` (Pest)
+- Q-56 first-wave trades: `LI-S1` (Saw), `LI-P1` (Pipe), `FB-M1` (Mow), `LI-R1` (Rinse), `LI-L1` (Lockout)
 - **NB2 format (current):** `NB2-D{1|2}-{LI|FB|IG|YT}-{CODE}{AW|RT}`
   - D1 = pain/urgency direction; D2 = aspiration/social proof direction
   - Campaign group: `nb2_d{1|2}_{platform}_{prefix}`
@@ -223,6 +228,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 ### Growth Command Center Notes (2026-03-31)
 
 - `/` now focuses on the live plumbing pilot (`pipe.city`) with launch countdown, influencer pipeline, creative pipeline, channel placeholders, and budget tracking
+- `/` now records Jarrad's launch operating decisions: first wave is `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`; creator outreach drafts can move after 4H approval, but sends still require action-time approval; billing stays manual at first; generated image uploads require Jarrad sign-off
 - `/gtm` now includes a read-only product route inventory copied from sawcity-lite reference files: 21 routes, 20 live demo lines, and the five beachhead domains ready for creator/ad planning
 - `/launch` now builds deterministic trade-domain launch URLs with AGENTS-format paid-social UTMs, angle, asset, and optional creator metadata
 - `/launch` now runs an internal readiness validator that returns actionable blockers for domain, UTM, offer, trial, checklist, creative approval, copy approval, and Jarrad approval state
@@ -233,7 +239,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/scorecard` now includes a weekly learning report that ranks trades, creators, images, and angles from attribution events while clearly labeling zero-data and no-paid-signal states
 - `/scorecard` now includes local keep/kill/iterate decisions with notes, timestamps, undo, and visible history; this does not pause, launch, upload, or spend
 - `/scorecard` now includes a customer pace forecast that shows logged paid customers, current weekly/monthly pace, projected gap to 1,000/2,000 by 2026-12-31, and an evidence-based next bet
-- `/scorecard` now includes a trade weekly target calculator that splits the required 1,000-2,000 customer pace across pipe, duct, mow, pest, and coat until trade-level paid signal justifies reweighting
+- `/scorecard` now includes a trade weekly target calculator that splits the required 1,000-2,000 customer pace across saw, pipe, mow, rinse, and lockout until trade-level paid signal justifies reweighting
 - `/lifecycle` now measures signup-to-trial, trial-to-activation, and activation-to-paid movement from logged attribution events while staying read-only for sends and webhooks
 - `/assets` now includes creative fatigue and variant lineage tracking that groups prompt families, shows views/downstream signal, and flags replacement-variant candidates without pausing or launching anything
 - `/approval` now includes an internal audit view that classifies approval activity across ad copy, creative, outreach, launch bundle, and export gates; the audit view is metadata only and does not send outreach, take ad-platform action, launch, create webhooks, spend, or change billing
@@ -279,10 +285,10 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `docs/product-route-inventory.md` records the landing route and demo phone findings without touching sawcity-lite
 - `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
-- `/assets` now has the first Q-01 beachhead image pack generated and in review: pipe, duct, mow, pest, and coat across missed-call, demo-call, owner-agent, and ROI-math angles
+- `/assets` now has the first launch beachhead prompt set aligned to saw, pipe, mow, rinse, and lockout across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state
 - `/assets` can create replacement v2/v3 prompts while preserving parent/child creative lineage
-- `/assets` now tracks founder-shot video packets for pipe, duct, mow, pest, and coat across missed-call and demo-proof angles; packets are copyable planning assets and cannot publish or launch anything
+- `/assets` now tracks founder-shot video packets for saw, pipe, mow, rinse, and lockout across missed-call and demo-proof angles; packets are copyable planning assets and cannot publish or launch anything
 - `docs/claude-design-creative-lab-handoff.md` gives Claude Design the Creative Lab UX goals, data model, routes, screenshot checklist, and constraints
 - `supabase/migrations/009_growth_command_center.sql` adds `creative_assets` plus richer influencer fields for persistent production storage
 - `supabase/migrations/010_influencer_outreach_agent.sql` adds the email-only outreach state model for human-gated creator approvals
@@ -299,7 +305,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-55 workflow redirect | v4.4.24*
+*Last updated: 2026-04-27 launch operating decisions | v4.4.25*
 
 ---
 

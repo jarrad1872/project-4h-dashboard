@@ -10,20 +10,20 @@ export const IMAGE_CREATIVE_PLATFORMS = ["multi", "facebook", "instagram", "yout
 
 export const BEACHHEAD_IMAGE_TRADES = [
   {
+    slug: "saw",
+    domain: "saw.city",
+    label: "Concrete cutting",
+    ownerScene: "a concrete cutting owner near a saw-cut job while the phone rings",
+    proofObject: "a phone screen showing an AI answered call and a concrete cutting job summary",
+    fieldDetails: "walk-behind saw, marked slab, dust control hose, safety glasses",
+  },
+  {
     slug: "pipe",
     domain: "pipe.city",
     label: "Plumbing",
     ownerScene: "a plumbing owner in a service van between emergency calls",
     proofObject: "a phone screen showing an AI answered call and a booked job summary",
     fieldDetails: "wet floor, copper pipe, tool bag, invoice clipboard",
-  },
-  {
-    slug: "duct",
-    domain: "duct.city",
-    label: "HVAC",
-    ownerScene: "an HVAC owner beside an outdoor condenser during a busy service day",
-    proofObject: "a phone screen showing an after-hours no-cool call handled by AI",
-    fieldDetails: "gauges, refrigerant hoses, condenser fan, service ladder",
   },
   {
     slug: "mow",
@@ -34,20 +34,20 @@ export const BEACHHEAD_IMAGE_TRADES = [
     fieldDetails: "zero-turn mower, grass clippings, route sheet, trailer ramp",
   },
   {
-    slug: "pest",
-    domain: "pest.city",
-    label: "Pest control",
-    ownerScene: "a pest control owner at a truck preparing for an urgent homeowner call",
-    proofObject: "a phone screen showing pest issue details summarized by AI",
-    fieldDetails: "sprayer, inspection light, sealed bait station, gloves",
+    slug: "rinse",
+    domain: "rinse.city",
+    label: "Pressure washing",
+    ownerScene: "a pressure washing owner beside a trailer after finishing a driveway job",
+    proofObject: "a phone screen showing a new wash estimate captured by AI",
+    fieldDetails: "pressure washer hose, surface cleaner, wet concrete, before-and-after photo",
   },
   {
-    slug: "coat",
-    domain: "coat.city",
-    label: "Painting",
-    ownerScene: "a painting owner on a job site while a new estimate call comes in",
-    proofObject: "a phone screen showing a paint estimate request captured by AI",
-    fieldDetails: "drop cloth, paint fan deck, ladder, masked trim",
+    slug: "lockout",
+    domain: "lockout.city",
+    label: "Locksmith",
+    ownerScene: "a locksmith owner at a van preparing for an urgent lockout call",
+    proofObject: "a phone screen showing an emergency lockout request captured by AI",
+    fieldDetails: "key blanks, lock picks, van side door, late-night parking lot light",
   },
 ] as const;
 

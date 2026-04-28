@@ -148,7 +148,7 @@ The `/gtm` page route and the product-route inventory it displayed are separate 
 | --- | ---: | --- |
 | Product routes | 21 | Preserve domain, landing, signup, demo-line, demo-auth, hero, and campaign-use context. |
 | Ready routes | 20 | Preserve confirmed trade route assumptions without writing to sawcity-lite. |
-| Beachhead routes | 5 | Preserve pipe, duct, mow, pest, and coat landing/demo-line context for Launch and creator work. |
+| Beachhead routes | 5 | Preserve saw, pipe, mow, rinse, and lockout landing/demo-line context for Launch and creator work. |
 | Read-only source files | 7 | Preserve sawcity-lite evidence paths as reference only. |
 
 Q-44 did not redirect `/gtm`, delete the old page, change launch URLs, change product code, write to sawcity-lite, or change external systems. The route is now a candidate for future archive-only treatment after one more explicit cleanup decision.

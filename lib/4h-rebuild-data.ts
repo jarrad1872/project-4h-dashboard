@@ -20,16 +20,16 @@ export const imageDriver = {
 
 export const beachheadTrades = [
   {
+    domain: "saw.city",
+    trade: "Concrete cutting",
+    reason: "Original proof trade with strong product credibility and a known live route for first-wave demonstrations.",
+    firstOffer: "Call saw.city and hear the AI capture a concrete cutting job while the operator is busy.",
+  },
+  {
     domain: "pipe.city",
     trade: "Plumbing",
     reason: "High emergency intent, clear missed-call pain, and strong value story for 24/7 answering.",
     firstOffer: "Call pipe.city and hear the AI book a plumbing job.",
-  },
-  {
-    domain: "duct.city",
-    trade: "HVAC",
-    reason: "Seasonal spikes make speed-to-lead obvious; emergency calls are expensive to miss.",
-    firstOffer: "See how the AI handles after-hours no-cool and no-heat calls.",
   },
   {
     domain: "mow.city",
@@ -38,16 +38,16 @@ export const beachheadTrades = [
     firstOffer: "Turn missed mowing calls into scheduled estimates while crews are out.",
   },
   {
-    domain: "pest.city",
-    trade: "Pest control",
-    reason: "Urgent homeowner anxiety maps well to fast response and pre-qualification.",
-    firstOffer: "Let the AI answer, qualify the pest issue, and send the owner the job details.",
+    domain: "rinse.city",
+    trade: "Pressure washing",
+    reason: "Creator-friendly trade with visible before/after proof and a known live demo route.",
+    firstOffer: "Call rinse.city and hear the AI capture a pressure washing estimate.",
   },
   {
-    domain: "coat.city",
-    trade: "Painting",
-    reason: "Estimate-heavy workflow where missed calls and slow follow-up quietly leak revenue.",
-    firstOffer: "Capture paint estimate calls and send the owner a clean job summary.",
+    domain: "lockout.city",
+    trade: "Locksmith",
+    reason: "Highest urgency lead path: when a lockout call is missed, the job is usually gone.",
+    firstOffer: "Call lockout.city and hear the AI capture an emergency lockout request.",
   },
 ] as const;
 
@@ -765,5 +765,16 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     approval: "none",
     outcome: "The legacy `/workflow` page route redirects to Launch while workflow history remains visible from Command.",
     acceptance: "`/workflow` redirects internally to `/launch`; Command still shows the workflow history/ownership map; no bulk mutations, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite changes occur.",
+  },
+  {
+    id: "Q-56",
+    phase: "Governance",
+    lane: "Launch",
+    title: "Lock launch operating decisions",
+    route: "/",
+    status: "complete",
+    approval: "none",
+    outcome: "The first launch beachheads and approval boundaries are recorded in Command and source data.",
+    acceptance: "`saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city` are the first launch beachheads; creator outreach drafts can move after approval but sends still require action-time approval; billing remains manual at first; generated image uploads require Jarrad sign-off; no external action occurs.",
   },
 ];

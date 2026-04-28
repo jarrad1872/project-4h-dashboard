@@ -79,7 +79,7 @@ function validateLaunchUrl(input: LaunchReadinessInput, issues: LaunchReadinessI
       severity: "blocker",
       label: "Trade domain is missing",
       detail: "Launch candidates must use a trade-specific .city domain, not a generic product or tracking URL.",
-      action: "Choose a ready product route such as pipe.city, duct.city, mow.city, pest.city, or coat.city.",
+      action: "Choose a confirmed launch beachhead route such as saw.city, pipe.city, mow.city, rinse.city, or lockout.city.",
       evidence: expectedHost,
     }));
   }

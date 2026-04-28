@@ -220,10 +220,10 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 
 ## Blocked Or Requires Jarrad
 
-- [ ] Confirm which five trades are the first launch beachhead. Current default: `pipe.city`, `duct.city`, `mow.city`, `pest.city`, `coat.city`.
-- [ ] Confirm whether creator outreach can begin once drafts are approved in 4H.
-- [ ] Confirm ad accounts and billing remain manual for now.
-- [ ] Confirm final approval workflow for generated image uploads.
+- [x] Confirm which five trades are the first launch beachhead: `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, `lockout.city`.
+- [x] Confirm creator outreach can begin after drafts are approved in 4H.
+- [x] Confirm ad accounts and billing remain manual at first.
+- [x] Confirm final approval workflow for generated image uploads: Jarrad sign-off.
 - [ ] Approve any external campaign, creator send, ad upload, webhook, or spend.
 
 ---

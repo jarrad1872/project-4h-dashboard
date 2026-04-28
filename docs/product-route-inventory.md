@@ -17,11 +17,11 @@ This inventory is copied into 4H from read-only sawcity-lite reference files. It
 
 | Domain | Trade | Landing | Signup | Demo phone | Demo API |
 | --- | --- | --- | --- | --- | --- |
+| `saw.city` | Concrete cutting | `/` | `/login?mode=signup` | `(385) 475-6437` | `/api/demo-line/concrete-cutting` |
 | `pipe.city` | Plumbing | `/` | `/login?mode=signup` | `(385) 475-3881` | `/api/demo-line/plumbing` |
-| `duct.city` | HVAC | `/` | `/login?mode=signup` | `(385) 458-3456` | `/api/demo-line/hvac` |
 | `mow.city` | Lawn care | `/` | `/login?mode=signup` | `(385) 458-9028` | `/api/demo-line/lawn-care` |
-| `pest.city` | Pest control | `/` | `/login?mode=signup` | `(385) 354-6514` | `/api/demo-line/pest-control` |
-| `coat.city` | Painting | `/` | `/login?mode=signup` | `(385) 334-5577` | `/api/demo-line/painting` |
+| `rinse.city` | Pressure washing | `/` | `/login?mode=signup` | `(385) 378-6326` | `/api/demo-line/pressure-washing` |
+| `lockout.city` | Locksmith | `/` | `/login?mode=signup` | `(385) 481-5772` | `/api/demo-line/locksmith` |
 
 ## Planning Implications
 

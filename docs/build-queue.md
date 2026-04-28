@@ -71,6 +71,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-53 | Governance | Navigation | Apply Creatives page redirect packet | 2026-04-27 | `/creatives` now redirects internally to `/assets`, and all 24 public `/creatives/*.jpg` URLs still return 200 as static JPEGs. |
 | Q-54 | Governance | Navigation | Resolve Workflow ownership guard | 2026-04-27 | `/workflow` ownership is documented across Approval, Launch, bulk-status API, fallback data, and workflow-history; no redirect or bulk mutation happened. |
 | Q-55 | Governance | Navigation | Apply Workflow page redirect packet | 2026-04-27 | `/workflow` now redirects internally to `/launch`, while Command keeps the workflow history/ownership map and the direct-link bulk mutation UI is no longer reachable from `/workflow`. |
+| Q-56 | Governance | Launch | Lock launch operating decisions | 2026-04-27 | First launch beachheads are `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`; creator outreach drafts can move after approval, but sends still need action-time approval; billing stays manual at first; generated image uploads require Jarrad sign-off. |
 
 ## Ready Queue
 

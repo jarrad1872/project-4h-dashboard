@@ -69,7 +69,7 @@ describe("buildTradeWeeklyTargetPlan", () => {
     expect(plan.totalWeeklyLowTarget).toBe(1000);
     expect(plan.totalWeeklyHighTarget).toBe(2000);
     expect(plan.totalPaidThisWeek).toBe(2);
-    expect(plan.trades[0]).toMatchObject({
+    expect(plan.trades.find((trade) => trade.domain === "pipe.city")).toMatchObject({
       domain: "pipe.city",
       weeklyLowTarget: 200,
       weeklyHighTarget: 400,
@@ -88,11 +88,11 @@ describe("buildTradeWeeklyTargetPlan", () => {
     });
     const plan = buildTradeWeeklyTargetPlan({
       pace,
-      weeklySummary: summary({ "duct.city": 20, mow: 40 }),
-      allTimeSummary: summary({ "duct.city": 25, mow: 55 }),
+      weeklySummary: summary({ "rinse.city": 20, mow: 40 }),
+      allTimeSummary: summary({ "rinse.city": 25, mow: 55 }),
     });
 
-    expect(plan.trades.find((trade) => trade.domain === "duct.city")?.paidThisWeek).toBe(20);
+    expect(plan.trades.find((trade) => trade.domain === "rinse.city")?.paidThisWeek).toBe(20);
     expect(plan.trades.find((trade) => trade.domain === "mow.city")?.paidThisWeek).toBe(40);
   });
 

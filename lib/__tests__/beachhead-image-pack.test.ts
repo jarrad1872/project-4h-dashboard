@@ -45,7 +45,7 @@ describe("beachhead image pack summary", () => {
     expect(summary.expectedTotal).toBe(BEACHHEAD_IMAGE_TRADES.length * IMAGE_CREATIVE_ANGLES.length);
     expect(summary.complete).toBe(false);
     expect(summary.missingKeys).toContain("pipe-missed-call");
-    expect(summary.missingKeys).toContain("coat-roi-math");
+    expect(summary.missingKeys).toContain("lockout-roi-math");
   });
 
   it("is complete only when every expected card has an uploaded generated image in review or better", () => {

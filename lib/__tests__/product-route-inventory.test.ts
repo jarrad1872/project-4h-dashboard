@@ -12,11 +12,11 @@ describe("product route inventory", () => {
     const beachhead = getBeachheadProductRoutes();
 
     expect(beachhead.map((route) => route.domain).sort()).toEqual([
-      "coat.city",
-      "duct.city",
+      "lockout.city",
       "mow.city",
-      "pest.city",
       "pipe.city",
+      "rinse.city",
+      "saw.city",
     ]);
     expect(beachhead).toHaveLength(5);
 

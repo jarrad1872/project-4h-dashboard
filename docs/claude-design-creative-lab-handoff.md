@@ -17,7 +17,7 @@ The active image workflow is manual ChatGPT Pro generation:
 - Model label in 4H: `chatgpt-image-latest`
 - Provider label: `chatgpt-pro`
 - API model reference if ever needed later: `gpt-image-1.5`
-- Current beachhead trades: `pipe.city`, `duct.city`, `mow.city`, `pest.city`, `coat.city`
+- Current beachhead trades: `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, `lockout.city`
 - Offer rules: `$39/mo`, `14-day free trial`, `no credit card required`
 
 ## UX Goals
@@ -66,7 +66,7 @@ Important fields:
 | Field | Purpose |
 | --- | --- |
 | `id` | Asset row ID. |
-| `trade_slug` | Trade key such as `pipe`, `duct`, or `mow`. |
+| `trade_slug` | Trade key such as `saw`, `pipe`, `mow`, `rinse`, or `lockout`. |
 | `title` | Human-readable concept or asset title. |
 | `angle` | `missed-call`, `demo-call`, `owner-agent`, or `roi-math` for the beachhead pack. |
 | `provider` | Usually `chatgpt-pro`. |

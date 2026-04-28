@@ -40,6 +40,7 @@ import {
   productRouteInventorySources,
   productRouteRetirementDependencySummary,
 } from "@/lib/product-route-inventory";
+import { launchOperatingDecisionSummary } from "@/lib/launch-operating-decisions";
 import {
   adArchiveAuditDependencySummary,
   adArchiveDependencies,
@@ -183,6 +184,7 @@ export default function OverviewPage() {
   const settingsSummary = useMemo(() => settingsSourceNoteSummary(), []);
   const gtmRouteSummary = useMemo(() => productRouteRetirementDependencySummary(), []);
   const gtmBeachheadRoutes = useMemo(() => getBeachheadProductRoutes(), []);
+  const launchDecisionSummary = useMemo(() => launchOperatingDecisionSummary(), []);
   const adArchiveSummary = useMemo(() => adArchiveAuditDependencySummary(state.ads), [state.ads]);
   const cleanupPacketSummary = useMemo(() => clearRouteCleanupPacketSummary(), []);
   const blockedCleanupPacketSummary = useMemo(() => blockedRouteCleanupPacketSummary(), []);
@@ -253,6 +255,31 @@ export default function OverviewPage() {
             <p className="mt-2 text-sm leading-5 text-slate-400">{item.detail}</p>
           </Card>
         ))}
+      </section>
+
+      <section data-testid="launch-operating-decisions">
+        <Card className="border-emerald-900/60 bg-emerald-950/10">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Launch operating decisions</p>
+              <h2 className="mt-1 text-xl font-semibold text-white">First wave is locked to five domains</h2>
+            </div>
+            <StatusPill>{launchDecisionSummary.beachheadCount} beachheads</StatusPill>
+          </div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr,1fr]">
+            <div className="flex flex-wrap gap-2">
+              {launchDecisionSummary.beachheadDomains.map((domain) => (
+                <StatusPill key={domain}>{domain}</StatusPill>
+              ))}
+            </div>
+            <div className="space-y-2 text-sm leading-5 text-slate-300">
+              <p>Creator outreach drafts can move after 4H approval gates; sends still require action-time approval.</p>
+              <p>Ad accounts and billing stay manual at first.</p>
+              <p>{launchDecisionSummary.imageApproval}</p>
+              <p>{launchDecisionSummary.externalActionApproval}</p>
+            </div>
+          </div>
+        </Card>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1fr,1.05fr]">

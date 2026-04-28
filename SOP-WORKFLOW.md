@@ -114,12 +114,12 @@ Image URL: points to `trade-heros/nb2/{slug}-hero-a.jpg`
 - Active UI: `/assets` Creative Lab.
 - Active concept API: `GET/POST /api/image-concepts`.
 - Prompt briefs live in `lib/image-creative-briefs.ts`.
-- Use **Create 20-prompt set** to seed the beachhead queue: `pipe`, `duct`, `mow`, `pest`, and `coat` across missed-call, demo-call, owner-agent, and ROI math.
+- Use **Create 20-prompt set** to seed the beachhead queue: `saw`, `pipe`, `mow`, `rinse`, and `lockout` across missed-call, demo-call, owner-agent, and ROI math.
 - Use the Creative Lab filters to narrow review by status, trade, angle, or generation state before copying packets or uploading generated images.
 - Use **Copy packet** on a prompt card, generate the image here with ChatGPT Pro, then upload the generated image back to the same asset card.
 - Q-01's first beachhead review pack is stored in 4H under `public/creative-assets/q01-beachhead-pack` and linked to the 20 Creative Lab prompt cards. These are review assets only until Jarrad approves them.
 - Use **Create v2/v3 prompt** when an image needs a replacement. The new prompt keeps the original `prompt_brief_id`, stores `parent_asset_id`, and assigns a deterministic variant ID such as `pipe-missed-call-multi-v2`.
-- Use the Q-26 founder video tracker on `/assets` to copy local shoot packets for pipe, duct, mow, pest, and coat missed-call/demo-proof clips. These packets are capture guidance only; they do not publish, upload, send outreach, launch ads, create webhooks, move money, or change billing.
+- Use the Q-26 founder video tracker on `/assets` to copy local shoot packets for saw, pipe, mow, rinse, and lockout missed-call/demo-proof clips. These packets are capture guidance only; they do not publish, upload, send outreach, launch ads, create webhooks, move money, or change billing.
 - Use the Q-28 fatigue and lineage panel on `/assets` to group image assets by prompt/variant family, compare tracked views against downstream events, and identify replacement candidates. These signals are planning guidance only and do not pause campaigns, upload assets, launch ads, spend money, or change billing.
 - Use `docs/claude-design-creative-lab-handoff.md` when handing Creative Lab to Claude Design for UI polish.
 - Creative lineage is stored on `creative_assets`: provider, model, prompt brief, prompt text, negative prompt, dimensions, variant ID, parent asset, generation status, storage path, quality, moderation, and response metadata.
@@ -312,7 +312,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `/sales` is the internal operating surface for the Arizona founding rep pilot.
 - Sales rep cards must include a stable rep code, `utm_medium=field-sales`, `utm_campaign=4h_YYYY-MM_{campaign}`, and a unique card ID in `utm_content`.
 - Printed cards must preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
-- The default Arizona pilot card points to `answered.city` for broad discovery, while lead-specific CRM rows can carry trade-domain tracking such as `pipe.city`, `duct.city`, `mow.city`, `pest.city`, or `coat.city`.
+- The default Arizona pilot card points to `answered.city` for broad discovery, while lead-specific CRM rows can carry trade-domain tracking such as `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, or `lockout.city`.
 - Business card exports use 3.75 x 2.25 inch bleed artwork at 300 DPI, with key text inside the safe area. The dashboard generates SVG/PNG assets only; it does not place a Vistaprint order or move money.
 - CRM stages are internal tracking states: prospect, qualified, visited, card-left, demo-booked, trial-started, activated, paid, and lost.
 - Placeholder lead rows are target archetypes unless a real owner is intentionally entered later. Do not represent them as contacted businesses, testers, or customers.
@@ -329,7 +329,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 **Product route inventory:**
 - `/gtm` holds the 4H-owned inventory of live product routes copied from read-only sawcity-lite reference files.
 - Trade-specific paid and creator traffic should use the trade domain root, such as `pipe.city/`, with UTMs added by the 4H launch URL builder.
-- Beachhead demo call CTAs can use the confirmed demo lines for `pipe.city`, `duct.city`, `mow.city`, `pest.city`, and `coat.city`.
+- Beachhead demo call CTAs can use the confirmed demo lines for `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`.
 - `answered.city/` is the broad trade directory, not the preferred destination for trade-specific paid clicks.
 - Route/message-match changes for sawcity-lite belong in handoff briefs only. Do not edit sawcity-lite from this repo.
 
@@ -360,6 +360,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 **External action stop screen:**
 - `/launch` stops campaign launch/edit, ad upload, creator outreach send, webhook creation, and spend/billing changes at a visible approval boundary.
 - Each stopped action must state the risk, the exact Jarrad approval needed, the blocked mechanism, and the next internal step.
+- Jarrad confirmed creator outreach may begin after drafts pass 4H approval, ad accounts and billing remain manual at first, and generated image uploads require Jarrad sign-off before becoming launchable assets.
 - The stop screen is a planning surface only. It does not call ad-platform APIs, send messages, upload sheets, create webhooks, change billing, or move money.
 - The former launch-status action is not an external launch control. Any real campaign launch remains manual or separately approved by Jarrad.
 

@@ -12,7 +12,7 @@ describe("founder video assets", () => {
       return domains;
     }, {});
 
-    expect(Object.keys(byDomain).sort()).toEqual(["coat.city", "duct.city", "mow.city", "pest.city", "pipe.city"]);
+    expect(Object.keys(byDomain).sort()).toEqual(["lockout.city", "mow.city", "pipe.city", "rinse.city", "saw.city"]);
     expect(Object.values(byDomain).every((angles) => angles.includes("missed-call") && angles.includes("demo-proof"))).toBe(true);
   });
 
