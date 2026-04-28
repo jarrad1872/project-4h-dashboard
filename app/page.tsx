@@ -27,6 +27,7 @@ import {
   workflowHistoryDependencySummary,
   workflowTransitionPairs,
 } from "@/lib/workflow-history";
+import { workflowOwnershipGuardSummary, workflowOwnershipSurfaces } from "@/lib/workflow-ownership-guard";
 import {
   settingsDependencyNotes,
   settingsSetupGuides,
@@ -177,6 +178,7 @@ export default function OverviewPage() {
   const staticCreativeGuardSummary = useMemo(() => staticCreativeUrlGuardSummary(), []);
   const staticCreativeRedirectSummary = useMemo(() => staticCreativeUrlRedirectSummary(), []);
   const workflowHistorySummary = useMemo(() => workflowHistoryDependencySummary(), []);
+  const workflowOwnershipSummary = useMemo(() => workflowOwnershipGuardSummary(), []);
   const workflowTransitions = useMemo(() => workflowTransitionPairs(), []);
   const settingsSummary = useMemo(() => settingsSourceNoteSummary(), []);
   const gtmRouteSummary = useMemo(() => productRouteRetirementDependencySummary(), []);
@@ -741,6 +743,7 @@ export default function OverviewPage() {
             <StatusPill>{workflowHistorySummary.stageCount} stages</StatusPill>
             <StatusPill>{workflowHistorySummary.transitionCount} transitions</StatusPill>
             <StatusPill>{workflowHistorySummary.dependencyCount} deps</StatusPill>
+            <StatusPill>{workflowOwnershipSummary.readyForPageRedirectPacket ? "Q-54 guard resolved" : "guard blocked"}</StatusPill>
           </div>
         </div>
         <Card className="mt-3 border-cyan-900/50 bg-cyan-950/10">
@@ -748,6 +751,11 @@ export default function OverviewPage() {
           <p className="mt-2 text-xs text-slate-500">
             Route: {workflowHistorySummary.route}; API: {workflowHistorySummary.apiRoute}; fallback file:{" "}
             {workflowHistorySummary.fallbackFile}
+          </p>
+          <p className="mt-2 text-xs text-cyan-200">
+            Q-54 ownership check: {workflowOwnershipSummary.stageCount} stages, {workflowOwnershipSummary.transitionCount} transitions,{" "}
+            {workflowOwnershipSummary.dependencyCount} dependencies, and {workflowOwnershipSummary.ownershipSurfaceCount} owner
+            surfaces documented. Redirect implemented: {workflowOwnershipSummary.redirectImplemented ? "yes" : "no"}.
           </p>
           <div className="mt-4 grid gap-3 xl:grid-cols-[0.8fr,1fr]">
             <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
@@ -765,6 +773,18 @@ export default function OverviewPage() {
               </p>
             </div>
             <div className="grid gap-2">
+              {workflowOwnershipSurfaces.map((owner) => (
+                <div key={owner.surface} className="rounded border border-slate-700 bg-slate-900/60 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-white">{owner.surface}</p>
+                    <StatusPill>owner</StatusPill>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-300">{owner.owns}</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Mutation allowed in guard: {owner.mutationAllowedInGuard ? "yes" : "no"}
+                  </p>
+                </div>
+              ))}
               {workflowHistoryDependencies.map((dependency) => (
                 <div key={dependency.id} className="rounded border border-slate-700 bg-slate-900/60 p-3">
                   <div className="flex flex-wrap items-start justify-between gap-2">

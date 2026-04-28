@@ -82,9 +82,9 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 | GTM Board | `/gtm` | Full mission brief, product state, trade registry, product route inventory, action board |
 | Ads | `/ads` | Current ad candidates plus historical archive labels for old generated ads |
 | Approval | `/approval` | Approve/Hold/Reject pending ads and review the internal approval audit trail |
-| Creatives | `/creatives` | Generated ad creative thumbnails |
+| Creatives | `/creatives` | Legacy page route that now redirects internally to `/assets`; public `/creatives/*.jpg` files remain direct-link accessible |
 | Assets | `/assets` | AI UGC creative asset tracking, founder video shoot packets, creative fatigue/lineage tracking, and draft/review/approved/live workflow |
-| Workflow | `/workflow` | Pipeline stages (concept → approved → uploaded → live) |
+| Workflow | `/workflow` | Legacy direct-link six-stage workflow board pending Q-55 redirect to `/launch`; Command preserves its history/ownership map |
 | Lifecycle | `/lifecycle` | Day 0/1/3 email + SMS sequences plus attribution-only follow-up measurement |
 | Scorecard | `/scorecard` | Weekly performance metrics, learning rankings, trade weekly targets, local keep/kill/iterate decisions, and customer pace forecast |
 | Budget | `/budget` | Spend allocation per platform plus local experiment-level budget planning |
@@ -269,6 +269,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-51 adds a blocked-route cleanup packet for `/creatives` and `/workflow`; it requires public static `/creatives/*.jpg` 200 checks plus workflow-history preservation before future redirect work
 - Q-52 resolves the `/creatives` static URL guard: `/creatives` plus all 24 public JPEG URLs returned 200 locally, evidence is recorded in `docs/creative-static-url-guard.md`, and no redirect or file move happened
 - Q-53 applies the `/creatives` page-route redirect to `/assets`; all 24 public `/creatives/*.jpg` URLs still return 200 as static JPEGs after the redirect
+- Q-54 resolves the `/workflow` ownership guard: six stages, five transitions, fallback data, legacy `/workflow`, bulk-status API, Approval, and Launch ownership are documented before any redirect
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
@@ -297,7 +298,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 Q-53 creatives redirect | v4.4.22*
+*Last updated: 2026-04-27 Q-54 workflow ownership guard | v4.4.23*
 
 ---
 

@@ -69,12 +69,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-51 | Governance | Navigation | Draft blocked-route cleanup packets | 2026-04-27 | Command now shows blocked-route packet drafts for `/creatives` and `/workflow`, including static 200 checks and workflow-history preservation requirements before any future redirect work. |
 | Q-52 | Governance | Navigation | Resolve Creatives static URL guard | 2026-04-27 | `/creatives` plus all 24 public `/creatives/*.jpg` URLs returned 200 locally, evidence is documented, and `/creatives` is clear for a future page-route redirect packet. |
 | Q-53 | Governance | Navigation | Apply Creatives page redirect packet | 2026-04-27 | `/creatives` now redirects internally to `/assets`, and all 24 public `/creatives/*.jpg` URLs still return 200 as static JPEGs. |
+| Q-54 | Governance | Navigation | Resolve Workflow ownership guard | 2026-04-27 | `/workflow` ownership is documented across Approval, Launch, bulk-status API, fallback data, and workflow-history; no redirect or bulk mutation happened. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-54 | Governance | Navigation | Resolve Workflow ownership guard | none | Document where six stages, five transitions, fallback data, and bulk-status ownership live before any `/workflow` redirect; no redirects, bulk mutations, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite changes occur. |
+| Q-55 | Governance | Navigation | Apply Workflow page redirect packet | none | `/workflow` redirects internally to `/launch`; Command still shows the workflow history/ownership map; no bulk mutations, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite changes occur. |
 
 ## Stop Conditions
 

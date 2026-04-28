@@ -120,6 +120,14 @@ function blockedVerificationForGuard(guard: RouteDependencyGuard) {
   return verificationForGuard(guard);
 }
 
+function blockedPreservationRule() {
+  if (blockedRouteCleanupPacket.length === 0) {
+    return "All blocked route guards are resolved; future work must use clear-route cleanup packets before implementation.";
+  }
+
+  return "Q-52 resolved the static creative URL blocker; the remaining blocked-route packet preserves workflow history before any future /workflow redirect work.";
+}
+
 export const clearRouteCleanupPacket: ClearRouteCleanupEntry[] = routeDependencyGuards
   .filter((guard) => guard.status === "clear" && guard.readyForRedirectOrDelete)
   .map((guard) => {
@@ -207,7 +215,6 @@ export function blockedRouteCleanupPacketSummary() {
       "billing change",
       "sawcity-lite change",
     ],
-    preservationRule:
-      "Q-52 resolved the static creative URL blocker; the remaining blocked-route packet preserves workflow history before any future /workflow redirect work.",
+    preservationRule: blockedPreservationRule(),
   };
 }

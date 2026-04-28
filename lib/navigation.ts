@@ -285,12 +285,21 @@ export const routeDependencyGuards: RouteDependencyGuard[] = [
   },
   {
     route: "/workflow",
-    status: "blocked",
-    readyForRedirectOrDelete: false,
-    activeReferences: ["Direct-link archive", "legacy banner only"],
-    dataDependencies: ["6-stage bulk workflow history inventory in workflow-history"],
-    docOrTestReferences: ["README route table", "influencer campaign implementation docs", "navigation.test", "Command workflow history map"],
-    guardrail: "Do not redirect until stage history, fallback overrides, and bulk transition behavior are preserved or moved to Launch/Approval.",
+    status: "clear",
+    readyForRedirectOrDelete: true,
+    activeReferences: ["Direct-link archive until page-route redirect packet", "legacy banner only"],
+    dataDependencies: [
+      "6-stage bulk workflow history inventory in workflow-history",
+      "Q-54 verified Launch/Approval ownership, fallback data, bulk-status API, and six-stage history before redirect work",
+    ],
+    docOrTestReferences: [
+      "README route table",
+      "influencer campaign implementation docs",
+      "navigation.test",
+      "workflow-ownership-guard",
+      "Command workflow history map",
+    ],
+    guardrail: "Q-54 resolved the workflow ownership blocker. Future page-route redirect must preserve six-stage history and leave bulk mutation ownership in Approval/API.",
   },
   {
     route: "/templates",
