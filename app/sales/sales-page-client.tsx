@@ -245,6 +245,71 @@ export default function SalesPageClient() {
         ))}
       </div>
 
+      <Card className="space-y-4 border-amber-900/60 bg-amber-950/10" data-testid="sales-card-proof-top">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-amber-300">Business card proofs</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">Dustin Bouwhuis pipe.city card mockups</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Three print-ready Jobsite-design concepts are live below with front/back PNG and SVG exports. The cards
+              use `DUSTINAZ`, Dustin's phone, `dustin@saw.city`, real pipe.city assets, and the AI Agent angle.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full border border-emerald-800 px-3 py-1 text-emerald-300">$39/mo locked</span>
+            <span className="rounded-full border border-cyan-800 px-3 py-1 text-cyan-300">AI Agent</span>
+            <span className="rounded-full border border-amber-800 px-3 py-1 text-amber-300">DUSTINAZ</span>
+          </div>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
+                <Image
+                  src="/api/sales/business-card/dustin-pipe-local-trust/front.svg"
+                  alt="pipe.city Dustin Bouwhuis local trust business card front"
+                  width={businessCardPrintSpec.pixelSize.width}
+                  height={businessCardPrintSpec.pixelSize.height}
+                  unoptimized
+                  className="block w-full"
+                />
+              </div>
+              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Concept 1 front</p>
+            </div>
+            <div>
+              <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
+                <Image
+                  src="/api/sales/business-card/dustin-pipe-missed-call/back.svg"
+                  alt="pipe.city Dustin Bouwhuis missed-call business card back"
+                  width={businessCardPrintSpec.pixelSize.width}
+                  height={businessCardPrintSpec.pixelSize.height}
+                  unoptimized
+                  className="block w-full"
+                />
+              </div>
+              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Concept 2 back</p>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Fast exports</p>
+            <div className="mt-3 grid gap-2">
+              {cardProofs.map((proof) => (
+                <div key={proof.id} className="rounded border border-slate-800 bg-slate-900/50 p-3">
+                  <p className="text-sm font-semibold text-white">{proof.label}</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">{proof.frontHeadline}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <DownloadLink href={`/api/sales/business-card/${proof.id}/front.png`}>Front PNG</DownloadLink>
+                    <DownloadLink href={`/api/sales/business-card/${proof.id}/back.png`}>Back PNG</DownloadLink>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+
       <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10" data-testid="pipe-proof-sprint-board">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
           <div>
