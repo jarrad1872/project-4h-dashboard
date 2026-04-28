@@ -36,6 +36,7 @@ import {
   buildSalesTrackingUrl,
   businessCardPrintSpec,
   getPrimarySalesCard,
+  PIPE_CITY_DEMO_LINE,
   salesCardVariants,
   salesLeads as seedSalesLeads,
   salesReps,
@@ -250,10 +251,11 @@ export default function SalesPageClient() {
           <div>
             <p className="text-xs uppercase tracking-wide text-amber-300">Business card proofs</p>
             <h2 className="mt-1 text-lg font-semibold text-white">Dustin Bouwhuis pipe.city card mockups</h2>
-            <p className="mt-1 max-w-3xl text-sm text-slate-400">
-              Three print-ready Jobsite-design concepts are live below with front/back PNG and SVG exports. The cards
-              use `DUSTINAZ`, Dustin's phone, `dustin@saw.city`, real pipe.city assets, and the AI Agent angle.
-            </p>
+              <p className="mt-1 max-w-3xl text-sm text-slate-400">
+                Three print-ready Jobsite-design concepts are live below with front/back PNG and SVG exports. The cards
+                use the pipe.city hero image as the full-bleed background, `DUSTINAZ`, Dustin's phone, `dustin@saw.city`,
+                demo line {PIPE_CITY_DEMO_LINE}, and the AI Agent angle.
+              </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
             <span className="rounded-full border border-emerald-800 px-3 py-1 text-emerald-300">$39/mo locked</span>

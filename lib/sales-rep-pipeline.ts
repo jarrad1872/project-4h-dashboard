@@ -96,6 +96,7 @@ export const FIELD_SALES_UTM_MEDIUM = "field-sales";
 export const FIELD_SALES_CAMPAIGN = "4h_2026-04_az_pipe_proof_sprint";
 export const SALES_CARD_PRICE = "$39/mo";
 export const SALES_CARD_TRIAL = "14-day free trial, no credit card required";
+export const PIPE_CITY_DEMO_LINE = "(385) 475-3881";
 
 export const salesStages: { id: SalesStage; label: string; intent: string }[] = [
   { id: "prospect", label: "Prospect", intent: "Local owner looks like a fit, but no touch yet." },
@@ -135,8 +136,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     campaignName: "az pipe proof sprint",
     destination: "trade-domain",
     primaryTradeDomain: "pipe.city",
-    frontHeadline: "AI Agent answers plumbing calls when you cannot.",
-    frontSubhead: "Local Arizona setup help for solo plumbing owners.",
+    frontHeadline: "AI Agent for plumbing calls.",
+    frontSubhead: `Call the demo line: ${PIPE_CITY_DEMO_LINE}`,
     backHeadline: "Let pipe.city catch the next urgent call.",
     backBullets: [
       "Answers the call before the next plumber gets it.",
@@ -156,7 +157,7 @@ export const salesCardVariants: SalesCardVariant[] = [
     destination: "trade-domain",
     primaryTradeDomain: "pipe.city",
     frontHeadline: "Missed call = missed job.",
-    frontSubhead: "pipe.city AI Agent answers while you are under the sink, driving, or already on a call.",
+    frontSubhead: `AI Agent answers while you work. Demo: ${PIPE_CITY_DEMO_LINE}`,
     backHeadline: "Your AI Agent for plumbing calls.",
     backBullets: [
       "24/7 answering for urgent plumbing leads.",
@@ -175,8 +176,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     campaignName: "az pipe proof sprint",
     destination: "trade-domain",
     primaryTradeDomain: "pipe.city",
-    frontHeadline: "Scan for a live pipe.city AI Agent demo.",
-    frontSubhead: "Hear the AI Agent answer, qualify, text the owner, and capture the job.",
+    frontHeadline: "Call the demo line.",
+    frontSubhead: `${PIPE_CITY_DEMO_LINE} answers like a plumbing AI Agent.`,
     backHeadline: "AI Agent built for solo plumbing owners on the jobsite.",
     backBullets: [
       "Answers call",
@@ -456,6 +457,7 @@ export function validateSalesCardVariant(variant: SalesCardVariant) {
     ...variant.backBullets,
     variant.offer,
     variant.price,
+    PIPE_CITY_DEMO_LINE,
     variant.callout,
   ].join(" ");
 

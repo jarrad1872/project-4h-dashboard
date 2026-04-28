@@ -6,7 +6,9 @@ import {
   businessCardPrintSpec,
   getSalesCardVariant,
   getSalesRep,
+  PIPE_CITY_DEMO_LINE,
   SALES_CARD_PRICE,
+  SALES_CARD_TRIAL,
 } from "@/lib/sales-rep-pipeline";
 
 export const dynamic = "force-dynamic";
@@ -54,10 +56,7 @@ async function buildCardSvg(variantId: string, side: CardSide) {
     width: 220,
     color: { dark: "#0f172a", light: "#ffffff" },
   });
-  const [pipeIcon, pipeHero] = await Promise.all([
-    publicAssetDataUrl("sales-assets/pipe-512.png", "image/png"),
-    publicAssetDataUrl("sales-assets/pipe-hero.jpg", "image/jpeg"),
-  ]);
+  const pipeHero = await publicAssetDataUrl("sales-assets/pipe-hero.jpg", "image/jpeg");
 
   const width = businessCardPrintSpec.pixelSize.width;
   const height = businessCardPrintSpec.pixelSize.height;
@@ -73,67 +72,73 @@ async function buildCardSvg(variantId: string, side: CardSide) {
         <stop offset="1" stop-color="#1A1F24"/>
       </linearGradient>
       <style>
-        .brandDark { font: 900 64px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
-        .brandLight { font: 900 64px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .brandDark { font: 900 72px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .brandLight { font: 900 72px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .brandQr { font: 900 54px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .kickerDark { font: 800 20px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 2px; }
         .kickerLight { font: 800 20px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 2px; }
-        .headlineDark { font: 900 42px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
-        .headlineLight { font: 900 48px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
-        .subDark { font: 600 24px Geist, Arial, Helvetica, sans-serif; fill: #9BA4AD; letter-spacing: 0; }
-        .subLight { font: 600 24px Geist, Arial, Helvetica, sans-serif; fill: #9BA4AD; letter-spacing: 0; }
+        .headlineDark { font: 900 48px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .headlineLight { font: 900 58px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .heroHeadline { font: 900 72px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .demoNumber { font: 900 68px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 0; }
+        .subDark { font: 700 26px Geist, Arial, Helvetica, sans-serif; fill: #D8DEE5; letter-spacing: 0; }
+        .subLight { font: 700 26px Geist, Arial, Helvetica, sans-serif; fill: #D8DEE5; letter-spacing: 0; }
         .smallDark { font: 800 21px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .smallLight { font: 800 21px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
         .fineDark { font: 600 17px Geist, Arial, Helvetica, sans-serif; fill: #9BA4AD; letter-spacing: 0; }
         .fineLight { font: 600 17px Geist, Arial, Helvetica, sans-serif; fill: #9BA4AD; letter-spacing: 0; }
-        .price { font: 900 34px Geist, Arial, Helvetica, sans-serif; fill: #0B0D0F; letter-spacing: 0; }
-        .offer { font: 800 21px Geist, Arial, Helvetica, sans-serif; fill: #0B0D0F; letter-spacing: 0; }
-        .bulletDark { font: 800 24px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
-        .bulletLight { font: 800 24px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .price { font: 900 34px Geist, Arial, Helvetica, sans-serif; fill: #F5C518; letter-spacing: 0; }
+        .offer { font: 800 21px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .offerDark { font: 900 21px Geist, Arial, Helvetica, sans-serif; fill: #0B0D0F; letter-spacing: 0; }
+        .bulletDark { font: 800 25px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
+        .bulletLight { font: 800 25px Geist, Arial, Helvetica, sans-serif; fill: #F2F4F6; letter-spacing: 0; }
       </style>
     </defs>`;
 
-  const offerLockup = (x: number, y: number) => `
-    <rect x="${x}" y="${y}" width="482" height="86" rx="10" fill="#F5C518"/>
-    ${textLine(SALES_CARD_PRICE, x + 28, y + 45, "price")}
-    ${textLine("14-day free trial", x + 168, y + 41, "offer")}
-    ${textLine("No credit card required.", x + 168, y + 66, "offer")}`;
+  const heroBase = (opacity = 0.7) => `
+    <rect width="${width}" height="${height}" fill="#0B0D0F"/>
+    <image href="${pipeHero}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice" opacity="${opacity}"/>
+    <rect x="0" y="0" width="${width}" height="${height}" fill="#0B0D0F" opacity="0.28"/>`;
+
+  const yellowRule = (x: number, y: number, ruleWidth = 132) => `
+    <line x1="${x}" y1="${y}" x2="${x + ruleWidth}" y2="${y}" stroke="#F5C518" stroke-width="8" stroke-linecap="round"/>`;
+
+  const repLine = (x: number, y: number, className = "smallLight") =>
+    textLine(`${rep.name}  |  ${rep.phone}  |  ${rep.email}`, x, y, className);
+
+  const offerLine = (x: number, y: number, className = "offer") =>
+    textLine(`${SALES_CARD_PRICE}  |  ${SALES_CARD_TRIAL}`, x, y, className);
+
+  const demoLine = (x: number, y: number, className = "demoNumber") => textLine(PIPE_CITY_DEMO_LINE, x, y, className);
 
   if (variant.id === "dustin-pipe-missed-call") {
     if (side === "front") {
       return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city missed-call card front">
   ${commonDefs}
-  <rect width="${width}" height="${height}" fill="url(#dark)"/>
-  <image href="${pipeHero}" x="670" y="0" width="455" height="675" preserveAspectRatio="xMidYMid slice" opacity="0.36"/>
-  <rect x="0" y="0" width="${width}" height="${height}" fill="#0B0D0F" opacity="0.34"/>
-  <image href="${pipeIcon}" x="76" y="76" width="86" height="86"/>
-  ${textLine("pipe.city", 180, 136, "brandLight")}
-  ${textLine("ARIZONA PLUMBING PROOF SPRINT", 82, 198, "kickerLight")}
-  ${textLine("Missed call", 82, 295, "headlineLight")}
-  ${textLine("= missed job.", 82, 356, "headlineLight")}
-  ${textLine("AI Agent answers urgent calls while you keep working.", 84, 414, "subLight")}
-  ${offerLockup(82, 468)}
-  ${textLine(`${rep.name}  |  ${rep.phone}  |  ${rep.email}`, 84, 615, "smallLight")}
+  ${heroBase(0.76)}
+  ${textLine("pipe.city", 74, 116, "brandLight")}
+  ${yellowRule(78, 152, 112)}
+  ${textLine("Missed call", 78, 284, "heroHeadline")}
+  ${textLine("= missed job.", 78, 360, "heroHeadline")}
+  ${textLine("AI Agent answers while you're on the job.", 82, 420, "subLight")}
+  ${textLine("Demo line", 82, 502, "kickerLight")}
+  ${demoLine(82, 575)}
+  ${repLine(82, 628, "smallLight")}
 </svg>`;
     }
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city missed-call card back">
   ${commonDefs}
-  <rect width="${width}" height="${height}" fill="#0B0D0F"/>
-  <rect x="72" y="72" width="612" height="522" rx="14" fill="#14181C" stroke="#2A3138"/>
-  ${textLine("Your AI Agent", 106, 137, "headlineLight")}
-  ${textLine("for plumbing calls.", 106, 193, "headlineLight")}
-  ${variant.backBullets.map((bullet, index) => textLine(`${index + 1}. ${bullet}`, 118, 286 + index * 64, "bulletLight")).join("\n  ")}
-  ${textLine(rep.name, 110, 520, "smallLight")}
-  ${textLine(`${rep.role}  |  ${rep.phone}  |  ${rep.email}`, 110, 555, "fineLight")}
-  <rect x="756" y="104" width="292" height="292" rx="14" fill="#ffffff"/>
-  <image href="${qrDataUrl}" x="792" y="140" width="220" height="220"/>
-  ${textLine("Scan for live demo", 902, 426, "smallLight", "middle")}
-  ${textLine("pipe.city", 902, 504, "brandQr", "middle")}
-  <rect x="764" y="530" width="284" height="50" rx="10" fill="#F5C518"/>
-  ${textLine("Built for urgent calls", 906, 562, "offer", "middle")}
+  ${heroBase(0.62)}
+  ${textLine("Your AI Agent", 76, 132, "headlineLight")}
+  ${textLine("for plumbing calls.", 76, 190, "headlineLight")}
+  ${variant.backBullets.map((bullet, index) => textLine(`${index + 1}. ${bullet}`, 86, 302 + index * 62, "bulletLight")).join("\n  ")}
+  ${offerLine(84, 532)}
+  ${repLine(84, 596)}
+  <image href="${qrDataUrl}" x="850" y="96" width="170" height="170"/>
+  ${textLine("Scan", 935, 300, "smallLight", "middle")}
 </svg>`;
   }
 
@@ -142,37 +147,29 @@ async function buildCardSvg(variantId: string, side: CardSide) {
       return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city live demo card front">
   ${commonDefs}
-  <rect width="${width}" height="${height}" fill="#0B0D0F"/>
-  <rect x="58" y="58" width="408" height="560" rx="14" fill="#14181C" stroke="#2A3138"/>
-  <rect x="114" y="111" width="296" height="296" rx="14" fill="#ffffff" stroke="#F5C518" stroke-width="8"/>
-  <image href="${qrDataUrl}" x="152" y="149" width="220" height="220"/>
-  ${textLine("SCAN FOR", 262, 465, "kickerDark", "middle")}
-  ${textLine("LIVE DEMO", 262, 516, "headlineDark", "middle")}
-  <image href="${pipeIcon}" x="686" y="76" width="96" height="96"/>
-  ${textLine("pipe.city", 800, 145, "brandDark")}
-  ${textLine("Hear the AI Agent", 586, 235, "headlineDark")}
-  ${textLine("answer the call.", 586, 286, "headlineDark")}
-  ${textLine("Answers call  |  Texts owner  |  Captures job", 590, 333, "subDark")}
-  ${offerLockup(586, 392)}
-  ${textLine(rep.name, 590, 532, "smallDark")}
-  ${textLine(`${rep.role}  |  ${rep.phone}  |  ${rep.email}`, 590, 566, "fineDark")}
+  ${heroBase(0.72)}
+  ${textLine("pipe.city", 74, 116, "brandLight")}
+  ${yellowRule(78, 152, 112)}
+  ${textLine("Call the", 78, 290, "heroHeadline")}
+  ${textLine("demo line.", 78, 366, "heroHeadline")}
+  ${demoLine(78, 476)}
+  ${textLine("Hear the AI Agent answer a plumbing call.", 82, 536, "subLight")}
+  ${repLine(82, 612, "smallLight")}
 </svg>`;
     }
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city live demo card back">
   ${commonDefs}
-  <rect width="${width}" height="${height}" fill="url(#dark)"/>
-  <image href="${pipeHero}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice" opacity="0.22"/>
-  <rect x="68" y="68" width="989" height="539" rx="14" fill="#0B0D0F" opacity="0.86"/>
-  ${textLine("AI Agent built for solo", 108, 159, "headlineLight")}
-  ${textLine("plumbing owners.", 108, 217, "headlineLight")}
-  ${variant.backBullets.map((bullet, index) => textLine(`${index + 1}. ${bullet}`, 126, 319 + index * 62, "bulletLight")).join("\n  ")}
-  ${textLine(`${rep.name}  |  ${rep.phone}  |  ${rep.email}`, 110, 555, "smallLight")}
-  <rect x="790" y="146" width="240" height="240" rx="14" fill="#ffffff"/>
-  <image href="${qrDataUrl}" x="800" y="156" width="220" height="220"/>
-  ${textLine("pipe.city", 910, 449, "brandLight", "middle")}
-  ${textLine("14-day free trial, no credit card", 910, 496, "smallLight", "middle")}
+  ${heroBase(0.62)}
+  ${textLine("Live pipe.city", 76, 138, "headlineLight")}
+  ${textLine("AI Agent demo.", 76, 196, "headlineLight")}
+  ${textLine("Answers call  |  Texts owner  |  Captures job", 82, 286, "subLight")}
+  ${textLine("Demo line", 82, 380, "kickerLight")}
+  ${demoLine(82, 452)}
+  ${offerLine(84, 548)}
+  ${repLine(84, 606)}
+  <image href="${qrDataUrl}" x="870" y="92" width="150" height="150"/>
 </svg>`;
   }
 
@@ -180,35 +177,29 @@ async function buildCardSvg(variantId: string, side: CardSide) {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city local trust card front">
   ${commonDefs}
-  <rect width="${width}" height="${height}" fill="url(#trust)"/>
-  <path d="M840 92 L985 92 L1035 218 L998 346 L1048 492 L925 592 L752 516 L705 336 Z" fill="#F5C518" opacity="0.10"/>
-  <rect x="0" y="0" width="22" height="${height}" fill="#F5C518"/>
-  <image href="${pipeIcon}" x="76" y="76" width="104" height="104"/>
-  ${textLine("pipe.city", 204, 146, "brandDark")}
-  ${textLine("ARIZONA PLUMBING EARLY TESTER ROUTE", 82, 224, "kickerDark")}
-  ${textLine(rep.name, 82, 327, "headlineDark")}
-  ${textLine(rep.role, 84, 378, "subDark")}
-  ${textLine(rep.phone, 84, 428, "headlineDark")}
-  ${textLine(rep.email, 84, 472, "smallDark")}
-  ${textLine("AI Agent answers plumbing calls when you cannot.", 84, 525, "smallDark")}
-  ${textLine("Local help. Live demo. No pressure.", 84, 548, "fineDark")}
+  ${heroBase(0.7)}
+  ${textLine("pipe.city", 74, 116, "brandLight")}
+  ${yellowRule(78, 152, 112)}
+  ${textLine("AI Agent", 78, 300, "heroHeadline")}
+  ${textLine("for plumbing calls.", 78, 376, "heroHeadline")}
+  ${textLine("Demo line", 82, 462, "kickerLight")}
+  ${demoLine(82, 535)}
+  ${repLine(82, 612, "smallLight")}
 </svg>`;
   }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dustin Bouwhuis pipe.city local trust card back">
   ${commonDefs}
-  <rect width="${width}" height="${height}" fill="#0B0D0F"/>
-  <rect x="0" y="0" width="${width}" height="22" fill="#F5C518"/>
-  ${textLine("Let pipe.city catch", 75, 100, "headlineDark")}
-  ${textLine("the next urgent call.", 75, 153, "headlineDark")}
-  ${variant.backBullets.map((bullet, index) => textLine(`${index + 1}. ${bullet}`, 94, 205 + index * 58, "bulletDark")).join("\n  ")}
-  ${offerLockup(76, 410)}
-  <rect x="780" y="110" width="270" height="270" rx="14" fill="#ffffff" stroke="#F5C518" stroke-width="6"/>
-  <image href="${qrDataUrl}" x="805" y="135" width="220" height="220"/>
-  ${textLine("Scan for live demo", 915, 426, "smallDark", "middle")}
-  ${textLine("pipe.city", 915, 504, "brandQr", "middle")}
-  ${textLine(`${rep.name}  |  ${rep.phone}  |  ${rep.email}`, 75, 594, "fineDark")}
+  ${heroBase(0.62)}
+  ${textLine(rep.name, 76, 140, "headlineLight")}
+  ${textLine(rep.role, 80, 196, "subLight")}
+  ${textLine(rep.phone, 80, 286, "demoNumber")}
+  ${textLine(rep.email, 84, 342, "smallLight")}
+  ${textLine("Local setup help for Arizona plumbing owners.", 84, 430, "subLight")}
+  ${textLine("Demo line", 84, 514, "kickerLight")}
+  ${textLine(PIPE_CITY_DEMO_LINE, 84, 586, "headlineLight")}
+  <image href="${qrDataUrl}" x="892" y="92" width="132" height="132"/>
 </svg>`;
 }
 

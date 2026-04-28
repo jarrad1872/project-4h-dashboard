@@ -242,7 +242,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-70 channel priority recut so direct install outranks creator and paid until proof gates are met.
 - [x] Add Q-71 Google Maps review-signal import plan with manual/API/provider workflow and compliance gates.
 - [x] Add Q-72 Deep Research verdict shelf on Command/Templates.
-- [x] Add Dustin Bouwhuis pipe.city business-card proof set with three print-ready Jobsite-design concepts, local pipe.city assets, `DUSTINAZ` tracking, and AI Agent positioning.
+- [x] Add Dustin Bouwhuis pipe.city business-card proof set with three print-ready Jobsite-design concepts, full-bleed pipe.city hero backgrounds, `DUSTINAZ` tracking, demo line `(385) 475-3881`, and AI Agent positioning.
 
 ---
 
