@@ -12,10 +12,18 @@
 
 Build Project 4H into the acquisition operating system that gets Answered.City to **1,000-2,000 paying customers by 2026-12-31**.
 
-That means 125-250 net new customers per month for the next eight months. 4H should not merely store ads. It should run the weekly growth loops that produce customers:
+That means 125-250 net new customers per month for the next eight months. 4H should not merely store ads. It should run the weekly growth loops that produce customers. After the 2026-04-28 Deep Research reset, the operating default is plumbing-first:
 
-- Creator demo loop
-- Human field sales loop
+- `pipe.city` is the primary scale lane.
+- ICP is the solo plumbing owner-operator answering calls from the jobsite.
+- Activation means phone connected or forwarded, one real inbound call handled, owner summary/text received, lead/job captured, and the owner has not turned it off.
+- `saw.city`, `rinse.city`, `lockout.city`, and `mow.city` stay available as supporting lanes, not co-equal launch priorities.
+
+Weekly loops now prioritize:
+
+- Direct install and founder demo loop
+- Human field sales micro-pilot loop
+- Creator proof amplification loop
 - ChatGPT Pro image creative loop
 - Demo-call and signup funnel loop
 - Approval and launch governance loop
@@ -37,9 +45,10 @@ Core offer rules:
 - Dashboard exists and deploys on Vercel.
 - Supabase APIs exist for ads, creators, creative assets, metrics, launch checklist, and budget.
 - 1,000+ historical ads exist, but they are an archive until the new creative strategy proves signal.
-- Creator pipeline exists, but outreach and approvals need to become the main operating loop.
+- Creator pipeline exists, but it is now proof amplification behind direct pipe.city owner conversations.
 - Creative asset tracking exists, but the new driver is ChatGPT Pro `chatgpt-image-latest`, not the older Gemini/NB2 flow.
 - Metrics currently show no spend-to-customer signal.
+- Deep Research reset is now encoded in `lib/customer-proof-sprint.ts`, Command, Sales, Templates, Scorecard, and this task board.
 
 ---
 
@@ -224,6 +233,15 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-61 live proof packets on `/templates`.
 - [x] Add Q-62 first-10 customer sprint board on `/sales` and Command.
 - [x] Add Q-63 channel experiment ledger on `/scorecard`.
+- [x] Add Q-64 strategy reset packet: Command, README, TASKS, SOP, and build queue now point at the plumbing-first urgent-call wedge.
+- [x] Add Q-65 activation hardening: activation requires phone connected/forwarded, real call handled, owner summary/text, lead/job captured, and owner retention.
+- [x] Add Q-66 pipe.city 30-day proof sprint board on `/sales` with target rows, stages, objections, next actions, and proof status.
+- [x] Add Q-67 pipe.city demo proof pack on `/templates` and Command.
+- [x] Add Q-68 approval-ready outreach draft packets as review-only copy with no send path.
+- [x] Add Q-69 weekly customer machine scorecard around paid customers, activated trials, CAC per activated trial, demo calls, activation quality, and owner conversations.
+- [x] Add Q-70 channel priority recut so direct install outranks creator and paid until proof gates are met.
+- [x] Add Q-71 Google Maps review-signal import plan with manual/API/provider workflow and compliance gates.
+- [x] Add Q-72 Deep Research verdict shelf on Command/Templates.
 
 ---
 
@@ -256,6 +274,11 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Live proof packets tied to demo phones, screenshot checklist, and tracked paths.
 - [x] First-10 customer attempt board.
 - [x] Channel experiment ledger for review-signal outbound, founder video, field sales, creator demos, and paid social.
+- [x] Plumbing-first Deep Research reset for Q-64 through Q-72.
+- [x] Strict activated-trial definition shared by Command, Sales, Scorecard, Lifecycle docs, and tests.
+- [x] Pipe.city 30-day proof sprint board with 50-100 target capacity.
+- [x] Approval-ready outreach draft packets that cannot send.
+- [x] Channel priority recut that keeps paid social gated until proof exists.
 - [x] Weekly learning report rankings for trades, creators, images, and angles.
 - [x] Local reversible keep/kill/iterate decision board.
 - [x] Creator outreach state tracker.

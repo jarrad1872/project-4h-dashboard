@@ -102,7 +102,7 @@ export const salesStages: { id: SalesStage; label: string; intent: string }[] = 
   { id: "card-left", label: "Card left", intent: "Printed card was handed over or left with front desk/crew." },
   { id: "demo-booked", label: "Demo booked", intent: "Owner agreed to a call, walkthrough, or live demo." },
   { id: "trial-started", label: "Trial started", intent: "Owner started the 14-day trial." },
-  { id: "activated", label: "Activated", intent: "Owner completed a meaningful product setup step." },
+  { id: "activated", label: "Activated", intent: "Phone connected, one real call handled, owner summary received, and a lead/job captured." },
   { id: "paid", label: "Paid", intent: "Owner converted to the $39/mo plan." },
   { id: "lost", label: "Lost", intent: "Not a fit, no response, or explicit decline." },
 ];

@@ -51,22 +51,29 @@ Jarrad issues commands in plain language. Bob does the work. Dashboard reflects 
 
 ## Customer Proof Sprint SOPs
 
-Q-58 through Q-63 shift the next motion from broad ad launch to first-customer proof.
+Q-58 through Q-72 shift the next motion from broad ad launch to first-customer proof. The 2026-04-28 Deep Research reset makes `pipe.city` the default scale lane and urgent missed calls the wedge.
 
 - Active customer proof UI: `/sales`.
 - Active proof packet UI: `/templates`.
 - Active learning ledger: `/scorecard`.
 - Roadmap doc: `docs/google-maps-pain-signal-roadmap.md`.
 - Shared contract: `lib/customer-proof-sprint.ts`.
+- Primary lane: `pipe.city` for solo plumbing owner-operators answering calls from the jobsite.
+- Supporting lanes: `saw.city` for founder-proof credibility, `rinse.city` for creator/content lab, `lockout.city` for urgency experiments, and `mow.city` as deferred scale.
+- Activation definition: phone connected or forwarded, one real inbound call handled, owner summary/text received, lead/job captured, and the owner has not turned it off.
+- Not activation: signup-only, demo-only, phone-connected-only, fake test call only, or owner turning the agent off.
 
 Operating sequence:
 
-1. Use the Q-58 pain-signal lead finder to identify public review phrases such as "did not answer," "never called back," "left a voicemail," "after hours," and "hard to schedule."
-2. Save only internal research hypotheses until a real owner/business row is intentionally created.
-3. Use Q-59 founder demo scripts and Q-61 live proof packets to show the missed-call moment, live demo line, captured job summary, and $39/mo trial offer.
-4. Use the Q-60 objection bank after real conversations to separate trust, price, AI quality, and "another app" objections.
-5. Keep the Q-62 next-10 board focused on named attempts before adding broad paid budget.
-6. Use Q-63 channel ledger to compare weekly inputs, success metrics, and kill criteria across review-signal outbound, founder video, field sales, creator demos, and paid social.
+1. Start with direct pipe.city install attempts and founder demos before paid social or broad creator work.
+2. Use the Q-58/Q-71 pain-signal lead finder to identify public review phrases such as "did not answer," "never called back," "left a voicemail," "after hours," and "hard to schedule."
+3. Save only internal research hypotheses until a real owner/business row is intentionally created.
+4. Use Q-59 founder demo scripts and Q-61 live proof packets to show the missed-call moment, live demo line, captured job summary, and $39/mo trial offer.
+5. Use the Q-60 objection bank after real conversations to separate trust, price, AI quality, and "another app" objections.
+6. Use the Q-66 pipe.city 30-day proof sprint board for 50-100 qualified demo targets and stage movement from research to paid.
+7. Keep all Q-68 outreach packets review-only until Jarrad approves the exact action-time send.
+8. Use Q-69 weekly customer-machine metrics before vanity channel metrics: paid customers, activated trials, CAC per activated trial, demo calls, activation quality, time to first value, activation-to-paid, and owner conversations.
+9. Use Q-70 channel ledger ordering: direct install first, review-signal research second, Arizona field sales micro-pilot third, creator proof amplification fourth, and paid social only after proof gates are met.
 
 Google Maps / review-signal boundaries:
 

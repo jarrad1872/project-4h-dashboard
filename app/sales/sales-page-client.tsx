@@ -24,8 +24,11 @@ import { Button, Card } from "@/components/ui";
 import { summarizeFieldSalesAttribution, type FieldSalesAttributionBucket } from "@/lib/field-sales-attribution";
 import { buildFieldSalesOperatingPacket } from "@/lib/field-sales-operating-plan";
 import {
+  activationDefinition,
+  beachheadPriorities,
   googleMapsLeadFinderRoadmap,
   objectionBank,
+  pipeProofSprint,
   summarizeProofSprint,
   tenCustomerSprintRows,
 } from "@/lib/customer-proof-sprint";
@@ -211,11 +214,12 @@ export default function SalesPageClient() {
     <div className="space-y-6" data-testid="sales-crm-page">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Q-32 persistent field CRM</p>
-          <h1 className="mt-1 text-2xl font-bold text-white">Human Sales Rep Pipeline</h1>
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Q-66 pipe.city proof sprint</p>
+          <h1 className="mt-1 text-2xl font-bold text-white">Plumbing-First Sales Pipeline</h1>
           <p className="mt-2 max-w-4xl text-sm text-slate-400">
-            Arizona pilot lane for local SMB trade outreach, rep-coded business cards, and early tester tracking. 4H
-            creates internal CRM rows and printable assets only; no outreach, card order, webhook, billing action, or spend happens here.
+            The Deep Research reset makes pipe.city the primary scale lane for solo plumbing owner-operators. 4H
+            creates internal CRM rows, proof stages, and printable assets only; no outreach, card order, webhook,
+            billing action, spend, or sawcity-lite edit happens here.
           </p>
         </div>
         <div className="rounded-lg border border-emerald-900/50 bg-emerald-950/20 px-4 py-3 text-sm text-emerald-200">
@@ -241,6 +245,84 @@ export default function SalesPageClient() {
         ))}
       </div>
 
+      <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10" data-testid="pipe-proof-sprint-board">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-emerald-300">Q-64 / Q-65 / Q-66 strategy reset</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">Pipe.City 30-day urgent-call proof sprint</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-400">
+              ICP: {pipeProofSprint.icp} Target: {pipeProofSprint.targetQualifiedDemoCalls}; success starts at{" "}
+              {pipeProofSprint.targetActivatedTrials}. Activated means {activationDefinition.shortLabel.toLowerCase()}.
+            </p>
+          </div>
+          <div className="rounded-lg border border-emerald-800/60 bg-slate-950/50 px-3 py-2 text-xs text-emerald-100">
+            {pipeProofSprint.timebox} - {pipeProofSprint.rows.length} starter rows - {pipeProofSprint.stages.length} stages
+          </div>
+        </div>
+
+        <div className="grid gap-3 xl:grid-cols-[0.85fr_1.15fr]">
+          <div className="space-y-3">
+            <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Beachhead recut</p>
+              <div className="mt-3 space-y-2">
+                {beachheadPriorities.map((priority) => (
+                  <div key={priority.domain} className="rounded border border-slate-800 bg-slate-900/50 p-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-white">{priority.domain}</p>
+                        <p className="text-xs text-emerald-300">{priority.label}</p>
+                      </div>
+                      <span className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">#{priority.priority}</span>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-slate-400">{priority.directive}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Activated trial requires</p>
+              <ul className="mt-3 space-y-1 text-xs leading-5 text-slate-300">
+                {activationDefinition.requiredSignals.map((signal) => <li key={signal}>- {signal}</li>)}
+              </ul>
+              <p className="mt-3 text-xs leading-5 text-amber-200">
+                Not enough: {activationDefinition.notEnough.join(", ")}.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="grid gap-2 md:grid-cols-3">
+              {pipeProofSprint.stages.map((stage) => (
+                <div key={stage.id} className="rounded border border-slate-800 bg-slate-950/60 p-3">
+                  <p className="text-sm font-semibold text-white">{stage.label}</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">{stage.intent}</p>
+                  <p className="mt-2 text-xs leading-5 text-emerald-200">Proof: {stage.proofRequired}</p>
+                </div>
+              ))}
+            </div>
+            <div className="grid gap-2 md:grid-cols-2">
+              {pipeProofSprint.rows.map((row) => (
+                <div key={row.id} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-white">{row.businessName}</p>
+                      <p className="mt-1 text-xs text-slate-500">{row.cityState} - {row.source}</p>
+                    </div>
+                    <span className="rounded border border-emerald-800/60 bg-emerald-950/30 px-2 py-1 text-xs text-emerald-200">
+                      {row.stage}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-300">{row.painSignal}</p>
+                  <p className="mt-2 text-xs leading-5 text-violet-100">Learn: {row.objectionToLearn}</p>
+                  <p className="mt-2 border-l border-emerald-800 pl-3 text-xs leading-5 text-emerald-100">{row.nextAction}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs leading-5 text-slate-500">{pipeProofSprint.approvalBoundary}</p>
+          </div>
+        </div>
+      </Card>
+
       <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/10" data-testid="pain-signal-lead-finder">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
           <div>
@@ -256,7 +338,7 @@ export default function SalesPageClient() {
           </div>
         </div>
 
-        <div className="grid gap-3 xl:grid-cols-[1fr_1fr_1fr]">
+        <div className="grid gap-3 xl:grid-cols-[1fr_1fr_1fr_1fr]">
           <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
             <Search className="h-4 w-4 text-cyan-300" aria-hidden="true" />
             <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Starter queries</p>
@@ -265,6 +347,15 @@ export default function SalesPageClient() {
                 <li key={query}>- {query}</li>
               ))}
             </ul>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <Download className="h-4 w-4 text-cyan-300" aria-hidden="true" />
+            <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Manual/API/provider import</p>
+            <ol className="mt-3 space-y-2 text-xs leading-5 text-slate-300">
+              {googleMapsLeadFinderRoadmap.importWorkflow.map((step, index) => (
+                <li key={step}>{index + 1}. {step}</li>
+              ))}
+            </ol>
           </div>
           <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
             <Target className="h-4 w-4 text-cyan-300" aria-hidden="true" />

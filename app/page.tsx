@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui";
 import { buildActiveLoopSupportSummary, EMPTY_MARKETING_EVENT_SUMMARY } from "@/lib/active-loop-support-summaries";
 import {
-  beachheadTrades,
   customerMath,
   imageDriver,
   nextFourteenDays,
@@ -53,11 +52,14 @@ import {
   clearRouteCleanupPacketSummary,
 } from "@/lib/route-cleanup-packet";
 import {
+  activationDefinition,
+  beachheadPriorities,
   channelExperimentLedger,
+  deepResearchVerdict,
   googleMapsLeadFinderRoadmap,
+  pipeProofSprint,
   proofSprintQueue,
   summarizeProofSprint,
-  tenCustomerSprintRows,
 } from "@/lib/customer-proof-sprint";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
@@ -104,46 +106,43 @@ function ActionLink({ href, children }: { href: string; children: React.ReactNod
   );
 }
 
+function fetchJsonOr<T>(path: string, fallback: T): Promise<T> {
+  return fetch(path, { cache: "no-store", signal: AbortSignal.timeout(5000) })
+    .then((response) => response.json())
+    .catch(() => fallback);
+}
+
 export default function OverviewPage() {
   const [state, setState] = useState<OverviewState>(EMPTY_STATE);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [ads, influencers, creativeAssets, lifecycleMessages, templates, marketingEvents, metrics] = await Promise.all([
-        fetch("/api/ads", { cache: "no-store" })
-          .then((response) => response.json())
-          .catch(() => []),
-        fetch("/api/influencers", { cache: "no-store" })
-          .then((response) => response.json())
-          .catch(() => []),
-        fetch("/api/creative-assets", { cache: "no-store" })
-          .then((response) => response.json())
-          .catch(() => []),
-        fetch("/api/lifecycle", { cache: "no-store" })
-          .then((response) => response.json())
-          .catch(() => []),
-        fetch("/api/templates", { cache: "no-store" })
-          .then((response) => response.json())
-          .catch(() => []),
-        fetch("/api/events?summary=1", { cache: "no-store" })
-          .then((response) => response.json())
-          .catch(() => null),
-        fetch("/api/metrics", { cache: "no-store" })
-          .then((response) => response.json())
-          .catch(() => null),
-      ]);
+      try {
+        const [ads, influencers, creativeAssets, lifecycleMessages, templates, marketingEvents, metrics] = await Promise.all([
+          fetchJsonOr("/api/ads", []),
+          fetchJsonOr("/api/influencers", []),
+          fetchJsonOr("/api/creative-assets", []),
+          fetchJsonOr("/api/lifecycle", []),
+          fetchJsonOr("/api/templates", []),
+          fetchJsonOr("/api/events?summary=1", null),
+          fetchJsonOr("/api/metrics", null),
+        ]);
 
-      setState({
-        ads: Array.isArray(ads) ? ads : [],
-        influencers: Array.isArray(influencers) ? influencers : [],
-        creativeAssets: Array.isArray(creativeAssets) ? creativeAssets : [],
-        lifecycleMessages: Array.isArray(lifecycleMessages) ? lifecycleMessages : [],
-        templates: Array.isArray(templates) ? templates : [],
-        marketingSummary: marketingEvents?.summary ?? EMPTY_MARKETING_EVENT_SUMMARY,
-        metrics,
-      });
-      setLoading(false);
+        setState({
+          ads: Array.isArray(ads) ? ads : [],
+          influencers: Array.isArray(influencers) ? influencers : [],
+          creativeAssets: Array.isArray(creativeAssets) ? creativeAssets : [],
+          lifecycleMessages: Array.isArray(lifecycleMessages) ? lifecycleMessages : [],
+          templates: Array.isArray(templates) ? templates : [],
+          marketingSummary: (marketingEvents as { summary?: MarketingEventSummary } | null)?.summary ?? EMPTY_MARKETING_EVENT_SUMMARY,
+          metrics,
+        });
+      } catch {
+        setState(EMPTY_STATE);
+      } finally {
+        setLoading(false);
+      }
     }
 
     void load();
@@ -240,7 +239,7 @@ export default function OverviewPage() {
             <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
               Goal: {formatNumber(rebuildMission.customerTargetLow)}-{formatNumber(rebuildMission.customerTargetHigh)} customers
               by December 31, 2026. The product reference is read-only {rebuildMission.referenceProduct}; the 4H surface is where
-              we rebuild creator outreach, image-led creative, approvals, and measurement.
+              we now run the pipe.city urgent-call wedge, creator proof, approvals, and measurement.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -270,17 +269,22 @@ export default function OverviewPage() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Launch operating decisions</p>
-              <h2 className="mt-1 text-xl font-semibold text-white">First wave is locked to five domains</h2>
+              <h2 className="mt-1 text-xl font-semibold text-white">Five domains remain available, but pipe.city is the scale lane</h2>
             </div>
-            <StatusPill>{launchDecisionSummary.beachheadCount} beachheads</StatusPill>
+            <StatusPill>{proofSprintSummary.primaryLane} first</StatusPill>
           </div>
           <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr,1fr]">
-            <div className="flex flex-wrap gap-2">
-              {launchDecisionSummary.beachheadDomains.map((domain) => (
-                <StatusPill key={domain}>{domain}</StatusPill>
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+              {beachheadPriorities.map((priority) => (
+                <div key={priority.domain} className="rounded border border-slate-800 bg-slate-950/40 p-3">
+                  <p className="text-sm font-semibold text-white">{priority.domain}</p>
+                  <p className="mt-1 text-xs font-semibold uppercase text-emerald-300">{priority.label}</p>
+                  <p className="mt-2 text-xs leading-5 text-slate-400">{priority.directive}</p>
+                </div>
               ))}
             </div>
             <div className="space-y-2 text-sm leading-5 text-slate-300">
+              <p>{launchDecisionSummary.beachheadCount} confirmed domains stay usable, but they no longer run as co-equal GTM lanes.</p>
               <p>Creator outreach drafts can move after 4H approval gates; sends still require action-time approval.</p>
               <p>Ad accounts and billing stay manual at first.</p>
               <p>{launchDecisionSummary.imageApproval}</p>
@@ -290,15 +294,44 @@ export default function OverviewPage() {
         </Card>
       </section>
 
+      <section data-testid="deep-research-verdict-shelf">
+        <Card className="border-emerald-900/60 bg-slate-900/70">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Q-72 Deep Research verdict</p>
+              <h2 className="mt-1 text-xl font-semibold text-white">Narrow the machine around the missed-call moment</h2>
+              <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-300">{deepResearchVerdict.verdict}</p>
+              <p className="mt-2 max-w-4xl text-sm leading-6 text-emerald-100">{deepResearchVerdict.positioning}</p>
+            </div>
+            <StatusPill>urgent-call wedge</StatusPill>
+          </div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            <div className="rounded border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Preferred option</p>
+              <p className="mt-2 text-sm font-semibold text-white">{deepResearchVerdict.preferredOption}</p>
+            </div>
+            <div className="rounded border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Alternative option</p>
+              <p className="mt-2 text-sm text-slate-300">{deepResearchVerdict.alternativeOption}</p>
+            </div>
+            <div className="rounded border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Activated trial</p>
+              <p className="mt-2 text-sm font-semibold text-white">{activationDefinition.shortLabel}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-400">{activationDefinition.ownerValueMoment}</p>
+            </div>
+          </div>
+        </Card>
+      </section>
+
       <section data-testid="customer-proof-sprint">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Customer proof sprint</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Q-58 through Q-63 turn GTM into first-customer proof</h2>
+            <h2 className="mt-1 text-xl font-semibold text-white">Q-58 through Q-72 turn GTM into pipe.city proof-to-install</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <StatusPill>{proofSprintSummary.queueItems} queue items</StatusPill>
-            <StatusPill>{proofSprintSummary.firstCustomerRows} first rows</StatusPill>
+            <StatusPill>{proofSprintSummary.pipeSprintRows} pipe rows</StatusPill>
             <StatusPill>{proofSprintSummary.channelExperiments} experiments</StatusPill>
           </div>
         </div>
@@ -318,13 +351,14 @@ export default function OverviewPage() {
               </div>
             </div>
             <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Next 10 customer attempts</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Pipe.City 30-day sprint</p>
+              <p className="mt-2 text-sm leading-5 text-slate-300">{pipeProofSprint.icp}</p>
               <div className="mt-3 space-y-2">
-                {tenCustomerSprintRows.slice(0, 5).map((row) => (
+                {pipeProofSprint.rows.map((row) => (
                   <div key={row.id} className="rounded border border-slate-800 bg-slate-950/50 p-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">{row.tradeDomain}</p>
-                      <span className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">{row.source}</span>
+                      <p className="text-sm font-semibold text-white">{row.businessName}</p>
+                      <span className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">{row.stage}</span>
                     </div>
                     <p className="mt-1 text-xs leading-5 text-slate-400">{row.painSignal}</p>
                   </div>
@@ -335,7 +369,7 @@ export default function OverviewPage() {
               <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Google Maps roadmap</p>
               <p className="mt-2 text-sm leading-5 text-slate-300">{googleMapsLeadFinderRoadmap.principle}</p>
               <p className="mt-3 text-xs text-slate-500">
-                {googleMapsLeadFinderRoadmap.painSignals.length} pain phrases, {googleMapsLeadFinderRoadmap.captureFields.length} capture fields, {googleMapsLeadFinderRoadmap.blockedTactics.length} blocked tactics.
+                {googleMapsLeadFinderRoadmap.painSignals.length} pain phrases, {googleMapsLeadFinderRoadmap.captureFields.length} capture fields, {googleMapsLeadFinderRoadmap.importWorkflow.length} import paths, {googleMapsLeadFinderRoadmap.blockedTactics.length} blocked tactics.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {channelExperimentLedger.slice(0, 3).map((experiment) => (
@@ -640,17 +674,17 @@ export default function OverviewPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.9fr,1.1fr]">
         <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Beachhead trades</p>
-          <h2 className="mt-1 text-xl font-semibold text-white">Start where the missed-call pain is obvious</h2>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Beachhead roles</p>
+          <h2 className="mt-1 text-xl font-semibold text-white">Stop treating every domain as co-equal</h2>
           <div className="mt-4 space-y-3">
-            {beachheadTrades.map((trade) => (
+            {beachheadPriorities.map((trade) => (
               <div key={trade.domain} className="border-t border-slate-700 pt-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-semibold text-white">{trade.domain}</p>
-                  <span className="text-xs text-slate-500">{trade.trade}</span>
+                  <span className="text-xs text-slate-500">{trade.trade} - {trade.label}</span>
                 </div>
                 <p className="mt-1 text-sm leading-5 text-slate-400">{trade.reason}</p>
-                <p className="mt-1 text-sm leading-5 text-emerald-200">{trade.firstOffer}</p>
+                <p className="mt-1 text-sm leading-5 text-emerald-200">{trade.directive}</p>
               </div>
             ))}
           </div>

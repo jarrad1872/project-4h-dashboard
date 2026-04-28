@@ -71,7 +71,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-53 | Governance | Navigation | Apply Creatives page redirect packet | 2026-04-27 | `/creatives` now redirects internally to `/assets`, and all 24 public `/creatives/*.jpg` URLs still return 200 as static JPEGs. |
 | Q-54 | Governance | Navigation | Resolve Workflow ownership guard | 2026-04-27 | `/workflow` ownership is documented across Approval, Launch, bulk-status API, fallback data, and workflow-history; no redirect or bulk mutation happened. |
 | Q-55 | Governance | Navigation | Apply Workflow page redirect packet | 2026-04-27 | `/workflow` now redirects internally to `/launch`, while Command keeps the workflow history/ownership map and the direct-link bulk mutation UI is no longer reachable from `/workflow`. |
-| Q-56 | Governance | Launch | Lock launch operating decisions | 2026-04-27 | First launch beachheads are `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`; creator outreach drafts can move after approval, but sends still need action-time approval; billing stays manual at first; generated image uploads require Jarrad sign-off. |
+| Q-56 | Governance | Launch | Lock launch operating decisions | 2026-04-27 | Historical decision recorded the five available launch domains; Q-64 supersedes the active priority order with `pipe.city` primary and the others supporting. Creator sends, billing, and generated image uploads still require approval. |
 | Q-57 | Phase 5 | Launch | Add agentic launch control | 2026-04-28 | `/launch`, `/api/launch/orchestrate`, and `npm run cli -- launch plan/prepare/execute` now share one launch contract for app, Codex, and Claude Code. Internal bundle/sheet prep is agentic; external adapters remain approval-gated and unconfigured. |
 | Q-58 | Customer Proof | Research | Add pain-signal lead finder | 2026-04-28 | `/sales` and `docs/google-maps-pain-signal-roadmap.md` now document manual/API-first Google Maps review-signal prospecting, capture fields, scoring, and blocked scraping/evasion tactics. |
 | Q-59 | Customer Proof | Founder Proof | Add founder demo script factory | 2026-04-28 | `/templates` now has copy-ready founder demo scripts for the five beachhead domains and live demo lines, with no publishing action. |
@@ -79,12 +79,21 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-61 | Customer Proof | Demo Proof | Add live proof packets | 2026-04-28 | `/templates` now exposes live proof packets with demo phone, call prompt, AI capture checklist, screenshot checklist, and tracked proof path. |
 | Q-62 | Customer Proof | Pipeline Focus | Add 10-customer sprint board | 2026-04-28 | `/sales` and Command now focus the next motion on ten internal customer-attempt hypotheses before broad paid scale. |
 | Q-63 | Customer Proof | Learning | Add channel experiment ledger | 2026-04-28 | `/scorecard` now compares review-signal outbound, founder video, field sales, creator demos, and paid social by weekly inputs, success metric, kill criteria, and evidence strength. |
+| Q-64 | Deep Research Reset | Strategy | Add plumbing-first strategy reset packet | 2026-04-28 | Command, README, TASKS, SOP, and shared data now treat pipe.city as the primary scale lane; saw.city is founder proof, rinse.city content lab, lockout.city urgency test, and mow.city deferred. |
+| Q-65 | Deep Research Reset | Activation | Harden activated-trial definition | 2026-04-28 | `/scorecard` and docs now define activation as phone connected/forwarded, one real inbound call handled, owner summary/text received, lead/job captured, and no immediate turnoff. |
+| Q-66 | Deep Research Reset | Sales | Add Pipe.City 30-day proof sprint board | 2026-04-28 | `/sales` now shows the pipe.city solo-owner proof sprint, 50-100 qualified demo target capacity, stage definitions, starter rows, and approval boundary. |
+| Q-67 | Deep Research Reset | Demo Proof | Promote Pipe.City demo proof pack | 2026-04-28 | `/templates` now promotes the pipe.city founder script, live proof packet, call prompt, screenshot checklist, tracked proof path, and close line. |
+| Q-68 | Deep Research Reset | Outreach Review | Add approval-ready outreach draft packets | 2026-04-28 | `/templates` now has review-only draft packets for review-signal, AZ field-sales follow-up, and founder-demo follow-up; no send action exists. |
+| Q-69 | Deep Research Reset | Learning | Add weekly customer machine scorecard | 2026-04-28 | `/scorecard` now leads with paid customers, strict activated trials, CAC per activated trial, demo calls, trial-to-activation, time to first value, activation-to-paid, and owner conversations. |
+| Q-70 | Deep Research Reset | Learning | Reprioritize channel experiment ledger | 2026-04-28 | `/scorecard` now ranks direct install and review-signal proof before creators and paid; paid social is explicitly gated until proof assets show demo/activation signal. |
+| Q-71 | Deep Research Reset | Research | Expand Google Maps review-signal import plan | 2026-04-28 | `/sales` and `docs/google-maps-pain-signal-roadmap.md` now document manual/API/provider import paths with source URL, quote, confidence, and compliance gates; scraping/evasion remains blocked. |
+| Q-72 | Deep Research Reset | Strategy | Add Deep Research verdict shelf | 2026-04-28 | Command and `/templates` now expose the Deep Research verdict, preferred/alternative options, kill criteria, and stop/start/keep guidance for future agents. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| _None_ | - | - | Queue clear after Q-63 | - | Pick the next first-principles build item only after adding it to this queue with acceptance criteria. |
+| _None_ | - | - | Queue clear after Q-72 | - | Pick the next first-principles build item only after adding it to this queue with acceptance criteria. |
 
 ## Stop Conditions
 

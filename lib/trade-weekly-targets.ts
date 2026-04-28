@@ -1,4 +1,4 @@
-import { beachheadTrades } from "./4h-rebuild-data";
+import { beachheadPriorities } from "./customer-proof-sprint";
 import type { CustomerPaceForecast } from "./customer-pace-forecast";
 import type { MarketingEventSummary } from "./types";
 
@@ -66,7 +66,18 @@ function nextAction(status: TradeWeeklyTargetStatus, domain: string, gapToLow: n
   if (status === "behind") {
     return `Close ${Math.ceil(gapToLow).toLocaleString()} paid customers to hit this week's low case.`;
   }
-  return `Get one approved ${domain} test live manually, then log paid conversions here.`;
+  if (domain === "pipe.city") {
+    return "Run the pipe.city direct-install sprint before any broad paid scale.";
+  }
+  return `Keep ${domain} in its supporting lane until pipe.city activation signal is clear.`;
+}
+
+function targetWeight(domain: string) {
+  if (domain === "pipe.city") return 0.6;
+  if (domain === "saw.city") return 0.15;
+  if (domain === "rinse.city") return 0.1;
+  if (domain === "lockout.city") return 0.1;
+  return 0.05;
 }
 
 export function buildTradeWeeklyTargetPlan({
@@ -74,10 +85,10 @@ export function buildTradeWeeklyTargetPlan({
   weeklySummary,
   allTimeSummary,
 }: TradeWeeklyTargetOptions): TradeWeeklyTargetPlan {
-  const tradeCount = beachheadTrades.length || 1;
-  const weeklyLowTarget = roundOne(pace.requiredWeeklyLow / tradeCount);
-  const weeklyHighTarget = roundOne(pace.requiredWeeklyHigh / tradeCount);
-  const trades = beachheadTrades.map((trade) => {
+  const trades = beachheadPriorities.map((trade) => {
+    const weight = targetWeight(trade.domain);
+    const weeklyLowTarget = roundOne(pace.requiredWeeklyLow * weight);
+    const weeklyHighTarget = roundOne(pace.requiredWeeklyHigh * weight);
     const paidThisWeek = paidForTrade(weeklySummary, trade.domain);
     const allTimePaid = paidForTrade(allTimeSummary, trade.domain);
     const gapToLow = Math.max(0, roundOne(weeklyLowTarget - paidThisWeek));
@@ -99,8 +110,8 @@ export function buildTradeWeeklyTargetPlan({
   });
 
   const totalPaidThisWeek = trades.reduce((sum, trade) => sum + trade.paidThisWeek, 0);
-  const totalWeeklyLowTarget = roundOne(weeklyLowTarget * tradeCount);
-  const totalWeeklyHighTarget = roundOne(weeklyHighTarget * tradeCount);
+  const totalWeeklyLowTarget = roundOne(trades.reduce((sum, trade) => sum + trade.weeklyLowTarget, 0));
+  const totalWeeklyHighTarget = roundOne(trades.reduce((sum, trade) => sum + trade.weeklyHighTarget, 0));
   const totalGapToLow = Math.max(0, roundOne(totalWeeklyLowTarget - totalPaidThisWeek));
   const totalGapToHigh = Math.max(0, roundOne(totalWeeklyHighTarget - totalPaidThisWeek));
 
@@ -112,7 +123,7 @@ export function buildTradeWeeklyTargetPlan({
     totalGapToHigh,
     trades,
     evidence: pace.paidCustomers === 0
-      ? "No paid customer data is logged yet; targets are an even first-principles split across the beachhead trades."
-      : `Targets split the remaining ${pace.remainingToLow.toLocaleString()}-${pace.remainingToHigh.toLocaleString()} customer gap evenly across the five beachhead trades until trade-level paid signal is strong enough to reweight.`,
+      ? "No paid customer data is logged yet; targets are weighted toward pipe.city because the active wedge is plumbing-first."
+      : `Targets weight the remaining ${pace.remainingToLow.toLocaleString()}-${pace.remainingToHigh.toLocaleString()} customer gap toward pipe.city until trade-level activation signal is strong enough to reweight.`,
   };
 }

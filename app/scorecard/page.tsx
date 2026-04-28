@@ -7,7 +7,7 @@ import { Button, Card } from "@/components/ui";
 import { buildActiveLoopSupportSummary, EMPTY_MARKETING_EVENT_SUMMARY } from "@/lib/active-loop-support-summaries";
 import { CHANNELS } from "@/lib/constants";
 import { buildCustomerPaceForecast, type CustomerPaceStatus } from "@/lib/customer-pace-forecast";
-import { rankChannelExperiments } from "@/lib/customer-proof-sprint";
+import { activationDefinition, rankChannelExperiments, weeklyCustomerMachineMetrics } from "@/lib/customer-proof-sprint";
 import {
   addLearningDecision,
   currentLearningDecisions,
@@ -134,6 +134,10 @@ function weekEventParams(weekStart: string) {
   });
 }
 
+function fetchWithTimeout(path: string) {
+  return fetch(path, { cache: "no-store", signal: AbortSignal.timeout(5000) });
+}
+
 export default function ScorecardPage() {
   const [metrics, setMetrics] = useState<MetricsData>({ weeks: [] });
   const [marketingSummary, setMarketingSummary] = useState<MarketingEventSummary>(EMPTY_MARKETING_EVENT_SUMMARY);
@@ -151,32 +155,42 @@ export default function ScorecardPage() {
 
   async function load() {
     setLoading(true);
-    const metricsRes = await fetch("/api/metrics", { cache: "no-store" });
-    const data = (await metricsRes.json()) as MetricsData;
-    setMetrics(data);
-    const latest = data.weeks.at(-1);
-    if (latest && !selectedWeek) {
-      setSelectedWeek(latest.weekStart);
-      setDraft(latest);
-    }
-    if (!latest) {
+    try {
+      const metricsRes = await fetchWithTimeout("/api/metrics");
+      const data = (await metricsRes.json()) as MetricsData;
+      setMetrics(data);
+      const latest = data.weeks.at(-1);
+      if (latest && !selectedWeek) {
+        setSelectedWeek(latest.weekStart);
+        setDraft(latest);
+      }
+      if (!latest) {
+        setDraft(null);
+        setMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
+      }
+      const [allTimeEventsRes, lifecycleRes, templatesRes] = await Promise.all([
+        fetchWithTimeout("/api/events?summary=1").catch(() => null),
+        fetchWithTimeout("/api/lifecycle").catch(() => null),
+        fetchWithTimeout("/api/templates").catch(() => null),
+      ]);
+      if (allTimeEventsRes?.ok) {
+        const allTimeEventsData = (await allTimeEventsRes.json()) as { summary?: MarketingEventSummary };
+        setAllTimeMarketingSummary(allTimeEventsData.summary ?? EMPTY_MARKETING_EVENT_SUMMARY);
+      } else {
+        setAllTimeMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
+      }
+      setLifecycleMessages(lifecycleRes?.ok ? ((await lifecycleRes.json()) as LifecycleMessage[]) : []);
+      setTemplates(templatesRes?.ok ? ((await templatesRes.json()) as AdTemplate[]) : []);
+    } catch {
+      setMetrics({ weeks: [] });
       setDraft(null);
       setMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
-    }
-    const [allTimeEventsRes, lifecycleRes, templatesRes] = await Promise.all([
-      fetch("/api/events?summary=1", { cache: "no-store" }).catch(() => null),
-      fetch("/api/lifecycle", { cache: "no-store" }).catch(() => null),
-      fetch("/api/templates", { cache: "no-store" }).catch(() => null),
-    ]);
-    if (allTimeEventsRes?.ok) {
-      const allTimeEventsData = (await allTimeEventsRes.json()) as { summary?: MarketingEventSummary };
-      setAllTimeMarketingSummary(allTimeEventsData.summary ?? EMPTY_MARKETING_EVENT_SUMMARY);
-    } else {
       setAllTimeMarketingSummary(EMPTY_MARKETING_EVENT_SUMMARY);
+      setLifecycleMessages([]);
+      setTemplates([]);
+    } finally {
+      setLoading(false);
     }
-    setLifecycleMessages(lifecycleRes?.ok ? ((await lifecycleRes.json()) as LifecycleMessage[]) : []);
-    setTemplates(templatesRes?.ok ? ((await templatesRes.json()) as AdTemplate[]) : []);
-    setLoading(false);
   }
 
   useEffect(() => { void load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -209,7 +223,7 @@ export default function ScorecardPage() {
         return;
       }
 
-      const eventsRes = await fetch(`/api/events?${params.toString()}`, { cache: "no-store" }).catch(() => null);
+      const eventsRes = await fetchWithTimeout(`/api/events?${params.toString()}`).catch(() => null);
       if (cancelled) return;
       if (eventsRes?.ok) {
         const eventsData = (await eventsRes.json()) as { summary?: MarketingEventSummary };
@@ -249,6 +263,28 @@ export default function ScorecardPage() {
     [allTimeMarketingSummary, lifecycleMessages, templates.length],
   );
   const proofExperiments = useMemo(() => rankChannelExperiments(), []);
+  const visibleWeek = useMemo(() => draft ?? createWeek(selectedWeek || "No week selected"), [draft, selectedWeek]);
+  const weekTotals = useMemo(() => sumChannels([visibleWeek]), [visibleWeek]);
+  const customerMachineStats = useMemo(() => {
+    const weekly = marketingSummary.byType;
+    const activatedTrials = Math.max(weekly.activated, weekTotals.activations);
+    const paidCustomers = Math.max(weekly.paid, weekTotals.paid);
+    const trialStarts = Math.max(weekly.trial_started, weekTotals.signups);
+    const cacActivated = weekTotals.spend > 0 && activatedTrials > 0 ? `$${(weekTotals.spend / activatedTrials).toFixed(0)}` : "No spend";
+    const trialActivationRate = trialStarts > 0 ? `${((activatedTrials / trialStarts) * 100).toFixed(0)}%` : "No trial base";
+    const activationPaidRate = activatedTrials > 0 ? `${((paidCustomers / activatedTrials) * 100).toFixed(0)}%` : "No activation base";
+
+    return [
+      { label: "Paid customers", value: paidCustomers.toLocaleString(), detail: "Selected week output" },
+      { label: "Activated trials", value: activatedTrials.toLocaleString(), detail: activationDefinition.shortLabel },
+      { label: "CAC / activated trial", value: cacActivated, detail: "Spend divided by strict activation" },
+      { label: "Demo calls", value: weekly.demo_call.toLocaleString(), detail: "Live trust-building moments" },
+      { label: "Trial-to-activation", value: trialActivationRate, detail: "Setup friction check" },
+      { label: "Time to first value", value: "Manual", detail: "Target under 72 hours" },
+      { label: "Activation-to-paid", value: activationPaidRate, detail: "$39/mo conversion quality" },
+      { label: "Owner conversations", value: "Manual", detail: "Log from Sales/field notes" },
+    ];
+  }, [marketingSummary.byType, weekTotals.activations, weekTotals.paid, weekTotals.signups, weekTotals.spend]);
   const decisionTargets = useMemo(
     () => learningReport.reports.flatMap((report) =>
       report.items.map((item) => decisionTargetFromRankedItem(report.dimension, item)),
@@ -260,9 +296,6 @@ export default function ScorecardPage() {
     [decisionHistory, selectedWeek],
   );
   const currentDecisions = useMemo(() => currentLearningDecisions(selectedWeekDecisionHistory), [selectedWeekDecisionHistory]);
-  const visibleWeek = draft ?? createWeek(selectedWeek || "No week selected");
-  const weekTotals = useMemo(() => sumChannels([visibleWeek]), [visibleWeek]);
-
   function updateChannel(channel: (typeof CHANNELS)[number], field: keyof ChannelMetrics, value: string) {
     setDraft((current) => {
       if (!current) return current;
@@ -370,12 +403,44 @@ export default function ScorecardPage() {
         {totalUsers === 0 && <p className="mt-2 text-xs text-slate-500">No paying users yet. Campaign pre-launch. Log weekly actuals here once ads go live.</p>}
       </Card>
 
+      <Card className="border-emerald-900/60 bg-emerald-950/10" data-testid="weekly-customer-machine-scorecard">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-emerald-300">Q-65 / Q-69 Weekly Customer Machine</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-300">
+              Activation is strict: {activationDefinition.requiredSignals.join(", ")}. Signup-only and phone-connected-only rows do not count.
+            </p>
+          </div>
+          <span className="rounded border border-emerald-800/60 bg-emerald-950/30 px-3 py-1 text-xs font-semibold text-emerald-200">
+            pipe.city proof first
+          </span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {customerMachineStats.map((item) => (
+            <div key={item.label} className="rounded border border-slate-700 bg-slate-900/70 p-3">
+              <p className="text-2xl font-bold text-slate-100">{item.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-400">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+          {weeklyCustomerMachineMetrics.map((metric) => (
+            <div key={metric.label} className="rounded border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">{metric.label}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-400">{metric.whyItMatters}</p>
+              <p className="mt-2 text-[11px] text-slate-500">{metric.source}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       <Card className="border-cyan-900/60 bg-cyan-950/10" data-testid="channel-experiment-ledger">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Q-63 Channel Experiment Ledger</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Q-63 / Q-70 Channel Experiment Ledger</h2>
             <p className="mt-1 text-sm text-slate-400">
-              Customer-proof channels are ranked by evidence strength and weekly input discipline before paid scale.
+              Direct proof and install motion outrank creators and paid until a real activation signal exists.
             </p>
           </div>
           <span className="rounded border border-cyan-800/60 bg-cyan-950/30 px-3 py-1 text-xs font-semibold text-cyan-200">
@@ -401,6 +466,7 @@ export default function ScorecardPage() {
               </ul>
               <p className="mt-3 text-xs leading-5 text-emerald-200">Success: {experiment.successMetric}</p>
               <p className="mt-2 text-xs leading-5 text-rose-200">Kill: {experiment.killCriteria}</p>
+              <p className="mt-2 text-xs leading-5 text-cyan-100">Gate: {experiment.gate}</p>
             </div>
           ))}
         </div>
@@ -462,7 +528,7 @@ export default function ScorecardPage() {
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Trade Weekly Target Calculator</h2>
             <p className="mt-1 text-sm text-slate-500">
-              First-principles weekly quotas for the five beachhead domains, tied to the 1,000-2,000 customer deadline.
+              Planning quotas remain visible, but the active sprint reads pipe.city first and treats the other domains as supporting lanes.
             </p>
           </div>
           <span className="rounded border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">

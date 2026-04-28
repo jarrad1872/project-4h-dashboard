@@ -12,8 +12,12 @@ import { buildContentBriefPacket, CONTENT_BRIEF_TEMPLATES, type ContentBriefTemp
 import {
   buildFounderDemoScriptPacket,
   buildLiveProofPacketCopy,
+  deepResearchVerdict,
   founderDemoScripts,
+  getPipeFounderScript,
+  getPipeProofPacket,
   liveProofPackets,
+  outreachDraftPackets,
 } from "@/lib/customer-proof-sprint";
 import {
   buildMessageMatchPacket,
@@ -37,6 +41,7 @@ export default function TemplatesPage() {
   const [copiedCompetitorResearch, setCopiedCompetitorResearch] = useState(false);
   const [copiedFounderScript, setCopiedFounderScript] = useState<string | null>(null);
   const [copiedProofPacket, setCopiedProofPacket] = useState<string | null>(null);
+  const [copiedOutreachDraft, setCopiedOutreachDraft] = useState<string | null>(null);
   const [copyFallback, setCopyFallback] = useState("");
   const [messageMatchTrade, setMessageMatchTrade] = useState("all");
   const [messageMatchAngle, setMessageMatchAngle] = useState<MessageMatchAngle | "all">("all");
@@ -163,11 +168,42 @@ export default function TemplatesPage() {
     }
   }
 
+  async function copyOutreachDraft(id: string) {
+    const draft = outreachDraftPackets.find((item) => item.id === id);
+    if (!draft) return;
+    const packet = [
+      draft.title,
+      `Source: ${draft.source}`,
+      `Use case: ${draft.useCase}`,
+      "",
+      `Subject: ${draft.subject}`,
+      "",
+      draft.body,
+      "",
+      `Approval gate: ${draft.approvalGate}`,
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(packet);
+      setCopiedOutreachDraft(id);
+      setCopiedFounderScript(null);
+      setCopiedProofPacket(null);
+      setCopiedMessageMatch(null);
+      setCopiedBrief(null);
+      setCopiedCompetitorResearch(false);
+      setCopyFallback("");
+    } catch {
+      setCopiedOutreachDraft(null);
+      setCopyFallback(packet);
+    }
+  }
+
   const filteredMessageMatchBriefs = MESSAGE_MATCH_BRIEFS.filter((brief) => {
     const tradeMatches = messageMatchTrade === "all" || brief.domain === messageMatchTrade;
     const angleMatches = messageMatchAngle === "all" || brief.angle === messageMatchAngle;
     return tradeMatches && angleMatches;
   });
+  const pipeFounderScript = getPipeFounderScript();
+  const pipeProofPacket = getPipeProofPacket();
 
   return (
     <div className="space-y-6">
@@ -180,6 +216,102 @@ export default function TemplatesPage() {
         </div>
         <p className="text-sm text-slate-400">{CONTENT_BRIEF_TEMPLATES.length} creator briefs · {templates.length} ad templates</p>
       </div>
+
+      <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10" data-testid="deep-research-verdict-shelf">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Q-72 Deep Research verdict</p>
+            <h2 className="text-lg font-semibold text-white">Plumbing-first urgent-call wedge</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-300">{deepResearchVerdict.verdict}</p>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-emerald-100">{deepResearchVerdict.positioning}</p>
+          </div>
+          <span className="rounded border border-emerald-800/60 bg-emerald-950/30 px-3 py-2 text-xs font-semibold uppercase text-emerald-200">
+            pipe.city first
+          </span>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Two strategic options</p>
+            <p className="mt-2 text-sm font-semibold text-white">Preferred: {deepResearchVerdict.preferredOption}</p>
+            <p className="mt-2 text-sm text-slate-400">Alternative: {deepResearchVerdict.alternativeOption}</p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Kill criteria</p>
+            <ul className="mt-2 space-y-1 text-xs leading-5 text-rose-100">
+              {deepResearchVerdict.killCriteria.map((criterion) => <li key={criterion}>- {criterion}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/10" data-testid="pipe-demo-proof-pack">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Q-67 pipe.city demo proof pack</p>
+            <h2 className="text-lg font-semibold text-white">{pipeFounderScript.title}</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-300">{pipeFounderScript.hook}</p>
+          </div>
+          <span className="rounded border border-cyan-800/60 bg-cyan-950/30 px-3 py-2 text-xs font-semibold uppercase text-cyan-200">
+            {pipeFounderScript.demoPhone}
+          </span>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-[1fr_1fr_0.9fr]">
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Founder beats</p>
+            <ol className="mt-3 space-y-1 text-xs leading-5 text-slate-300">
+              {pipeFounderScript.beats.map((beat, index) => <li key={beat}>{index + 1}. {beat}</li>)}
+            </ol>
+            <GhostButton className="mt-4" onClick={() => void copyFounderScript(pipeFounderScript.id)}>
+              {copiedFounderScript === pipeFounderScript.id ? "Copied script" : "Copy pipe.city script"}
+            </GhostButton>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Live proof packet</p>
+            <p className="mt-2 text-sm leading-5 text-slate-300">{pipeProofPacket.callPrompt}</p>
+            <ul className="mt-3 space-y-1 text-xs leading-5 text-slate-300">
+              {pipeProofPacket.screenshotChecklist.map((item) => <li key={item}>- {item}</li>)}
+            </ul>
+            <GhostButton className="mt-4" onClick={() => void copyProofPacket(pipeProofPacket.id)}>
+              {copiedProofPacket === pipeProofPacket.id ? "Copied packet" : "Copy pipe.city packet"}
+            </GhostButton>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Tracked close</p>
+            <p className="mt-2 text-sm leading-5 text-cyan-100">{pipeProofPacket.closeLine}</p>
+            <p className="mt-3 break-all text-[11px] text-cyan-200">{pipeProofPacket.trackingPath}</p>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-4 border-amber-900/60 bg-amber-950/10" data-testid="approval-ready-outreach-drafts">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Q-68 approval-ready outreach draft packets</p>
+            <h2 className="text-lg font-semibold text-white">Review-only copy, no send action</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-400">
+              These drafts support review-signal outreach, AZ field-sales follow-up, and founder-demo follow-up. They are internal copy packets only.
+            </p>
+          </div>
+          <span className="rounded border border-amber-800/60 bg-amber-950/30 px-3 py-2 text-xs font-semibold uppercase text-amber-200">
+            {outreachDraftPackets.length} drafts
+          </span>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {outreachDraftPackets.map((draft) => (
+            <div key={draft.id} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-sm font-semibold text-white">{draft.title}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-amber-300">{draft.source}</p>
+              <p className="mt-3 text-xs leading-5 text-slate-400">{draft.useCase}</p>
+              <p className="mt-3 text-xs font-semibold text-slate-200">{draft.subject}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-300">{draft.body}</p>
+              <p className="mt-3 text-xs leading-5 text-rose-100">{draft.approvalGate}</p>
+              <GhostButton className="mt-4" onClick={() => void copyOutreachDraft(draft.id)}>
+                {copiedOutreachDraft === draft.id ? "Copied draft" : "Copy draft"}
+              </GhostButton>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="space-y-4 border-violet-900/60 bg-slate-900/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">

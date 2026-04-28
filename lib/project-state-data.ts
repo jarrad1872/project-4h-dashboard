@@ -57,13 +57,14 @@ export function getProjectState() {
       },
       status: 'pre-launch',
       dashboard: 'https://pumpcans.com',
-      // Q-56 locked first launch beachheads. TAM tiers remain in all_trades below as reference data.
+      // Q-64 reset: these domains remain available, but pipe.city is the active primary scale lane.
+      // TAM tiers remain in all_trades below as reference data.
       tier1_trades: [
-        { domain: 'saw.city', slug: 'concrete-cutting', appName: 'Saw.City', trade: 'Concrete Cutting' },
-        { domain: 'pipe.city', slug: 'plumbing', appName: 'Pipe.City', trade: 'Plumbing' },
-        { domain: 'mow.city', slug: 'lawn-care', appName: 'Mow.City', trade: 'Lawn Care' },
-        { domain: 'rinse.city', slug: 'pressure-washing', appName: 'Rinse.City', trade: 'Pressure Washing' },
-        { domain: 'lockout.city', slug: 'locksmith', appName: 'Lockout.City', trade: 'Locksmith' },
+        { domain: 'pipe.city', slug: 'plumbing', appName: 'Pipe.City', trade: 'Plumbing', role: 'primary scale lane' },
+        { domain: 'saw.city', slug: 'concrete-cutting', appName: 'Saw.City', trade: 'Concrete Cutting', role: 'founder-proof credibility lane' },
+        { domain: 'rinse.city', slug: 'pressure-washing', appName: 'Rinse.City', trade: 'Pressure Washing', role: 'creator/content lab' },
+        { domain: 'lockout.city', slug: 'locksmith', appName: 'Lockout.City', trade: 'Locksmith', role: 'urgency experiment' },
+        { domain: 'mow.city', slug: 'lawn-care', appName: 'Mow.City', trade: 'Lawn Care', role: 'deferred scale lane' },
       ],
       // TAM-ranked tiers (source: Feb 2026 trade research). Tier = opportunity rank, not campaign phase.
       // Campaign Phase 1 ads were built for: saw / rinse / mow / rooter (brand familiarity; not TAM-driven)

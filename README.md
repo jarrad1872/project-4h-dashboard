@@ -14,21 +14,17 @@
 
 The year-end target is **1,000-2,000 paying customers by 2026-12-31**. That means 125-250 net new customers per month for the next eight months, so the dashboard must make weekly customer-producing loops visible instead of only storing generated ads.
 
-Primary loops:
-- Creator demo loop: trade creators call live demo lines and show the result.
-- Human field sales loop: rep-coded business cards and local SMB trade touches create early tester signal.
+Primary loops after the 2026-04-28 Deep Research reset:
+- Direct install loop: `pipe.city` solo plumbing owners see the urgent missed-call demo, connect or forward the phone, and prove one real call can become a captured lead/job.
+- Human field sales loop: rep-coded business cards and Arizona SMB trade touches create early tester signal, starting as a micro-pilot.
+- Creator proof loop: creators amplify working proof after owner conversations produce believable assets.
 - Image creative loop: ChatGPT Pro `chatgpt-image-latest` generates trade-specific proof visuals and platform variants.
-- Demo funnel loop: every asset tracks trade, creator, image variant, UTM, demo call, signup, activation, and paid conversion.
+- Demo funnel loop: every asset tracks trade, creator, image variant, UTM, demo call, signup, activated trial, and paid conversion.
 - Approval loop: nothing external goes live without Jarrad approval.
 
-> **2,000 users on Saw.City LITE. Not 1,000. Not "customers." 2,000 users.**
+> **Current operating default:** `pipe.city` plumbing-first urgent-call wedge. The five confirmed domains stay available, but they are no longer treated as co-equal launch priorities.
 
-Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook, Instagram) targeting owner-operators across **65 trade communities** — each marketed independently under its own `.city` domain. $20,000 total budget. No demos. Fully self-serve.
-
-**Current state (as of 2026-02-28):**
-- 195 NB2 images generated (65 trades × Hero A + Hero B + OG) — pending Jarrad approval
-- 1,040 NB2 ad variants generated (65 trades × 2 directions × 8 ads) — pending approval
-- 20 trades live in Saw.City LITE app; 45 upcoming (need landing pages before ads launch)
+The 2026-02 NB2 ad/image library remains historical reference. It is not the active launch motion until customer proof exists.
 
 ---
 
@@ -56,15 +52,17 @@ Nothing goes external (ad accounts, live campaigns) without Jarrad's explicit ap
 
 Each `.city` domain is a **separate trade community** — not "Saw.City" marketed generically to everyone. We market `rinse.city` to pressure washers, `pipe.city` to plumbers, etc.
 
-### First Launch Beachheads (Q-56 locked)
+### First Launch Lanes (Q-64 reset)
 
-| Domain | Trade | US TAM | Businesses |
-|--------|-------|--------|------------|
-| `saw.city` | Concrete Cutting | $2.5B | 2K |
-| `pipe.city` | Plumbing | $191B | 130K |
-| `mow.city` | Lawn Care | $60B | 500K+ |
-| `rinse.city` | Pressure Washing | $1.8B | 12K |
-| `lockout.city` | Locksmith | $3B | 25K |
+| Domain | Trade | Role | US TAM | Businesses |
+|--------|-------|------|--------|------------|
+| `pipe.city` | Plumbing | Primary scale lane | $191B | 130K |
+| `saw.city` | Concrete Cutting | Founder-proof credibility lane | $2.5B | 2K |
+| `rinse.city` | Pressure Washing | Creator/content lab | $1.8B | 12K |
+| `lockout.city` | Locksmith | Urgency experiment | $3B | 25K |
+| `mow.city` | Lawn Care | Deferred scale lane | $60B | 500K+ |
+
+Activation is strict: phone connected or forwarded, one real inbound call handled, owner summary/text received, lead/job captured, and the owner has not turned it off. Signup-only and phone-connected-only are not activation.
 
 ### TAM-ranked next-wave reference
 
@@ -228,7 +226,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 ### Growth Command Center Notes (2026-03-31)
 
 - `/` now focuses on the live plumbing pilot (`pipe.city`) with launch countdown, influencer pipeline, creative pipeline, channel placeholders, and budget tracking
-- `/` now records Jarrad's launch operating decisions: first wave is `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`; creator outreach drafts can move after 4H approval, but sends still require action-time approval; billing stays manual at first; generated image uploads require Jarrad sign-off
+- `/` now records Jarrad's launch operating decisions and the Q-64 reset: `pipe.city` is the primary scale lane; `saw.city`, `rinse.city`, `lockout.city`, and `mow.city` remain supporting lanes; creator outreach drafts can move after 4H approval, but sends still require action-time approval; billing stays manual at first; generated image uploads require Jarrad sign-off
 - `/gtm` now includes a read-only product route inventory copied from sawcity-lite reference files: 21 routes, 20 live demo lines, and the five beachhead domains ready for creator/ad planning
 - `/launch` now builds deterministic trade-domain launch URLs with AGENTS-format paid-social UTMs, angle, asset, and optional creator metadata
 - `/launch` now runs an internal readiness validator that returns actionable blockers for domain, UTM, offer, trial, checklist, creative approval, copy approval, and Jarrad approval state
@@ -240,7 +238,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/scorecard` now includes a weekly learning report that ranks trades, creators, images, and angles from attribution events while clearly labeling zero-data and no-paid-signal states
 - `/scorecard` now includes local keep/kill/iterate decisions with notes, timestamps, undo, and visible history; this does not pause, launch, upload, or spend
 - `/scorecard` now includes a customer pace forecast that shows logged paid customers, current weekly/monthly pace, projected gap to 1,000/2,000 by 2026-12-31, and an evidence-based next bet
-- `/scorecard` now includes a trade weekly target calculator that splits the required 1,000-2,000 customer pace across saw, pipe, mow, rinse, and lockout until trade-level paid signal justifies reweighting
+- `/scorecard` now includes a trade weekly target calculator weighted toward pipe.city, with supporting lanes visible but secondary until trade-level paid signal justifies reweighting
 - `/lifecycle` now measures signup-to-trial, trial-to-activation, and activation-to-paid movement from logged attribution events while staying read-only for sends and webhooks
 - `/assets` now includes creative fatigue and variant lineage tracking that groups prompt families, shows views/downstream signal, and flags replacement-variant candidates without pausing or launching anything
 - `/approval` now includes an internal audit view that classifies approval activity across ad copy, creative, outreach, launch bundle, and export gates; the audit view is metadata only and does not send outreach, take ad-platform action, launch, create webhooks, spend, or change billing
@@ -279,6 +277,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-54 resolves the `/workflow` ownership guard: six stages, five transitions, fallback data, legacy `/workflow`, bulk-status API, Approval, and Launch ownership are documented before any redirect
 - Q-55 applies the `/workflow` page-route redirect to `/launch`; Command keeps the workflow history/ownership map and `/workflow` no longer exposes the legacy bulk mutation UI
 - Q-58 through Q-63 add the customer proof sprint: Google Maps/manual review-signal lead finder roadmap, founder demo scripts, objection bank, live proof packets, next-10 customer board, and channel experiment ledger
+- Q-64 through Q-72 apply the Deep Research reset: pipe.city is the primary scale lane, activation is hardened, Sales has a 30-day proof sprint board, Templates has pipe.city proof packets and review-only outreach drafts, Scorecard leads with weekly customer-machine metrics, paid social is gated behind proof, Google Maps review-signal imports require compliant manual/API/provider paths, and Command/Templates surface the Deep Research verdict shelf
 - `docs/google-maps-pain-signal-roadmap.md` documents the detailed manual/API-first path for review-signal prospecting plus the blocked tactics: no CAPTCHA solving, proxy rotation, rate-limit evasion, hidden scraping infrastructure, or automated outreach
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
 - `/templates` now includes founder-led demo scripts and live proof packets for `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`
@@ -311,7 +310,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-28 customer proof sprint | v4.4.27*
+*Last updated: 2026-04-28 plumbing-first Deep Research reset | v4.4.28*
 
 ---
 

@@ -52,7 +52,7 @@ function summary(tradePaid: Record<string, number>): MarketingEventSummary {
 }
 
 describe("buildTradeWeeklyTargetPlan", () => {
-  it("splits the required weekly customer target across beachhead trades", () => {
+  it("weights the required weekly customer target toward pipe.city", () => {
     const pace = buildCustomerPaceForecast([week(10)], {
       now: new Date("2026-04-27T00:00:00.000Z"),
       targetLow: 1010,
@@ -71,8 +71,8 @@ describe("buildTradeWeeklyTargetPlan", () => {
     expect(plan.totalPaidThisWeek).toBe(2);
     expect(plan.trades.find((trade) => trade.domain === "pipe.city")).toMatchObject({
       domain: "pipe.city",
-      weeklyLowTarget: 200,
-      weeklyHighTarget: 400,
+      weeklyLowTarget: 600,
+      weeklyHighTarget: 1200,
       paidThisWeek: 2,
       allTimePaid: 12,
       status: "behind",
@@ -111,5 +111,6 @@ describe("buildTradeWeeklyTargetPlan", () => {
 
     expect(plan.trades.every((trade) => trade.status === "waiting")).toBe(true);
     expect(plan.evidence).toContain("No paid customer data is logged yet");
+    expect(plan.evidence).toContain("pipe.city");
   });
 });
