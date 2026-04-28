@@ -88,6 +88,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-70 | Deep Research Reset | Learning | Reprioritize channel experiment ledger | 2026-04-28 | `/scorecard` now ranks direct install and review-signal proof before creators and paid; paid social is explicitly gated until proof assets show demo/activation signal. |
 | Q-71 | Deep Research Reset | Research | Expand Google Maps review-signal import plan | 2026-04-28 | `/sales` and `docs/google-maps-pain-signal-roadmap.md` now document manual/API/provider import paths with source URL, quote, confidence, and compliance gates; scraping/evasion remains blocked. |
 | Q-72 | Deep Research Reset | Strategy | Add Deep Research verdict shelf | 2026-04-28 | Command and `/templates` now expose the Deep Research verdict, preferred/alternative options, kill criteria, and stop/start/keep guidance for future agents. |
+| Q-73 | Creative System | Assets | Enforce generated creative source of truth | 2026-04-28 | `/assets`, `/sales`, README, SOP, and TASKS now state that finished creative is the image-gen artifact; coded SVG/HTML recreations are wireframes, crop helpers, metadata previews, or legacy utilities only. |
 
 ## Ready Queue
 

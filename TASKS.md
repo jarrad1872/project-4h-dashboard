@@ -244,6 +244,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-72 Deep Research verdict shelf on Command/Templates.
 - [x] Add Dustin Bouwhuis pipe.city business-card proof set with three print-ready Jobsite-design concepts, full-bleed pipe.city hero backgrounds, `DUSTINAZ` tracking, demo line `(385) 475-3881`, and AI Agent positioning.
 - [x] Promote the approved Dustin business-card direction on `/sales` as a front/back proof board so the app view matches the print exports rather than showing a disconnected chat-only concept.
+- [x] Add the creative source-of-truth rule: generated image artifacts are the finished creative for ads, proof sheets, business cards, creator frames, and campaign mockups; coded recreations are wireframes or legacy utilities only.
 
 ---
 

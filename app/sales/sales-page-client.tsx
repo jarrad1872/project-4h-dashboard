@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { Button, Card } from "@/components/ui";
+import { creativeSourceOfTruthRules } from "@/lib/creative-source-of-truth";
 import { summarizeFieldSalesAttribution, type FieldSalesAttributionBucket } from "@/lib/field-sales-attribution";
 import { buildFieldSalesOperatingPacket } from "@/lib/field-sales-operating-plan";
 import {
@@ -72,21 +73,6 @@ const EMPTY_FORM = {
   nextAction: "",
   notes: "",
 };
-
-const PROOF_SHEET_CAPTIONS = [
-  {
-    title: "Local Trust",
-    detail: "Understated. Clean. Local rep first. Built on credibility and relationships.",
-  },
-  {
-    title: "Missed Call Urgency",
-    detail: "Pain-forward. Big headline. Speaks the owner-operator reality.",
-  },
-  {
-    title: "Live Demo First",
-    detail: "Demo line front and center. Drives action and curiosity.",
-  },
-];
 
 function DownloadLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -267,9 +253,8 @@ export default function SalesPageClient() {
             <p className="text-xs uppercase tracking-wide text-amber-300">Business card proofs</p>
             <h2 className="mt-1 text-lg font-semibold text-white">Dustin Bouwhuis pipe.city card mockups</h2>
             <p className="mt-1 max-w-3xl text-sm text-slate-400">
-              Three print-ready Jobsite-design concepts are live in the same front/back proof-board format as the
-              approved chat mockup. The cards use the pipe.city hero image as the full-bleed background, `DUSTINAZ`,
-              Dustin's phone, `dustin@saw.city`, demo line {PIPE_CITY_DEMO_LINE}, and the AI Agent angle.
+              This is the generated creative proof sheet, not a code-redrawn imitation. The approved image-gen artifact is
+              the source of truth; the app stores it, displays it, and tracks it without rebuilding the visual language.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
@@ -279,59 +264,42 @@ export default function SalesPageClient() {
           </div>
         </div>
 
-        <div
-          className="rounded-xl border border-slate-800 bg-[#090b0d] p-3 shadow-2xl sm:p-4"
-          data-testid="sales-card-proof-sheet"
-        >
-          <div className="grid gap-3 lg:grid-cols-3">
-            {cardProofs.map((proof, index) => {
-              const caption = PROOF_SHEET_CAPTIONS[index] ?? {
-                title: proof.label,
-                detail: proof.frontSubhead,
-              };
-
-              return (
-                <div key={proof.id} className="min-w-0">
-                  <div className="overflow-hidden rounded-md border border-slate-700 bg-slate-950 shadow-xl">
-                    <Image
-                      src={`/api/sales/business-card/${proof.id}/front.svg`}
-                      alt={`pipe.city Dustin Bouwhuis ${caption.title} business card front`}
-                      width={businessCardPrintSpec.pixelSize.width}
-                      height={businessCardPrintSpec.pixelSize.height}
-                      unoptimized
-                      className="block w-full"
-                    />
-                  </div>
-                  <div className="mt-2 overflow-hidden rounded-md border border-slate-700 bg-slate-950 shadow-xl">
-                    <Image
-                      src={`/api/sales/business-card/${proof.id}/back.svg`}
-                      alt={`pipe.city Dustin Bouwhuis ${caption.title} business card back`}
-                      width={businessCardPrintSpec.pixelSize.width}
-                      height={businessCardPrintSpec.pixelSize.height}
-                      unoptimized
-                      className="block w-full"
-                    />
-                  </div>
-                  <div className="mt-4 grid grid-cols-[auto_1fr] gap-3 border-t border-slate-800 pt-3">
-                    <p className="text-5xl font-black leading-none text-amber-300">{index + 1}</p>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-white">{caption.title}</p>
-                      <p className="mt-1 text-xs leading-5 text-slate-500">{caption.detail}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <p className="mt-5 text-center text-[11px] text-slate-600">
-            Business card size: 3.5 x 2 in trim, 3.75 x 2.25 in bleed. Dark Jobsite design, safety yellow #F5C518,
-            real pipe.city hero artwork.
+        <div className="rounded-lg border border-amber-800/50 bg-slate-950/60 p-3 text-sm text-slate-300">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Creative source of truth</p>
+          <p className="mt-1 leading-6">
+            {creativeSourceOfTruthRules.summary} Blocked here: {creativeSourceOfTruthRules.blockedPattern}
           </p>
         </div>
 
+        <div className="mx-auto w-full max-w-[1480px]" data-testid="sales-card-proof-sheet">
+          <Image
+            src="/sales-assets/dustin-pipe-proof-sheet-v1.png"
+            alt="Dustin Bouwhuis pipe.city three-concept business card proof sheet"
+            width={1536}
+            height={1024}
+            unoptimized
+            className="block h-auto w-full rounded-[22px] border border-slate-800 shadow-2xl"
+            priority
+          />
+        </div>
+
         <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Print exports</p>
+          <p className="text-xs uppercase tracking-wide text-slate-500">Source artifact and legacy exports</p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            Use the generated proof sheet above for selection. The SVG/PNG exports below are legacy mechanical card
+            files and should not override the approved image-gen creative direction.
+          </p>
           <div className="mt-3 grid gap-2 lg:grid-cols-3">
+            <div className="rounded border border-amber-800/60 bg-amber-950/20 p-3 lg:col-span-3">
+              <p className="text-sm font-semibold text-white">Approved generated proof sheet</p>
+              <p className="mt-1 text-xs leading-5 text-slate-400">
+                Source creative for Dustin to review: three concepts, front/back, captions, contact details, demo line{" "}
+                {PIPE_CITY_DEMO_LINE}.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
+              </div>
+            </div>
             {cardProofs.map((proof) => (
               <div key={proof.id} className="rounded border border-slate-800 bg-slate-900/50 p-3">
                 <p className="text-sm font-semibold text-white">{proof.label}</p>
@@ -725,11 +693,11 @@ export default function SalesPageClient() {
         <Card className="space-y-4 border-amber-900/60 bg-amber-950/10">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-wide text-amber-300">Business card proof set</p>
+              <p className="text-xs uppercase tracking-wide text-amber-300">Business card tracking utilities</p>
               <h2 className="mt-1 text-lg font-semibold text-white">Dustin Bouwhuis pipe.city cards</h2>
               <p className="mt-1 text-sm text-slate-400">
-                Three print-ready front/back concepts using the local pipe.city icon and hero asset. Each QR is rep-coded
-                for Dustin and stops at a tracked demo path; no external order action exists here.
+                The generated proof sheet above is the visual source of truth. This section keeps rep-coded URLs and
+                legacy mechanical exports available without presenting them as the approved creative.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
@@ -770,35 +738,6 @@ export default function SalesPageClient() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                    <div data-testid={index === 0 ? "sales-card-front" : undefined}>
-                      <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
-                        <Image
-                          src={`/api/sales/business-card/${proof.id}/front.svg`}
-                          alt={`pipe.city Dustin Bouwhuis business card ${proof.label} front`}
-                          width={businessCardPrintSpec.pixelSize.width}
-                          height={businessCardPrintSpec.pixelSize.height}
-                          unoptimized
-                          className="block w-full"
-                        />
-                      </div>
-                      <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Front</p>
-                    </div>
-                    <div data-testid={index === 0 ? "sales-card-back" : undefined}>
-                      <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-xl">
-                        <Image
-                          src={`/api/sales/business-card/${proof.id}/back.svg`}
-                          alt={`pipe.city Dustin Bouwhuis business card ${proof.label} back`}
-                          width={businessCardPrintSpec.pixelSize.width}
-                          height={businessCardPrintSpec.pixelSize.height}
-                          unoptimized
-                          className="block w-full"
-                        />
-                      </div>
-                      <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Back</p>
-                    </div>
-                  </div>
-
                   <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-start">
                     <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
                       <p className="text-xs uppercase tracking-wide text-slate-500">Tracking URL</p>
@@ -810,6 +749,7 @@ export default function SalesPageClient() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2" data-testid={index === 0 ? "sales-card-download-front" : undefined}>
+                      <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
                       <DownloadLink href={`/api/sales/business-card/${proof.id}/front.png`}>Front PNG</DownloadLink>
                       <DownloadLink href={`/api/sales/business-card/${proof.id}/back.png`}>Back PNG</DownloadLink>
                       <DownloadLink href={`/api/sales/business-card/${proof.id}/front.svg`}>Front SVG</DownloadLink>

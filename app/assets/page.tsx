@@ -18,6 +18,7 @@ import {
   buildCreativeFatigueSummary,
   type CreativeFatigueStatus,
 } from "@/lib/creative-fatigue-lineage";
+import { creativeSourceOfTruthRules } from "@/lib/creative-source-of-truth";
 import {
   buildFounderVideoPacket,
   founderVideoAssets,
@@ -432,6 +433,30 @@ export default function AssetsPage() {
           </Card>
         ))}
       </div>
+
+      <Card className="border-amber-900/60 bg-amber-950/10" data-testid="creative-source-of-truth">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Creative source of truth</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">{creativeSourceOfTruthRules.title}</h2>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-300">{creativeSourceOfTruthRules.summary}</p>
+            <p className="mt-2 text-xs font-semibold text-rose-200">
+              Blocked pattern: {creativeSourceOfTruthRules.blockedPattern}
+            </p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3 text-xs leading-5 text-slate-300 xl:max-w-md">
+            {creativeSourceOfTruthRules.allowedAppWork}
+          </div>
+        </div>
+        <div className="mt-4 grid gap-2 lg:grid-cols-5">
+          {creativeSourceOfTruthRules.rules.map((rule, index) => (
+            <div key={rule} className="rounded border border-slate-800 bg-slate-950/50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Rule {index + 1}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-300">{rule}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="border-cyan-900/60 bg-cyan-950/10">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

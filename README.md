@@ -187,6 +187,8 @@ utm_source={platform}&utm_medium=paid-social&utm_campaign=4h_2026-03_{theme}&utm
 ### Image Assets
 The active rebuild path uses ChatGPT Pro `chatgpt-image-latest` prompt concepts in `/assets` and `/api/image-concepts`. Phase 2 stores prompt/model/variant lineage on `creative_assets`; generated image files are uploaded back into 4H for review and approval. Creative Lab filters narrow the queue by status, trade, angle, and generation state without a reload, and replacement prompts create deterministic v2/v3 variant IDs with parent/child lineage. The first Q-01 beachhead review pack stores 20 generated PNG assets under `public/creative-assets/q01-beachhead-pack` for five trades x four angles; they remain review assets until Jarrad approves. Q-26 adds founder-shot video packets for the same beachhead trades so missed-call and demo-proof clips can be captured before they become ad or creator assets. No OpenAI image API hookup is required.
 
+Creative source-of-truth rule: for finished creative, the generated image artifact is the asset. 4H may store it, display it, crop it, approve it, download it, track it, and attach metadata, but it should not rebuild the same visual in a separate coded layout. Half image-gen plus half coded recreation is blocked for ads, proof sheets, business cards, creator frames, and campaign mockups unless Jarrad explicitly asks for a labeled wireframe or mechanical print utility.
+
 Legacy NB2/Gemini images still exist for historical campaign assets:
 - **Hero A** (`hero_a`): `ad-creatives/trade-heros/nb2/{slug}-hero-a.jpg` — zoomed-in scene, for ads
 - **Hero B** (`hero_b`): `ad-creatives/trade-heros/nb2/{slug}-hero-b.jpg` — wide top-down, for landing pages
@@ -290,6 +292,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `docs/product-route-inventory.md` records the landing route and demo phone findings without touching sawcity-lite
 - `4h influencer seed` is now idempotent for production reruns: it creates missing shortlist creators and only updates canonical identity fields on existing rows (no duplicate row fan-out)
 - `/assets` now tracks ChatGPT Pro image concepts, generated creative assets, and prompt/model/variant lineage
+- `/assets` now surfaces the creative source-of-truth rule so future assets use generated images as finished artifacts rather than coded reconstructions
 - `/assets` now has the first launch beachhead prompt set aligned to saw, pipe, mow, rinse, and lockout across missed-call, demo-call, owner-agent, and ROI-math angles
 - `/assets` includes Creative Lab filters for status, trade, angle, and generation state
 - `/assets` can create replacement v2/v3 prompts while preserving parent/child creative lineage

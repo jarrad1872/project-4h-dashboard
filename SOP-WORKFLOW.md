@@ -178,6 +178,13 @@ Image URL: points to `trade-heros/nb2/{slug}-hero-a.jpg`
 - Creative lineage is stored on `creative_assets`: provider, model, prompt brief, prompt text, negative prompt, dimensions, variant ID, parent asset, generation status, storage path, quality, moderation, and response metadata.
 - All concepts remain `draft` or `review` until Jarrad approves. No external publishing, upload, webhook, ad launch, or spend happens automatically.
 
+### Creative Source-Of-Truth Rule
+- Finished creative assets are the generated image artifacts. The dashboard stores, displays, tracks, approves, crops, downloads, and annotates them; it must not rebuild the same visual with a second coded layout.
+- The blocked pattern is half image-gen plus half coded recreation for a finished asset. This creates bait-and-switch creative and is not acceptable for ads, proof sheets, business cards, creator frames, or campaign mockups.
+- Code-rendered SVG/HTML is allowed only for wireframes, metadata previews, crop helpers, or explicitly labeled legacy print utilities.
+- If exact text, QR codes, or print details matter, iterate in image generation until the whole image is acceptable, then upload that raster as the source of truth.
+- Approval decisions must point at the generated asset URL/file, not at a reconstructed approximation.
+
 ### Legacy Model: Nano Banana 2 (NB2)
 NB2/Gemini assets remain historical and may be referenced, but they are not the default creative strategy for the 4H rebuild.
 
@@ -366,7 +373,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Sales rep cards must include a stable rep code, `utm_medium=field-sales`, `utm_campaign=4h_YYYY-MM_{campaign}`, and a unique card ID in `utm_content`.
 - Printed cards must preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
 - Dustin Bouwhuis is the active Arizona rep for the pipe.city proof sprint. His default card set uses `dustin@saw.city`, `949-933-2719`, `DUSTINAZ`, pipe.city demo line `(385) 475-3881`, and trade-domain tracking to `pipe.city`.
-- Business card visual proofs should follow the read-only sawcity-lite Jobsite design package: dark canonical surface, Geist typography, safety-yellow accent, real pipe.city hero/OG-style background artwork as the full-bleed card image, minimal text-only overlay, and "AI Agent" positioning rather than generic "AI receptionist" language.
+- Business card visual proofs must follow the creative source-of-truth rule: the approved image-gen proof sheet is the asset. Do not replace it with a coded approximation unless Jarrad explicitly asks for a labeled mechanical print utility.
 - Business card exports use 3.75 x 2.25 inch bleed artwork at 300 DPI, with key text inside the safe area. The dashboard generates SVG/PNG assets only; it does not place a Vistaprint order or move money.
 - CRM stages are internal tracking states: prospect, qualified, visited, card-left, demo-booked, trial-started, activated, paid, and lost.
 - Placeholder lead rows are target archetypes unless a real owner is intentionally entered later. Do not represent them as contacted businesses, testers, or customers.
