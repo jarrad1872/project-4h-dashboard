@@ -43,7 +43,12 @@ import {
   adArchiveDependencies,
   adArchiveHistoricalSignals,
 } from "@/lib/ad-archive";
-import { clearRouteCleanupPacket, clearRouteCleanupPacketSummary } from "@/lib/route-cleanup-packet";
+import {
+  blockedRouteCleanupPacket,
+  blockedRouteCleanupPacketSummary,
+  clearRouteCleanupPacket,
+  clearRouteCleanupPacketSummary,
+} from "@/lib/route-cleanup-packet";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -175,6 +180,7 @@ export default function OverviewPage() {
   const gtmBeachheadRoutes = useMemo(() => getBeachheadProductRoutes(), []);
   const adArchiveSummary = useMemo(() => adArchiveAuditDependencySummary(state.ads), [state.ads]);
   const cleanupPacketSummary = useMemo(() => clearRouteCleanupPacketSummary(), []);
+  const blockedCleanupPacketSummary = useMemo(() => blockedRouteCleanupPacketSummary(), []);
   const publicCreativeRows = useMemo(
     () =>
       publicCreativeUrlDependencies.reduce<Array<{ prefix: string; domain: string; urls: string[]; placements: string[] }>>(
@@ -386,6 +392,57 @@ export default function OverviewPage() {
           <p className="mt-4 text-xs text-slate-500">
             Applied packets: {cleanupPacketSummary.appliedRoutes.length > 0 ? cleanupPacketSummary.appliedRoutes.join(", ") : "none"}
           </p>
+        </Card>
+      </section>
+
+      <section data-testid="blocked-route-cleanup-packet">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Blocked route cleanup packet</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Draft requirements before `/creatives` or `/workflow` redirect work</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{blockedCleanupPacketSummary.total} blocked drafts</StatusPill>
+            <StatusPill>{blockedCleanupPacketSummary.staticChecksRequired ? "200 checks required" : "no static checks"}</StatusPill>
+            <StatusPill>{blockedCleanupPacketSummary.implementationAllowed ? "implementation allowed" : "draft only"}</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-amber-900/50 bg-amber-950/10">
+          <p className="text-sm leading-6 text-slate-300">{blockedCleanupPacketSummary.preservationRule}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Implementation allowed: {blockedCleanupPacketSummary.implementationAllowed ? "yes" : "no"}; blocked actions:{" "}
+            {blockedCleanupPacketSummary.blockedActions.join(", ")}
+          </p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-2">
+            {blockedRouteCleanupPacket.map((entry) => (
+              <div key={entry.route} className="rounded border border-slate-700 bg-slate-900/60 p-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-base font-semibold text-white">{entry.route}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-amber-300">{entry.recommendation} later</p>
+                  </div>
+                  <StatusPill>blocked draft</StatusPill>
+                </div>
+                <p className="mt-3 text-xs leading-5 text-slate-300">{entry.packetIntent}</p>
+                <p className="mt-3 border-l border-amber-700/50 pl-3 text-xs leading-5 text-slate-400">{entry.blockingDependency}</p>
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Preserved evidence</p>
+                    <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                      {entry.preservedEvidence.slice(0, 5).map((item) => <li key={item}>- {item}</li>)}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Required checks</p>
+                    <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                      {entry.requiredVerification.slice(0, 5).map((item) => <li key={item}>- {item}</li>)}
+                    </ul>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs text-slate-500">Replacement after future approval: {entry.replacementHref ?? "none"}</p>
+              </div>
+            ))}
+          </div>
         </Card>
       </section>
 

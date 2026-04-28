@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   appliedRouteCleanupPackets,
+  blockedRouteCleanupPacket,
+  blockedRouteCleanupPacketSummary,
   clearRouteCleanupPacket,
   clearRouteCleanupPacketSummary,
 } from "../route-cleanup-packet";
@@ -65,5 +67,41 @@ describe("clearRouteCleanupPacket", () => {
         externalActionAllowed: false,
       },
     ]);
+  });
+
+  it("drafts blocked-route cleanup packets without authorizing implementation", () => {
+    expect(blockedRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/creatives", "/workflow"]);
+    expect(blockedRouteCleanupPacket.every((entry) => entry.implementationAllowed === false)).toBe(true);
+    expect(blockedRouteCleanupPacket.find((entry) => entry.route === "/creatives")?.requiredVerification).toContain(
+      "All inventoried /creatives/*.jpg static URLs return 200 before and after any future page-route redirect",
+    );
+    expect(blockedRouteCleanupPacket.find((entry) => entry.route === "/workflow")?.requiredVerification).toContain(
+      "Workflow history map still exposes six stages, five transitions, and fallback/API dependencies",
+    );
+  });
+
+  it("summarizes blocked-route packet requirements", () => {
+    expect(blockedRouteCleanupPacketSummary()).toEqual({
+      total: 2,
+      routes: ["/creatives", "/workflow"],
+      replacements: ["/assets", "/launch"],
+      implementationAllowed: false,
+      staticChecksRequired: true,
+      blockedActions: [
+        "route redirect",
+        "route deletion",
+        "static asset move",
+        "ad upload",
+        "campaign launch",
+        "outreach send",
+        "external API call",
+        "webhook creation",
+        "spend change",
+        "billing change",
+        "sawcity-lite change",
+      ],
+      preservationRule:
+        "Q-51 is a blocked-route draft packet: preserve static assets and workflow history before any future redirect work.",
+    });
   });
 });

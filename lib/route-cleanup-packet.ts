@@ -24,6 +24,18 @@ export interface AppliedRouteCleanupEntry {
   externalActionAllowed: false;
 }
 
+export interface BlockedRouteCleanupEntry {
+  route: string;
+  label: string;
+  recommendation: RouteRetirementRecommendation;
+  replacementHref: string | null;
+  blockingDependency: string;
+  packetIntent: string;
+  preservedEvidence: string[];
+  requiredVerification: string[];
+  implementationAllowed: false;
+}
+
 export const appliedRouteCleanupPackets: AppliedRouteCleanupEntry[] = [
   {
     route: "/generate",
@@ -77,6 +89,30 @@ function verificationForGuard(guard: RouteDependencyGuard) {
   ];
 }
 
+function blockedVerificationForGuard(guard: RouteDependencyGuard) {
+  if (guard.route === "/creatives") {
+    return [
+      "/creatives page route still returns 200 before implementation",
+      "All inventoried /creatives/*.jpg static URLs return 200 before and after any future page-route redirect",
+      "Creative Lab /assets remains the active replacement route",
+      "No public asset file is moved, deleted, renamed, or regenerated in this packet draft",
+      "No redirect, deletion, upload, launch, webhook, spend, billing, or sawcity-lite action occurs in Q-51",
+    ];
+  }
+
+  if (guard.route === "/workflow") {
+    return [
+      "/workflow page route still returns 200 before implementation",
+      "Workflow history map still exposes six stages, five transitions, and fallback/API dependencies",
+      "Launch /approval replacement surfaces remain reachable for current workflow ownership",
+      "No bulk workflow mutation, ad upload, campaign launch, webhook, spend, or billing action occurs in this packet draft",
+      "No redirect, deletion, upload, launch, webhook, spend, billing, or sawcity-lite action occurs in Q-51",
+    ];
+  }
+
+  return verificationForGuard(guard);
+}
+
 export const clearRouteCleanupPacket: ClearRouteCleanupEntry[] = routeDependencyGuards
   .filter((guard) => guard.status === "clear" && guard.readyForRedirectOrDelete)
   .map((guard) => {
@@ -94,6 +130,28 @@ export const clearRouteCleanupPacket: ClearRouteCleanupEntry[] = routeDependency
       packetIntent: intentForRecommendation(decision.recommendation),
       preservedEvidence: [...guard.dataDependencies, ...guard.docOrTestReferences],
       requiredVerification: verificationForGuard(guard),
+      implementationAllowed: false,
+    };
+  });
+
+export const blockedRouteCleanupPacket: BlockedRouteCleanupEntry[] = routeDependencyGuards
+  .filter((guard) => guard.status === "blocked")
+  .map((guard) => {
+    const decision = routeDispositionDecisions.find((row) => row.route === guard.route);
+
+    if (!decision) {
+      throw new Error(`Missing route disposition decision for ${guard.route}`);
+    }
+
+    return {
+      route: guard.route,
+      label: decision.label,
+      recommendation: decision.recommendation,
+      replacementHref: decision.replacementHref,
+      blockingDependency: guard.guardrail,
+      packetIntent: "Draft the dependency-preserving implementation packet before this blocked route can move to a redirect candidate.",
+      preservedEvidence: [...guard.dataDependencies, ...guard.docOrTestReferences],
+      requiredVerification: blockedVerificationForGuard(guard),
       implementationAllowed: false,
     };
   });
@@ -117,5 +175,32 @@ export function clearRouteCleanupPacketSummary() {
     blockedActions: ["route redirect", "route deletion", "ad upload", "campaign launch", "webhook creation", "spend change"],
     preservationRule:
       "This is a draft packet only: group clear candidates and verification requirements before any route implementation work.",
+  };
+}
+
+export function blockedRouteCleanupPacketSummary() {
+  return {
+    total: blockedRouteCleanupPacket.length,
+    routes: blockedRouteCleanupPacket.map((entry) => entry.route),
+    replacements: blockedRouteCleanupPacket.map((entry) => entry.replacementHref),
+    implementationAllowed: blockedRouteCleanupPacket.some((entry) => entry.implementationAllowed),
+    staticChecksRequired: blockedRouteCleanupPacket.some((entry) =>
+      entry.requiredVerification.some((verification) => verification.includes("return 200")),
+    ),
+    blockedActions: [
+      "route redirect",
+      "route deletion",
+      "static asset move",
+      "ad upload",
+      "campaign launch",
+      "outreach send",
+      "external API call",
+      "webhook creation",
+      "spend change",
+      "billing change",
+      "sawcity-lite change",
+    ],
+    preservationRule:
+      "Q-51 is a blocked-route draft packet: preserve static assets and workflow history before any future redirect work.",
   };
 }

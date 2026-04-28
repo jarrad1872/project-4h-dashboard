@@ -52,6 +52,7 @@ These routes are not active operating lanes. They remain available from the coll
 14. Q-48: Apply the legacy GTM archive-only packet. Complete; `/gtm` redirects internally to Command and product-route inventory remains preserved in Command/docs.
 15. Q-49: Apply the legacy Settings cleanup packet. Complete; `/settings` redirects internally to Approval and setup/source notes remain preserved in Command/docs.
 16. Q-50: Harden `/ads` as read-only archive reference. Complete; create/edit/pause/regenerate controls are removed and `/ads/[id]` redirects back to `/ads`.
+17. Q-51: Draft blocked-route cleanup packets. Complete; `/creatives` and `/workflow` now have explicit pre-redirect requirements for static 200 checks and workflow-history preservation.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -197,3 +198,9 @@ Q-49 did not expose credentials, change campaign status, remove source-note data
 Q-50 applies the final clear-route cleanup packet: `/ads` remains available as a readable archive reference, while create, edit, pause/unpause, creative-regeneration, and ad-detail editor affordances are removed. `/ads/[id]` redirects back to `/ads`.
 
 Q-50 did not delete ad rows, edit ad copy, upload to ad platforms, launch campaigns, create webhooks, spend money, change billing, or touch sawcity-lite. Browser verification must confirm the read-only guard is visible, no old mutable action labels are rendered, archive rows remain readable, and `/ads/[id]` returns to `/ads`.
+
+## Q-51 Blocked Route Cleanup Packets
+
+Q-51 drafts the blocked-route cleanup packets for `/creatives` and `/workflow`; it does not implement either redirect. `/creatives` cannot move until the page route has a before-check and every inventoried public `/creatives/*.jpg` URL has before/after 200 checks. `/workflow` cannot move until the six-stage workflow history, five transition pairs, fallback file, `/api/ads/bulk-status`, and Launch/Approval ownership are verified.
+
+Q-51 did not redirect or delete a route, move static creative files, mutate workflow rows, upload to ad platforms, launch campaigns, create webhooks, spend money, change billing, or touch sawcity-lite. Browser verification must confirm Command renders the blocked packet, `/creatives` still loads, `/workflow` still loads, and Q-52 is framed as all 24 public static creative URL 200 checks before any redirect packet.

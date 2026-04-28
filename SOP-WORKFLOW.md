@@ -383,6 +383,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-48 applies the `/gtm` archive-only cleanup packet. `/gtm` should redirect internally to Command; do not remove product-route inventory data/docs or edit sawcity-lite.
 - Q-49 applies the `/settings` cleanup packet. `/settings` should redirect internally to Approval; setup/source notes must remain in Command/docs and placeholder credentials must not be rendered.
 - Q-50 hardens `/ads` as a read-only archive. Keep historical rows readable, but do not restore create/edit/pause/regenerate controls or `/ads/[id]` editing without a new Launch/Approval ownership decision.
+- Q-51 drafts the blocked-route cleanup packets. Do not redirect `/creatives` until public `/creatives/*.jpg` URLs have before/after 200 checks; do not redirect `/workflow` until workflow-history preservation is explicitly verified.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

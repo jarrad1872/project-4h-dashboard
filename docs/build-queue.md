@@ -54,7 +54,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-36 | Governance | Navigation | Add legacy banners to old pages | 2026-04-27 | `/ads`, `/generate`, `/gtm`, `/settings`, `/creatives`, and `/workflow` now show a route disposition banner with active replacement links and no-external-action boundaries. |
 | Q-37 | Phase 6 | Learning | Fold lifecycle/template summaries into active loops | 2026-04-27 | Command and Scorecard now expose lifecycle follow-up status plus template/message-match support signals, while `/lifecycle` and `/templates` remain direct-link support routes. |
 | Q-38 | Governance | Navigation | Create route retirement decision matrix | 2026-04-27 | Command and `docs/route-disposition-plan.md` now classify leftover routes as rebuild, redirect, archive, or delete-later recommendations with no destructive action allowed. |
-| Q-39 | Governance | Navigation | Add route retirement dependency guard | 2026-04-27 | Command now shows dependency status for each leftover route: 5 blocked, 2 support, 1 clear, with active refs, data deps, docs/tests, and guardrails before any redirect/delete packet. |
+| Q-39 | Governance | Navigation | Add route retirement dependency guard | 2026-04-27 | Command now shows dependency status for each leftover route; after Q-51, the guard has 2 blocked, 2 support, and 4 already-applied clear routes with active refs, data deps, docs/tests, and guardrails before any redirect/delete packet. |
 | Q-40 | Governance | Navigation | Migrate stale campaign-flow links off legacy routes | 2026-04-27 | Creator campaign-flow data now points to `/assets`, `/approval`, `/launch`, and `/scorecard` instead of legacy `/creatives` and `/workflow`, without redirecting or deleting those pages. |
 | Q-41 | Governance | Navigation | Preserve public creative URL dependency map | 2026-04-27 | Command now shows the 24 static `/creatives/*.jpg` URL dependencies separately from the legacy `/creatives` page route, with tests confirming the files still exist. |
 | Q-42 | Governance | Navigation | Preserve bulk workflow history before redirect work | 2026-04-27 | Command now shows the six-stage `/workflow` history map, five bulk transitions, API/fallback dependencies, and no-external-action boundaries before any redirect work. |
@@ -66,12 +66,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-48 | Governance | Navigation | Apply legacy GTM archive-only packet | 2026-04-27 | `/gtm` now redirects internally to Command; product-route inventory remains preserved on Command/docs and sawcity-lite is untouched. |
 | Q-49 | Governance | Navigation | Apply legacy Settings cleanup packet | 2026-04-27 | `/settings` now redirects internally to Approval; setup/source notes remain preserved and placeholder credentials no longer render on the page. |
 | Q-50 | Governance | Navigation | Harden Ad Archive as read-only reference | 2026-04-27 | `/ads` now displays archive rows as read-only reference, removes create/edit/pause/regenerate affordances, and redirects `/ads/[id]` back to the archive. |
+| Q-51 | Governance | Navigation | Draft blocked-route cleanup packets | 2026-04-27 | Command now shows blocked-route packet drafts for `/creatives` and `/workflow`, including static 200 checks and workflow-history preservation requirements before any future redirect work. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-51 | Governance | Navigation | Draft blocked-route cleanup packets | none | Draft packets cover `/creatives` and `/workflow` dependencies and require 200/static checks; no redirects, deletions, uploads, launches, spend, billing, or sawcity-lite changes occur. |
+| Q-52 | Governance | Navigation | Resolve Creatives static URL guard | none | Run and document 200 checks for all 24 public `/creatives/*.jpg` URLs plus the `/creatives` page route; no redirects, asset file changes, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite changes occur. |
 
 ## Stop Conditions
 
