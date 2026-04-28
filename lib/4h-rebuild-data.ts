@@ -777,4 +777,15 @@ export const rebuildExecutionQueue: RebuildQueueItem[] = [
     outcome: "The first launch beachheads and approval boundaries are recorded in Command and source data.",
     acceptance: "`saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city` are the first launch beachheads; creator outreach drafts can move after approval but sends still require action-time approval; billing remains manual at first; generated image uploads require Jarrad sign-off; no external action occurs.",
   },
+  {
+    id: "Q-57",
+    phase: "Phase 5",
+    lane: "Launch",
+    title: "Add agentic launch control",
+    route: "/launch",
+    status: "complete",
+    approval: "none",
+    outcome: "The app, API, Codex, and Claude Code can all use one launch orchestration contract for internal launch prep.",
+    acceptance: "`/launch`, `/api/launch/orchestrate`, and `npm run cli -- launch plan/prepare/execute` share the same launch plan; internal URL/bundle/sheet prep works agentically; external sends, uploads, launches, webhooks, spend, and billing stay approval-gated and unconfigured.",
+  },
 ];

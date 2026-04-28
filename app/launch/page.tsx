@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, Card, GhostButton } from "@/components/ui";
+import { buildAgenticLaunchPlan, type AgenticLaunchStepStatus } from "@/lib/agentic-launch-control";
 import { rebuildMission } from "@/lib/4h-rebuild-data";
 import {
   externalActionStops,
@@ -190,8 +191,22 @@ export default function LaunchPage() {
     if (!launchBundle) return [];
     return buildPlatformUploadSheets(launchBundle);
   }, [launchBundle]);
+  const agenticLaunchPlan = useMemo(() => buildAgenticLaunchPlan({
+    bundle: launchBundle,
+    uploadSheets: platformUploadSheets,
+    mode: "prepare",
+    surface: "app",
+    externalConfirmation: false,
+  }), [launchBundle, platformUploadSheets]);
   const readyToGo = basicLaunchGateReady && (launchReadiness?.ready ?? false);
   const selectedStop = getExternalActionStop(selectedStopAction);
+
+  function agenticStepClass(status: AgenticLaunchStepStatus) {
+    if (status === "complete" || status === "ready") return "border-emerald-900/60 bg-emerald-950/20 text-emerald-100";
+    if (status === "adapter_missing") return "border-cyan-900/60 bg-cyan-950/20 text-cyan-100";
+    if (status === "requires_approval") return "border-amber-900/60 bg-amber-950/20 text-amber-100";
+    return "border-red-900/60 bg-red-950/20 text-red-100";
+  }
 
   async function copyLaunchUrl() {
     try {
@@ -671,6 +686,55 @@ export default function LaunchPage() {
               ))}
             </ul>
           </div>
+        </Card>
+      )}
+
+      {launchBundle && (
+        <Card className="border-emerald-900/60 bg-slate-900/70">
+          <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Agentic Launch Control</p>
+              <h2 className="mt-1 text-xl font-black text-white">One launch contract for app, Codex, and Claude Code</h2>
+              <p className="mt-1 max-w-3xl text-sm text-slate-400">
+                4H can now build, validate, bundle, and export launch packets from this screen or the CLI. External adapters are
+                intentionally gated until Jarrad approves the exact action and the platform credentials/adapters are wired.
+              </p>
+            </div>
+            <div className="rounded border border-emerald-800/60 bg-slate-950 px-3 py-2 text-right text-xs text-emerald-100">
+              <p className="font-semibold">{agenticLaunchPlan.readyForInternalAutomation ? "Internal automation ready" : "Internal automation blocked"}</p>
+              <p>{agenticLaunchPlan.readyForExternalAdapters ? "External adapters ready" : "External adapters gated"}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            {agenticLaunchPlan.steps.map((step) => (
+              <div key={step.id} className={`rounded border px-3 py-2 ${agenticStepClass(step.status)}`}>
+                <p className="text-xs font-bold uppercase tracking-wide">{step.status.replace(/_/g, " ")}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{step.label}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-300">{step.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            <div className="rounded border border-slate-800 bg-slate-950/70 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Plan</p>
+              <code className="mt-2 block break-all text-xs text-emerald-100">{agenticLaunchPlan.cli.plan}</code>
+            </div>
+            <div className="rounded border border-slate-800 bg-slate-950/70 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Prepare</p>
+              <code className="mt-2 block break-all text-xs text-emerald-100">{agenticLaunchPlan.cli.prepare}</code>
+            </div>
+            <div className="rounded border border-amber-900/60 bg-amber-950/20 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Execute</p>
+              <code className="mt-2 block break-all text-xs text-amber-100">{agenticLaunchPlan.cli.execute}</code>
+            </div>
+          </div>
+
+          <p className="mt-3 rounded border border-red-900/60 bg-red-950/20 px-3 py-2 text-xs text-red-100">
+            Execute mode currently returns an adapter-gated plan. It does not send outreach, upload ads, launch campaigns,
+            create webhooks, move spend, change billing, or call third-party APIs.
+          </p>
         </Card>
       )}
 

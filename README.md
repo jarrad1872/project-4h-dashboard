@@ -234,6 +234,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `/launch` now runs an internal readiness validator that returns actionable blockers for domain, UTM, offer, trial, checklist, creative approval, copy approval, and Jarrad approval state
 - `/launch` now renders an internal launch bundle draft that connects trade, angle, image asset, copy, URL, budget, readiness, and approvals without any external action
 - `/launch` now generates Q-17 local review-only CSV upload sheets for the selected launch bundle; the sheets can be copied or downloaded but are stamped do-not-upload until Jarrad approves
+- `/launch` now includes Agentic Launch Control: app, Codex, and Claude Code use the same `/api/launch/orchestrate` contract and `npm run cli -- launch plan/prepare/execute` commands for internal launch prep; external adapters remain approval-gated and unconfigured
 - `/launch` now shows an external-action stop screen for campaign launch/edit, ad upload, creator outreach send, webhook creation, and spend changes; it explains the exact approval needed and performs no external API action
 - `/budget` now includes an experiment-level budget planner for the first paid tests; it is local planning state only and cannot change billing or platform spend
 - `/scorecard` now includes a weekly learning report that ranks trades, creators, images, and angles from attribution events while clearly labeling zero-data and no-paid-signal states
@@ -305,7 +306,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-27 launch operating decisions | v4.4.25*
+*Last updated: 2026-04-28 agentic launch control | v4.4.26*
 
 ---
 
@@ -331,6 +332,8 @@ node scripts/4h-cli.js creative gen --trade saw --format hero_a --style pain-poi
 node scripts/4h-cli.js alerts list
 META_ACCESS_TOKEN=... node scripts/4h-cli.js competitive-intel validate-meta --out data/competitive-intel/meta-validation.md
 npm run cli -- influencer seed
+npm run cli -- launch plan --trade pipe.city --platform linkedin --angle missed-call
+npm run cli -- launch prepare --trade pipe.city --platform linkedin --angle missed-call --creative-status approved --copy-status approved --jarrad-status approved
 
 # Via npm:
 npm run cli -- report daily
@@ -348,3 +351,4 @@ Set `PUMPCANS_API_TOKEN` on the server to enable auth. Set `PUMPCANS_TOKEN` in y
 | `/api/report/daily` | GET | Structured JSON daily summary |
 | `/api/creative/batch` | POST | Batch AI creative generation |
 | `/api/alerts` | GET/POST/DELETE | CRUD for threshold alert rules |
+| `/api/launch/orchestrate` | GET/POST | Shared app/CLI launch planning contract; no external platform action |

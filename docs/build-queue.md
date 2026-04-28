@@ -1,6 +1,6 @@
 # Project 4H Build Queue
 
-Last updated: 2026-04-27
+Last updated: 2026-04-28
 
 This is the standing queue for Codex/Bob work. Pick the first ready item that does not require Jarrad approval, complete it end to end, update docs, run tests/build/browser verification, then continue to the next ready item.
 
@@ -72,12 +72,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-54 | Governance | Navigation | Resolve Workflow ownership guard | 2026-04-27 | `/workflow` ownership is documented across Approval, Launch, bulk-status API, fallback data, and workflow-history; no redirect or bulk mutation happened. |
 | Q-55 | Governance | Navigation | Apply Workflow page redirect packet | 2026-04-27 | `/workflow` now redirects internally to `/launch`, while Command keeps the workflow history/ownership map and the direct-link bulk mutation UI is no longer reachable from `/workflow`. |
 | Q-56 | Governance | Launch | Lock launch operating decisions | 2026-04-27 | First launch beachheads are `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`; creator outreach drafts can move after approval, but sends still need action-time approval; billing stays manual at first; generated image uploads require Jarrad sign-off. |
+| Q-57 | Phase 5 | Launch | Add agentic launch control | 2026-04-28 | `/launch`, `/api/launch/orchestrate`, and `npm run cli -- launch plan/prepare/execute` now share one launch contract for app, Codex, and Claude Code. Internal bundle/sheet prep is agentic; external adapters remain approval-gated and unconfigured. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| _None_ | - | - | Queue clear after Q-55 | - | Pick the next first-principles build item only after adding it to this queue with acceptance criteria. |
+| _None_ | - | - | Queue clear after Q-57 | - | Pick the next first-principles build item only after adding it to this queue with acceptance criteria. |
 
 ## Stop Conditions
 

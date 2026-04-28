@@ -626,7 +626,56 @@ async function cmdLaunch(subArgs) {
     return;
   }
 
-  console.error('Unknown launch subcommand. Use: check');
+  if (sub === 'plan' || sub === 'prepare' || sub === 'execute') {
+    const flags = parseArgs(subArgs.slice(1));
+    const payload = {
+      mode: sub,
+      surface: flags.surface || 'cli',
+      trade: flags.trade || 'pipe.city',
+      platform: flags.platform || 'linkedin',
+      angle: flags.angle || 'missed-call',
+      assetId: flags.asset || flags.assetId,
+      campaignName: flags.campaign || flags.campaignName || '',
+      campaignMonth: flags.month || flags.campaignMonth,
+      destination: flags.destination || 'landing',
+      creativeStatus: flags['creative-status'] || flags.creativeStatus || 'missing',
+      copyApprovalStatus: flags['copy-status'] || flags.copyStatus || flags.copy || 'missing',
+      jarradApprovalStatus: flags['jarrad-status'] || flags.jarradStatus || flags.jarrad || 'missing',
+      externalConfirmation: Boolean(flags['external-confirmation'] || flags.externalConfirmation),
+    };
+
+    const result = await api('POST', '/api/launch/orchestrate', payload);
+    if (flags.json) {
+      printJson(result);
+      return;
+    }
+
+    const plan = result.plan;
+    const bundle = result.bundle;
+    console.log(`\nAgentic Launch ${sub.toUpperCase()}`);
+    console.log('='.repeat(32));
+    console.log(`Bundle: ${bundle.id}`);
+    console.log(`Status: ${bundle.status}`);
+    console.log(`URL: ${bundle.url}`);
+    console.log(`Readiness: ${result.readiness.blockerCount} blocker(s), ${result.readiness.warningCount} warning(s)`);
+    console.log(`Internal automation: ${plan.readyForInternalAutomation ? 'ready' : 'blocked'}`);
+    console.log(`External approval request: ${plan.approvedForExternalRequest ? 'server verified' : 'not server verified'}`);
+    console.log(`External adapters: ${plan.readyForExternalAdapters ? 'configured and ready' : 'not executable'}`);
+    console.log('');
+    for (const step of plan.steps) {
+      console.log(`- [${step.status}] ${step.label}: ${step.detail}`);
+      console.log(`  ${step.evidence}`);
+    }
+    console.log('\nCLI next moves:');
+    console.log(`  Plan:    ${plan.cli.plan}`);
+    console.log(`  Prepare: ${plan.cli.prepare}`);
+    console.log(`  Execute: ${plan.cli.execute}`);
+    console.log('\nSafety: this command does not call ad-platform, outreach, billing, or webhook APIs.');
+    console.log('');
+    return;
+  }
+
+  console.error('Unknown launch subcommand. Use: check, plan, prepare, execute');
   process.exit(1);
 }
 
@@ -1209,6 +1258,9 @@ Commands:
   alerts remove --id <id>
 
   launch check
+  launch plan [--trade pipe.city] [--platform linkedin] [--angle missed-call] [--asset <id>] [--json]
+  launch prepare [--trade pipe.city] [--platform linkedin] [--angle missed-call] [--creative-status approved] [--copy-status approved] [--jarrad-status approved]
+  launch execute [same flags] [--external-confirmation]  # returns adapter-gated plan; no third-party API calls yet
 
   notify test
   notify send --message "text"

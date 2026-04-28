@@ -6,3 +6,7 @@ node_modules/
 .vercel
 *.tsbuildinfo
 deploy.sh
+.claude/settings.local.json
+.playwright-mcp/
+.tmp-*.json
+supabase/.temp/

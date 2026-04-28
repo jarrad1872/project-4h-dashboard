@@ -1,6 +1,6 @@
 # Project 4H - Build Plan
 
-**Last updated:** 2026-04-27
+**Last updated:** 2026-04-28
 **Owner:** Jarrad + Bob/Codex
 **Live app:** https://pumpcans.com
 **Product reference:** Answered.City / `sawcity-lite`
@@ -135,14 +135,15 @@ Core offer rules:
 
 **Goal:** Launch only the smallest paid tests that can teach us what converts.
 
-**Exit gate:** First controlled paid tests are approved, launched manually, and tracked end to end.
+**Exit gate:** First controlled paid tests are approved, prepared through the shared app/CLI launch contract, launched only after exact approval, and tracked end to end.
 
 - [x] Archive or label historical ads so they cannot be mistaken for current launch candidates.
 - [x] Create launch bundles: trade, angle, image, copy, creator/proof asset, URL, budget, approval.
 - [x] Add budget allocation by experiment, not only by platform.
-- [ ] Add preflight checks for price, trial, domain, UTM, creative approval, and Jarrad approval.
+- [x] Add preflight checks for price, trial, domain, UTM, creative approval, and Jarrad approval.
 - [x] Add import/export format for Meta, YouTube, LinkedIn, and Instagram upload sheets.
-- [ ] Keep ad account setup and spending outside automation until Jarrad approves.
+- [x] Add an agentic launch control contract usable from the app, Codex, or Claude Code CLI.
+- [ ] Wire external ad/outreach/webhook/spend adapters only after Jarrad approves the exact platform/account/action.
 
 ### Phase 6 - Weekly Learning Loop
 
@@ -215,6 +216,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-53 Creatives page redirect packet with after-checks.
 - [x] Add Q-54 Workflow ownership guard resolution packet.
 - [x] Add Q-55 Workflow page redirect packet.
+- [x] Add Q-56 launch operating decisions.
+- [x] Add Q-57 agentic launch control for app/CLI orchestration.
 
 ---
 
@@ -240,6 +243,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Lifecycle follow-up measurement after signup.
 - [x] Approval audit log for external launch decisions.
 - [x] External-action stop screen for launch, upload, outreach send, webhook, and spend actions.
+- [x] Agentic launch control contract for app, Codex, and Claude Code.
 - [x] Weekly learning report rankings for trades, creators, images, and angles.
 - [x] Local reversible keep/kill/iterate decision board.
 - [x] Creator outreach state tracker.

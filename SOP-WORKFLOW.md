@@ -1,6 +1,6 @@
 # SOP: Project 4H Dashboard — Operating Model
 
-**Last updated:** 2026-04-27
+**Last updated:** 2026-04-28
 **Dashboard:** https://pumpcans.com  
 **Repo:** `jarrad1872/project-4h-dashboard`
 
@@ -29,6 +29,23 @@ Jarrad issues commands in plain language. Bob does the work. Dashboard reflects 
 | Jarrad | Commands via Telegram, approves at pumpcans.com |
 | Bob (AI) | Generates copy/images, uploads to DB, populates dashboard |
 | Dashboard | Read-only view of campaign state — not a work tool |
+
+---
+
+## Agentic Launch SOPs
+
+4H should be launchable from the app or from agent CLI sessions, but all live external action remains explicitly gated.
+
+- Active UI: `/launch` Agentic Launch Control.
+- Active API: `POST /api/launch/orchestrate`.
+- Active CLI:
+  - `npm run cli -- launch plan --trade pipe.city --platform linkedin --angle missed-call`
+  - `npm run cli -- launch prepare --trade pipe.city --platform linkedin --angle missed-call --creative-status approved --copy-status approved --jarrad-status approved`
+  - `npm run cli -- launch execute --trade pipe.city --platform linkedin --angle missed-call --creative-status approved --copy-status approved --jarrad-status approved --external-confirmation`
+- Shared contract: `lib/agentic-launch-control.ts`.
+- The internal agentic path may build URLs, validate readiness, assemble launch bundles, and prepare review-only upload sheets.
+- Execute mode currently returns an adapter-gated plan. It does not send outreach, upload ads, launch campaigns, create webhooks, move spend, change billing, or call third-party APIs.
+- Future external adapters must require exact action-time Jarrad approval for the specific platform/account/trade/campaign/creative/copy/budget/webhook action before they run.
 
 ---
 
