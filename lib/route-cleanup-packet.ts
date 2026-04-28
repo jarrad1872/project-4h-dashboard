@@ -201,6 +201,6 @@ export function blockedRouteCleanupPacketSummary() {
       "sawcity-lite change",
     ],
     preservationRule:
-      "Q-51 is a blocked-route draft packet: preserve static assets and workflow history before any future redirect work.",
+      "Q-52 resolved the static creative URL blocker; the remaining blocked-route packet preserves workflow history before any future /workflow redirect work.",
   };
 }

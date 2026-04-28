@@ -53,6 +53,7 @@ These routes are not active operating lanes. They remain available from the coll
 15. Q-49: Apply the legacy Settings cleanup packet. Complete; `/settings` redirects internally to Approval and setup/source notes remain preserved in Command/docs.
 16. Q-50: Harden `/ads` as read-only archive reference. Complete; create/edit/pause/regenerate controls are removed and `/ads/[id]` redirects back to `/ads`.
 17. Q-51: Draft blocked-route cleanup packets. Complete; `/creatives` and `/workflow` now have explicit pre-redirect requirements for static 200 checks and workflow-history preservation.
+18. Q-52: Resolve `/creatives` static URL guard. Complete; `/creatives` plus all 24 public JPEG URLs returned 200 before any page-route redirect work.
 
 No route deletion happens without an explicit cleanup packet and verification that the active loops do not depend on it.
 
@@ -77,15 +78,14 @@ The Command page now shows a route dependency guard with these current statuses:
 
 | Status | Count | Meaning |
 | --- | ---: | --- |
-| Blocked | 2 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
+| Blocked | 1 | Do not redirect/delete until active refs, data dependencies, or source notes are migrated. |
 | Support | 2 | Keep as detail/support routes reached from active loops. |
-| Clear | 4 | Candidate or already-applied route cleanup after preserving useful notes. |
+| Clear | 5 | Candidate or already-applied route cleanup after preserving useful notes. |
 
-Current pending clear routes: none. Applied clear routes: `/generate`, `/gtm`, `/settings`, `/ads`.
+Current pending clear route: `/creatives`. Applied clear routes: `/generate`, `/gtm`, `/settings`, `/ads`.
 
 Current blockers to resolve first:
 
-- `/creatives`: 24 static `/creatives/*.jpg` URLs are inventoried; any redirect packet still needs explicit 200-check preservation.
 - `/workflow`: six-stage workflow history is inventoried; any redirect packet still needs Launch/Approval migration or explicit preservation.
 
 ## Q-40 Campaign Flow Link Migration
@@ -204,3 +204,9 @@ Q-50 did not delete ad rows, edit ad copy, upload to ad platforms, launch campai
 Q-51 drafts the blocked-route cleanup packets for `/creatives` and `/workflow`; it does not implement either redirect. `/creatives` cannot move until the page route has a before-check and every inventoried public `/creatives/*.jpg` URL has before/after 200 checks. `/workflow` cannot move until the six-stage workflow history, five transition pairs, fallback file, `/api/ads/bulk-status`, and Launch/Approval ownership are verified.
 
 Q-51 did not redirect or delete a route, move static creative files, mutate workflow rows, upload to ad platforms, launch campaigns, create webhooks, spend money, change billing, or touch sawcity-lite. Browser verification must confirm Command renders the blocked packet, `/creatives` still loads, `/workflow` still loads, and Q-52 is framed as all 24 public static creative URL 200 checks before any redirect packet.
+
+## Q-52 Creative Static URL Guard
+
+Q-52 resolves the `/creatives` blocker without redirecting the route. Browser/local HTTP verification against `http://127.0.0.1:3106` confirmed `/creatives` returned `200 text/html; charset=utf-8`, and all 24 inventoried public `/creatives/*.jpg` URLs returned `200 image/jpeg`. Evidence is recorded in `docs/creative-static-url-guard.md` and `lib/static-creative-url-guard.ts`.
+
+Q-52 did not redirect or delete `/creatives`, move static creative files, regenerate assets, upload to ad platforms, launch campaigns, create webhooks, send outreach, call external APIs, spend money, change billing, or touch sawcity-lite. `/creatives` is now clear only for a future page-route redirect packet, and that future packet must recheck all 24 public JPEG URLs after redirect implementation.

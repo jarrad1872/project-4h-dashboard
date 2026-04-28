@@ -384,6 +384,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Q-49 applies the `/settings` cleanup packet. `/settings` should redirect internally to Approval; setup/source notes must remain in Command/docs and placeholder credentials must not be rendered.
 - Q-50 hardens `/ads` as a read-only archive. Keep historical rows readable, but do not restore create/edit/pause/regenerate controls or `/ads/[id]` editing without a new Launch/Approval ownership decision.
 - Q-51 drafts the blocked-route cleanup packets. Do not redirect `/creatives` until public `/creatives/*.jpg` URLs have before/after 200 checks; do not redirect `/workflow` until workflow-history preservation is explicitly verified.
+- Q-52 resolves the `/creatives` static URL guard before redirect work. Keep `docs/creative-static-url-guard.md` as the before-check evidence and require all 24 public JPEG URLs to be rechecked after any future `/creatives` page-route redirect.
 - Use `docs/route-disposition-plan.md` before deleting, redirecting, or rebuilding any leftover route.
 
 **Experiment budget planner:**

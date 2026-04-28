@@ -67,12 +67,13 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-49 | Governance | Navigation | Apply legacy Settings cleanup packet | 2026-04-27 | `/settings` now redirects internally to Approval; setup/source notes remain preserved and placeholder credentials no longer render on the page. |
 | Q-50 | Governance | Navigation | Harden Ad Archive as read-only reference | 2026-04-27 | `/ads` now displays archive rows as read-only reference, removes create/edit/pause/regenerate affordances, and redirects `/ads/[id]` back to the archive. |
 | Q-51 | Governance | Navigation | Draft blocked-route cleanup packets | 2026-04-27 | Command now shows blocked-route packet drafts for `/creatives` and `/workflow`, including static 200 checks and workflow-history preservation requirements before any future redirect work. |
+| Q-52 | Governance | Navigation | Resolve Creatives static URL guard | 2026-04-27 | `/creatives` plus all 24 public `/creatives/*.jpg` URLs returned 200 locally, evidence is documented, and `/creatives` is clear for a future page-route redirect packet. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| Q-52 | Governance | Navigation | Resolve Creatives static URL guard | none | Run and document 200 checks for all 24 public `/creatives/*.jpg` URLs plus the `/creatives` page route; no redirects, asset file changes, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite changes occur. |
+| Q-53 | Governance | Navigation | Apply Creatives page redirect packet | none | `/creatives` redirects internally to `/assets`; all 24 inventoried `/creatives/*.jpg` URLs still return 200 after the redirect; no asset files, uploads, launches, webhooks, spend, billing, external actions, or sawcity-lite files are changed. |
 
 ## Stop Conditions
 

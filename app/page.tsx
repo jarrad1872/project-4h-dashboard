@@ -33,6 +33,7 @@ import {
   settingsSourceDocs,
   settingsSourceNoteSummary,
 } from "@/lib/settings-source-notes";
+import { staticCreativeUrlGuardSummary } from "@/lib/static-creative-url-guard";
 import {
   getBeachheadProductRoutes,
   productRouteInventorySources,
@@ -173,6 +174,7 @@ export default function OverviewPage() {
   const routeMatrixSummary = useMemo(() => routeDispositionSummary(), []);
   const routeGuardSummary = useMemo(() => routeDependencyGuardSummary(), []);
   const publicCreativeSummary = useMemo(() => publicCreativeUrlDependencySummary(), []);
+  const staticCreativeGuardSummary = useMemo(() => staticCreativeUrlGuardSummary(), []);
   const workflowHistorySummary = useMemo(() => workflowHistoryDependencySummary(), []);
   const workflowTransitions = useMemo(() => workflowTransitionPairs(), []);
   const settingsSummary = useMemo(() => settingsSourceNoteSummary(), []);
@@ -399,7 +401,7 @@ export default function OverviewPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Blocked route cleanup packet</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Draft requirements before `/creatives` or `/workflow` redirect work</h2>
+            <h2 className="mt-1 text-xl font-semibold text-white">Draft requirements before remaining blocked-route redirect work</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <StatusPill>{blockedCleanupPacketSummary.total} blocked drafts</StatusPill>
@@ -690,6 +692,7 @@ export default function OverviewPage() {
             <StatusPill>{publicCreativeSummary.assetCount} URLs</StatusPill>
             <StatusPill>{publicCreativeSummary.tradeCount} trades</StatusPill>
             <StatusPill>{publicCreativeSummary.formatCount} formats</StatusPill>
+            <StatusPill>{staticCreativeGuardSummary.readyForPageRedirectPacket ? "Q-52 guard resolved" : "guard blocked"}</StatusPill>
           </div>
         </div>
         <Card className="mt-3 border-amber-900/50 bg-amber-950/10">
@@ -697,6 +700,12 @@ export default function OverviewPage() {
           <p className="mt-2 text-xs text-slate-500">
             Directory: {publicCreativeSummary.assetDirectory}; URL prefix: {publicCreativeSummary.urlPrefix}; legacy page route:{" "}
             {publicCreativeSummary.legacyPageRoute}
+          </p>
+          <p className="mt-2 text-xs text-amber-200">
+            Q-52 before-check: {staticCreativeGuardSummary.checkedStaticUrls}/{staticCreativeGuardSummary.expectedStaticUrls} static
+            URLs returned {staticCreativeGuardSummary.staticAssetStatus} as {staticCreativeGuardSummary.staticAssetContentType};
+            page route returned {staticCreativeGuardSummary.pageRouteStatus}. Redirect implemented:{" "}
+            {staticCreativeGuardSummary.redirectImplemented ? "yes" : "no"}.
           </p>
           <div className="mt-4 grid gap-3 xl:grid-cols-4">
             {publicCreativeRows.map((row) => (

@@ -9,25 +9,28 @@ import {
 
 describe("clearRouteCleanupPacket", () => {
   it("groups only clear route candidates without authorizing implementation", () => {
-    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual([]);
+    expect(clearRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/creatives"]);
     expect(clearRouteCleanupPacket.every((entry) => entry.implementationAllowed === false)).toBe(true);
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/generate")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/gtm")).toBeUndefined();
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/settings")).toBeUndefined();
-    expect(clearRouteCleanupPacket.find((entry) => entry.route === "/creatives")).toBeUndefined();
+    expect(clearRouteCleanupPacket.find((entry) => entry.route === "/creatives")?.preservedEvidence).toContain(
+      "Q-52 verified /creatives page route and all 24 public JPEG URLs returned 200 before redirect work",
+    );
     expect(clearRouteCleanupPacket.find((entry) => entry.route === "/workflow")).toBeUndefined();
   });
 
-  it("has no pending clear candidates after Q50", () => {
-    expect(clearRouteCleanupPacket).toHaveLength(0);
+  it("keeps only /creatives clear after Q52 guard resolution", () => {
+    expect(clearRouteCleanupPacket).toHaveLength(1);
+    expect(clearRouteCleanupPacket[0].requiredVerification).toContain("Command route guard shows clear");
   });
 
   it("summarizes packet counts and blocked actions", () => {
     expect(clearRouteCleanupPacketSummary()).toEqual({
-      total: 0,
-      routes: [],
+      total: 1,
+      routes: ["/creatives"],
       appliedRoutes: ["/generate", "/gtm", "/settings", "/ads"],
-      counts: { rebuild: 0, redirect: 0, archive: 0, delete: 0 },
+      counts: { rebuild: 0, redirect: 1, archive: 0, delete: 0 },
       appliedCount: 4,
       implementationAllowed: false,
       blockedActions: ["route redirect", "route deletion", "ad upload", "campaign launch", "webhook creation", "spend change"],
@@ -70,11 +73,8 @@ describe("clearRouteCleanupPacket", () => {
   });
 
   it("drafts blocked-route cleanup packets without authorizing implementation", () => {
-    expect(blockedRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/creatives", "/workflow"]);
+    expect(blockedRouteCleanupPacket.map((entry) => entry.route)).toEqual(["/workflow"]);
     expect(blockedRouteCleanupPacket.every((entry) => entry.implementationAllowed === false)).toBe(true);
-    expect(blockedRouteCleanupPacket.find((entry) => entry.route === "/creatives")?.requiredVerification).toContain(
-      "All inventoried /creatives/*.jpg static URLs return 200 before and after any future page-route redirect",
-    );
     expect(blockedRouteCleanupPacket.find((entry) => entry.route === "/workflow")?.requiredVerification).toContain(
       "Workflow history map still exposes six stages, five transitions, and fallback/API dependencies",
     );
@@ -82,11 +82,11 @@ describe("clearRouteCleanupPacket", () => {
 
   it("summarizes blocked-route packet requirements", () => {
     expect(blockedRouteCleanupPacketSummary()).toEqual({
-      total: 2,
-      routes: ["/creatives", "/workflow"],
-      replacements: ["/assets", "/launch"],
+      total: 1,
+      routes: ["/workflow"],
+      replacements: ["/launch"],
       implementationAllowed: false,
-      staticChecksRequired: true,
+      staticChecksRequired: false,
       blockedActions: [
         "route redirect",
         "route deletion",
@@ -101,7 +101,7 @@ describe("clearRouteCleanupPacket", () => {
         "sawcity-lite change",
       ],
       preservationRule:
-        "Q-51 is a blocked-route draft packet: preserve static assets and workflow history before any future redirect work.",
+        "Q-52 resolved the static creative URL blocker; the remaining blocked-route packet preserves workflow history before any future /workflow redirect work.",
     });
   });
 });
