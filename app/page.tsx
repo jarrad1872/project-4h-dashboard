@@ -52,6 +52,13 @@ import {
   clearRouteCleanupPacket,
   clearRouteCleanupPacketSummary,
 } from "@/lib/route-cleanup-packet";
+import {
+  channelExperimentLedger,
+  googleMapsLeadFinderRoadmap,
+  proofSprintQueue,
+  summarizeProofSprint,
+  tenCustomerSprintRows,
+} from "@/lib/customer-proof-sprint";
 import type { Ad, AdTemplate, CreativeAsset, Influencer, LifecycleMessage, MarketingEventSummary, MetricsData } from "@/lib/types";
 
 interface OverviewState {
@@ -185,6 +192,7 @@ export default function OverviewPage() {
   const gtmRouteSummary = useMemo(() => productRouteRetirementDependencySummary(), []);
   const gtmBeachheadRoutes = useMemo(() => getBeachheadProductRoutes(), []);
   const launchDecisionSummary = useMemo(() => launchOperatingDecisionSummary(), []);
+  const proofSprintSummary = useMemo(() => summarizeProofSprint(), []);
   const adArchiveSummary = useMemo(() => adArchiveAuditDependencySummary(state.ads), [state.ads]);
   const cleanupPacketSummary = useMemo(() => clearRouteCleanupPacketSummary(), []);
   const blockedCleanupPacketSummary = useMemo(() => blockedRouteCleanupPacketSummary(), []);
@@ -277,6 +285,63 @@ export default function OverviewPage() {
               <p>Ad accounts and billing stay manual at first.</p>
               <p>{launchDecisionSummary.imageApproval}</p>
               <p>{launchDecisionSummary.externalActionApproval}</p>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      <section data-testid="customer-proof-sprint">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Customer proof sprint</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Q-58 through Q-63 turn GTM into first-customer proof</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill>{proofSprintSummary.queueItems} queue items</StatusPill>
+            <StatusPill>{proofSprintSummary.firstCustomerRows} first rows</StatusPill>
+            <StatusPill>{proofSprintSummary.channelExperiments} experiments</StatusPill>
+          </div>
+        </div>
+        <Card className="mt-3 border-cyan-900/50 bg-cyan-950/10">
+          <p className="text-sm leading-6 text-slate-300">{proofSprintSummary.safetyBoundary}</p>
+          <div className="mt-4 grid gap-3 xl:grid-cols-[1fr,1fr,0.9fr]">
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Built sprint packets</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {proofSprintQueue.map((item) => (
+                  <Link key={item.id} href={item.route} className="rounded border border-slate-800 bg-slate-950/50 p-3 hover:border-cyan-800">
+                    <p className="text-xs font-semibold uppercase text-cyan-300">{item.id}</p>
+                    <p className="mt-1 text-sm font-semibold text-white">{item.title}</p>
+                    <p className="mt-1 text-xs text-slate-500">{item.lane}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Next 10 customer attempts</p>
+              <div className="mt-3 space-y-2">
+                {tenCustomerSprintRows.slice(0, 5).map((row) => (
+                  <div key={row.id} className="rounded border border-slate-800 bg-slate-950/50 p-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-white">{row.tradeDomain}</p>
+                      <span className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">{row.source}</span>
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-slate-400">{row.painSignal}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded border border-slate-700 bg-slate-900/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Google Maps roadmap</p>
+              <p className="mt-2 text-sm leading-5 text-slate-300">{googleMapsLeadFinderRoadmap.principle}</p>
+              <p className="mt-3 text-xs text-slate-500">
+                {googleMapsLeadFinderRoadmap.painSignals.length} pain phrases, {googleMapsLeadFinderRoadmap.captureFields.length} capture fields, {googleMapsLeadFinderRoadmap.blockedTactics.length} blocked tactics.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {channelExperimentLedger.slice(0, 3).map((experiment) => (
+                  <StatusPill key={experiment.id}>{experiment.channel}</StatusPill>
+                ))}
+              </div>
             </div>
           </div>
         </Card>

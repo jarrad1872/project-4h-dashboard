@@ -73,12 +73,18 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-55 | Governance | Navigation | Apply Workflow page redirect packet | 2026-04-27 | `/workflow` now redirects internally to `/launch`, while Command keeps the workflow history/ownership map and the direct-link bulk mutation UI is no longer reachable from `/workflow`. |
 | Q-56 | Governance | Launch | Lock launch operating decisions | 2026-04-27 | First launch beachheads are `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`; creator outreach drafts can move after approval, but sends still need action-time approval; billing stays manual at first; generated image uploads require Jarrad sign-off. |
 | Q-57 | Phase 5 | Launch | Add agentic launch control | 2026-04-28 | `/launch`, `/api/launch/orchestrate`, and `npm run cli -- launch plan/prepare/execute` now share one launch contract for app, Codex, and Claude Code. Internal bundle/sheet prep is agentic; external adapters remain approval-gated and unconfigured. |
+| Q-58 | Customer Proof | Research | Add pain-signal lead finder | 2026-04-28 | `/sales` and `docs/google-maps-pain-signal-roadmap.md` now document manual/API-first Google Maps review-signal prospecting, capture fields, scoring, and blocked scraping/evasion tactics. |
+| Q-59 | Customer Proof | Founder Proof | Add founder demo script factory | 2026-04-28 | `/templates` now has copy-ready founder demo scripts for the five beachhead domains and live demo lines, with no publishing action. |
+| Q-60 | Customer Proof | Sales Learning | Add objection bank | 2026-04-28 | `/sales` now shows buyer objections, what they mean, field responses, and proof needed without triggering follow-up sends. |
+| Q-61 | Customer Proof | Demo Proof | Add live proof packets | 2026-04-28 | `/templates` now exposes live proof packets with demo phone, call prompt, AI capture checklist, screenshot checklist, and tracked proof path. |
+| Q-62 | Customer Proof | Pipeline Focus | Add 10-customer sprint board | 2026-04-28 | `/sales` and Command now focus the next motion on ten internal customer-attempt hypotheses before broad paid scale. |
+| Q-63 | Customer Proof | Learning | Add channel experiment ledger | 2026-04-28 | `/scorecard` now compares review-signal outbound, founder video, field sales, creator demos, and paid social by weekly inputs, success metric, kill criteria, and evidence strength. |
 
 ## Ready Queue
 
 | ID | Phase | Lane | Work | Approval | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| _None_ | - | - | Queue clear after Q-57 | - | Pick the next first-principles build item only after adding it to this queue with acceptance criteria. |
+| _None_ | - | - | Queue clear after Q-63 | - | Pick the next first-principles build item only after adding it to this queue with acceptance criteria. |
 
 ## Stop Conditions
 

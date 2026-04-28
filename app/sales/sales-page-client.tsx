@@ -7,19 +7,28 @@ import {
   BarChart3,
   CalendarDays,
   Download,
+  MessageSquareText,
   MapPin,
   PhoneCall,
   Printer,
   QrCode,
   Route,
   ScanLine,
+  Search,
   ShieldCheck,
+  Target,
   Users,
 } from "lucide-react";
 import Image from "next/image";
 import { Button, Card } from "@/components/ui";
 import { summarizeFieldSalesAttribution, type FieldSalesAttributionBucket } from "@/lib/field-sales-attribution";
 import { buildFieldSalesOperatingPacket } from "@/lib/field-sales-operating-plan";
+import {
+  googleMapsLeadFinderRoadmap,
+  objectionBank,
+  summarizeProofSprint,
+  tenCustomerSprintRows,
+} from "@/lib/customer-proof-sprint";
 import {
   buildSalesTrackingUrl,
   businessCardPrintSpec,
@@ -188,6 +197,7 @@ export default function SalesPageClient() {
     () => buildFieldSalesOperatingPacket({ leads, attribution, rep, cardVariant }),
     [leads, attribution, rep, cardVariant],
   );
+  const proofSprint = useMemo(() => summarizeProofSprint(), []);
   const leadsByStage = useMemo(
     () =>
       Object.fromEntries(salesStages.map((stage) => [stage.id, leads.filter((lead) => lead.stage === stage.id)])) as Record<
@@ -230,6 +240,120 @@ export default function SalesPageClient() {
           </Card>
         ))}
       </div>
+
+      <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/10" data-testid="pain-signal-lead-finder">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-cyan-300">Q-58 pain-signal lead finder</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">Google Maps review-signal roadmap</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-400">
+              {googleMapsLeadFinderRoadmap.principle} This is prospect research and scoring only. 4H does not scrape,
+              evade controls, enrich paid lists, or send outreach from this surface.
+            </p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-400">
+            {googleMapsLeadFinderRoadmap.painSignals.length} pain signals - {googleMapsLeadFinderRoadmap.captureFields.length} capture fields
+          </div>
+        </div>
+
+        <div className="grid gap-3 xl:grid-cols-[1fr_1fr_1fr]">
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <Search className="h-4 w-4 text-cyan-300" aria-hidden="true" />
+            <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Starter queries</p>
+            <ul className="mt-3 space-y-2 text-xs leading-5 text-slate-300">
+              {googleMapsLeadFinderRoadmap.targetQueries.map((query) => (
+                <li key={query}>- {query}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <Target className="h-4 w-4 text-cyan-300" aria-hidden="true" />
+            <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Pain phrases</p>
+            <div className="mt-3 space-y-2">
+              {googleMapsLeadFinderRoadmap.painSignals.map((signal) => (
+                <div key={signal.phrase} className="rounded border border-slate-800 bg-slate-900/50 p-2">
+                  <p className="text-sm font-semibold text-white">{signal.phrase}</p>
+                  <p className="mt-1 text-xs text-slate-400">{signal.whyItMatters}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-lg border border-amber-800 bg-amber-950/20 p-3">
+            <ShieldCheck className="h-4 w-4 text-amber-300" aria-hidden="true" />
+            <p className="mt-2 text-xs uppercase tracking-wide text-amber-300">Blocked tactics</p>
+            <ul className="mt-3 space-y-2 text-xs leading-5 text-amber-100">
+              {googleMapsLeadFinderRoadmap.blockedTactics.map((tactic) => (
+                <li key={tactic}>- {tactic}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="grid gap-3 xl:grid-cols-[1fr_1fr]">
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Compliant path</p>
+            <ol className="mt-3 space-y-2 text-xs leading-5 text-slate-300">
+              {googleMapsLeadFinderRoadmap.compliantPath.map((step, index) => (
+                <li key={step}>{index + 1}. {step}</li>
+              ))}
+            </ol>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Aggressive but human path</p>
+            <ol className="mt-3 space-y-2 text-xs leading-5 text-slate-300">
+              {googleMapsLeadFinderRoadmap.aggressiveButHumanPath.map((step, index) => (
+                <li key={step}>{index + 1}. {step}</li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-4 border-violet-900/60 bg-violet-950/10" data-testid="customer-proof-sprint-board">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-violet-300">Q-60 / Q-62 customer proof sprint</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">Objections and first 10 customer attempts</h2>
+            <p className="mt-1 max-w-4xl text-sm text-slate-400">
+              The next motion is ten named attempts, not abstract TAM math. Rows below are hypotheses until a real owner
+              interaction, trial, or paid event is verified.
+            </p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-400">
+            {proofSprint.firstCustomerRows} rows - {proofSprint.objections} objections
+          </div>
+        </div>
+
+        <div className="grid gap-3 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-2 md:grid-cols-2">
+            {tenCustomerSprintRows.map((row) => (
+              <div key={row.id} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-white">{row.id} - {row.tradeDomain}</p>
+                    <p className="mt-1 text-xs text-violet-300">{row.source} / {row.status}</p>
+                  </div>
+                  <span className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">internal</span>
+                </div>
+                <p className="mt-2 text-xs leading-5 text-slate-300">{row.ownerHypothesis}</p>
+                <p className="mt-2 text-xs leading-5 text-slate-400">{row.painSignal}</p>
+                <p className="mt-2 border-l border-violet-800 pl-3 text-xs leading-5 text-violet-100">{row.nextMove}</p>
+              </div>
+            ))}
+          </div>
+          <div className="space-y-2">
+            {objectionBank.map((entry) => (
+              <div key={entry.objection} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+                <MessageSquareText className="h-4 w-4 text-violet-300" aria-hidden="true" />
+                <p className="mt-2 text-sm font-semibold text-white">{entry.objection}</p>
+                <p className="mt-2 text-xs leading-5 text-slate-400">{entry.whatItMeans}</p>
+                <p className="mt-2 text-xs leading-5 text-violet-100">{entry.response}</p>
+                <p className="mt-2 text-xs text-slate-500">Proof needed: {entry.proofNeeded}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
 
       <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10" data-testid="sales-attribution-panel">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">

@@ -278,7 +278,12 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - Q-53 applies the `/creatives` page-route redirect to `/assets`; all 24 public `/creatives/*.jpg` URLs still return 200 as static JPEGs after the redirect
 - Q-54 resolves the `/workflow` ownership guard: six stages, five transitions, fallback data, legacy `/workflow`, bulk-status API, Approval, and Launch ownership are documented before any redirect
 - Q-55 applies the `/workflow` page-route redirect to `/launch`; Command keeps the workflow history/ownership map and `/workflow` no longer exposes the legacy bulk mutation UI
+- Q-58 through Q-63 add the customer proof sprint: Google Maps/manual review-signal lead finder roadmap, founder demo scripts, objection bank, live proof packets, next-10 customer board, and channel experiment ledger
+- `docs/google-maps-pain-signal-roadmap.md` documents the detailed manual/API-first path for review-signal prospecting plus the blocked tactics: no CAPTCHA solving, proxy rotation, rate-limit evasion, hidden scraping infrastructure, or automated outreach
 - `/templates` now includes copy-ready creator content brief packets for demo-call video, founder assist, and screenshot-proof formats
+- `/templates` now includes founder-led demo scripts and live proof packets for `saw.city`, `pipe.city`, `mow.city`, `rinse.city`, and `lockout.city`
+- `/sales` now shows the pain-signal lead finder, objection bank, and first-10 customer sprint board for the founder/local proof motion
+- `/scorecard` now includes a channel experiment ledger comparing review-signal outbound, founder videos, field sales, creator demos, and paid social by inputs, success metric, kill criteria, and evidence strength
 - `/templates` now includes Meta Ad Library access validation that separates official API limits from assumptions before competitor monitoring is automated
 - `/templates` now includes a copy-ready competitor research template for capturing offers, hooks, visuals, platforms, citations, evidence quality, coverage notes, and blocked overclaims
 - `docs/meta-ad-library-access-validation.md` records the manual-first Meta competitor research path and blocks scraping, scheduled collectors, and external actions
@@ -306,7 +311,7 @@ See **[docs/claude-design-creative-lab-handoff.md](./docs/claude-design-creative
 - `scripts/competitive-intel-meta.js` adds a token-based Meta `ads_archive` validation helper with redacted request logging and markdown summary output
 - Meta Ad Library should be treated as a validated dependency, not a given: public search exists, but automated access still requires token-based verification before we schedule or hire a dedicated agent
 
-*Last updated: 2026-04-28 agentic launch control | v4.4.26*
+*Last updated: 2026-04-28 customer proof sprint | v4.4.27*
 
 ---
 

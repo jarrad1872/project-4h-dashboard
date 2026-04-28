@@ -7,6 +7,7 @@ import { Button, Card } from "@/components/ui";
 import { buildActiveLoopSupportSummary, EMPTY_MARKETING_EVENT_SUMMARY } from "@/lib/active-loop-support-summaries";
 import { CHANNELS } from "@/lib/constants";
 import { buildCustomerPaceForecast, type CustomerPaceStatus } from "@/lib/customer-pace-forecast";
+import { rankChannelExperiments } from "@/lib/customer-proof-sprint";
 import {
   addLearningDecision,
   currentLearningDecisions,
@@ -247,6 +248,7 @@ export default function ScorecardPage() {
       }),
     [allTimeMarketingSummary, lifecycleMessages, templates.length],
   );
+  const proofExperiments = useMemo(() => rankChannelExperiments(), []);
   const decisionTargets = useMemo(
     () => learningReport.reports.flatMap((report) =>
       report.items.map((item) => decisionTargetFromRankedItem(report.dimension, item)),
@@ -366,6 +368,45 @@ export default function ScorecardPage() {
           />
         </div>
         {totalUsers === 0 && <p className="mt-2 text-xs text-slate-500">No paying users yet. Campaign pre-launch. Log weekly actuals here once ads go live.</p>}
+      </Card>
+
+      <Card className="border-cyan-900/60 bg-cyan-950/10" data-testid="channel-experiment-ledger">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Q-63 Channel Experiment Ledger</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Customer-proof channels are ranked by evidence strength and weekly input discipline before paid scale.
+            </p>
+          </div>
+          <span className="rounded border border-cyan-800/60 bg-cyan-950/30 px-3 py-1 text-xs font-semibold text-cyan-200">
+            {proofExperiments.length} experiments
+          </span>
+        </div>
+        <div className="grid gap-3 xl:grid-cols-5">
+          {proofExperiments.map((experiment) => (
+            <div key={experiment.id} className="rounded border border-slate-800 bg-slate-950/50 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold text-white">{experiment.title}</p>
+                  <p className="mt-1 text-xs uppercase tracking-wide text-cyan-300">{experiment.channel}</p>
+                </div>
+                <span className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">
+                  {experiment.evidenceStrength}
+                </span>
+              </div>
+              <p className="mt-3 text-xs leading-5 text-slate-300">{experiment.hypothesis}</p>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Weekly inputs</p>
+              <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-400">
+                {experiment.weeklyInputs.map((input) => <li key={input}>- {input}</li>)}
+              </ul>
+              <p className="mt-3 text-xs leading-5 text-emerald-200">Success: {experiment.successMetric}</p>
+              <p className="mt-2 text-xs leading-5 text-rose-200">Kill: {experiment.killCriteria}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-slate-500">
+          This ledger is guidance only. It does not launch ads, send outreach, create webhooks, spend, change billing, or mark customer proof without verified events.
+        </p>
       </Card>
 
       <Card>

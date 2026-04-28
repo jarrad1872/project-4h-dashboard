@@ -218,6 +218,12 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-55 Workflow page redirect packet.
 - [x] Add Q-56 launch operating decisions.
 - [x] Add Q-57 agentic launch control for app/CLI orchestration.
+- [x] Add Q-58 pain-signal lead finder roadmap on `/sales`.
+- [x] Add Q-59 founder demo script factory on `/templates`.
+- [x] Add Q-60 objection bank on `/sales`.
+- [x] Add Q-61 live proof packets on `/templates`.
+- [x] Add Q-62 first-10 customer sprint board on `/sales` and Command.
+- [x] Add Q-63 channel experiment ledger on `/scorecard`.
 
 ---
 
@@ -244,6 +250,12 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Approval audit log for external launch decisions.
 - [x] External-action stop screen for launch, upload, outreach send, webhook, and spend actions.
 - [x] Agentic launch control contract for app, Codex, and Claude Code.
+- [x] Customer proof sprint for Q-58 through Q-63.
+- [x] Detailed Google Maps/manual review-signal lead finder roadmap.
+- [x] Founder demo script factory for the five beachhead domains.
+- [x] Live proof packets tied to demo phones, screenshot checklist, and tracked paths.
+- [x] First-10 customer attempt board.
+- [x] Channel experiment ledger for review-signal outbound, founder video, field sales, creator demos, and paid social.
 - [x] Weekly learning report rankings for trades, creators, images, and angles.
 - [x] Local reversible keep/kill/iterate decision board.
 - [x] Creator outreach state tracker.

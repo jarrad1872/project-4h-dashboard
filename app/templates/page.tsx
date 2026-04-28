@@ -10,6 +10,12 @@ import {
 } from "@/lib/competitor-research-template";
 import { buildContentBriefPacket, CONTENT_BRIEF_TEMPLATES, type ContentBriefTemplateId } from "@/lib/content-brief-templates";
 import {
+  buildFounderDemoScriptPacket,
+  buildLiveProofPacketCopy,
+  founderDemoScripts,
+  liveProofPackets,
+} from "@/lib/customer-proof-sprint";
+import {
   buildMessageMatchPacket,
   listMessageMatchBriefs,
   type MessageMatchAngle,
@@ -29,6 +35,8 @@ export default function TemplatesPage() {
   const [copiedBrief, setCopiedBrief] = useState<ContentBriefTemplateId | null>(null);
   const [copiedMessageMatch, setCopiedMessageMatch] = useState<string | null>(null);
   const [copiedCompetitorResearch, setCopiedCompetitorResearch] = useState(false);
+  const [copiedFounderScript, setCopiedFounderScript] = useState<string | null>(null);
+  const [copiedProofPacket, setCopiedProofPacket] = useState<string | null>(null);
   const [copyFallback, setCopyFallback] = useState("");
   const [messageMatchTrade, setMessageMatchTrade] = useState("all");
   const [messageMatchAngle, setMessageMatchAngle] = useState<MessageMatchAngle | "all">("all");
@@ -78,6 +86,8 @@ export default function TemplatesPage() {
       setCopiedBrief(id);
       setCopiedMessageMatch(null);
       setCopiedCompetitorResearch(false);
+      setCopiedFounderScript(null);
+      setCopiedProofPacket(null);
       setCopyFallback("");
     } catch {
       setCopiedBrief(null);
@@ -92,6 +102,8 @@ export default function TemplatesPage() {
       setCopiedMessageMatch(brief.id);
       setCopiedBrief(null);
       setCopiedCompetitorResearch(false);
+      setCopiedFounderScript(null);
+      setCopiedProofPacket(null);
       setCopyFallback("");
     } catch {
       setCopiedMessageMatch(null);
@@ -106,10 +118,48 @@ export default function TemplatesPage() {
       setCopiedCompetitorResearch(true);
       setCopiedMessageMatch(null);
       setCopiedBrief(null);
+      setCopiedFounderScript(null);
+      setCopiedProofPacket(null);
       setCopyFallback("");
     } catch {
       setCopiedCompetitorResearch(false);
       setCopyFallback(packet);
+    }
+  }
+
+  async function copyFounderScript(id: string) {
+    const script = founderDemoScripts.find((item) => item.id === id);
+    if (!script) return;
+    const packet = buildFounderDemoScriptPacket(script);
+    try {
+      await navigator.clipboard.writeText(packet);
+      setCopiedFounderScript(id);
+      setCopiedProofPacket(null);
+      setCopiedMessageMatch(null);
+      setCopiedBrief(null);
+      setCopiedCompetitorResearch(false);
+      setCopyFallback("");
+    } catch {
+      setCopiedFounderScript(null);
+      setCopyFallback(packet);
+    }
+  }
+
+  async function copyProofPacket(id: string) {
+    const packet = liveProofPackets.find((item) => item.id === id);
+    if (!packet) return;
+    const copy = buildLiveProofPacketCopy(packet);
+    try {
+      await navigator.clipboard.writeText(copy);
+      setCopiedProofPacket(id);
+      setCopiedFounderScript(null);
+      setCopiedMessageMatch(null);
+      setCopiedBrief(null);
+      setCopiedCompetitorResearch(false);
+      setCopyFallback("");
+    } catch {
+      setCopiedProofPacket(null);
+      setCopyFallback(copy);
     }
   }
 
@@ -279,6 +329,72 @@ export default function TemplatesPage() {
               </ul>
             </div>
           </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-4 border-emerald-900/60 bg-emerald-950/10" data-testid="founder-demo-script-factory">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Q-59 founder demo script factory</p>
+            <h2 className="text-lg font-semibold text-white">Founder-led proof scripts for the five beachhead domains</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-400">
+              Scripts are built for 30-60 second founder clips: show the missed-call moment, call the live demo line, show the job summary, and close with the $39/mo trial offer. These are review packets, not publish actions.
+            </p>
+          </div>
+          <span className="rounded border border-emerald-800/60 bg-emerald-950/30 px-3 py-2 text-xs font-semibold uppercase text-emerald-200">
+            {founderDemoScripts.length} scripts
+          </span>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-5">
+          {founderDemoScripts.map((script) => (
+            <div key={script.id} className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+              <p className="text-base font-semibold text-white">{script.domain}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-emerald-300">{script.trade}</p>
+              <p className="mt-3 text-sm font-semibold text-slate-100">{script.title}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-400">{script.hook}</p>
+              <ol className="mt-3 space-y-1 text-xs leading-5 text-slate-300">
+                {script.beats.map((beat, index) => (
+                  <li key={beat}>{index + 1}. {beat}</li>
+                ))}
+              </ol>
+              <p className="mt-3 text-xs text-slate-500">Proof shot: {script.proofShot}</p>
+              <GhostButton className="mt-4" onClick={() => void copyFounderScript(script.id)}>
+                {copiedFounderScript === script.id ? "Copied script" : "Copy script"}
+              </GhostButton>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="space-y-4 border-cyan-900/60 bg-cyan-950/10" data-testid="live-proof-packets">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Q-61 live proof packets</p>
+            <h2 className="text-lg font-semibold text-white">Call, capture, screenshot, and close</h2>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-400">
+              Each packet gives a founder, creator, or field rep the exact demo call prompt and proof checklist. Screenshots must mask personal data, and external publishing still requires approval.
+            </p>
+          </div>
+          <span className="rounded border border-cyan-800/60 bg-cyan-950/30 px-3 py-2 text-xs font-semibold uppercase text-cyan-200">
+            {liveProofPackets.length} packets
+          </span>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-5">
+          {liveProofPackets.map((packet) => (
+            <div key={packet.id} className="rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+              <p className="text-base font-semibold text-white">{packet.domain}</p>
+              <p className="mt-1 text-xs text-cyan-300">{packet.demoPhone}</p>
+              <p className="mt-3 text-sm leading-5 text-slate-300">{packet.callPrompt}</p>
+              <p className="mt-3 text-xs uppercase tracking-wide text-slate-500">AI capture</p>
+              <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-300">
+                {packet.aiCapture.map((item) => <li key={item}>- {item}</li>)}
+              </ul>
+              <p className="mt-3 break-all text-[11px] text-cyan-200">{packet.trackingPath}</p>
+              <GhostButton className="mt-4" onClick={() => void copyProofPacket(packet.id)}>
+                {copiedProofPacket === packet.id ? "Copied packet" : "Copy packet"}
+              </GhostButton>
+            </div>
+          ))}
         </div>
       </Card>
 

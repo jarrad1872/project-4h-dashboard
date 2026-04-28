@@ -49,6 +49,35 @@ Jarrad issues commands in plain language. Bob does the work. Dashboard reflects 
 
 ---
 
+## Customer Proof Sprint SOPs
+
+Q-58 through Q-63 shift the next motion from broad ad launch to first-customer proof.
+
+- Active customer proof UI: `/sales`.
+- Active proof packet UI: `/templates`.
+- Active learning ledger: `/scorecard`.
+- Roadmap doc: `docs/google-maps-pain-signal-roadmap.md`.
+- Shared contract: `lib/customer-proof-sprint.ts`.
+
+Operating sequence:
+
+1. Use the Q-58 pain-signal lead finder to identify public review phrases such as "did not answer," "never called back," "left a voicemail," "after hours," and "hard to schedule."
+2. Save only internal research hypotheses until a real owner/business row is intentionally created.
+3. Use Q-59 founder demo scripts and Q-61 live proof packets to show the missed-call moment, live demo line, captured job summary, and $39/mo trial offer.
+4. Use the Q-60 objection bank after real conversations to separate trust, price, AI quality, and "another app" objections.
+5. Keep the Q-62 next-10 board focused on named attempts before adding broad paid budget.
+6. Use Q-63 channel ledger to compare weekly inputs, success metrics, and kill criteria across review-signal outbound, founder video, field sales, creator demos, and paid social.
+
+Google Maps / review-signal boundaries:
+
+- Manual review and official API/provider paths are allowed planning directions.
+- Small human-reviewed batches are acceptable for research and draft preparation.
+- Do not solve CAPTCHAs, bypass login or browser safety barriers, rotate proxies, evade rate limits, or build hidden scraping infrastructure.
+- Do not send email, SMS, DM, form submissions, creator outreach, ad uploads, webhooks, spend changes, or billing actions without exact action-time approval.
+- Do not claim a public review proves lost revenue unless the owner confirms it.
+
+---
+
 ## AD COPY SOPs
 
 ### Hard Rules (Non-Negotiable)
