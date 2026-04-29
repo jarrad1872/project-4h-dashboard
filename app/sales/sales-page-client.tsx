@@ -393,7 +393,9 @@ export default function SalesPageClient() {
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
-                <DownloadLink href="/sales-assets/print/dustin-pipe-business-card-print-pack.zip">Print Pack ZIP</DownloadLink>
+                <DownloadLink href="/sales-assets/print-hires/dustin-pipe-business-card-print-pack-hires.zip">
+                  Hi-Res Print Pack ZIP
+                </DownloadLink>
               </div>
             </div>
             {cardProofs.map((proof) => (
@@ -851,6 +853,9 @@ export default function SalesPageClient() {
                     </div>
                     <div className="flex flex-wrap gap-2" data-testid={index === 0 ? "sales-card-download-front" : undefined}>
                       <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
+                      <DownloadLink href="/sales-assets/print-hires/dustin-pipe-business-card-print-pack-hires.zip">
+                        Hi-Res Print Pack ZIP
+                      </DownloadLink>
                       {proof.printFrontPath ? <DownloadLink href={proof.printFrontPath}>Print Front PNG</DownloadLink> : null}
                       {proof.printBackPath ? <DownloadLink href={proof.printBackPath}>Print Back PNG</DownloadLink> : null}
                     </div>

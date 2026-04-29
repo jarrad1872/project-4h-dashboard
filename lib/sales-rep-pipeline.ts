@@ -149,8 +149,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     offer: SALES_CARD_TRIAL,
     price: SALES_CARD_PRICE,
     callout: "Best for trust-first drops with plumbing owners who want a human contact.",
-    printFrontPath: "/sales-assets/print/dustin-pipe-local-trust-front-print-1086x636.png",
-    printBackPath: "/sales-assets/print/dustin-pipe-local-trust-back-print-1086x636.png",
+    printFrontPath: "/sales-assets/print-hires/dustin-pipe-local-trust-front-print-2172x1272.png",
+    printBackPath: "/sales-assets/print-hires/dustin-pipe-local-trust-back-print-2172x1272.png",
   },
   {
     id: "dustin-pipe-missed-call",
@@ -171,8 +171,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     offer: SALES_CARD_TRIAL,
     price: SALES_CARD_PRICE,
     callout: "Best for urgent-call conversations and review-signal prospects.",
-    printFrontPath: "/sales-assets/print/dustin-pipe-missed-call-front-print-1086x636.png",
-    printBackPath: "/sales-assets/print/dustin-pipe-missed-call-back-print-1086x636.png",
+    printFrontPath: "/sales-assets/print-hires/dustin-pipe-missed-call-front-print-2172x1272.png",
+    printBackPath: "/sales-assets/print-hires/dustin-pipe-missed-call-back-print-2172x1272.png",
   },
   {
     id: "dustin-pipe-live-demo",
@@ -193,8 +193,8 @@ export const salesCardVariants: SalesCardVariant[] = [
     offer: SALES_CARD_TRIAL,
     price: SALES_CARD_PRICE,
     callout: "Best for counter drops, supply houses, and quick QR-first pitches.",
-    printFrontPath: "/sales-assets/print/dustin-pipe-live-demo-front-print-1086x636.png",
-    printBackPath: "/sales-assets/print/dustin-pipe-live-demo-back-print-1086x636.png",
+    printFrontPath: "/sales-assets/print-hires/dustin-pipe-live-demo-front-print-2172x1272.png",
+    printBackPath: "/sales-assets/print-hires/dustin-pipe-live-demo-back-print-2172x1272.png",
   },
 ];
 

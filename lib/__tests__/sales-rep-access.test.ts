@@ -30,8 +30,8 @@ describe("Dustin field sales access", () => {
 
   it("points Dustin card downloads at flattened print artwork", () => {
     for (const card of salesCardVariants.filter((variant) => variant.repId === "rep-az-founding")) {
-      expect(card.printFrontPath).toMatch(/^\/sales-assets\/print\/.+-front-print-1086x636\.png$/);
-      expect(card.printBackPath).toMatch(/^\/sales-assets\/print\/.+-back-print-1086x636\.png$/);
+      expect(card.printFrontPath).toMatch(/^\/sales-assets\/print-hires\/.+-front-print-2172x1272\.png$/);
+      expect(card.printBackPath).toMatch(/^\/sales-assets\/print-hires\/.+-back-print-2172x1272\.png$/);
     }
   });
 });
