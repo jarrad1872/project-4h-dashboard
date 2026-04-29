@@ -372,7 +372,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - `/sales` is the internal operating surface for the Arizona founding rep pilot.
 - Sales rep cards must include a stable rep code, `utm_medium=field-sales`, `utm_campaign=4h_YYYY-MM_{campaign}`, and a unique card ID in `utm_content`.
 - Printed cards must preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
-- Dustin Bouwhuis is the active Arizona rep for the pipe.city proof sprint. His default card set uses `dustin@saw.city`, `949-933-2719`, `DUSTINAZ`, pipe.city demo line `(385) 475-3881`, and trade-domain tracking to `pipe.city`.
+- Dustin Bouwhuis is the active Arizona rep for the pipe.city proof sprint. His default card set uses `dustin@saw.city`, Google Voice `480-466-0674`, `DUSTINAZ`, pipe.city demo line `(385) 475-3881`, and trade-domain tracking to `pipe.city`.
 - Business card visual proofs must follow the creative source-of-truth rule: the approved image-gen proof sheet is the asset. Do not replace it with a coded approximation unless Jarrad explicitly asks for a labeled mechanical print utility.
 - Business card print exports for Dustin must use the flattened generated-artifact PNGs in `public/sales-assets/print`, not the legacy SVG/PNG route. The current pack is six 1086x636 full-bleed PNGs plus `dustin-pipe-business-card-print-pack.zip`; the copy, QR, contact info, and demo line are baked into the uploaded artwork.
 - The dashboard may prepare/download print files, but it does not place a Vistaprint order or move money.

@@ -120,7 +120,7 @@ export const salesReps: SalesRep[] = [
     state: "AZ",
     code: "DUSTINAZ",
     role: "Arizona Growth Rep",
-    phone: "949-933-2719",
+    phone: "480-466-0674",
     email: "dustin@saw.city",
     weeklyTouchTarget: 35,
     focusTrades: ["pipe.city", "saw.city", "rinse.city", "lockout.city", "mow.city"],
