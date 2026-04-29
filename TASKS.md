@@ -246,7 +246,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Promote the approved Dustin business-card direction on `/sales` as a front/back proof board so the app view matches the print exports rather than showing a disconnected chat-only concept.
 - [x] Add the creative source-of-truth rule: generated image artifacts are the finished creative for ads, proof sheets, business cards, creator frames, and campaign mockups; coded recreations are wireframes or legacy utilities only.
 - [x] Add Dustin Field Mode: limited rep access-code support, mobile quick-add CRM fields, fast stage buttons, tracked card scan route, and public demo landing page without outreach, billing, webhooks, ads, or money movement.
-- [x] Add Vistaprint-ready Dustin card files: six 2172x1272 high-resolution PNGs plus a downloadable print-pack ZIP, so uploads contain crisp text/QR/demo details baked into the artwork.
+- [x] Add Vistaprint-ready Dustin card files: six 2172x1272 proof-sheet-faithful PNGs plus a downloadable print-pack ZIP, so uploads preserve the approved generated artwork with text/QR/demo details baked in.
 
 ---
 
