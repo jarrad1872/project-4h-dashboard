@@ -244,7 +244,7 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Add Q-72 Deep Research verdict shelf on Command/Templates.
 - [x] Add Dustin Bouwhuis pipe.city business-card proof set with three print-ready Jobsite-design concepts, full-bleed pipe.city hero backgrounds, `DUSTINAZ` tracking, demo line `(385) 475-3881`, and AI Agent positioning.
 - [x] Promote the approved Dustin business-card direction on `/sales` as a front/back proof board so the app view matches the print exports rather than showing a disconnected chat-only concept.
-- [x] Add the creative source-of-truth rule: generated image artifacts are the finished creative for ads, proof sheets, business cards, creator frames, and campaign mockups; coded recreations are wireframes or legacy utilities only.
+- [x] Add the creative source-of-truth rule: use `$imagegen` for all visual assets, every time; generated image artifacts are the finished creative for ads, proof sheets, business cards, creator frames, hero images, thumbnails, and campaign mockups; coded recreations are wireframes or legacy utilities only.
 - [x] Add Dustin Field Mode: limited rep access-code support, mobile quick-add CRM fields, fast stage buttons, tracked card scan route, and public demo landing page without outreach, billing, webhooks, ads, or money movement.
 - [x] Add Vistaprint-ready Dustin card files: six 2172x1272 proof-sheet-faithful PNGs plus a downloadable print-pack ZIP, so uploads preserve the approved generated artwork with text/QR/demo details baked in.
 

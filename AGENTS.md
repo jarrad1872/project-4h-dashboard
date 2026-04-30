@@ -26,6 +26,9 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 5. **Update relevant .md files before every commit.** If the work affects how the system works, what's been built, or what's pending — update TASKS.md, SOP-WORKFLOW.md, or README.md in the same commit. Never push code that leaves the docs stale. The .md files are the system's memory.
 6. **Never move money or modify billing** in any system.
 
+### Imagegen Creative Hard Rule
+**Use `$imagegen` for all visual assets, every time.** Finished ads, business cards, proof sheets, creator frames, campaign mockups, hero images, thumbnails, icons-as-art, and other raster creative must start from the `$imagegen` skill / built-in `image_gen` workflow. Code may crop, upscale, package, route, display, validate dimensions, or create labeled mechanical utilities, but it must not replace imagegen creative with HTML/CSS/SVG/canvas/card-render approximations unless Jarrad explicitly asks for a wireframe or mechanical print helper. If an asset is project-bound, save the selected imagegen output into the repo and document the prompt/source; do not leave it only in a temporary generated-images folder.
+
 ### TRADE_MAP Hard Rule
 **Every new trade added to the campaign MUST have its prefix added to `lib/trade-utils.ts → TRADE_MAP` in the same commit.**
 Missing entries silently fall back to `saw.city` badge on every page — this is a user-visible bug.
