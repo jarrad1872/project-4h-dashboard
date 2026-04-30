@@ -368,8 +368,8 @@ export default function SalesPageClient() {
 
         <div className="mx-auto w-full max-w-[1480px]" data-testid="sales-card-proof-sheet">
           <Image
-            src="/sales-assets/dustin-pipe-proof-sheet-v1.png"
-            alt="Dustin Bouwhuis pipe.city three-concept business card proof sheet"
+            src="/sales-assets/dustin-pipe-proof-sheet-v2.png"
+            alt="Dustin Bouwhuis pipe.city imagegen-native three-concept business card proof sheet"
             width={1536}
             height={1024}
             unoptimized
@@ -381,8 +381,8 @@ export default function SalesPageClient() {
         <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
           <p className="text-xs uppercase tracking-wide text-slate-500">Vistaprint-ready flattened exports</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            These PNGs are cropped from the approved generated proof sheet with the text baked into the image. Use these
-            for Vistaprint instead of the legacy generated SVG/PNG route.
+            These PNGs are cropped from the imagegen-native proof sheet with the text baked into the image. Use these for
+            Vistaprint instead of the legacy generated SVG/PNG route or any coded card rendering.
           </p>
           <div className="mt-3 grid gap-2 lg:grid-cols-3">
             <div className="rounded border border-amber-800/60 bg-amber-950/20 p-3 lg:col-span-3">
@@ -392,7 +392,7 @@ export default function SalesPageClient() {
                 {PIPE_CITY_DEMO_LINE}.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
+                <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v2.png">Imagegen Proof Sheet PNG</DownloadLink>
                 <DownloadLink href="/sales-assets/print-hires/dustin-pipe-business-card-print-pack-hires.zip">
                   Hi-Res Print Pack ZIP
                 </DownloadLink>
@@ -852,7 +852,7 @@ export default function SalesPageClient() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2" data-testid={index === 0 ? "sales-card-download-front" : undefined}>
-                      <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v1.png">Proof Sheet PNG</DownloadLink>
+                      <DownloadLink href="/sales-assets/dustin-pipe-proof-sheet-v2.png">Imagegen Proof Sheet PNG</DownloadLink>
                       <DownloadLink href="/sales-assets/print-hires/dustin-pipe-business-card-print-pack-hires.zip">
                         Hi-Res Print Pack ZIP
                       </DownloadLink>
