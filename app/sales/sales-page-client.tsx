@@ -382,7 +382,9 @@ export default function SalesPageClient() {
           <p className="text-xs uppercase tracking-wide text-slate-500">Vistaprint-ready flattened exports</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
             These PNGs are cropped from the imagegen-native proof sheet with the text baked into the image. Use these for
-            Vistaprint instead of the legacy generated SVG/PNG route or any coded card rendering.
+            Vistaprint instead of the legacy generated SVG/PNG route or any coded card rendering. QR cards receive a
+            mechanical production QR overlay via <code>npm run cards:dustin</code> so scans are real, trackable, and not
+            dependent on generated QR-looking art.
           </p>
           <div className="mt-3 grid gap-2 lg:grid-cols-3">
             <div className="rounded border border-amber-800/60 bg-amber-950/20 p-3 lg:col-span-3">

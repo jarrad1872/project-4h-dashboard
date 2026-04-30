@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui";
 import { PIPE_CITY_DEMO_LINE, salesReps } from "@/lib/sales-rep-pipeline";
+import { DemoCallButton } from "./demo-call-button";
 
 export default async function DustinFieldLanding({
   searchParams,
@@ -11,6 +12,7 @@ export default async function DustinFieldLanding({
   const rep = salesReps[0];
   const tracked = params.tracked === "1";
   const card = typeof params.card === "string" ? params.card : "dustin-pipe-proof-sheet";
+  const telHref = `tel:${PIPE_CITY_DEMO_LINE.replace(/[^0-9]/g, "")}`;
 
   return (
     <div className="mx-auto max-w-3xl space-y-5" data-testid="dustin-field-landing">
@@ -21,12 +23,7 @@ export default async function DustinFieldLanding({
           Hear the agent answer a plumbing call, capture the job details, and text the owner summary while the crew keeps
           working.
         </p>
-        <a
-          href={`tel:${PIPE_CITY_DEMO_LINE.replace(/[^0-9]/g, "")}`}
-          className="mt-5 inline-flex rounded-lg bg-amber-300 px-5 py-3 text-lg font-black text-slate-950 hover:bg-amber-200"
-        >
-          Call {PIPE_CITY_DEMO_LINE}
-        </a>
+        <DemoCallButton phoneLabel={PIPE_CITY_DEMO_LINE} telHref={telHref} />
         <div className="mt-5 rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300">
           <p className="font-semibold text-white">{rep.name}</p>
           <p>{rep.role}</p>
@@ -42,7 +39,10 @@ export default async function DustinFieldLanding({
             ? "This card scan was logged for field-sales attribution."
             : "Use the tracked card URL or QR path to log this visit before the owner lands here."}
         </p>
-        <p className="mt-2 text-xs text-slate-500">Card: {card}. No outreach, billing, ad launch, or webhook runs from this page.</p>
+        <p className="mt-2 text-xs text-slate-500">
+          Card: {card}. The demo button logs demo-call intent, then opens the phone dialer. No outreach, billing, ad
+          launch, or webhook runs from this page.
+        </p>
       </Card>
 
       <Link href="/sales" className="inline-flex text-sm font-semibold text-emerald-300 hover:text-emerald-200">

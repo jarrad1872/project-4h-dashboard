@@ -3,7 +3,9 @@ import { requireAuth } from "@/lib/auth";
 import { isFieldSalesEvent } from "@/lib/field-sales-attribution";
 import { DataFiles, writeJsonFile } from "@/lib/file-db";
 import {
+  isLegacyEventNameRequiredError,
   marketingEventToDb,
+  marketingEventToLegacyEventNameDb,
   normalizeMarketingEvent,
   summarizeMarketingEvents,
   validateMarketingEvents,
@@ -99,7 +101,17 @@ export async function POST(request: Request) {
         .upsert(events.map(marketingEventToDb), { onConflict: "event_key" });
 
       if (error) {
-        return errorJson("Failed to save marketing events", 500, error.message, request);
+        if (isLegacyEventNameRequiredError(error)) {
+          const retry = await supabaseAdmin
+            .from("marketing_events")
+            .upsert(events.map(marketingEventToLegacyEventNameDb), { onConflict: "event_key" });
+
+          if (retry.error) {
+            return errorJson("Failed to save marketing events", 500, retry.error.message, request);
+          }
+        } else {
+          return errorJson("Failed to save marketing events", 500, error.message, request);
+        }
       }
     }
 

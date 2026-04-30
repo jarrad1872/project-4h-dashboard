@@ -1,6 +1,6 @@
 # Project 4H - Build Plan
 
-**Last updated:** 2026-04-28
+**Last updated:** 2026-04-30
 **Owner:** Jarrad + Bob/Codex
 **Live app:** https://pumpcans.com
 **Product reference:** Answered.City / `sawcity-lite`
@@ -246,7 +246,11 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Promote the approved Dustin business-card direction on `/sales` as a front/back proof board so the app view matches the print exports rather than showing a disconnected chat-only concept.
 - [x] Add the creative source-of-truth rule: use `$imagegen` for all visual assets, every time; generated image artifacts are the finished creative for ads, proof sheets, business cards, creator frames, hero images, thumbnails, and campaign mockups; coded recreations are wireframes or legacy utilities only.
 - [x] Add Dustin Field Mode: limited rep access-code support, mobile quick-add CRM fields, fast stage buttons, tracked card scan route, and public demo landing page without outreach, billing, webhooks, ads, or money movement.
-- [x] Add Vistaprint-ready Dustin card files: six 2172x1272 imagegen-native PNGs plus a downloadable print-pack ZIP, cropped from the from-scratch `dustin-pipe-proof-sheet-v2.png` artwork with text/QR/demo details baked in.
+- [x] Add Vistaprint-ready Dustin card files: six 2172x1272 imagegen-native PNGs plus a downloadable print-pack ZIP, cropped from the from-scratch `dustin-pipe-proof-sheet-v2.png` artwork.
+- [x] Add production-safe Dustin card QR handling: `npm run cards:dustin` overlays real QR codes onto the imagegen-native QR areas and rebuilds the print ZIPs without replacing the creative direction.
+- [x] Fix field-sales tracking compatibility with legacy production `marketing_events.event_name` schema and add migration `015_marketing_events_event_name_compat.sql`.
+- [x] Log Dustin landing-page demo-line clicks as `demo_call` before handing off to the phone dialer.
+- [ ] Configure production sales rep write access in Vercel by setting `PUMPCANS_DUSTIN_REP_CODE` or `PUMPCANS_SALES_REP_CODE`; do not commit the value.
 
 ---
 

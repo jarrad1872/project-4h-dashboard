@@ -29,6 +29,8 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 ### Imagegen Creative Hard Rule
 **Use `$imagegen` for all visual assets, every time.** Finished ads, business cards, proof sheets, creator frames, campaign mockups, hero images, thumbnails, icons-as-art, and other raster creative must start from the `$imagegen` skill / built-in `image_gen` workflow. Code may crop, upscale, package, route, display, validate dimensions, or create labeled mechanical utilities, but it must not replace imagegen creative with HTML/CSS/SVG/canvas/card-render approximations unless Jarrad explicitly asks for a wireframe or mechanical print helper. If an asset is project-bound, save the selected imagegen output into the repo and document the prompt/source; do not leave it only in a temporary generated-images folder.
 
+**QR production exception:** imagegen can reserve the QR area, but final print files must use a real QR overlay/export utility so scans work. For Dustin's pipe.city cards, run `npm run cards:dustin`; it preserves the imagegen card art and replaces only the QR bitmap in the reserved QR area.
+
 ### TRADE_MAP Hard Rule
 **Every new trade added to the campaign MUST have its prefix added to `lib/trade-utils.ts → TRADE_MAP` in the same commit.**
 Missing entries silently fall back to `saw.city` badge on every page — this is a user-visible bug.

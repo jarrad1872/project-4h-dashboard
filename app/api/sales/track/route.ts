@@ -1,7 +1,12 @@
 import { errorJson, okJson } from "@/lib/api";
 import { FIELD_SALES_CAMPAIGN, FIELD_SALES_UTM_MEDIUM, salesReps } from "@/lib/sales-rep-pipeline";
 import { DataFiles, writeJsonFile } from "@/lib/file-db";
-import { marketingEventToDb, validateMarketingEvent } from "@/lib/marketing-events";
+import {
+  isLegacyEventNameRequiredError,
+  marketingEventToDb,
+  marketingEventToLegacyEventNameDb,
+  validateMarketingEvent,
+} from "@/lib/marketing-events";
 import { hasSupabase, logActivity, readFallback } from "@/lib/server-utils";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { MarketingEvent } from "@/lib/types";
@@ -26,7 +31,17 @@ async function saveEvent(event: MarketingEvent) {
   }
 
   const { error } = await supabaseAdmin.from("marketing_events").upsert(marketingEventToDb(event), { onConflict: "event_key" });
-  if (error) throw new Error(error.message);
+  if (!error) return;
+
+  if (isLegacyEventNameRequiredError(error)) {
+    const retry = await supabaseAdmin
+      .from("marketing_events")
+      .upsert(marketingEventToLegacyEventNameDb(event), { onConflict: "event_key" });
+    if (!retry.error) return;
+    throw new Error(retry.error.message);
+  }
+
+  throw new Error(error.message);
 }
 
 export async function GET(request: Request) {

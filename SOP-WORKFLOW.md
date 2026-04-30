@@ -182,7 +182,8 @@ Image URL: points to `trade-heros/nb2/{slug}-hero-a.jpg`
 - Finished creative assets are the generated image artifacts. The dashboard stores, displays, tracks, approves, crops, downloads, and annotates them; it must not rebuild the same visual with a second coded layout.
 - The blocked pattern is half image-gen plus half coded recreation for a finished asset. This creates bait-and-switch creative and is not acceptable for ads, proof sheets, business cards, creator frames, or campaign mockups.
 - Code-rendered SVG/HTML is allowed only for wireframes, metadata previews, crop helpers, or explicitly labeled legacy print utilities.
-- If exact text, QR codes, or print details matter, iterate in image generation until the whole image is acceptable, then upload that raster as the source of truth.
+- If exact text or print details matter, iterate in image generation until the whole image is acceptable, then upload that raster as the source of truth.
+- QR codes are the one production exception: imagegen may reserve the visual QR area, but final print files must use a real mechanical QR overlay so the scan path is guaranteed. Dustin's current card pack uses `npm run cards:dustin`, which keeps the imagegen artwork intact and replaces only the QR bitmap in the reserved QR area.
 - Approval decisions must point at the generated asset URL/file, not at a reconstructed approximation.
 
 ### Legacy Model: Nano Banana 2 (NB2)
@@ -374,7 +375,7 @@ If audit fails → fix the flagged ads → re-run → 🟢 → report done.
 - Printed cards must preserve the hard offer: `$39/mo`, `14-day free trial, no credit card required`.
 - Dustin Bouwhuis is the active Arizona rep for the pipe.city proof sprint. His default card set uses `dustin@saw.city`, Google Voice `480-466-0674`, `DUSTINAZ`, pipe.city demo line `(385) 475-3881`, and trade-domain tracking to `pipe.city`.
 - Business card visual proofs must follow the creative source-of-truth rule: use `$imagegen` for all assets, every time. The approved imagegen proof sheet or imagegen card face is the asset. Do not replace it with a coded approximation unless Jarrad explicitly asks for a labeled mechanical print utility.
-- Business card print exports for Dustin must use the high-resolution imagegen-native PNGs in `public/sales-assets/print-hires`, not remade coded layouts or the legacy SVG/PNG route. The current pack is six 2172x1272 full-bleed PNGs plus `dustin-pipe-business-card-print-pack-hires.zip`, cropped from `public/sales-assets/dustin-pipe-proof-sheet-v2.png`; the copy, QR, contact info, and demo line are baked into the imagegen artwork so Vistaprint preserves the selected creative direction.
+- Business card print exports for Dustin must use the high-resolution imagegen-native PNGs in `public/sales-assets/print-hires`, not remade coded layouts or the legacy SVG/PNG route. The current pack is six 2172x1272 full-bleed PNGs plus `dustin-pipe-business-card-print-pack-hires.zip`, cropped from `public/sales-assets/dustin-pipe-proof-sheet-v2.png`; the copy, contact info, and demo line stay baked into the imagegen artwork. QR cards then get a mechanical QR overlay via `npm run cards:dustin` so Vistaprint preserves the selected creative direction and the QR code is scannable.
 - The dashboard may prepare/download print files, but it does not place a Vistaprint order or move money.
 - CRM stages are internal tracking states: prospect, qualified, visited, card-left, demo-booked, trial-started, activated, paid, and lost.
 - Placeholder lead rows are target archetypes unless a real owner is intentionally entered later. Do not represent them as contacted businesses, testers, or customers.

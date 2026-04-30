@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "cli": "node scripts/4h-cli.js",
+    "cards:dustin": "node scripts/build-dustin-card-print-pack.cjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -211,30 +211,43 @@ export function marketingEventToDb(event: MarketingEvent) {
   };
 }
 
-export function normalizeMarketingEvent(input: any): MarketingEvent {
+export function marketingEventToLegacyEventNameDb(event: MarketingEvent) {
   return {
-    id: String(input.id),
-    event_key: input.event_key ?? null,
-    event_type: input.event_type,
-    event_at: String(input.event_at ?? input.occurred_at),
-    tenant_id: input.tenant_id ?? null,
-    visitor_id: input.visitor_id ?? null,
-    platform: input.platform ?? null,
-    trade_slug: input.trade_slug ?? null,
-    creator_id: input.creator_id ?? null,
-    creative_asset_id: input.creative_asset_id ?? null,
-    angle: input.angle ?? null,
-    variant_id: input.variant_id ?? null,
-    utm_source: input.utm_source ?? null,
-    utm_medium: input.utm_medium ?? null,
-    utm_campaign: input.utm_campaign ?? null,
-    utm_content: input.utm_content ?? null,
-    utm_term: input.utm_term ?? null,
-    session_id: input.session_id ?? null,
-    contact_id: input.contact_id ?? null,
-    value_cents: Number(input.value_cents ?? 0),
-    metadata: metadataObject(input.metadata),
-    created_at: String(input.created_at ?? input.event_at ?? input.occurred_at),
+    ...marketingEventToDb(event),
+    event_name: event.event_type,
+  };
+}
+
+export function isLegacyEventNameRequiredError(error: { message?: string } | null | undefined) {
+  const message = String(error?.message ?? "").toLowerCase();
+  return message.includes("event_name") && message.includes("not-null");
+}
+
+export function normalizeMarketingEvent(input: MarketingEvent | { [key: string]: unknown }): MarketingEvent {
+  const row = input as { [key: string]: unknown };
+  return {
+    id: String(row.id),
+    event_key: (row.event_key as string | null | undefined) ?? null,
+    event_type: row.event_type as MarketingEventType,
+    event_at: String(row.event_at ?? row.occurred_at),
+    tenant_id: (row.tenant_id as string | null | undefined) ?? null,
+    visitor_id: (row.visitor_id as string | null | undefined) ?? null,
+    platform: (row.platform as CreativeAssetPlatform | null | undefined) ?? null,
+    trade_slug: (row.trade_slug as string | null | undefined) ?? null,
+    creator_id: (row.creator_id as string | null | undefined) ?? null,
+    creative_asset_id: (row.creative_asset_id as string | null | undefined) ?? null,
+    angle: (row.angle as string | null | undefined) ?? null,
+    variant_id: (row.variant_id as string | null | undefined) ?? null,
+    utm_source: (row.utm_source as string | null | undefined) ?? null,
+    utm_medium: (row.utm_medium as string | null | undefined) ?? null,
+    utm_campaign: (row.utm_campaign as string | null | undefined) ?? null,
+    utm_content: (row.utm_content as string | null | undefined) ?? null,
+    utm_term: (row.utm_term as string | null | undefined) ?? null,
+    session_id: (row.session_id as string | null | undefined) ?? null,
+    contact_id: (row.contact_id as string | null | undefined) ?? null,
+    value_cents: Number(row.value_cents ?? 0),
+    metadata: metadataObject(row.metadata),
+    created_at: String(row.created_at ?? row.event_at ?? row.occurred_at),
   };
 }
 

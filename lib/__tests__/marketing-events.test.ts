@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  isLegacyEventNameRequiredError,
+  marketingEventToDb,
+  marketingEventToLegacyEventNameDb,
   summarizeMarketingEvents,
   validateMarketingEvent,
   validateMarketingEvents,
@@ -27,7 +30,7 @@ describe("validateMarketingEvent", () => {
   });
 
   it("rejects unknown event types", () => {
-    const result = validateMarketingEvent({ event_type: "watched_video" as any }, fixedNow);
+    const result = validateMarketingEvent({ event_type: "watched_video" as never }, fixedNow);
 
     expect(result.event).toBeNull();
     expect(result.errors[0]).toContain("event_type must be one of");
@@ -37,7 +40,7 @@ describe("validateMarketingEvent", () => {
     const result = validateMarketingEvent({
       event_type: "signup",
       trade_slug: "Pipe City",
-      platform: "tiktok" as any,
+      platform: "tiktok" as never,
     }, fixedNow);
 
     expect(result.event).toBeNull();
@@ -90,6 +93,28 @@ describe("validateMarketingEvents", () => {
     expect(result.events).toHaveLength(1);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0]).toContain("Row 1");
+  });
+});
+
+describe("marketing event db mapping", () => {
+  it("keeps the modern event_type mapper clean and adds event_name only for legacy retries", () => {
+    const event = validateMarketingEvent({
+      event_type: "asset_view",
+      trade_slug: "pipe",
+    }, fixedNow).event!;
+
+    expect(marketingEventToDb(event)).not.toHaveProperty("event_name");
+    expect(marketingEventToLegacyEventNameDb(event)).toMatchObject({
+      event_type: "asset_view",
+      event_name: "asset_view",
+    });
+  });
+
+  it("detects the legacy production event_name not-null failure", () => {
+    expect(isLegacyEventNameRequiredError({
+      message: 'null value in column "event_name" of relation "marketing_events" violates not-null constraint',
+    })).toBe(true);
+    expect(isLegacyEventNameRequiredError({ message: "column event_name does not exist" })).toBe(false);
   });
 });
 
