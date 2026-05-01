@@ -100,6 +100,10 @@ See GTM board at `/gtm` for full registry, TAM ranking, and status per trade.
 
 Primary sidebar navigation now shows only active growth loops and launch governance. Original-build pages such as `/ads`, `/generate`, `/gtm`, and `/settings` sit in the collapsed Reference Shelf until each route is rebuilt, folded into an active loop, archived, or retired. See `docs/route-disposition-plan.md`.
 
+### Dustin Field Sales Handoff
+
+The Arizona field pilot README for Dustin lives at `docs/dustin-field-sales-readme.md`. It includes the `/sales` access code, card QA steps, stage meanings, daily cadence, and the pipe.city missed-call pitch.
+
 ---
 
 ## Local Development

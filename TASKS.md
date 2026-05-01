@@ -1,6 +1,6 @@
 # Project 4H - Build Plan
 
-**Last updated:** 2026-04-30
+**Last updated:** 2026-05-01
 **Owner:** Jarrad + Bob/Codex
 **Live app:** https://pumpcans.com
 **Product reference:** Answered.City / `sawcity-lite`
@@ -251,7 +251,8 @@ The majority rebuild queue now lives in `docs/build-queue.md` and is mirrored on
 - [x] Fix field-sales tracking compatibility with legacy production `marketing_events.event_name` schema and add migration `015_marketing_events_event_name_compat.sql`.
 - [x] Relax legacy optional attribution NOT NULL columns with `016_marketing_events_optional_attribution_nullable.sql` after production smoke exposed old `session_id` constraints.
 - [x] Log Dustin landing-page demo-line clicks as `demo_call` before handing off to the phone dialer.
-- [ ] Configure production sales rep write access in Vercel by setting `PUMPCANS_DUSTIN_REP_CODE` or `PUMPCANS_SALES_REP_CODE`; do not commit the value.
+- [x] Configure production sales rep write access in Vercel with `PUMPCANS_DUSTIN_REP_CODE`.
+- [x] Add Dustin field-sales handoff README with the plain rep access code, card QA checklist, stage definitions, daily cadence, and pipe.city pitch.
 
 ---
 

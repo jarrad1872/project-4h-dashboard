@@ -91,6 +91,7 @@ This is the standing queue for Codex/Bob work. Pick the first ready item that do
 | Q-73 | Creative System | Assets | Enforce generated creative source of truth | 2026-04-28 | `/assets`, `/sales`, AGENTS, BOB, README, SOP, and TASKS now state that `$imagegen` is required for all visual assets every time; coded SVG/HTML recreations are wireframes, crop helpers, metadata previews, or legacy utilities only. |
 | Q-74 | Field Sales | Sales | Add Dustin Field Mode | 2026-04-28 | `/sales` now has limited rep access-code support, mobile quick-add CRM fields, fast stage buttons, tracked card scan URLs, and `/sales/dustin` as the demo landing page; no outreach, billing, webhook, ad, or money movement path is added. |
 | Q-75 | Field Sales | Print Assets | Add hi-res Dustin Vistaprint files | 2026-04-28 | `/sales` now downloads the actual print artwork: six 2172x1272 imagegen-native PNGs plus a ZIP pack cropped from `dustin-pipe-proof-sheet-v2.png`, instead of pointing Dustin at background-only files, remade coded layouts, or legacy mechanical exports. |
+| Q-76 | Field Sales | Handoff | Add Dustin field-sales README | 2026-05-01 | `docs/dustin-field-sales-readme.md` gives Dustin the `/sales` access code, card QA steps, stage definitions, daily cadence, pipe.city pitch, and no-overpromise boundaries before cards arrive. |
 
 ## Ready Queue
 
