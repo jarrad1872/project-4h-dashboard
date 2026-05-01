@@ -72,6 +72,7 @@ export async function GET(request: Request) {
     trade_slug: trade,
     creative_asset_id: cardId,
     variant_id: cardInstance,
+    session_id: scanId,
     utm_source: rep.code.toLowerCase(),
     utm_medium: FIELD_SALES_UTM_MEDIUM,
     utm_campaign: utmCampaign,
