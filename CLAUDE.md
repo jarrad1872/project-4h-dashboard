@@ -20,7 +20,7 @@ Marketing campaign command center for **sawcity-lite** (a separate repo at `~/pr
 ```bash
 npm run dev          # Dev server at localhost:3000
 npm run build        # Production build (sharp fails locally on Windows — works on Vercel)
-npm test             # Vitest — 136 tests covering lib/ functions
+npm test             # Vitest suites in lib/__tests__/
 npm run lint         # ESLint
 ```
 
@@ -56,15 +56,15 @@ npm run lint         # ESLint
 | `lib/project-state-data.ts` | GTM board state (single source of truth) |
 | `scripts/4h-cli.js` | CLI for all campaign operations |
 | `scripts/4h-engine.js` | VPS automation script (cron-driven) |
-| `app/api/*/route.ts` | 23 API routes (includes /api/ads/generate for AI copy) |
+| `app/api/**/route.ts` | API routes (includes /api/ads/generate for AI copy) |
 | `app/*/page.tsx` | 15 pages |
 | `supabase/migrations/` | SQL migrations (run via Supabase SQL Editor or pg) |
-| `lib/__tests__/` | Vitest test suites (136 tests) |
+| `lib/__tests__/` | Vitest test suites |
 
 ## Database
 
 - **Connection:** `db.vzawlfitqnjhypnkguas.supabase.co:5432` (postgres)
-- **Migrations:** Run in order via Supabase SQL Editor. Current: 001–008.
+- **Migrations:** Numbered `NNN_name.sql`; run in order via Supabase SQL Editor. The highest number in `supabase/migrations/` is current.
 - **RLS:** Enabled on all tables (migration 007). Service role bypasses RLS.
 - **Storage:** `ad-creatives` bucket (public)
 - **Fallback:** JSON files in `/data/` when Supabase is unavailable (dev mode)
@@ -72,7 +72,7 @@ npm run lint         # ESLint
 ## Architecture Notes
 
 - API routes use `okJson()`/`errorJson()` from `lib/api.ts` — CORS is handled there
-- All routes call `requireAuth()` — auth passes through when no Bearer header (dashboard calls)
+- Routes call `requireAuth()` — auth passes through when no Bearer header (dashboard calls). Exceptions: `/api/sales/access` checks the rep access code via `lib/sales-write-auth.ts` (the `/api/sales/leads*` routes use both); `/api/sales/track` and `/api/sales/business-card/[variantId]/[file]` are unauthenticated GETs for field-sales QR scans and card files; `/api/drive-backup/export` is an archived 410 stub
 - AI endpoints (`/api/ai-creative`, `/api/creative/batch`, `/api/regen-creative`, `/api/ads/generate`) are rate-limited
 - `normalizeAd()` handles bidirectional snake_case ↔ camelCase
 - Non-blocking side effects: Drive backup and activity logging use fire-and-forget pattern

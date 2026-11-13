@@ -34,7 +34,6 @@ Project 4H is a 4-channel paid acquisition campaign (LinkedIn, YouTube, Facebook
 ### TRADE_MAP Hard Rule
 **Every new trade added to the campaign MUST have its prefix added to `lib/trade-utils.ts → TRADE_MAP` in the same commit.**
 Missing entries silently fall back to `saw.city` badge on every page — this is a user-visible bug.
-Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 
 ### Ad Copy Hard Rules
 - **Price is ALWAYS $39/mo** — never $79, $99, $149, or any other amount.
@@ -67,7 +66,6 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 
 ### AI Generation
 - **Ad copy generation:** `/api/ads/generate` route (Gemini 2.0 Flash) — constrained pipeline with validation
-- **Text copy (legacy):** `/api/generate` route (Gemini 2.5 Flash)
 - **Image gen (legacy):** `/api/ai-creative` route (model: `gemini-3.1-flash-image-preview`)
 - **Image gen (rebuild direction):** Generate manually here with ChatGPT Pro using `chatgpt-image-latest`; if an API path is ever revisited, the current official API model target is `gpt-image-1.5`. Do not add API hooks, spend, or launch externally without Jarrad approval.
 
@@ -79,13 +77,12 @@ Current: 65 prefixes registered as of commit `820719f` (Feb 28, 2026).
 |------|---------|
 | `lib/project-state-data.ts` | Single source of truth for GTM board data — edit this to update all dashboard state |
 | `lib/types.ts` | TypeScript types for Ad, AdStatus, etc. |
-| `lib/trade-utils.ts` | TRADE_MAP (65 prefixes) + tradeFromAd() — add prefix FIRST before any ads. Missing = silent saw.city fallback |
+| `lib/trade-utils.ts` | TRADE_MAP + tradeFromAd() — add prefix FIRST before any ads. Missing = silent saw.city fallback |
 | `lib/server-utils.ts` | normalizeAd(), adToDb() — DB↔API field mapping |
 | `app/gtm/page.tsx` | GTM Action Board — mission, product readiness, trade registry, actions |
 | `app/approval/page.tsx` | Approval queue — reads ads table, Approve/Hold/Reject per ad |
 | `app/api/ads/route.ts` | Ads CRUD API |
 | `app/api/ads/generate/route.ts` | Ad copy generation pipeline (Gemini + validator) |
-| `app/api/generate/route.ts` | Legacy AI copy generation (Gemini) |
 | `app/api/ai-creative/route.ts` | Image creative generation (Gemini) |
 | `app/api/image-concepts/route.ts` | ChatGPT Pro image prompt brief API; saves prompt metadata for manual generation |
 | `lib/trade-copy-context.ts` | Per-trade context data for 20 live trades |
@@ -234,25 +231,15 @@ utm_source={platform}&utm_medium=paid-social&utm_campaign=4h_2026-03_{theme}&utm
 
 ---
 
-## Tier 1 Campaign Trades (Current Pivot — Feb 2026)
+## Campaign Trade Lanes
 
-The campaign is pivoting from saw/rinse/mow/rooter to the **TAM-ranked Tier 1 trades**:
-
-| Domain | Trade | US TAM | Priority |
-|--------|-------|--------|----------|
-| `pipe.city` | Plumbing | $191B | 1 |
-| `mow.city` | Lawn Care | $60B | 2 |
-| `coat.city` | Painting | $28B | 3 |
-| `duct.city` | HVAC | $30B | 4 |
-| `pest.city` | Pest Control | $26B | 5 |
-
-Note: crimp/eave/excavation/disaster are Tier 1 by TAM but are `status: "upcoming"` in the app — campaigns for those come in Phase 2 once they're built.
+Campaign focus and trade tiers live in `lib/project-state-data.ts`, not here: `tier1_trades` holds the active campaign lanes and each lane's role (pipe.city is the primary scale lane), and `all_trades` holds the TAM-ranked registry (`tier` = opportunity rank, plus `tam`, `status`, and `forwardsTo` for forward domains such as crimp.city and eave.city). Badge tiers are the `tier` field in `lib/trade-utils.ts → TRADE_MAP`. Read those before planning trade work.
 
 ---
 
 ## Ad Copy Generation Pipeline
 
-The generation pipeline replaces the old NB2 ad copy with constrained AI-generated copy. It produces trade-authentic, validated ads across 4 angles and 4 platforms.
+The generation pipeline produces constrained, AI-generated copy: trade-authentic, validated ads across 4 angles and 4 platforms.
 
 ### Copy Angles (4 per trade)
 | Angle | Strategy |
@@ -271,7 +258,7 @@ Trade context → Prompt (angle + platform + trade) → Gemini 2.0 Flash → Val
 - Price must be "$39/mo"
 - Must include "14-day free trial" and "no credit card"
 - Must use trade's .city domain, never "saw.city" (unless trade IS saw)
-- Character limits: primary_text ≤ 2000, headline ≤ 300, cta ≤ 200
+- Character limits: primary_text ≤ 250, headline ≤ 80, cta ≤ 40 (`CHAR_LIMITS` in `lib/ad-copy-validator.ts`)
 - No generic language ("trade business", "small business software")
 
 ### CLI Commands
